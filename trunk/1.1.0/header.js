@@ -152,7 +152,8 @@ RaidMenu tabs kind of respect tabPosition now, depending on browser. Will implem
 In some browsers, the script appeared to load a number of times only to fail. Most of these should no longer run.
 Added first version of raid format into the raid menu
 Added a simple /update command for those that get confused between scripts. Will eventually like to have the command do more.
-Files are now in an Assembla SVN repo
+Files are now in an Assembla SVN repo: http://subversion.assembla.com/svn/doomscript/
+Now using Trac for bug tracking: http://trac.assembla.com/doomscript
 */
 
 // 1.1.0 Stable Release Todos
