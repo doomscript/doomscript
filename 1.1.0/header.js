@@ -154,50 +154,8 @@ Added first version of raid format into the raid menu
 Added a simple /update command for those that get confused between scripts. Will eventually like to have the command do more.
 Files are now in an Assembla SVN repo: http://subversion.assembla.com/svn/doomscript/
 Now using Trac for bug tracking: http://trac.assembla.com/doomscript
+Todos all moved to ticketing system.
 */
-
-// 1.1.0 Stable Release Todos
-//TODO: If you click a bunch of links _really_ fast, only the last one appears to be marked visited
-//TODO: Make RaidMenu resizeable 
-//TODO: When expanding to full length, the omnibox can expand too far .
-//TODO: Actually implement ignored and completed states
-//TODO: Improve color transition on omnibox focus/hover
-//TODO: Aliases should probably be registered with holodeck.
-//TODO: Don't store the whole state, just the ID. (Left in currently for backward compatibility, but eats memory)
-//TODO: Fix appearance of broken links posted from IE (should be mostly fixed)
-//TODO: Command aliases to save and re-execute commands.
-//TODO: Zone lookups, time limit, stat used, id, and last seen time filtering
-//TODO: Set up customizable bits of text (seems to be mostly working, needs more testing)
-//TODO: Add text boxes to manage customizable bits of text
-//TODO: Add filtering style rules
-//TODO: Shortcut to the omnibox, probably typing // in the chatbox
-//TODO: Keyboard controls to the omnibox to reduce clicking
-//TODO: Semi-automatic posting of specified links to chat
-//TODO: Encode and serve local copies of all the images that are linked through jqueryui
-//TODO: /markraids filter command
-//TODO: Order tabs in raid menu correctly.
-//TODO: Consider using a timer to sync raids to disk rather than on every write.
-//TODO: Pastebin handler
-
-// 1.1.1 Todos
-//TODO: Improve /farmvalue to be more user friendly. Probably take in a RaidFilter. Probably add the values to the raid types.
-//TODO: Make update process less kludgy
-//TODO: Sorting in raid lists and such
-//TODO: Timer to sync raids to disk. Big slow down for some people.
-//TODO: After you post a link, fill the chat box with a description of that link (can be turned off)
-//TODO: A place for the omnibox to display its own status messages and results
-
-// 1.1.2 Todos
-//TODO: Improved syncing across instances of the same browser
-//TODO: Initial integration with database
-//TODO: Full blown tool for recovering from bad data in local db
-
-// Future Todos
-//TODO: Reduce memory usage in storage (pretty much complete, but always keep in mind)
-//TODO: Ability to minify script, could be dangerous, though
-//TODO: Make script work in IE (probably never going to happen)
-//TODO: Ship Optimizer utility to determine best configuration for any given set of ships/crew/officers.
-//TODO: Tinyurl parser
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
 function main()
