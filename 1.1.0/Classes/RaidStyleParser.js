@@ -3,7 +3,7 @@
 		/************************************/
 		
 		// Class to parse raid style parameters into CSS stuff
-		window.RaidMenu = Class.create({
+		window.RaidStyleParser = Class.create({
 			initialize: function(params)
 			{
 				// Variables
