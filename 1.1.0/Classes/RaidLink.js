@@ -46,13 +46,7 @@
 							
 							// Separate params 
 							var params = paramString.split("&");
-							
-							// There should be at least 5 params
-//							if (params.length < 5)
-//							{
-//								return;
-//							}
-							
+														
 							// Put the params together again into this object
 							var paramObj = {kv_raid_id: "", kv_hash: ""};
 							
@@ -476,8 +470,11 @@
 		RaidLink.paramText = "url";
 
 		// Define the regular expression (regex) that tells us if a link is a raid link or not
-		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?\??(?:kv_action_type=raidhelp)&([^,"]*)\b/i;
-
+		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?(?!\?4217\-op)\?([^,"]*)\b/i;
+		
+		// Define a regular expresson to catch busted links
+		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?kv_action_type=raidhelp.*?(?:\u2026|\u8320|…|\.\.\.|\])+/i;
+		
 		// Fallback image url if we can't get the provided one
 		RaidLink.defaultImage = '<img src="http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op" />';
 		

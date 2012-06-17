@@ -312,7 +312,14 @@ function main()
 							{
 								//TODO: Missed this case
 								//http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op","5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&amp;kv_difficulty=4&amp;kv_hash=Bil9M7W0s5&amp;kv_raid_boss=centurian_sentinel&amp;kv_raid_id=2969908","Legacy\u00a0of\u00a0a\u00a0T……
-								msg = msg.replace(/.\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?kv_action_type=raidhelp.*?(?:\u2026|\u8320|…|\.\.\.|\])+/i, newMessage);
+								//http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op","5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_difficulty=4&kv_hash=Nw3p60d02T&kv_raid_boss=kalaxian_cult_mistress&kv_raid_id=3293614
+
+								//s["http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op","5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_difficulty=4&kv_hash=4cc5r5FTXh&kv_raid_boss=kalaxian_cult_mistress&kv_raid_id=3315012","Legacy of a Thousand Sun…
+								
+								//s["http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op","5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_difficulty=4&kv_hash=VRoC7Po8CD&kv_raid_boss=kalaxian_cult_mistress&kv_raid_id=3324329","Legacy of a Thousand Sun…
+
+
+								msg = msg.replace(RaidLink.backupLinkReplacementPattern, newMessage);
 							}
 							
 							// If still didn't get it, note the problem
@@ -1616,13 +1623,7 @@ function main()
 							
 							// Separate params 
 							var params = paramString.split("&");
-							
-							// There should be at least 5 params
-//							if (params.length < 5)
-//							{
-//								return;
-//							}
-							
+														
 							// Put the params together again into this object
 							var paramObj = {kv_raid_id: "", kv_hash: ""};
 							
@@ -2046,8 +2047,11 @@ function main()
 		RaidLink.paramText = "url";
 
 		// Define the regular expression (regex) that tells us if a link is a raid link or not
-		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?\??(?:kv_action_type=raidhelp)&([^,"]*)\b/i;
-
+		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?(?!\?4217\-op)\?([^,"]*)\b/i;
+		
+		// Define a regular expresson to catch busted links
+		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?kv_action_type=raidhelp.*?(?:\u2026|\u8320|…|\.\.\.|\])+/i;
+		
 		// Fallback image url if we can't get the provided one
 		RaidLink.defaultImage = '<img src="http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op" />';
 		
@@ -5447,72 +5451,6 @@ function main()
 			}
 		);
 		
-		RaidCommand.create(
-			{
-				commandName: "autoload",
-				aliases: [],
-				parsingClass: RaidFilter,
-
-				handler: function(deck, raidFilter, params, text, context)
-				{
-					// Declare ret object
-					var ret = {};
-						
-
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					return;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
-					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
-					helpText += "NOT YET IMPLEMENTED\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
-		RaidCommand.create( 
-			{
-				commandName: "timerdata",
-				aliases: [],
-				// No parsing needed
-				/*parsingClass: ,*/
-
-				handler: function(deck, parser, params, text, context)
-				{
-					// Declare ret object
-					var ret = {success: true};
-						
-					deck.activeDialogue().raidBotMessage(Timer.getReport());
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					var commandOptions = {					
-						initialText: {
-							text: "Print the timer report",
-						},
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
-					helpText += "Prints out timing and performance data about the script\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
 // List of all raid ids and names. Any raid without a real raid id will not show up nicely.
 DC_LoaTS_Helper.raids = 
 {
@@ -5527,7 +5465,7 @@ DC_LoaTS_Helper.raids =
     lupin:              new RaidType("lupin",               "Z7", "Lupin", "Lupin", "Lupin",                          72,  10, "S",   12000000),
     lieutenant_targe:   new RaidType("lieutenant_targe",    "Z8", "Lieutenant Targe", "Targe", "Targe",              120,  10, "S",   14000000),
     sigurd:             new RaidType("sigurd",              "Z9", "Sigurd Spinebreaker", "Sigurd", "Sigurd",          72,  10, "S",   16000000),
-    space_pox:          new RaidType("space_pox",           "P1", "Space Pox", "Pox", "Pox",                           5,  12, "S", [100000000, 500000000, 1000000000, 1500000000],/*FS calculated normally*/null,[35000000, 170000000, 350000000, 525000000]),
+    space_pox:          new RaidType("space_pox",           "P1", "Space Pox", "Pox", "Pox",                           5,  12, "S", [100000000, 500000000, 1000000000, 1500000000],/*FS calculated normally*/null,[35000000, 175000000, 350000000, 525000000]),
     
     // Medium Raids
     void:               new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
@@ -5550,7 +5488,7 @@ DC_LoaTS_Helper.raids =
     agony_and_ecstasy:  new RaidType("agony_and_ecstasy",   "Z6", "Agony and Ecstasy", "Agony, Ecstasy", "A&E",       72, 100, "S",   95000000),
     sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  100000000),
     sludge_serpent:     new RaidType("sludge_serpent",      "Z8", "Sludge Serpent", "Serpent", "Serpent",             72, 100, "S",  120000000),
-    kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Mistress",72, 100, "S",  160000000),
+    kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S",  160000000),
                 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Colo",           168, 250, "S",  150000000),
@@ -5570,7 +5508,7 @@ DC_LoaTS_Helper.raids =
     nemo:               new RaidType("nemo",                "Z7", "Nemo",    "Nemo", "Nemo",                         168, 500, "S", 1000000000),
     the_emperor:        new RaidType("the_emperor",         "Z8", "Dule's Robot", "Dule's Bot", "Dule",              168, 500, "S", 5000000000),
     dule_warmaster:     new RaidType("dule_warmaster",      "Z9", "Centurian Councilor", "CC Councilor", "Councilor", 24, 500, "S", 2500000000),
-    crush_colossa:      new RaidType("crush_colossa",      "Z10", "Crush Colossa", "Colossa", "Colossa",              72, 500, "S", 3000000000),
+    crush_colossa:      new RaidType("crush_colossa",      "Z10", "Crush Colossa", "Colossa", "Crush",              72, 500, "S", 3000000000),
     
     // Aliance Raids
     // Small Raids
@@ -5596,7 +5534,7 @@ DC_LoaTS_Helper.raids =
     tourniquet:         new RaidType("tourniquet",          "A1", "Tourniquet 7", "Tourniquet 7", "T7",              168,  100, "H",   60000000),
     rylattu_exterminator: new RaidType("rylattu_exterminator","A2", "Rylattu Exterminator", "Exterminator","Exterminator",168,100,"H",100000000),
     peacemaker_500:     new RaidType("peacemaker_500",      "A3", "Peacemaker 500",    "Peacemaker", "Peacemaker",   168,  100, "H",  140000000),
-    kaltharan_devourer: new RaidType("kaltharan_devourer",  "A4", "Kaltharan Devourer", "Devourer", "Devourer",      168,  100, "H",  175000000),        
+    kaltharan_devourer: new RaidType("kaltharan_devourer",  "A4", "Kaltharan Devourer", "Devourer", "Devourer",      168,  100, "H",  180000000),        
     terminus_juggernaut: new RaidType("terminus_juggernaut","A5", "Terminus Juggernaut", "Juggernaut", "Juggernaut", 168,  100, "H",  200000000),
     legacy_bot:         new RaidType("legacy_bot",          "A6", "Legacy Bot",    "Legacy", "Legacy",               168,  100, "H",  250000000),
     wahsh:              new RaidType("wahsh",               "A7", "Wahsh Al-Sahraa", "Wahsh", "Wahsh",                84,  100, "H", [500000000, 1200000000, 3125000000, 7812500000]),
