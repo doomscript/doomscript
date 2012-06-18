@@ -98,120 +98,150 @@
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		DC_LoaTS_Helper.raidLinkClick = function(eventParam)
 		{
-			// Just in case
-			var event = eventParam || window.event;
-			
-			// Couldn't locate event
-			if (typeof event == "undefined")
+			// Want to handle any errors that occur in here
+			try
 			{
-				console.warn("Couldn't locate the event for right-click detection");
+				// Just in case
+				var event = eventParam || window.event;
 				
-				// Don't cancel the click
-				return;
-			}
-			
-			// Get the target element
-			var target = event.srcElement || event.target || event.targetElement;
-			
-			if (typeof target == "undefined")
-			{
-				console.warn("Couldn't locate the target for right-click detection");
-				
-				// Don't cancel the click
-				return;
-			}
-			
-			// Grab the url from the link
-			var url = target.href;
-						
-			// Still failed
-			if (typeof url == "undefined" || url.length == 0)
-			{
-				console.warn("Trouble determining url from link. Could not apply click.");
-				console.warn(event);
-				
-				// Let the click go through and reload the whole browser. Better than nothing.
-				return true;
-			}
-			
-			// If the user is holding shift, cycle through the states
-			if (event.shiftKey)
-			{
-				// Generate an actual raid link object
-				var raidLink = new RaidLink(url);
-				
-				// If the link is valid
-				if (raidLink.isValid())
+				// Couldn't locate event
+				if (typeof event == "undefined")
 				{
-					// Get the STATE of the link
-					var linkState = RaidManager.fetchState(raidLink);
+					console.warn("Couldn't locate the event for right-click detection");
 					
-					// Place holder for our new state
-					var newLinkState;
+					// Don't cancel the click
+					return;
+				}
+				
+				// Get the target element
+				var target;			
+				if (event.target) 
+				{
+					target = event.target;
+				}
+				else if (event.srcElement)
+				{
+					target = event.srcElement;
+				}
+				
+				// Safari work around
+				if (target.nodeType == 3)
+				{
+					target = target.parentNode;
+				}
+
+				
+				if (typeof target == "undefined")
+				{
+					console.warn("Couldn't locate the target for right-click detection");
 					
-					var foundCurrent = false;
-					var firstState;
+					// Don't cancel the click
+					return;
+				}
+				
+				// Grab the url from the link
+				var url = target.href;
+							
+				// Still failed
+				if (typeof url == "undefined" || url.length == 0)
+				{
+					console.warn("Trouble determining url from link. Could not apply click.");
+					console.warn(event);
+					console.warn(target);
 					
-					// Iterate over all possible states
-					// This is basically a hack for the fact that the 
-					// STATEs don't have any inherit ordinal values that could be incremented
-					//TODO: Reorganize STATE to have ordinals if this ever happens somewhere else in the code
-					for (var stateKey in RaidManager.STATE)
+					// Let the click go through and reload the whole browser. Better than nothing.
+					return true;
+				}
+				
+				// If the user is holding shift, cycle through the states
+				if (event.shiftKey)
+				{
+					// Generate an actual raid link object
+					var raidLink = new RaidLink(url);
+					
+					// If the link is valid
+					if (raidLink.isValid())
 					{
-						// Grab the state
-						var state = RaidManager.STATE[stateKey];
+						// Get the STATE of the link
+						var linkState = RaidManager.fetchState(raidLink);
 						
-						// Make sure this isn't a function or anything from STATE
-						if (typeof state == "object")
+						// Place holder for our new state
+						var newLinkState;
+						
+						var foundCurrent = false;
+						var firstState;
+						
+						// Iterate over all possible states
+						// This is basically a hack for the fact that the 
+						// STATEs don't have any inherit ordinal values that could be incremented
+						//TODO: Reorganize STATE to have ordinals if this ever happens somewhere else in the code
+						for (var stateKey in RaidManager.STATE)
 						{
-							// If this is the first state we've seen
-							if (typeof firstState == "undefined")
+							// Grab the state
+							var state = RaidManager.STATE[stateKey];
+							
+							// Make sure this isn't a function or anything from STATE
+							if (typeof state == "object")
 							{
-								// Capture it so we can roll back around past the last state
-								firstState = state;
-							}
-						
-							// If this is the same state as the link is currently in
-							if (RaidManager.STATE.equals(linkState, state))
-							{
-								// Note the current state
-								foundCurrent = true;
-							}
-							// If we found current, this must be the next state
-							else if (foundCurrent)
-							{
-								// Grab this state to save as the new state
-								newLinkState = state;
-								
-								// Don't accidentally find other states
-								break;
+								// If this is the first state we've seen
+								if (typeof firstState == "undefined")
+								{
+									// Capture it so we can roll back around past the last state
+									firstState = state;
+								}
+							
+								// If this is the same state as the link is currently in
+								if (RaidManager.STATE.equals(linkState, state))
+								{
+									// Note the current state
+									foundCurrent = true;
+								}
+								// If we found current, this must be the next state
+								else if (foundCurrent)
+								{
+									// Grab this state to save as the new state
+									newLinkState = state;
+									
+									// Don't accidentally find other states
+									break;
+								}
 							}
 						}
+						
+						// If we did not find a new state to set it to
+						if (typeof newLinkState == "undefined")
+						{
+							// Cycle back around to the first state
+							newLinkState = firstState;
+						}
+						
+						// Store the link with its new state
+						RaidManager.store(raidLink, newLinkState);					
 					}
-					
-					// If we did not find a new state to set it to
-					if (typeof newLinkState == "undefined")
+					// Log invalid raid links
+					else
 					{
-						// Cycle back around to the first state
-						newLinkState = firstState;
+						console.warn("Clicked invalid link to " + url);
 					}
 					
-					// Store the link with its new state
-					RaidManager.store(raidLink, newLinkState);					
+					// Always suppress reload on shift-clicks
+					return false;
 				}
-				// Log invalid raid links
+				// If the user is not holding shift, just load the raid
 				else
 				{
-					console.warn("Clicked invalid link to " + url);
+					return DC_LoaTS_Helper.loadRaid(url);
 				}
-				
-				// Always suppress reload on shift-clicks
-				return false;
 			}
-			// If the user is not holding shift, just load the raid
-			else
+			catch(ex)
 			{
-				return DC_LoaTS_Helper.loadRaid(url);
+				// Notify the user of the issue
+				console.warn("An error occurred while trying to handle your click!");
+				
+				console.warn(ex);
+				
+				// Let the click go through. Annoying, but still can load raid
+				return true;
 			}
 		};
 		
