@@ -3121,8 +3121,17 @@ function main()
 				// Split the params at the + that divides the filter from the style
 				var parts = params.split("\+");
 				
-				var filterText = params[0].trim();
-				var styleText = params[1].trim();
+				var raidFilter;
+				var styleText;
+				if (parts.length >= 1)
+				{
+					var filterText = params[0].trim();
+					raidFilter = new RaidFilter(filterText); 
+				}
+				if (parts.length >= 2)
+				{
+					styleText = params[1].trim();
+				}
 				
 				
 			}
@@ -5451,72 +5460,6 @@ function main()
 			}
 		);
 		
-		RaidCommand.create(
-			{
-				commandName: "autoload",
-				aliases: [],
-				parsingClass: RaidFilter,
-
-				handler: function(deck, raidFilter, params, text, context)
-				{
-					// Declare ret object
-					var ret = {};
-						
-
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					return;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
-					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
-					helpText += "NOT YET IMPLEMENTED\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
-		RaidCommand.create( 
-			{
-				commandName: "timerdata",
-				aliases: [],
-				// No parsing needed
-				/*parsingClass: ,*/
-
-				handler: function(deck, parser, params, text, context)
-				{
-					// Declare ret object
-					var ret = {success: true};
-						
-					deck.activeDialogue().raidBotMessage(Timer.getReport());
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					var commandOptions = {					
-						initialText: {
-							text: "Print the timer report",
-						},
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
-					helpText += "Prints out timing and performance data about the script\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
 // List of all raid ids and names. Any raid without a real raid id will not show up nicely.
 DC_LoaTS_Helper.raids = 
 {
@@ -5566,7 +5509,7 @@ DC_LoaTS_Helper.raids =
     hultex_quibberath:  new RaidType("hultex_quibberath",   "Z7", "Guldax Quibberath", "Quibberath", "Quib",         168, 250, "S",  800000000),
     commander_veck:     new RaidType("commander_veck",      "Z8", "Centurian Storm Commander", "Storm", "Storm",     168, 250, "S",  900000000),
     reaver:             new RaidType("reaver",              "Z9", "Galactic Reaver", "Reaver", "Reaver",              72, 250, "S", 1000000000),
-    the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", 1100000000),
+    the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [1100000000, 1380000000, /* 37/22 ratio*/1850000000, 2200000000]),
     
     // Colossal Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
@@ -5618,7 +5561,7 @@ DC_LoaTS_Helper.raids =
     inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     
-    // Like we're ever going to get one of these on Kong. :-P
+    // This is probably irrelevant since we'll never see another health based Skornzeny
     general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorzeny",        120,  9999,"S",[1000000000, 50000000000, 250000000000, 500000000000],/*FS calculated normally*/null,5000000),
     
     // Galaxy Dome Raids
