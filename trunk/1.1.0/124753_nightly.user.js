@@ -4264,6 +4264,42 @@ function main()
 	
 		RaidCommand.create( 
 			{
+				commandName: "clearchat",
+				aliases: [],
+				// No parsing
+				//parsingClass: ,
+				handler: function(deck, raidLink, params, text, context)
+				{
+					// Declare ret object
+					var ret = {sucess: true, statusMessage: "Chat cleared at " + (new Date().toLocaleString())};
+						
+					// Load the raid from the link's url
+					holodeck._active_dialogue._message_window_node.innerHTML = "";
+					
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Clear chat?",
+						},
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/clearchat</code>\n";
+					helpText += "Clears the text of the chat.\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
 				commandName: "clearraids",
 				aliases: ["clearraid", "raidclear", "raidsclear", "clearcache"],
 				parsingClass: RaidFilter,
@@ -5456,6 +5492,72 @@ function main()
 				{
 					searchInput = searchInput || "";
 					return this.urlPattern.format(escape(searchInput.replace(" ", "+")));
+				}
+			}
+		);
+		
+		RaidCommand.create(
+			{
+				commandName: "autoload",
+				aliases: [],
+				parsingClass: RaidFilter,
+
+				handler: function(deck, raidFilter, params, text, context)
+				{
+					// Declare ret object
+					var ret = {};
+						
+
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					return;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
+					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
+					helpText += "NOT YET IMPLEMENTED\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
+				commandName: "timerdata",
+				aliases: [],
+				// No parsing needed
+				/*parsingClass: ,*/
+
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+						
+					deck.activeDialogue().raidBotMessage(Timer.getReport());
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Print the timer report",
+						},
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
+					helpText += "Prints out timing and performance data about the script\n";
+					
+					return helpText;
 				}
 			}
 		);
