@@ -4274,7 +4274,7 @@ function main()
 					var ret = {sucess: true, statusMessage: "Chat cleared at " + (new Date().toLocaleString())};
 						
 					// Load the raid from the link's url
-					holodeck._active_dialogue._message_window_node.innerHTML = "";
+					holodeck._active_dialogue._message_window_node.childElements().invoke("remove");
 					
 					return ret;
 				},
