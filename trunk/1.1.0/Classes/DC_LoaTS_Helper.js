@@ -227,8 +227,8 @@
 									// If we found an alias
 									if (new RegExp("^\/" + alias + "\\b", "i").test(str))
 									{
-										// Redirect the official command
-										str = str.replace(alias, commandName);
+										// Redirect to the official command
+										str = str.replace(new RegExp(alias, "i"), commandName);
 									}
 								}
 							}

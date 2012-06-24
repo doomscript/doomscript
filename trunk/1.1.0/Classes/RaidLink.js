@@ -182,6 +182,7 @@
 						newMessage = newMessage.replace(/{target}/gi, raid.getTargetDamageText(this.difficulty));
 						newMessage = newMessage.replace(/{optimal}/gi, raid.getTargetDamageText(this.difficulty));
 						newMessage = newMessage.replace(/{ofs}/gi, raid.getTargetDamageText(this.difficulty));
+						newMessage = newMessage.replace(/{os}/gi, raid.getTargetDamageText(this.difficulty));
 						
 						newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
 						newMessage = newMessage.replace(/{cache-state-nice}/gi, linkState.niceText);
@@ -284,6 +285,7 @@
 					newMessage = newMessage.replace(/{target}/gi, raid.getTargetDamageText(this.difficulty));
 					newMessage = newMessage.replace(/{optimal}/gi, raid.getTargetDamageText(this.difficulty));
 					newMessage = newMessage.replace(/{ofs}/gi, raid.getTargetDamageText(this.difficulty));
+					newMessage = newMessage.replace(/{os}/gi, raid.getTargetDamageText(this.difficulty));
 					
 					newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
 					newMessage = newMessage.replace(/{cache-state-nice}/gi, linkState.niceText);

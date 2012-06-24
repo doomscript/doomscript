@@ -437,8 +437,8 @@ function main()
 									// If we found an alias
 									if (new RegExp("^\/" + alias + "\\b", "i").test(str))
 									{
-										// Redirect the official command
-										str = str.replace(alias, commandName);
+										// Redirect to the official command
+										str = str.replace(new RegExp(alias, "i"), commandName);
 									}
 								}
 							}
@@ -1759,6 +1759,7 @@ function main()
 						newMessage = newMessage.replace(/{target}/gi, raid.getTargetDamageText(this.difficulty));
 						newMessage = newMessage.replace(/{optimal}/gi, raid.getTargetDamageText(this.difficulty));
 						newMessage = newMessage.replace(/{ofs}/gi, raid.getTargetDamageText(this.difficulty));
+						newMessage = newMessage.replace(/{os}/gi, raid.getTargetDamageText(this.difficulty));
 						
 						newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
 						newMessage = newMessage.replace(/{cache-state-nice}/gi, linkState.niceText);
@@ -1861,6 +1862,7 @@ function main()
 					newMessage = newMessage.replace(/{target}/gi, raid.getTargetDamageText(this.difficulty));
 					newMessage = newMessage.replace(/{optimal}/gi, raid.getTargetDamageText(this.difficulty));
 					newMessage = newMessage.replace(/{ofs}/gi, raid.getTargetDamageText(this.difficulty));
+					newMessage = newMessage.replace(/{os}/gi, raid.getTargetDamageText(this.difficulty));
 					
 					newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
 					newMessage = newMessage.replace(/{cache-state-nice}/gi, linkState.niceText);
