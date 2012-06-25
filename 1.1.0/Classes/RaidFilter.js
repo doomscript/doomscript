@@ -26,7 +26,7 @@
 					this.filterText = filterText;
 					
 					// Pattern to pick apart the command for the name and id
-					var commandPattern = /([^1-4{}]+)? ?([1-4])? ?/;
+					var commandPattern = /([^0-4{}]+)? ?([0-4])? ?/;
 	
 					// Attempt to find the matches
 					var match = commandPattern.exec(filterText);
