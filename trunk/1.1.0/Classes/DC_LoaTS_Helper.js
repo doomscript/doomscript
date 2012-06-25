@@ -249,7 +249,7 @@
 					
 					// Only pass the message along if it wasn't a /w RaidBot and it's not a command
 					return !raidBotWhisper && chatCommandResult;
-				}
+				}; // End Replacement displayUnsanitizedMessage
 		    } // End initialize
 	    });	
 	    
@@ -450,6 +450,7 @@
 			helpText += "<b>Commands:</b>\n";
 			helpText += "\n";
 			
+			// Iterate over all commands and display their summaries
 			for (var commandName in DC_LoaTS_Helper.chatCommands)
 			{
 				var command = DC_LoaTS_Helper.chatCommands[commandName];
@@ -462,19 +463,14 @@
 				}
 			}
 			
-//			helpText += "<code>/raid raidname [difficulty]</code>\n";
-//			helpText += "<code>/seenraids [raidname] [difficulty] [{state: stateName}]</code>\n";
-//			helpText += "<code>/clearraids [raidname] [difficulty] [{state: stateName}]</code>\n";
-//			helpText += "<code>/reload</code>\n";
-//			helpText += "<code>/raidformat [newformat]</code>\n";
-//			helpText += "<code>/loadraid url</code>\n";
-//			helpText += "<code>/autoupdate [toggle]</code>\n";
 			helpText += "\n";
 			helpText += "All commands can do <code>/commandname help</code> to learn more about them. Brackets <code>[]</code> indicate optional parameters; don't actually put brackets in your commands, please.\n";
 			deck.activeDialogue().raidBotMessage(helpText);
 			
 			
 			return false;
-	    }	
+	    }
+	    
 	DC_LoaTS_Helper.chatCommands = {};
+	DC_LoaTS_Helper.raidStyles = {};
 

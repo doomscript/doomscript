@@ -146,7 +146,7 @@ Added Right-click visited option to preferences menu
 Added /farmvalue command for simple hard-coded dump of info from spreadsheet
 Added very simple implementation of live search in Raids tab
 Fixed wiki commands making double entries in the omnibox autocomplete
--- Fourth Alpha Release: 2012-05-30
+-- Fourth Alpha Release: 2012-06-13
 Altered RaidLink constructor parameter order - now is id, hash, diff, boss. No longer need all 4, just the first 2
 RaidMenu tabs kind of respect tabPosition now, depending on browser. Will implement real solution later.
 In some browsers, the script appeared to load a number of times only to fail. Most of these should no longer run.
@@ -155,6 +155,15 @@ Added a simple /update command for those that get confused between scripts. Will
 Files are now in an Assembla SVN repo: http://subversion.assembla.com/svn/doomscript/
 Now using Trac for bug tracking: http://trac.assembla.com/doomscript
 Todos all moved to ticketing system.
+Added Z10 raids, first pasee
+-- Fifth Alpha Release: 2012-06-25
+Removed kv_action_type=raidhelp from the required parameters of the link due to changes in SReject's spammer
+Added game specific icons in place of generic LoTS icon
+Can now /raid raidName 0 to get base info about a raid that doesn't change with health
+Fixed bug with command aliases being case sensitive. /SEENRAID colo should now work.
+Added /clearchat command
+Added /raidstyle command
+Kong added some padding to their text boxes that has now been removed from the Omnibox
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -459,7 +468,7 @@ function main()
 					
 					// Only pass the message along if it wasn't a /w RaidBot and it's not a command
 					return !raidBotWhisper && chatCommandResult;
-				}
+				}; // End Replacement displayUnsanitizedMessage
 		    } // End initialize
 	    });	
 	    
@@ -685,8 +694,10 @@ function main()
 			
 			
 			return false;
-	    }	
+	    }
+	    
 	DC_LoaTS_Helper.chatCommands = {};
+	DC_LoaTS_Helper.raidStyles = {};
 
 		/************************************/
 		/********* RaidButton Class *********/
@@ -1046,10 +1057,10 @@ function main()
 					}
 				}
 				// Not a help command
-				else if (typeof doNotCallHandler == "undefined" || !doNotCallHandler)
+				else if (typeof doNotCallHandler === "undefined" || !doNotCallHandler)
 				{
 					DCDebug("Executing non-help for " + this.commandName + " doNotCallHandler: " + doNotCallHandler)
-					if (typeof this.parser == "undefined" || (typeof this.parser.isValid == "function" && this.parser.isValid()))
+					if (typeof this.parser === "undefined" || (typeof this.parser.isValid === "function" && this.parser.isValid()))
 					{
 						ret = this.handler(holodeck, this.parser, this.processedText, this.commandText, this.context);
 						
@@ -1073,7 +1084,7 @@ function main()
 					}
 					else
 					{
-						console.warn("Could not parse text" + this.commandText + " as command " + this.commandName + " in context " + this.context);
+						console.warn("Could not parse text " + this.commandText + " as command " + this.commandName + " in context " + this.context);
 					}
 				}
 				
@@ -1108,6 +1119,11 @@ function main()
 			commandClass.aliases = classObject.aliases;
 			commandClass.paramText = classObject.paramText;
 			commandClass.parsingClass = classObject.parsingClass;
+			//TODO Implement OO framework at some point
+			if (typeof commandClass.parsingClass !== "undefined" && typeof commandClass.parsingClass.prototype.isValid !== "function")
+			{
+				console.warn(commandClass.commandName + " Command Creation Error: Parser must have isValid method!");
+			}
 			commandClass.doNotEnumerateInHelp = classObject.doNotEnumerateInHelp;
 			commandClass.getParamText = function()
 			{
@@ -1576,6 +1592,43 @@ function main()
 		RaidFilter.numberExpressionPattern = /(<=?|>=?|==?|!=?)?\s*(\d+)\s*(\w\w?)?/;
 		
 		/************************************/
+		/**** RaidFilterStyleParser Class ***/
+		/************************************/
+		
+		// Class to parse raid link and style parameters
+		window.RaidFilterStyleParser = Class.create({
+			initialize: function(params)
+			{
+				// Split the params at the + that divides the filter from the style
+				var parts = params.split("\+");
+				console.log(parts)
+
+				if (parts.length >= 1)
+				{
+					this.raidFilter = new RaidFilter(parts[0].trim()); 
+				}
+				
+				if (parts.length >= 2)
+				{
+					this.linkStyle = new RaidStyle(parts[1].trim());
+				}
+				
+				if (parts.length >= 3)
+				{
+					this.messageStyle = new RaidStyle(parts[2].trim());
+				}
+				
+				if (parts.length >= 4)
+				{
+					this.imageStyle = new RaidStyle(parts[3].trim());
+				}
+			},
+			
+			isValid: function()
+			{
+				return typeof this.raidFilter !== "undefined" && this.raidFilter.isValid();
+			}
+		});		/************************************/
 		/********** RaidLink Class **********/
 		/************************************/
 		
@@ -1723,6 +1776,65 @@ function main()
 				
 				// Return the raid type, or if we found nothing, a new empty raid type
 				return (typeof raid != "undefined")?raid:new RaidType(this.raidTypeId);
+			},
+			
+			getMatchedStyles: function()
+			{
+				// Possible styles to find and apply
+				var styleRet = {};
+				
+				// Attempt to apply styles
+				try 
+				{
+					// Iterate over all the styles
+					for (var key in DC_LoaTS_Helper.raidStyles)
+					{
+						// Get the style manager for the style
+						var styleManagers = DC_LoaTS_Helper.raidStyles[key];
+						
+						// Grab the higher level info about the raid link
+						var raidData = RaidManager.fetch(this);
+						
+						for (var i = 0; i < styleManagers.length; i++)
+						{
+							// Get the current style manager
+							var styleManager = styleManagers[i];
+							
+							// If this link matches the filter
+							if (styleManager.raidFilter.matches(
+										{
+											age: (new Date()/1) - raidData.firstSeen,
+											difficulty: this.difficulty,
+											fs:  this.getRaid().getFairShare(this.difficulty),
+											name: this.getRaid().getSearchableName(),
+											state: RaidManager.fetchState(this),
+										})
+							)
+							{
+								for (var property in styleManager)
+								{
+									if (property.indexOf("Style") > 0 && typeof styleManager[property] !== "undefined")
+									{
+										if (typeof styleRet[property] === "undefined")
+										{
+											styleRet[property] = "";
+										}
+										
+										styleRet[property] += styleManager[property];
+									}
+								}
+							}
+						}
+					}
+				}
+				catch(ex)
+				{
+					console.warn("Error while finding styles for link:");
+					console.warn(this);
+					console.warn(ex);
+				}
+				
+				return styleRet;
 			},
 			
 			// Takes in a format returns a formatted text for this link
@@ -1946,17 +2058,12 @@ function main()
 					// Get the text of the message without the image
 					var noImage = newMessage.replace(/{image}/gi, "").replace(/<[^>]+>/gi, "").trim();
 					
+					// Define the image tag
+					var imageTag = this.getFormattedImageTag();
+					
 					// Index of the image tag
 					var imageIndex = newMessage.indexOf("{image}");
-					
-					// Define the image tag
-					var imageTag = RaidLink.defaultImage;
-					if (typeof this.raidTypeId !== "undefined")
-					{
-						imageTag = '<img src="http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/' + this.raidTypeId + '_1.jpg" />';
-					}
-					
-					
+
 					// If {image} is in the middle, just lump it in with the text
 					if (imageIndex == -1 || (imageIndex > 0 && imageIndex < newMessage.length - "{image}".length))
 					{
@@ -1985,16 +2092,16 @@ function main()
 					newMessage = newMessage.replace(/{difficulty}/gi, RaidType.difficulty[this.difficulty]);
 					newMessage = newMessage.replace(/{text-no-image}/gi, noImage);
 					newMessage = newMessage.replace(/{url}/gi, this.getURL());
+					
+
+					
 					newMessage = "<span class=\"raidMessage\">" + newMessage + "</span>";
-					
-					// If this is an unseen link, mark it new
-//					var linkState = RaidManager.fetchState(this);
-//					
-//					if (linkState.text == RaidManager.STATE.UNSEEN.text)
-//					{
-//						newMessage = "NEW " + newMessage;
-//					}
-					
+
+
+					// Get the styles for this link
+					var styles = this.getMatchedStyles();
+
+					newMessage = newMessage.replace(/{linkStyle}/gi, styles.linkStyle||"");
 				}
 				catch(ex)
 				{
@@ -2038,6 +2145,44 @@ function main()
 				return raidURL;
 			},
 			
+			// Get the raid image url, or default to LoaTS icon
+			getImageSRC: function()
+			{
+				// Assume default
+				var imageSRC = RaidLink.defaultImageSRC;
+				
+				// If we have a raidTypeId
+				if (typeof this.raidTypeId !== "undefined")
+				{
+					// Locate the offsite image
+					imageSRC = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/" + this.raidTypeId + "_1.jpg";
+				}
+				
+				return imageSRC;
+			},
+			
+			// Get the fully formatted <img> tag for this raid
+			getFormattedImageTag: function()
+			{
+				// Get the styles for this link
+				var styles = this.getMatchedStyles();
+				
+				// Get the image src
+				var imageSRC = this.getImageSRC();
+				
+				// Create and fill in the image tag
+				var imageTag = RaidLink.defaultImageFormat;
+				
+				// Fill in image SRC
+				imageTag = imageTag.replace("{imageSRC}", imageSRC);
+				
+				// Style the image
+				imageTag = imageTag.replace("{imageStyle}", styles.imageStyle||"");
+				
+				return imageTag;
+
+			},
+			
 			// Generate a param array for this link
 			getParamArray: function()
 			{
@@ -2060,19 +2205,25 @@ function main()
 		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?(?!\?4217\-op)\?([^,"]*)\b/i;
 		
 		// Define a regular expresson to catch busted links
-		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\])*$/i;
+		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
 		
 		// Fallback image url if we can't get the provided one
-		RaidLink.defaultImage = '<img src="http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op" />';
+		RaidLink.defaultImageFormat = '<img style="{imageStyle}" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
+		
+		// Fallback image url if we can't get the nice one
+		RaidLink.defaultImageSRC = "http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op";
 		
 		// Fallback message format
-		RaidLink.defaultMessageFormat = "{image} {visited} Raid: [{size}-{stat}-{difficulty}-{fs}] {name}";
+		RaidLink.defaultMessageFormat = "{image} {visited} Raid: [{size}-{stat}-{difficulty}-{fs}-{os}] {short-name}";
 		
 		// Old link format
 		RaidLink.defaultLinkFormat_v1 = "<a class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event, '{url}');\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
 		
 		// Fallback link format
-		RaidLink.defaultLinkFormat_v2 = "<a class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event);\" onmousedown=\"return DC_LoaTS_Helper.raidLinkMouseDown(event);\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
+		RaidLink.defaultLinkFormat_v2 = "<a style=\"{linkStyle}\" class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event);\" onmousedown=\"return DC_LoaTS_Helper.raidLinkMouseDown(event);\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
+		
+		// Fix broken images, an inline handler
+		RaidLink.fixBrokenImage = function() {if (this.src != RaidLink.defaultImageSRC){this.src = RaidLink.defaultImageSRC;}else{this.src="";}};
 		
 		/************************************/
 		/**** RaidLinkstateParser Class *****/
@@ -2513,7 +2664,7 @@ function main()
 				Timer.stop("store");
 			},
 			
-			// Lookup a given raid link and determine its state
+			// Lookup a given raid link
 			/*public static RaidLink*/
 			fetch: function(raidLink)
 			{
@@ -2522,7 +2673,7 @@ function main()
 				// Declare the return var
 				var foundLink;
 				
-				if (raidLink.isValid() && typeof GM_getValue != "undefined" && typeof GM_getValue != "undefined")
+				if (raidLink.isValid() && typeof GM_getValue !== "undefined" && typeof GM_getValue !== "undefined")
 				{
 					// Load up the storage object
 //					var raidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
@@ -2531,7 +2682,7 @@ function main()
 					var raidData = RaidManager.raidStorage[raidLink.getUniqueKey()];
 										
 					// If the link is in storage
-					if (typeof raidData != "undefined")
+					if (typeof raidData !== "undefined")
 					{
 						// Add in the functions that you expect to see on those objects
 						Object.extend(raidData.raidLink, RaidLink.prototype);
@@ -2688,7 +2839,7 @@ function main()
 								
 								try
 								{
-									// If the age is within range
+									// If this link matches the filter
 									if (raidFilter.matches(
 										{
 											age: commandStartTime - raidData.firstSeen,
@@ -3120,32 +3271,112 @@ function main()
 		/********** RaidStyle Class *********/
 		/************************************/
 		
-		// Class to parse raid style parameters into CSS stuff
-		window.RaidStyleParser = Class.create({
-			initialize: function(params)
+		// Class to parse raid style text of any form into CSS stuff
+		window.RaidStyle = Class.create({
+			initialize: function(styleText)
 			{
-				// Variables
-				this.filter;
-				this.style;
+				var naturalLanguage = "";
+				var nativeCSS = "";
+				this.css = "";
+
+				console.log("Parsing styleText: \"" + styleText + "\"")
 				
-				// Split the params at the + that divides the filter from the style
-				var parts = params.split("\+");
-				
-				var raidFilter;
-				var styleText;
-				if (parts.length >= 1)
+				// Extract from the inputted text the various natural language and native CSS bits
+				RaidStyle.parsePattern.lastIndex = 0;
+				for (var match = RaidStyle.parsePattern.exec(styleText); match && match[0] != ""; match = RaidStyle.parsePattern.exec(styleText))
 				{
-					var filterText = params[0].trim();
-					raidFilter = new RaidFilter(filterText); 
+					// Combine any natural language pieces together
+					if (typeof match[1] !== "undefined")
+					{
+						naturalLanguage += match[1];
+					}
+					
+					// Combine any native CSS pieces together
+					if (typeof match[2] !== "undefined")
+					{
+						nativeCSS += match[2];
+					}
 				}
-				if (parts.length >= 2)
+				
+				// Trim out any extra whitespace
+				naturalLanguage = naturalLanguage.trim().toLowerCase();
+				nativeCSS = nativeCSS.trim();
+				
+				console.log("styleText yielded naturalLanguage: \"" + naturalLanguage + "\" and nativeCSS: \"" + nativeCSS + "\"");
+				
+				// Try to parse the natural language bits
+				// First, get a copy of the parsable bits
+				var parseEls = RaidStyle.getNaturalLanguageParseElements();
+				
+				for (var i = 0; i < parseEls.length && naturalLanguage.length > 0; i++)
 				{
-					styleText = params[1].trim();
+					var el = parseEls[i];
+					el.pattern.lastIndex = 0;
+					var match = el.pattern.exec(naturalLanguage);
+					if (match != null && match[0] != "")
+					{
+						console.log(el.property + " captured \"" + match[el.capture] + "\" and will replace \"" + match[el.replace]) +"\"";
+						this.css += el.property + ": " + match[el.capture] + "; ";
+						console.log("Natural language before: \"" + naturalLanguage + "\"");
+						naturalLanguage = naturalLanguage.replace(match[el.replace], "").trim();
+						console.log("Natural language after: \"" + naturalLanguage + "\"");
+					}
+					else
+					{
+						console.log(el.property + " did not match against \"" + naturalLanguage + "\"");
+					}
 				}
 				
-				
+				this.css += nativeCSS;
+				console.log("CSS: ");
+				console.log(this.css);
+			},
+			
+			toString: function()
+			{
+				return this.css;
+			},
+			
+			isValid: function()
+			{
+				//TODO Will a style ever be not valid?
+				return true;
 			}
-		});		/************************************/
+		});
+		
+		// General pattern to pick apart the natural language style from the native CSS styles
+		RaidStyle.parsePattern = /([^"]*)?("[^"]*")?/gi;
+		
+		// Pattern to find bits of text that are colors. Can find #FFF, #FFFFFF, rgb(255,255,255), or white as the color white
+		RaidStyle.baseColorPattern = /#[0-9a-f]{3}(?:[0-9a-f]{3})?\b|rgb\((?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]),(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]),(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\)|\b(?:black|white|red|yellow|lime|aqua|blue|fuchsia|orange|gray|silver|maroon|olive|green|teal|navy|purple)\b/i;
+		RaidStyle.colorPattern = new RegExp("(?:(?:(?!on +).. )|^)(" + RaidStyle.baseColorPattern.source + ")", "i");
+		RaidStyle.backgroundColorPattern = new RegExp("\\bon +(" + RaidStyle.baseColorPattern.source + ")", "i");
+		
+		// These are the current natural language features we're going to support for now
+		RaidStyle.naturalLanguageParseElements = [
+												 	{property: "font-weight", 		capture: 0, replace: 0, pattern: /\b(?:[1-9]00(?!px|pt|em|en|%)|bold(?:er)?|lighter|normal)\b/i},
+												 	{property: "background-color", 	capture: 1, replace: 0, pattern: RaidStyle.backgroundColorPattern},
+												 	{property: "color", 			capture: 1, replace: 1, pattern: RaidStyle.colorPattern},
+												 	{property: "font-size", 		capture: 0, replace: 0, pattern: /\b[0-9]?[0-9]?[0-9]?[0-9] ?(?:(?:px|pt|em|en)\b|%)|\bx?x-small\b|\bsmall(?:er)?\b|\bmedium\b|\blarger?\b|\bx?x-large\b/i},
+												 	{property: "text-decoration", 	capture: 0, replace: 0, pattern: /\bunderline(?: overline)\b/i},												 	
+												 	{property: "font-style", 		capture: 0, replace: 0, pattern: /\b(?:italic|oblique|normal)\b/i},												 	
+												 	{property: "whitespace", 		capture: 0, replace: 0, pattern: /\b(?:pre|pre-wrap|pre-line|-moz-pre-wrap|-o-pre-wrap|nowrap|normal)\b/i},												 	
+												 	{property: "display", 			capture: 0, replace: 0, pattern: /\b(?:none|inline|block|inline-block|list-item|marker|compact|run-in|table-header-group|table-footer-group|table|inline-table|table-caption|table-cell|table-row|table-row-group|table-column|table-column-group)\b/i},												 	
+												 ];
+		
+		RaidStyle.getNaturalLanguageParseElements = function()
+		{
+			var el = [];
+			for (var i = 0; i < RaidStyle.naturalLanguageParseElements.length; i++)
+			{
+				el.push(RaidStyle.naturalLanguageParseElements[i]);
+			}
+			
+			return el;
+		}
+		
+												 
+		/************************************/
 		/********* RaidToolbar Class ********/
 		/************************************/
 		window.RaidToolbar = Class.create({
@@ -5006,15 +5237,55 @@ function main()
 			{
 				commandName: "raidstyle",
 				aliases: [],
-				parsingClass: RaidStyleParser,
+				parsingClass: RaidFilterStyleParser,
 
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
 					var ret = {};
 					
+					console.log(parser);
 					
-										
+					if (typeof parser.raidFilter === "undefined" || parser.raidFilter.isEmpty())
+					{
+						// Display all existing raid styles
+						
+						
+					}
+					else if (typeof parser.linkStyle === "undefined" && typeof parser.messageStyle === "undefined" && typeof parser.imageStyle === "undefined")
+					{
+						//TODO: Display all raid styles that have the same filter
+					}
+					else
+					{
+						var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
+						if (typeof matchingStyles === "undefined")
+						{
+							matchingStyles = [];
+							DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
+						}
+						
+						matchingStyles.push(parser);
+						
+						ret.success = true;
+						ret.statusMessage = "Raids Matching <code>" + parser.raidFilter.toString() + "</code> will now have ";
+						
+						if (typeof parser.linkStyle !== "undefined")
+						{
+							ret.statusMessage += "\nLink Style: <code>" + parser.linkStyle.toString() + "</code>";
+						}
+						
+						if (typeof parser.messageStyle !== "undefined")
+						{
+							ret.statusMessage += "\nMessage Style: <code>" + parser.messageStyle.toString() + "</code>";
+						}
+						
+						if (typeof parser.imageStyle !== "undefined")
+						{
+							ret.statusMessage += "\nImage Style: <code>" + parser.imageStyle.toString() + "</code>";
+						}
+					}
+					
 					return ret;
 				},
 				getOptions: function()
@@ -5506,6 +5777,7 @@ function main()
 			}
 		);
 		
+//TODO: Rename to loadAll command. AutoLoad should be for incoming new raids, not loading existing ones
 		RaidCommand.create(
 			{
 				commandName: "autoload",
@@ -5516,20 +5788,103 @@ function main()
 				{
 					// Declare ret object
 					var ret = {};
+					
+					// Cancel the previous timer, if there is one
+					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined")
+					{
+						// Clear out the raidLinks array from the previous one.
+						// The timeout will detect that there are suddenly no more links
+						// and acknowledge the error state and quit.
+						DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+					}
+					
+					
+					// This only works with a valid filter
+					if (raidFilter && raidFilter.isValid())
+					{
+						// Fetch all the links
+						var raidLinks = RaidManager.fetchByFilter(raidFilter);
 						
-
+						// If there were any matched links
+						if (raidLinks.length > 0)
+						{
+							// private variable to be closed over in the autoLoader
+							var autoLoadCounter = 0;
+							var startTime = new Date()/1;
+							
+							// Create function closure to be called repeatedly
+							var autoLoader = function __autoload()
+							{
+								// This shouldn't be called without links, but just in case
+								if (raidLinks.length > 0)
+								{
+									// Load the next raid
+									DC_LoaTS_Helper.loadRaid(raidLinks.pop());
+									
+									// Keep track of how many we've loaded
+									autoLoadCounter++;
+									
+									// If there are any links left, we'll need to continue loading them
+									if (raidLinks.length > 0)
+									{
+										// Fire the loader again after a while
+										DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, 6000);
+									}
+									else
+									{
+										// Calculate how long it took to load them all
+										var endTime = new Date()/1;
+										var took = (endTime - startTime)/1000;
+										holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " complete! " + autoLoadCounter + " raids loaded in " + took + "s.");
+									}
+								}
+								else
+								{
+									// Calculate how long it took to load them all
+									var endTime = new Date()/1;
+									var took = (endTime - startTime)/1000;
+									holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " ended abruptly. " + autoLoadCounter + " raids loaded in " + took + "s.");
+								}
+							}
+							
+							ret.success = true;
+							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString();
+							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
+						}
+						else
+						{
+							ret.statusMessage = "AutoLoad could not find any raids matching your filter to load.";							
+						}
+						
+						ret.success = true;
+					}
+					else
+					{
+						ret.success = false;
+						ret.statusMessage = "Could not execute autoload due to invalid raid filter.";
+					}
 						
 					return ret;
 				},
 				getOptions: function()
 				{
-					return;
+					//TODO: Better options here
+					var commandOptions = {					
+						initialText: {
+							text: "Load all raids matching the filter",
+						},
+					};
+					
+					return commandOptions;
 				},
 				buildHelpText: function()
 				{
 					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
 					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
-					helpText += "NOT YET IMPLEMENTED\n";
+					helpText += "\n";
+					helpText += "Loads all seen raids that match the given filter\n";
+					helpText += "\n";
+					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
 					
 					return helpText;
 				}
@@ -5598,7 +5953,7 @@ DC_LoaTS_Helper.raids =
     warden_ramiro:      new RaidType("warden_ramiro",       "Z7", "Warden Ramiro", "Ramiro", "Ramiro",                72,  50, "S",   60000000),
     vulture_gunship:    new RaidType("vulture_gunship",     "Z8", "Vulture Gunship", "Vulture", "Vulture",            72,  50, "S",   65000000),
     xarpa:              new RaidType("xarpa",               "Z9", "Centurian Fleet Commander", "Fleet Com.", "Fleet Comm",72,50,"S",  70000000),
-    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50,"S",    75000000),
+    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50,"S",    [75000000, 97500000, 120000000,/*confirmed*/ 150000000]),
     
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -5609,7 +5964,7 @@ DC_LoaTS_Helper.raids =
     agony_and_ecstasy:  new RaidType("agony_and_ecstasy",   "Z6", "Agony and Ecstasy", "Agony, Ecstasy", "A&E",       72, 100, "S",   95000000),
     sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  100000000),
     sludge_serpent:     new RaidType("sludge_serpent",      "Z8", "Sludge Serpent", "Serpent", "Serpent",             72, 100, "S",  120000000),
-    kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S",  160000000),
+    kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S",  [/*confirmed*/ 180000000,/*confirmed*/ 234000000, 256000000 ,/*confirmed*/ 320000000]),
                 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Colo",           168, 250, "S",  150000000),
@@ -5621,7 +5976,7 @@ DC_LoaTS_Helper.raids =
     hultex_quibberath:  new RaidType("hultex_quibberath",   "Z7", "Guldax Quibberath", "Quibberath", "Quib",         168, 250, "S",  800000000),
     commander_veck:     new RaidType("commander_veck",      "Z8", "Centurian Storm Commander", "Storm", "Storm",     168, 250, "S",  900000000),
     reaver:             new RaidType("reaver",              "Z9", "Galactic Reaver", "Reaver", "Reaver",              72, 250, "S", 1000000000),
-    the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [1100000000, 1380000000, /* 37/22 ratio*/1850000000, 2200000000]),
+    the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [/*confirmed*/ 1100000000,/*confirmed*/ 1475000000, /*confirmed*/ 1850000000,/*confirmed*/ 2200000000]),
     
     // Colossal Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
@@ -6000,11 +6355,12 @@ DC_LoaTS_Helper.raids =
 		DC_LoaTS_Helper.loadRaid = function(raidParam)
 		{
 			// If we're not actually on LoaTS right now, we have to actually go to the link
-			if (window.location.href.indexOf("http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns") != 0)
-			{
-				// Will let the browser actually alter the location of the page
-				return true;
-			}
+			// UPDATE: Script doesn't even load on non LoaTS pages now anyway
+			// if (window.location.href.indexOf("http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns") != 0)
+			// {
+				// // Will let the browser actually alter the location of the page
+				// return true;
+			// }
 			
 			
 			try
@@ -6013,7 +6369,7 @@ DC_LoaTS_Helper.raids =
 				var reg = new RegExp(/var iframe_options = ([^\x3B]+)/g);
 				
 				// If Kong has defined the properties we need to scrape from			
-				if (typeof activateGame != "undefined")
+				if (typeof activateGame !== "undefined")
 				{
 					// Attempt to find the properties we need
 					var match = reg.exec(activateGame); 
@@ -6022,18 +6378,19 @@ DC_LoaTS_Helper.raids =
 					if (match != null)
 					{
 						var raidLink;
-						if (typeof raidParam == "string")
+						if (typeof raidParam === "string")
 						{
 							// Create a raid link from the url
 							var raidLink = new RaidLink(raidParam);
 						}
-						else
+						else if (typeof raidParam.isValid === "function")
 						{
 							// Passed in value must've been a link
 							raidLink = raidParam;
-						}						
+						}
+						
 						// If the link is valid
-						if (raidLink.isValid())
+						if (typeof raidLink !== "undefined" && raidLink.isValid())
 						{
 							// Mark link as visited
 							RaidManager.store(raidLink, RaidManager.STATE.VISITED);
@@ -6101,7 +6458,7 @@ DC_LoaTS_Helper.raids =
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
-			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout != "undefined")
+			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout !== "undefined")
 			{
 				clearTimeout(DC_LoaTS_Helper.updatePostedLinksTimeout);
 			}
@@ -6129,10 +6486,18 @@ DC_LoaTS_Helper.raids =
 						var newRaidLink = new RaidLink(elem.children[0].href);
 						
 						// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-						if (newRaidLink.isValid() &&  (typeof raidLink == "undefined" || raidLink.getUniqueKey() == newRaidLink.getUniqueKey()))
+						if (newRaidLink.isValid() &&  (typeof raidLink === "undefined" || raidLink.getUniqueKey() == newRaidLink.getUniqueKey()))
 						{
 							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
 							elem.remove();
+							
+							// Restyle the message as appropriate
+							var styles = newRaidLink.getMatchedStyles();
+							if (typeof styles.messageStyle !== "undefined")
+							{
+								elem.setAttribute("style", styles.messageStyle);
+								elem.cssText = styles.messageStyle;
+							}
 						}
 						else if (!newRaidLink.isValid())
 						{
@@ -6705,6 +7070,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tborder-radius: 5px;\n";
 				rulesText += "\tborder-color: #FFFFFF;\n"								
 				rulesText += "\tbackground-color: #71A5CE;\n";
+				rulesText += "\tpadding: 0px 2px !important;\n";
 				rulesText += "}\n";
 								
 				rulesText += "\n.DC_LoaTS_omnibox_focus {\n";

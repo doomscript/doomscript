@@ -148,6 +148,65 @@
 				return (typeof raid != "undefined")?raid:new RaidType(this.raidTypeId);
 			},
 			
+			getMatchedStyles: function()
+			{
+				// Possible styles to find and apply
+				var styleRet = {};
+				
+				// Attempt to apply styles
+				try 
+				{
+					// Iterate over all the styles
+					for (var key in DC_LoaTS_Helper.raidStyles)
+					{
+						// Get the style manager for the style
+						var styleManagers = DC_LoaTS_Helper.raidStyles[key];
+						
+						// Grab the higher level info about the raid link
+						var raidData = RaidManager.fetch(this);
+						
+						for (var i = 0; i < styleManagers.length; i++)
+						{
+							// Get the current style manager
+							var styleManager = styleManagers[i];
+							
+							// If this link matches the filter
+							if (styleManager.raidFilter.matches(
+										{
+											age: (new Date()/1) - raidData.firstSeen,
+											difficulty: this.difficulty,
+											fs:  this.getRaid().getFairShare(this.difficulty),
+											name: this.getRaid().getSearchableName(),
+											state: RaidManager.fetchState(this),
+										})
+							)
+							{
+								for (var property in styleManager)
+								{
+									if (property.indexOf("Style") > 0 && typeof styleManager[property] !== "undefined")
+									{
+										if (typeof styleRet[property] === "undefined")
+										{
+											styleRet[property] = "";
+										}
+										
+										styleRet[property] += styleManager[property];
+									}
+								}
+							}
+						}
+					}
+				}
+				catch(ex)
+				{
+					console.warn("Error while finding styles for link:");
+					console.warn(this);
+					console.warn(ex);
+				}
+				
+				return styleRet;
+			},
+			
 			// Takes in a format returns a formatted text for this link
 			getFormattedRaidLinkText: function(messageFormat)
 			{
@@ -369,17 +428,12 @@
 					// Get the text of the message without the image
 					var noImage = newMessage.replace(/{image}/gi, "").replace(/<[^>]+>/gi, "").trim();
 					
+					// Define the image tag
+					var imageTag = this.getFormattedImageTag();
+					
 					// Index of the image tag
 					var imageIndex = newMessage.indexOf("{image}");
-					
-					// Define the image tag
-					var imageTag = RaidLink.defaultImage;
-					if (typeof this.raidTypeId !== "undefined")
-					{
-						imageTag = '<img src="http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/' + this.raidTypeId + '_1.jpg" />';
-					}
-					
-					
+
 					// If {image} is in the middle, just lump it in with the text
 					if (imageIndex == -1 || (imageIndex > 0 && imageIndex < newMessage.length - "{image}".length))
 					{
@@ -408,16 +462,16 @@
 					newMessage = newMessage.replace(/{difficulty}/gi, RaidType.difficulty[this.difficulty]);
 					newMessage = newMessage.replace(/{text-no-image}/gi, noImage);
 					newMessage = newMessage.replace(/{url}/gi, this.getURL());
+					
+
+					
 					newMessage = "<span class=\"raidMessage\">" + newMessage + "</span>";
-					
-					// If this is an unseen link, mark it new
-//					var linkState = RaidManager.fetchState(this);
-//					
-//					if (linkState.text == RaidManager.STATE.UNSEEN.text)
-//					{
-//						newMessage = "NEW " + newMessage;
-//					}
-					
+
+
+					// Get the styles for this link
+					var styles = this.getMatchedStyles();
+
+					newMessage = newMessage.replace(/{linkStyle}/gi, styles.linkStyle||"");
 				}
 				catch(ex)
 				{
@@ -461,6 +515,44 @@
 				return raidURL;
 			},
 			
+			// Get the raid image url, or default to LoaTS icon
+			getImageSRC: function()
+			{
+				// Assume default
+				var imageSRC = RaidLink.defaultImageSRC;
+				
+				// If we have a raidTypeId
+				if (typeof this.raidTypeId !== "undefined")
+				{
+					// Locate the offsite image
+					imageSRC = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/" + this.raidTypeId + "_1.jpg";
+				}
+				
+				return imageSRC;
+			},
+			
+			// Get the fully formatted <img> tag for this raid
+			getFormattedImageTag: function()
+			{
+				// Get the styles for this link
+				var styles = this.getMatchedStyles();
+				
+				// Get the image src
+				var imageSRC = this.getImageSRC();
+				
+				// Create and fill in the image tag
+				var imageTag = RaidLink.defaultImageFormat;
+				
+				// Fill in image SRC
+				imageTag = imageTag.replace("{imageSRC}", imageSRC);
+				
+				// Style the image
+				imageTag = imageTag.replace("{imageStyle}", styles.imageStyle||"");
+				
+				return imageTag;
+
+			},
+			
 			// Generate a param array for this link
 			getParamArray: function()
 			{
@@ -483,17 +575,23 @@
 		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?(?!\?4217\-op)\?([^,"]*)\b/i;
 		
 		// Define a regular expresson to catch busted links
-		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\])*$/i;
+		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
 		
 		// Fallback image url if we can't get the provided one
-		RaidLink.defaultImage = '<img src="http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op" />';
+		RaidLink.defaultImageFormat = '<img style="{imageStyle}" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
+		
+		// Fallback image url if we can't get the nice one
+		RaidLink.defaultImageSRC = "http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op";
 		
 		// Fallback message format
-		RaidLink.defaultMessageFormat = "{image} {visited} Raid: [{size}-{stat}-{difficulty}-{fs}] {name}";
+		RaidLink.defaultMessageFormat = "{image} {visited} Raid: [{size}-{stat}-{difficulty}-{fs}-{os}] {short-name}";
 		
 		// Old link format
 		RaidLink.defaultLinkFormat_v1 = "<a class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event, '{url}');\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
 		
 		// Fallback link format
-		RaidLink.defaultLinkFormat_v2 = "<a class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event);\" onmousedown=\"return DC_LoaTS_Helper.raidLinkMouseDown(event);\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
+		RaidLink.defaultLinkFormat_v2 = "<a style=\"{linkStyle}\" class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event);\" onmousedown=\"return DC_LoaTS_Helper.raidLinkMouseDown(event);\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
+		
+		// Fix broken images, an inline handler
+		RaidLink.fixBrokenImage = function() {if (this.src != RaidLink.defaultImageSRC){this.src = RaidLink.defaultImageSRC;}else{this.src="";}};
 		

@@ -2,22 +2,53 @@
 			{
 				commandName: "raidstyle",
 				aliases: [],
-				parsingClass: RaidStyleParser,
+				parsingClass: RaidFilterStyleParser,
 
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
 					var ret = {};
 					
+					console.log(parser);
 					
-										
+					if (typeof parser.raidFilter === "undefined" || parser.raidFilter.isEmpty())
+					{
+						//TODO: Display all existing raid styles
+						
+						
+					}
+					else if (typeof parser.linkStyle === "undefined" && typeof parser.messageStyle === "undefined" && typeof parser.imageStyle === "undefined")
+					{
+						//TODO: Display all raid styles that have the same filter
+					}
+					else
+					{
+						// Find all the styles matching this filter
+						var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
+						if (typeof matchingStyles === "undefined")
+						{
+							matchingStyles = [];
+							DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
+						}
+						
+						// Create a CSS class for this parser, and attach it to the parser.
+						DC_LoaTS_Helper.injectStyles(parser);
+						
+						// Add this to the list of styles for this filter
+						matchingStyles.push(parser);
+						
+						// Success report
+						ret.success = true;
+						ret.statusMessage = parser.toString();
+					}
+					
 					return ret;
 				},
 				getOptions: function()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Create this raid style",
+							text: "Execute this raid style command",
 						},
 					};
 					
@@ -25,8 +56,8 @@
 				},
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/raidstyle filter style</code>\n";
-					helpText += "Ta\n";
+					var helpText = "<b>Raid Command:</b> <code>/raidstyle filter +linkStyle +messageStyle +imageStyle</code>\n";
+					helpText += "\n";
 					
 					return helpText;
 				},	
