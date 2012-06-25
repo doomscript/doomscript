@@ -1949,10 +1949,18 @@ function main()
 					// Index of the image tag
 					var imageIndex = newMessage.indexOf("{image}");
 					
+					// Define the image tag
+					var imageTag = RaidLink.defaultImage;
+					if (typeof this.raidTypeId !== "undefined")
+					{
+						imageTag = '<img src="http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/' + this.raidTypeId + '_1.jpg" />';
+					}
+					
+					
 					// If {image} is in the middle, just lump it in with the text
 					if (imageIndex == -1 || (imageIndex > 0 && imageIndex < newMessage.length - "{image}".length))
 					{
-						newMessage = newMessage.replace(/{image}/gi, RaidLink.defaultImage).trim();
+						newMessage = newMessage.replace(/{image}/gi, imageTag).trim();
 						newMessage = linkFormat.replace(/{text}/gi, newMessage);
 					}
 					// If {image} is at the beginning or end, put it in it's own anchor, for aesthetics
@@ -1961,12 +1969,12 @@ function main()
 						// At the beginning
 						if (newMessage.indexOf("{image}") == 0)
 						{
-							newMessage = linkFormat.replace(/{text}/gi, RaidLink.defaultImage).replace(/class=\"/, "class=\"game_icon_link ") + " " + linkFormat.replace(/{text}/gi, newMessage);
+							newMessage = linkFormat.replace(/{text}/gi, imageTag).replace(/class=\"/, "class=\"game_icon_link ") + " " + linkFormat.replace(/{text}/gi, newMessage);
 						}
 						// At the end
 						else
 						{
-							newMessage = linkFormat.replace(/{text}/gi, newMessage) + " " + linkFormat.replace(/{text}/gi, RaidLink.defaultImage);
+							newMessage = linkFormat.replace(/{text}/gi, newMessage) + " " + linkFormat.replace(/{text}/gi, imageTag);
 						}
 						
 						// Remove images from the message
