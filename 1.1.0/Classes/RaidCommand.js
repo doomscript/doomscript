@@ -330,10 +330,10 @@
 					}
 				}
 				// Not a help command
-				else if (typeof doNotCallHandler == "undefined" || !doNotCallHandler)
+				else if (typeof doNotCallHandler === "undefined" || !doNotCallHandler)
 				{
 					DCDebug("Executing non-help for " + this.commandName + " doNotCallHandler: " + doNotCallHandler)
-					if (typeof this.parser == "undefined" || (typeof this.parser.isValid == "function" && this.parser.isValid()))
+					if (typeof this.parser === "undefined" || (typeof this.parser.isValid === "function" && this.parser.isValid()))
 					{
 						ret = this.handler(holodeck, this.parser, this.processedText, this.commandText, this.context);
 						
@@ -357,7 +357,7 @@
 					}
 					else
 					{
-						console.warn("Could not parse text" + this.commandText + " as command " + this.commandName + " in context " + this.context);
+						console.warn("Could not parse text " + this.commandText + " as command " + this.commandName + " in context " + this.context);
 					}
 				}
 				
@@ -392,6 +392,11 @@
 			commandClass.aliases = classObject.aliases;
 			commandClass.paramText = classObject.paramText;
 			commandClass.parsingClass = classObject.parsingClass;
+			//TODO Implement OO framework at some point
+			if (typeof commandClass.parsingClass !== "undefined" && typeof commandClass.parsingClass.prototype.isValid !== "function")
+			{
+				console.warn(commandClass.commandName + " Command Creation Error: Parser must have isValid method!");
+			}
 			commandClass.doNotEnumerateInHelp = classObject.doNotEnumerateInHelp;
 			commandClass.getParamText = function()
 			{

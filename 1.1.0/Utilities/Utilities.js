@@ -145,12 +145,20 @@
 				// Still failed
 				if (typeof url == "undefined" || url.length == 0)
 				{
-					console.warn("Trouble determining url from link. Could not apply click.");
-					console.warn(event);
-					console.warn(target);
-					
-					// Let the click go through and reload the whole browser. Better than nothing.
-					return true;
+					// In certain cases, the image can detect the click instead of the link
+					if (target.parentNode.href != "undefined")
+					{
+						url = target.parentNode.href;
+					}
+					else
+					{
+						console.warn("Trouble determining url from link. Could not apply click.");
+						console.warn(event);
+						console.warn(target);
+						
+						// Let the click go through and reload the whole browser. Better than nothing.
+						return true;
+					}
 				}
 				
 				// If the user is holding shift, cycle through the states
@@ -275,38 +283,69 @@
 			if (rightclick)
 			{
 				// Get the target element
-				var target = event.srcElement || event.target || event.targetElement;
+				var target;			
+				if (event.target) 
+				{
+					target = event.target;
+				}
+				else if (event.srcElement)
+				{
+					target = event.srcElement;
+				}
+				
+				// Safari work around
+				if (target.nodeType == 3)
+				{
+					target = target.parentNode;
+				}
+
+				// If there was no target
+				if (typeof target == "undefined")
+				{
+					console.warn("Couldn't locate the target for right-click detection");
+					
+					// Don't cancel the click
+					return;
+				}
 				
 				// Grab the url from the link
 				var url = target.href;
-				
+							
 				// Still failed
 				if (typeof url == "undefined" || url.length == 0)
 				{
-					console.warn("Trouble determining url from link. Could not apply click.");
-					console.warn(event);					
-				}
-				// Successfully got the url
-				else
-				{
-					// Get the raid link
-					var raidLink = new RaidLink(url);
-					
-					// Only care about valid links
-					if (raidLink.isValid())
+					// In certain cases, the image can detect the click instead of the link
+					if (target.parentNode.href != "undefined")
 					{
-						if (DC_LoaTS_Helper.getPref("RightClickVisited") === true)
-						{
-							RaidManager.store(raidLink, RaidManager.STATE.VISITED);
-						}
+						url = target.parentNode.href;
 					}
 					else
 					{
-						console.warn("Could not parse url (\"" + url + "\") into a valid RaidLink");
-						console.warn(raidLink);
+						console.warn("Trouble determining url from link. Could not apply click.");
+						console.warn(event);
+						console.warn(target);
+						
+						// No useful work to complete here
+						return;
 					}
 				}
-
+				// Successfully got the url
+				// Get the raid link
+				var raidLink = new RaidLink(url);
+				
+				// Only care about valid links
+				if (raidLink.isValid())
+				{
+					if (DC_LoaTS_Helper.getPref("RightClickVisited") === true)
+					{
+						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+					}
+				}
+				else
+				{
+					console.warn("Could not parse url (\"" + url + "\") into a valid RaidLink");
+					console.warn(raidLink);
+				}
 			}
 			
 
@@ -317,11 +356,12 @@
 		DC_LoaTS_Helper.loadRaid = function(raidParam)
 		{
 			// If we're not actually on LoaTS right now, we have to actually go to the link
-			if (window.location.href.indexOf("http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns") != 0)
-			{
-				// Will let the browser actually alter the location of the page
-				return true;
-			}
+			// UPDATE: Script doesn't even load on non LoaTS pages now anyway
+			// if (window.location.href.indexOf("http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns") != 0)
+			// {
+				// // Will let the browser actually alter the location of the page
+				// return true;
+			// }
 			
 			
 			try
@@ -330,7 +370,7 @@
 				var reg = new RegExp(/var iframe_options = ([^\x3B]+)/g);
 				
 				// If Kong has defined the properties we need to scrape from			
-				if (typeof activateGame != "undefined")
+				if (typeof activateGame !== "undefined")
 				{
 					// Attempt to find the properties we need
 					var match = reg.exec(activateGame); 
@@ -339,18 +379,19 @@
 					if (match != null)
 					{
 						var raidLink;
-						if (typeof raidParam == "string")
+						if (typeof raidParam === "string")
 						{
 							// Create a raid link from the url
 							var raidLink = new RaidLink(raidParam);
 						}
-						else
+						else if (typeof raidParam.isValid === "function")
 						{
 							// Passed in value must've been a link
 							raidLink = raidParam;
-						}						
+						}
+						
 						// If the link is valid
-						if (raidLink.isValid())
+						if (typeof raidLink !== "undefined" && raidLink.isValid())
 						{
 							// Mark link as visited
 							RaidManager.store(raidLink, RaidManager.STATE.VISITED);
@@ -418,7 +459,7 @@
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
-			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout != "undefined")
+			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout !== "undefined")
 			{
 				clearTimeout(DC_LoaTS_Helper.updatePostedLinksTimeout);
 			}
@@ -446,10 +487,18 @@
 						var newRaidLink = new RaidLink(elem.children[0].href);
 						
 						// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-						if (newRaidLink.isValid() &&  (typeof raidLink == "undefined" || raidLink.getUniqueKey() == newRaidLink.getUniqueKey()))
+						if (newRaidLink.isValid() &&  (typeof raidLink === "undefined" || raidLink.getUniqueKey() == newRaidLink.getUniqueKey()))
 						{
 							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
 							elem.remove();
+							
+							// Restyle the message as appropriate
+							var styles = newRaidLink.getMatchedStyles();
+							if (typeof styles.messageStyle !== "undefined")
+							{
+								elem.setAttribute("style", styles.messageStyle);
+								elem.cssText = styles.messageStyle;
+							}
 						}
 						else if (!newRaidLink.isValid())
 						{

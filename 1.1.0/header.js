@@ -146,7 +146,7 @@ Added Right-click visited option to preferences menu
 Added /farmvalue command for simple hard-coded dump of info from spreadsheet
 Added very simple implementation of live search in Raids tab
 Fixed wiki commands making double entries in the omnibox autocomplete
--- Fourth Alpha Release: 2012-05-30
+-- Fourth Alpha Release: 2012-06-13
 Altered RaidLink constructor parameter order - now is id, hash, diff, boss. No longer need all 4, just the first 2
 RaidMenu tabs kind of respect tabPosition now, depending on browser. Will implement real solution later.
 In some browsers, the script appeared to load a number of times only to fail. Most of these should no longer run.
@@ -155,6 +155,15 @@ Added a simple /update command for those that get confused between scripts. Will
 Files are now in an Assembla SVN repo: http://subversion.assembla.com/svn/doomscript/
 Now using Trac for bug tracking: http://trac.assembla.com/doomscript
 Todos all moved to ticketing system.
+Added Z10 raids, first pasee
+-- Fifth Alpha Release: 2012-06-25
+Removed kv_action_type=raidhelp from the required parameters of the link due to changes in SReject's spammer
+Added game specific icons in place of generic LoTS icon
+Can now /raid raidName 0 to get base info about a raid that doesn't change with health
+Fixed bug with command aliases being case sensitive. /SEENRAID colo should now work.
+Added /clearchat command
+Added /raidstyle command
+Kong added some padding to their text boxes that has now been removed from the Omnibox
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.

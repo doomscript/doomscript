@@ -371,7 +371,7 @@
 				Timer.stop("store");
 			},
 			
-			// Lookup a given raid link and determine its state
+			// Lookup a given raid link
 			/*public static RaidLink*/
 			fetch: function(raidLink)
 			{
@@ -380,7 +380,7 @@
 				// Declare the return var
 				var foundLink;
 				
-				if (raidLink.isValid() && typeof GM_getValue != "undefined" && typeof GM_getValue != "undefined")
+				if (raidLink.isValid() && typeof GM_getValue !== "undefined" && typeof GM_getValue !== "undefined")
 				{
 					// Load up the storage object
 //					var raidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
@@ -389,7 +389,7 @@
 					var raidData = RaidManager.raidStorage[raidLink.getUniqueKey()];
 										
 					// If the link is in storage
-					if (typeof raidData != "undefined")
+					if (typeof raidData !== "undefined")
 					{
 						// Add in the functions that you expect to see on those objects
 						Object.extend(raidData.raidLink, RaidLink.prototype);
@@ -546,7 +546,7 @@
 								
 								try
 								{
-									// If the age is within range
+									// If this link matches the filter
 									if (raidFilter.matches(
 										{
 											age: commandStartTime - raidData.firstSeen,

@@ -293,6 +293,7 @@
 				rulesText += "\tborder-radius: 5px;\n";
 				rulesText += "\tborder-color: #FFFFFF;\n"								
 				rulesText += "\tbackground-color: #71A5CE;\n";
+				rulesText += "\tpadding: 0px 2px !important;\n";
 				rulesText += "}\n";
 								
 				rulesText += "\n.DC_LoaTS_omnibox_focus {\n";
