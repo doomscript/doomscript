@@ -331,6 +331,26 @@ function main()
 								msg = msg.replace(RaidLink.backupLinkReplacementPattern, newMessage);
 							}
 							
+							// Make sure attributes exists
+							if (typeof attributes === "undefined")
+							{
+								attributes = {};
+							}
+							
+							// Make sure attributes.class exists
+							if (typeof attributes.class === "undefined")
+							{
+								attributes.class = "";
+							}
+							
+							// Get the className of the link
+							var className = raidLink.getMatchedStyles().className;
+							if (typeof className !== "undefined")
+							{
+								attributes.class += className;
+							}
+							
+							
 							// If still didn't get it, note the problem
 							if (msg == originalMsg)
 							{
@@ -669,6 +689,7 @@ function main()
 			helpText += "<b>Commands:</b>\n";
 			helpText += "\n";
 			
+			// Iterate over all commands and display their summaries
 			for (var commandName in DC_LoaTS_Helper.chatCommands)
 			{
 				var command = DC_LoaTS_Helper.chatCommands[commandName];
@@ -681,13 +702,6 @@ function main()
 				}
 			}
 			
-//			helpText += "<code>/raid raidname [difficulty]</code>\n";
-//			helpText += "<code>/seenraids [raidname] [difficulty] [{state: stateName}]</code>\n";
-//			helpText += "<code>/clearraids [raidname] [difficulty] [{state: stateName}]</code>\n";
-//			helpText += "<code>/reload</code>\n";
-//			helpText += "<code>/raidformat [newformat]</code>\n";
-//			helpText += "<code>/loadraid url</code>\n";
-//			helpText += "<code>/autoupdate [toggle]</code>\n";
 			helpText += "\n";
 			helpText += "All commands can do <code>/commandname help</code> to learn more about them. Brackets <code>[]</code> indicate optional parameters; don't actually put brackets in your commands, please.\n";
 			deck.activeDialogue().raidBotMessage(helpText);
@@ -1602,33 +1616,136 @@ function main()
 				// Split the params at the + that divides the filter from the style
 				var parts = params.split("\+");
 				console.log(parts)
-
+				
+				// Parse the first part as a raid filter
 				if (parts.length >= 1)
 				{
 					this.raidFilter = new RaidFilter(parts[0].trim()); 
 				}
 				
+				// The second part as the link style
 				if (parts.length >= 2)
 				{
 					this.linkStyle = new RaidStyle(parts[1].trim());
 				}
 				
+				// The third part as the message style
 				if (parts.length >= 3)
 				{
 					this.messageStyle = new RaidStyle(parts[2].trim());
 				}
 				
+				// The fourth part as the image style
 				if (parts.length >= 4)
 				{
 					this.imageStyle = new RaidStyle(parts[3].trim());
 				}
 			},
 			
+			// Whether or not a link style exists for this parser
+			hasLinkStyle: function()
+			{
+				return typeof this.linkStyle !== "undefined" && !this.linkStyle.isEmpty();
+			},
+			
+			// Whether or not a message style exists for this parser
+			hasMessageStyle: function()
+			{
+				return typeof this.messageStyle !== "undefined" && !this.messageStyle.isEmpty();
+			},
+			
+			// Whether or not an image style exists for this parser
+			hasImageStyle: function()
+			{
+				return typeof this.imageStyle !== "undefined" && !this.imageStyle.isEmpty();
+			},
+			
+			// String describing this parser
+			toString: function()
+			{
+				var ret;
+				if (this.isValid())
+				{
+					ret = "Raids Matching <code>" + this.raidFilter.toString() + "</code> will have ";
+					
+					if (this.hasLinkStyle())
+					{
+						ret += "\nLink Style: <code>" + this.linkStyle.toString() + "</code>";
+					}
+					
+					if (this.hasMessageStyle())
+					{
+						ret += "\nMessage Style: <code>" + this.messageStyle.toString() + "</code>";
+					}
+					
+					if (this.hasImageStyle())
+					{
+						ret += "\nImage Style: <code>" + this.imageStyle.toString() + "</code>";
+					}
+				}
+				else
+				{
+					ret = "Invalid Raid Filter Style Parser. Filter: " + (this.raidFilter?this.raidFilter.toString():"Not defined.");
+				}
+				
+				return ret;
+			},
+			
+			// Inject the styles from this parser into the page
+			injectStyles: function()
+			{
+				// Create a class name for this set of styles
+				this.className = "DCLH-RFSP-" + RaidFilterStyleParser._lastInjectedStyleId++;
+				var rulesText = "";
+				
+				if (this.hasMessageStyle())
+				{
+					rulesText += "#kong_game_ui .chat_message_window ." + this.className + "{" + this.messageStyle.toString() + "}";
+				}
+				
+				if (this.hasLinkStyle())
+				{
+					rulesText += "#kong_game_ui .chat_message_window ." + this.className + " a {" + this.linkStyle.toString() + "}";
+				}
+				
+				if (this.hasImageStyle())
+				{
+					rulesText += "#kong_game_ui .chat_message_window ." + this.className + " img {" + this.imageStyle.toString() + "}";
+				}
+				
+				
+				// Locate/Create nodes
+				var head = document.getElementsByTagName('head')[0],
+				    style = document.createElement('style'),
+				    rules = document.createTextNode(rulesText);
+				
+				// Style tag type
+				style.type = 'text/css';
+				
+				// Browser dependencies
+				if(style.styleSheet)
+				{
+				    style.styleSheet.cssText = rules.nodeValue;
+				}
+				else
+				{
+					style.appendChild(rules);
+				}
+				
+				// Drop in the style node
+				head.appendChild(style);
+			},
+			
+			// Check validity of the parser
 			isValid: function()
 			{
 				return typeof this.raidFilter !== "undefined" && this.raidFilter.isValid();
 			}
-		});		/************************************/
+		});
+		
+		RaidFilterStyleParser._lastInjectedStyleId = 0;
+
+		/************************************/
 		/********** RaidLink Class **********/
 		/************************************/
 		
@@ -1813,14 +1930,14 @@ function main()
 							{
 								for (var property in styleManager)
 								{
-									if (property.indexOf("Style") > 0 && typeof styleManager[property] !== "undefined")
+									if ((property.indexOf("Style") > 0 || property.indexOf("className") > -1) && typeof styleManager[property] !== "undefined")
 									{
 										if (typeof styleRet[property] === "undefined")
 										{
 											styleRet[property] = "";
 										}
 										
-										styleRet[property] += styleManager[property];
+										styleRet[property] += " " + styleManager[property];
 									}
 								}
 							}
@@ -2099,9 +2216,9 @@ function main()
 
 
 					// Get the styles for this link
-					var styles = this.getMatchedStyles();
+//					var styles = this.getMatchedStyles();
 
-					newMessage = newMessage.replace(/{linkStyle}/gi, styles.linkStyle||"");
+//					newMessage = newMessage.replace(/{linkStyle}/gi, styles.linkStyle||"");
 				}
 				catch(ex)
 				{
@@ -2163,21 +2280,12 @@ function main()
 			
 			// Get the fully formatted <img> tag for this raid
 			getFormattedImageTag: function()
-			{
-				// Get the styles for this link
-				var styles = this.getMatchedStyles();
-				
+			{				
 				// Get the image src
 				var imageSRC = this.getImageSRC();
 				
-				// Create and fill in the image tag
-				var imageTag = RaidLink.defaultImageFormat;
-				
 				// Fill in image SRC
-				imageTag = imageTag.replace("{imageSRC}", imageSRC);
-				
-				// Style the image
-				imageTag = imageTag.replace("{imageStyle}", styles.imageStyle||"");
+				var imageTag = RaidLink.defaultImageFormat.replace("{imageSRC}", imageSRC);
 				
 				return imageTag;
 
@@ -2208,7 +2316,7 @@ function main()
 		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
 		
 		// Fallback image url if we can't get the provided one
-		RaidLink.defaultImageFormat = '<img style="{imageStyle}" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
+		RaidLink.defaultImageFormat = '<img style="raidIcon" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
 		
 		// Fallback image url if we can't get the nice one
 		RaidLink.defaultImageSRC = "http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op";
@@ -3335,6 +3443,11 @@ function main()
 			toString: function()
 			{
 				return this.css;
+			},
+			
+			isEmpty: function()
+			{
+				return typeof this.css === "undefined" || this.css.trim().length == 0;
 			},
 			
 			isValid: function()
@@ -5248,7 +5361,7 @@ function main()
 					
 					if (typeof parser.raidFilter === "undefined" || parser.raidFilter.isEmpty())
 					{
-						// Display all existing raid styles
+						//TODO: Display all existing raid styles
 						
 						
 					}
@@ -5258,6 +5371,7 @@ function main()
 					}
 					else
 					{
+						// Find all the styles matching this filter
 						var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
 						if (typeof matchingStyles === "undefined")
 						{
@@ -5265,25 +5379,18 @@ function main()
 							DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
 						}
 						
+						// Have the parser create CSS styles for itself.
+						parser.injectStyles();
+						
+						// Add this to the list of styles for this filter
 						matchingStyles.push(parser);
 						
+						// Success report
 						ret.success = true;
-						ret.statusMessage = "Raids Matching <code>" + parser.raidFilter.toString() + "</code> will now have ";
+						ret.statusMessage = parser.toString();
 						
-						if (typeof parser.linkStyle !== "undefined")
-						{
-							ret.statusMessage += "\nLink Style: <code>" + parser.linkStyle.toString() + "</code>";
-						}
-						
-						if (typeof parser.messageStyle !== "undefined")
-						{
-							ret.statusMessage += "\nMessage Style: <code>" + parser.messageStyle.toString() + "</code>";
-						}
-						
-						if (typeof parser.imageStyle !== "undefined")
-						{
-							ret.statusMessage += "\nImage Style: <code>" + parser.imageStyle.toString() + "</code>";
-						}
+						// Refresh the links to see the change
+						DC_LoaTS_Helper.updatePostedLinks();
 					}
 					
 					return ret;
@@ -5292,7 +5399,7 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Create this raid style",
+							text: "Execute this raid style command",
 						},
 					};
 					
@@ -5300,8 +5407,8 @@ function main()
 				},
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/raidstyle filter style</code>\n";
-					helpText += "Ta\n";
+					var helpText = "<b>Raid Command:</b> <code>/raidstyle filter +linkStyle +messageStyle +imageStyle</code>\n";
+					helpText += "\n";
 					
 					return helpText;
 				},	
@@ -6183,12 +6290,20 @@ DC_LoaTS_Helper.raids =
 				// Still failed
 				if (typeof url == "undefined" || url.length == 0)
 				{
-					console.warn("Trouble determining url from link. Could not apply click.");
-					console.warn(event);
-					console.warn(target);
-					
-					// Let the click go through and reload the whole browser. Better than nothing.
-					return true;
+					// In certain cases, the image can detect the click instead of the link
+					if (target.parentNode.href != "undefined")
+					{
+						url = target.parentNode.href;
+					}
+					else
+					{
+						console.warn("Trouble determining url from link. Could not apply click.");
+						console.warn(event);
+						console.warn(target);
+						
+						// Let the click go through and reload the whole browser. Better than nothing.
+						return true;
+					}
 				}
 				
 				// If the user is holding shift, cycle through the states
@@ -6313,42 +6428,74 @@ DC_LoaTS_Helper.raids =
 			if (rightclick)
 			{
 				// Get the target element
-				var target = event.srcElement || event.target || event.targetElement;
+				var target;			
+				if (event.target) 
+				{
+					target = event.target;
+				}
+				else if (event.srcElement)
+				{
+					target = event.srcElement;
+				}
+				
+				// Safari work around
+				if (target.nodeType == 3)
+				{
+					target = target.parentNode;
+				}
+
+				// If there was no target
+				if (typeof target == "undefined")
+				{
+					console.warn("Couldn't locate the target for right-click detection");
+					
+					// Don't cancel the click
+					return;
+				}
 				
 				// Grab the url from the link
 				var url = target.href;
-				
+							
 				// Still failed
 				if (typeof url == "undefined" || url.length == 0)
 				{
-					console.warn("Trouble determining url from link. Could not apply click.");
-					console.warn(event);					
-				}
-				// Successfully got the url
-				else
-				{
-					// Get the raid link
-					var raidLink = new RaidLink(url);
-					
-					// Only care about valid links
-					if (raidLink.isValid())
+					// In certain cases, the image can detect the click instead of the link
+					if (target.parentNode.href != "undefined")
 					{
-						if (DC_LoaTS_Helper.getPref("RightClickVisited") === true)
-						{
-							RaidManager.store(raidLink, RaidManager.STATE.VISITED);
-						}
+						url = target.parentNode.href;
 					}
 					else
 					{
-						console.warn("Could not parse url (\"" + url + "\") into a valid RaidLink");
-						console.warn(raidLink);
+						console.warn("Trouble determining url from link. Could not apply click.");
+						console.warn(event);
+						console.warn(target);
+						
+						// No useful work to complete here
+						return;
 					}
 				}
-
+				// Successfully got the url
+				// Get the raid link
+				var raidLink = new RaidLink(url);
+				
+				// Only care about valid links
+				if (raidLink.isValid())
+				{
+					if (DC_LoaTS_Helper.getPref("RightClickVisited") === true)
+					{
+						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+					}
+				}
+				else
+				{
+					console.warn("Could not parse url (\"" + url + "\") into a valid RaidLink");
+					console.warn(raidLink);
+				}
 			}
 			
 
 		};
+		
 		
 		// Load raid without refreshing page
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh

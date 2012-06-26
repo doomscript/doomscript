@@ -31,8 +31,8 @@
 							DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
 						}
 						
-						// Create a CSS class for this parser, and attach it to the parser.
-						DC_LoaTS_Helper.injectStyles(parser);
+						// Have the parser create CSS styles for itself.
+						parser.injectStyles();
 						
 						// Add this to the list of styles for this filter
 						matchingStyles.push(parser);
@@ -40,6 +40,9 @@
 						// Success report
 						ret.success = true;
 						ret.statusMessage = parser.toString();
+						
+						// Refresh the links to see the change
+						DC_LoaTS_Helper.updatePostedLinks();
 					}
 					
 					return ret;

@@ -183,14 +183,14 @@
 							{
 								for (var property in styleManager)
 								{
-									if (property.indexOf("Style") > 0 && typeof styleManager[property] !== "undefined")
+									if ((property.indexOf("Style") > 0 || property.indexOf("className") > -1) && typeof styleManager[property] !== "undefined")
 									{
 										if (typeof styleRet[property] === "undefined")
 										{
 											styleRet[property] = "";
 										}
 										
-										styleRet[property] += styleManager[property];
+										styleRet[property] += " " + styleManager[property];
 									}
 								}
 							}
@@ -469,9 +469,9 @@
 
 
 					// Get the styles for this link
-					var styles = this.getMatchedStyles();
+//					var styles = this.getMatchedStyles();
 
-					newMessage = newMessage.replace(/{linkStyle}/gi, styles.linkStyle||"");
+//					newMessage = newMessage.replace(/{linkStyle}/gi, styles.linkStyle||"");
 				}
 				catch(ex)
 				{
@@ -533,21 +533,12 @@
 			
 			// Get the fully formatted <img> tag for this raid
 			getFormattedImageTag: function()
-			{
-				// Get the styles for this link
-				var styles = this.getMatchedStyles();
-				
+			{				
 				// Get the image src
 				var imageSRC = this.getImageSRC();
 				
-				// Create and fill in the image tag
-				var imageTag = RaidLink.defaultImageFormat;
-				
 				// Fill in image SRC
-				imageTag = imageTag.replace("{imageSRC}", imageSRC);
-				
-				// Style the image
-				imageTag = imageTag.replace("{imageStyle}", styles.imageStyle||"");
+				var imageTag = RaidLink.defaultImageFormat.replace("{imageSRC}", imageSRC);
 				
 				return imageTag;
 
@@ -578,7 +569,7 @@
 		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
 		
 		// Fallback image url if we can't get the provided one
-		RaidLink.defaultImageFormat = '<img style="{imageStyle}" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
+		RaidLink.defaultImageFormat = '<img style="raidIcon" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
 		
 		// Fallback image url if we can't get the nice one
 		RaidLink.defaultImageSRC = "http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op";

@@ -351,6 +351,7 @@
 
 		};
 		
+		
 		// Load raid without refreshing page
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		DC_LoaTS_Helper.loadRaid = function(raidParam)
