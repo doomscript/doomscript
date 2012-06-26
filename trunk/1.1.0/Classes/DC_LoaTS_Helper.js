@@ -112,6 +112,26 @@
 								msg = msg.replace(RaidLink.backupLinkReplacementPattern, newMessage);
 							}
 							
+							// Make sure attributes exists
+							if (typeof attributes === "undefined")
+							{
+								attributes = {};
+							}
+							
+							// Make sure attributes.class exists
+							if (typeof attributes.class === "undefined")
+							{
+								attributes.class = "";
+							}
+							
+							// Get the className of the link
+							var className = raidLink.getMatchedStyles().className;
+							if (typeof className !== "undefined")
+							{
+								attributes.class += className;
+							}
+							
+							
 							// If still didn't get it, note the problem
 							if (msg == originalMsg)
 							{
