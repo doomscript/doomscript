@@ -14,6 +14,7 @@
 				this.zone = zone;
 				this.fullName = fullName;
 				this.shortName = shortName;
+				this.shortestName = "!"; // This will actually be calculated after all raids are known
 				this.colloqName = colloqName;
 				this.time = time;
 				this.size = size;

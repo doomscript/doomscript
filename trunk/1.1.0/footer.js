@@ -497,6 +497,9 @@
 	// Gotta jumpstart this bucket of giggles	
     function bootstrap_DC_LoaTS_Helper(loadSubFrames)
     {
+    	// Start time used to calculate overall start up time
+    	var startTime = new Date()/1;
+    	 
     	// Only run if the script is running in the top frame
     	if (top !== self && loadSubFrames != true)
     	{
@@ -548,8 +551,12 @@
 			window._dc_loats_helper = new DC_LoaTS_Helper();
     	}
     	
+    	// End time used to calculate overall start up time
+    	var endTime = new Date()/1;
+    	
     	// Everything is done
-        console.info("DC LoaTS Link Helper started!");
+        console.info("DC LoaTS Link Helper started in " + (endTime-startTime) + "ms!");
+        
     }
     
     // Hit the go button and activate the main script.
