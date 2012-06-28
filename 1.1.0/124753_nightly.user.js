@@ -1982,6 +1982,7 @@ function main()
 						newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 						newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 						newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
+						newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 						newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 						newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -2085,6 +2086,7 @@ function main()
 					newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 					newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 					newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
+					newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 					newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 					newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -6903,6 +6905,48 @@ DC_LoaTS_Helper.raids =
 			return "<a href=\"#\" class=\"chatCommandLink\" onclick=\"holodeck.processChatCommand('" + commandText + "'); return false;\">" + displayText + "</a>";
 		};
 		
+		
+		// Calculate shortest names
+		(function shortestNames(){
+			Timer.start("shortestNames calc");
+			// Borrowed from: http://stackoverflow.com/questions/11245481/find-the-smallest-unique-substring-for-each-string-in-an-array
+			var uniqueNames = [], nameInd, windowSize, substrInd, substr, otherNameInd, foundMatch;
+			// For each name
+			for (nameInd in DC_LoaTS_Helper.raids)
+			{
+			    var name = DC_LoaTS_Helper.raids[nameInd].getSearchableName();
+			    // For each possible substring length
+			    windowLoop:
+			    for (windowSize = 1; windowSize <= name.length; windowSize++)
+			    {
+			        // For each starting index of a substring
+			        for (substrInd = 0; substrInd <= name.length-windowSize; substrInd++)
+			        {
+			            substr = name.substring(substrInd,substrInd+windowSize).toLowerCase();
+			            foundMatch = false;
+			            // For each other name
+			            for (otherNameInd in DC_LoaTS_Helper.raids)
+			            {
+			                if (nameInd != otherNameInd && DC_LoaTS_Helper.raids[otherNameInd].getSearchableName().toLowerCase().indexOf(substr) > -1)
+			                {
+			                    foundMatch = true;
+			                    break;
+			                }
+			            }
+			
+			            if (!foundMatch)
+			            {
+			                // This substr works!
+			                DC_LoaTS_Helper.raids[nameInd].shortestName = substr;
+			                break windowLoop;
+			            }
+			        }
+			    }
+			}
+			Timer.stop("shortestNames calc");
+		}());
+		
+		
 		// Debug log wrapping function
 		// Special scope debugging for just this script
 		window.DCDebug = function()
@@ -7421,6 +7465,9 @@ DC_LoaTS_Helper.raids =
 	// Gotta jumpstart this bucket of giggles	
     function bootstrap_DC_LoaTS_Helper(loadSubFrames)
     {
+    	// Start time used to calculate overall start up time
+    	var startTime = new Date()/1;
+    	 
     	// Only run if the script is running in the top frame
     	if (top !== self && loadSubFrames != true)
     	{
@@ -7472,8 +7519,12 @@ DC_LoaTS_Helper.raids =
 			window._dc_loats_helper = new DC_LoaTS_Helper();
     	}
     	
+    	// End time used to calculate overall start up time
+    	var endTime = new Date()/1;
+    	
     	// Everything is done
-        console.info("DC LoaTS Link Helper started!");
+        console.info("DC LoaTS Link Helper started! (took " + (endTime-startTime) + "ms)");
+        
     }
     
     // Hit the go button and activate the main script.
