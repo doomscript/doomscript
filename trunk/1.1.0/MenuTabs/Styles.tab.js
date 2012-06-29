@@ -1,17 +1,18 @@
 		/************************************/
-		/************ Utils Tab *************/
+		/*********** Styles Tab *************/
 		/************************************/
 		
 		// Class to manage a tab in the raid tab in the popup menu
 		RaidMenuTab.create(
 			{
-				tabName: "Utils",
-				tabHeader: "Utilities",
-				tabPosition: 50,
+				tabName: "Styles",
+				tabHeader: "Raid Styles",
+				tabPosition: 20,
 				
 				initPane: function()
 				{
-					//TODO: Fill out utilities tab
+					//TODO: Create UI
+					//
 				},
 							
 		});

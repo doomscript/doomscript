@@ -47,8 +47,15 @@
 							// For every link we found
 							for (var i = 0; i < raidLinks.length; i++)
 							{
+								// We need to find the style the user has requested
+								var className = raidLinks[i].getMatchedStyles().className;
+								
+								// Bits to wrap each message raid link with
+								var wrapperFront = "<span class=\"seenraidMessageWrapper" + (className?" " + className:"") + "\">" + (i+1) + ") ";
+								var wrapperBack = "</span>\n\n";
+								
 								// Print matched links
-								outputText += (i+1) + ") " + raidLinks[i].getFormattedRaidLink(messageFormat, linkFormat) + "\n\n";
+								outputText += wrapperFront + raidLinks[i].getFormattedRaidLink(messageFormat, linkFormat) + wrapperBack;
 							}
 							
 							// Print out the raid links we found
