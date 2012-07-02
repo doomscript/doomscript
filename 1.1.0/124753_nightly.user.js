@@ -1229,6 +1229,7 @@ function main()
 					this.filterText = filterText;
 					
 					// Pattern to pick apart the command for the name and id
+					//TODO: /((?:[^{}\d]|[5-9]|\d*\.\d*)+)?\s*([0-4](?:\s*\|\s*[0-4]){0,4})?/
 					var commandPattern = /([^0-4{}]+)? ?([0-4])? ?/;
 	
 					// Attempt to find the matches
@@ -1982,7 +1983,6 @@ function main()
 						newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 						newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 						newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
-						newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 						newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 						newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -2086,7 +2086,6 @@ function main()
 					newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 					newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 					newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
-					newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 					newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 					newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -2333,7 +2332,52 @@ function main()
 		RaidLink.defaultLinkFormat_v2 = "<a style=\"{linkStyle}\" class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event);\" onmousedown=\"return DC_LoaTS_Helper.raidLinkMouseDown(event);\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
 		
 		// Fix broken images, an inline handler
-		RaidLink.fixBrokenImage = function() {if (this.src != RaidLink.defaultImageSRC){this.src = RaidLink.defaultImageSRC;}else{this.src="";}};
+		RaidLink.fixBrokenImage = function()
+		{
+			// Get the relevant raid link
+			var raidLink = new RaidLink(this.parentNode.href);
+			
+			// First time failed, check for alternate fail names
+			if (this.src == "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
+			{
+				switch(raidLink.raidTypeId)
+				{
+					case "dule_warmaster":
+						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/dule_1.jpg";
+						break;
+					case "hultex_quibberath":
+						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/hultex_1.jpg";
+						break;
+					case "warden_ramiro":
+						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/ramiro_1.jpg";
+						break;
+					case "purple_lion":
+						this.src = RaidLink.defaultImageSRC;
+						break;
+					case "kang":
+						this.src = RaidLink.defaultImageSRC;
+						break;
+					case "tourniquet":
+						this.src = RaidLink.defaultImageSRC;
+						break;
+					case "flora":
+						this.src = RaidLink.defaultImageSRC;
+						break;
+					default:
+						this.src = RaidLink.defaultImageSRC;
+				}
+			}
+			// Second time failed, switch to default
+			else if (this.src != RaidLink.defaultImageSRC)
+			{
+				this.src = RaidLink.defaultImageSRC;
+			}
+			// Default failed, no image
+			else
+			{
+				this.src="";
+			}
+		};
 		
 		/************************************/
 		/**** RaidLinkstateParser Class *****/
@@ -3929,6 +3973,7 @@ function main()
 				this.zone = zone;
 				this.fullName = fullName;
 				this.shortName = shortName;
+				this.shortestName = "!"; // This will actually be calculated after all raids are known
 				this.colloqName = colloqName;
 				this.time = time;
 				this.size = size;
@@ -4519,6 +4564,56 @@ function main()
 //		RaidMenuTab.raidSearchResultsFields = [{"raid."}]
 		
 		/************************************/
+		/*********** Styles Tab *************/
+		/************************************/
+		
+		// Class to manage a tab in the raid tab in the popup menu
+		RaidMenuTab.create(
+			{
+				tabName: "Styles",
+				tabHeader: "Raid Styles",
+				tabPosition: 20,
+				optionIndex: 0,
+				
+				initPane: function()
+				{
+					this.optionRowTemplate = document.createElement("div");
+					this.optionRowTemplate.className = "StylesTab-OptionRow clearfix";
+					
+					var raidNamesPicker = document.createElement("div");
+					raidNamesPicker.className = "StylesTab-RaidNamesPicker";
+					this.optionRowTemplate.appendChild(raidNamesPicker);
+					
+					var selectedRaidsInput = document.createElement("input");
+					raidNamesPicker.appendChild(selectedRaidsInput);
+					
+					var selectedRaidsOptionHolder = document.createElement("div");
+					raidNamesPicker.appendChild(selectedRaidsOptionHolder);
+					
+					for (var raidId in DC_LoaTS_Helper.raids)
+					{
+						var raid = DC_LoaTS_Helper.raids[raidId];
+						var label = document.createElement("label");
+						label.for = "StyleTab-RaidOption-" + raid.shortestName + "-" + this.optionIndex++;
+						label.appendChild(document.createTextNode(raid.colloqName));
+						
+						var checkbox = document.createElement("input");
+						checkbox.type = "checkbox";
+						checkbox.id = label.for;
+						label.appendChild(checkbox);
+						
+						selectedRaidsOptionHolder.appendChild(label);
+						
+						
+					}
+					
+					this.pane.appendChild(this.optionRowTemplate);
+					
+				},
+				
+		});
+
+		/************************************/
 		/************ Utils Tab *************/
 		/************************************/
 		
@@ -4531,11 +4626,7 @@ function main()
 				
 				initPane: function()
 				{
-//					this.header = document.createElement("h1");
-//					this.header.className = "RaidMenuTab-Header";
-//					this.header.update("Utilities");
-//					this.pane.appendChild(this.header);
-//					
+					//TODO: Fill out utilities tab
 				},
 							
 		});
@@ -4772,6 +4863,104 @@ function main()
 					helpText += "\n"
 					helpText += "<i>Clear all void nightmare vorden raids\n"
 					helpText += "<code>/clearraids vorden 4</code>\n"
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
+				commandName: "exportraids",
+				aliases: ["dumpraids"],
+				parsingClass: RaidFilter,
+				
+				handler: function(deck, raidFilter, params, text, context)
+				{
+					// Declare ret object
+					var ret = {sucess: true};
+						
+					// Capture the start time of the query
+					var queryStartTime = new Date()/1;
+				
+					// Declare ret object
+					var ret = {};
+					
+					// Find all raids that match the user's criteria
+					var raidLinks = RaidManager.fetchByFilter(raidFilter);
+					
+					// If the RaidManager executed successfully
+					if (typeof raidLinks != "undefined")
+					{
+						// If we didn't match a single raid
+						if (raidLinks.length == 0)
+						{
+							if (params.length == 0)
+							{
+								ret.statusMessage = "Could not locate any seen raids in memory.";
+							}
+							else
+							{
+								ret.statusMessage = "Could not locate any seen raids matching <code>" + params + "<code>";
+							}
+							
+							// The lookup succeeded, we just didn't find anything
+							ret.success = true;
+						}
+						// If we did match some raids
+						else
+						{
+							// Capture all the text in one block
+							var outputText = "";
+							
+							// For every link we found
+							for (var i = 0; i < raidLinks.length; i++)
+							{
+								// Print matched links
+								outputText += raidLinks[i].getURL() + "\n";
+							}
+							
+							// Export the data we found
+							DC_LoaTS_Helper.forceDownload(outputText, raidFilter.toString().replace(" ", "_").replace(/\W/gi, ""));
+							
+							// Print out the stats for the query
+							ret.statusMessage = "<code>/" + this.commandName + " " + raidFilter.toString() + "</code> took " + (new Date()/1 - queryStartTime) + " ms and exported " + raidLinks.length + " results.";
+							
+							// Succeeded
+							ret.success = true;
+						}
+					}
+					// RaidManager failed
+					else
+					{
+						ret.statusMessage = "Did not understand command: <code>" + text + "</code>";
+						ret.success = false;
+					}
+
+					
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Export matching data",
+						},
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/exportraids raidName difficulty {state: stateName} {age: timeFormat} {fs: fsFormat} {count: numberResults} {page: resultsPage}</code>\n";
+					helpText += "Exports to file raids that you've seen before in chat"
+					helpText += "where <code>raidName</code> <i>(optional)</i> is any partial or full raid name\n";
+					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
+					helpText += "where <code>stateName</code> <i>(optional)</i> is either seen or visited\n";
+					helpText += "where <code>timeFormat</code> <i>(optional)</i> is like <code>&lt;24h</code>, <code>&lt;30m</code>, or <code>&gt;1d</code>\n";
+					helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+					helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
+					helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
 					
 					return helpText;
 				}
@@ -5278,10 +5467,11 @@ function main()
 					helpText += "<span class=\"abbr\" title=\"Kongregate LoaTS icon\">image</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Break to the next line\">line</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Official Raid Name\">name</span>, ";
-					helpText += "<span class=\"abbr\" title=\"Same as target\">ofs</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Same as target\">os</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Same as target\">optimal</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Official Short Raid Name\">short-name</span>, ";
-					helpText += "<span class=\"abbr\" title=\"Short raid name\">shorter-name</span>, ";
+					helpText += "<span class=\"abbr\" title=\"User defined short name\">shorter-name</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Shortest identifiable name of the raid\">shortest-name</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Raid Size = Max raid members\">size</span>, ";
 					helpText += "<span class=\"abbr\" title=\"S, E, and/or H if the raid uses Stamina, Energy, and/or Health\">stat</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Target (Damage) = FS * multiplier. Changes per raid size.\">target</span>, ";
@@ -5299,7 +5489,7 @@ function main()
 					helpText += "<i class=\"smallText\">(<code>" + this.getCommandLink("reset") + "</code> will set your format back to this)</i>\n";
 					helpText += "\n";
 					helpText += "<b>Alternate Default:</b>\n";
-					helpText += "<code>" + this.getCommandLink("{image} {visited} Raid: [{size}-{stat}-{difficulty}-{target}] {name}") + "</code>";
+					helpText += "<code>" + this.getCommandLink("{image} {visited} Raid: [{size}-{stat}-{difficulty}-{os}] {name}") + "</code>";
 					helpText += "\n";
 					helpText += "<b>Short:</b>\n";
 					helpText += "<code>" + this.getCommandLink("{cache-state-short} {diff} {shorter-name}") + "</code>";
@@ -5502,8 +5692,15 @@ function main()
 							// For every link we found
 							for (var i = 0; i < raidLinks.length; i++)
 							{
+								// We need to find the style the user has requested
+								var className = raidLinks[i].getMatchedStyles().className;
+								
+								// Bits to wrap each message raid link with
+								var wrapperFront = "<span class=\"seenraidMessageWrapper" + (className?" " + className:"") + "\">" + (i+1) + ") ";
+								var wrapperBack = "</span>\n\n";
+								
 								// Print matched links
-								outputText += (i+1) + ") " + raidLinks[i].getFormattedRaidLink(messageFormat, linkFormat) + "\n\n";
+								outputText += wrapperFront + raidLinks[i].getFormattedRaidLink(messageFormat, linkFormat) + wrapperBack;
 							}
 							
 							// Print out the raid links we found
@@ -6062,7 +6259,7 @@ DC_LoaTS_Helper.raids =
     warden_ramiro:      new RaidType("warden_ramiro",       "Z7", "Warden Ramiro", "Ramiro", "Ramiro",                72,  50, "S",   60000000),
     vulture_gunship:    new RaidType("vulture_gunship",     "Z8", "Vulture Gunship", "Vulture", "Vulture",            72,  50, "S",   65000000),
     xarpa:              new RaidType("xarpa",               "Z9", "Centurian Fleet Commander", "Fleet Com.", "Fleet Comm",72,50,"S",  70000000),
-    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50,"S",    [75000000, 97500000, 120000000,/*confirmed*/ 150000000]),
+    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50,"S",    [75000000, 97500000,/*confirmed*/ 120000000,/*confirmed*/ 150000000]),
     
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -6498,6 +6695,38 @@ DC_LoaTS_Helper.raids =
 
 		};
 		
+		// Force the download of some data as a file
+		// Works nice on some browsers
+		// Title parameter only works in some browsers as well.
+		DC_LoaTS_Helper.forceDownload = function(data, title)
+		{
+			// Awesome style
+//			if (window.webkitRequestFileSystem)
+//			{
+//				window.webkitRequestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
+//	        		fs.root.getFile(title, {create: true}, function(fileEntry) {
+//	            		fileEntry.createWriter(function(fileWriter) {
+//			                var builder = new WebKitBlobBuilder();
+//			                builder.append(data);
+//			                var blob = builder.getBlob();
+//			    
+//			                fileWriter.onwriteend = function() {
+//			                    // navigate to file, will download
+//			                    location.href = fileEntry.toURL();
+//			                };
+//			    
+//			                fileWriter.write(blob);
+//			            }, function() {});
+//			        }, function() {});
+//			    }, function() {});​
+//			}
+			// Sad style
+//			else
+//			{
+		    	window.location='data:text/csv;charset=utf8,' + encodeURIComponent(data);
+//			}
+		    return true; 
+		}
 		
 		// Load raid without refreshing page
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
@@ -6905,48 +7134,6 @@ DC_LoaTS_Helper.raids =
 			return "<a href=\"#\" class=\"chatCommandLink\" onclick=\"holodeck.processChatCommand('" + commandText + "'); return false;\">" + displayText + "</a>";
 		};
 		
-		
-		// Calculate shortest names
-		(function shortestNames(){
-			Timer.start("shortestNames calc");
-			// Borrowed from: http://stackoverflow.com/questions/11245481/find-the-smallest-unique-substring-for-each-string-in-an-array
-			var uniqueNames = [], nameInd, windowSize, substrInd, substr, otherNameInd, foundMatch;
-			// For each name
-			for (nameInd in DC_LoaTS_Helper.raids)
-			{
-			    var name = DC_LoaTS_Helper.raids[nameInd].getSearchableName();
-			    // For each possible substring length
-			    windowLoop:
-			    for (windowSize = 1; windowSize <= name.length; windowSize++)
-			    {
-			        // For each starting index of a substring
-			        for (substrInd = 0; substrInd <= name.length-windowSize; substrInd++)
-			        {
-			            substr = name.substring(substrInd,substrInd+windowSize).toLowerCase();
-			            foundMatch = false;
-			            // For each other name
-			            for (otherNameInd in DC_LoaTS_Helper.raids)
-			            {
-			                if (nameInd != otherNameInd && DC_LoaTS_Helper.raids[otherNameInd].getSearchableName().toLowerCase().indexOf(substr) > -1)
-			                {
-			                    foundMatch = true;
-			                    break;
-			                }
-			            }
-			
-			            if (!foundMatch)
-			            {
-			                // This substr works!
-			                DC_LoaTS_Helper.raids[nameInd].shortestName = substr;
-			                break windowLoop;
-			            }
-			        }
-			    }
-			}
-			Timer.stop("shortestNames calc");
-		}());
-		
-		
 		// Debug log wrapping function
 		// Special scope debugging for just this script
 		window.DCDebug = function()
@@ -7165,6 +7352,10 @@ DC_LoaTS_Helper.raids =
 				
 				rulesText += "\n.FormattingTab-Button {\n";
 				rulesText += "\tpadding: 3px 15px 4px;\n";
+				rulesText += "}\n";				
+				
+				rulesText += "\n.StylesTab-RaidNamesPicker {\n";
+				rulesText += "\tfloat:left;\n";
 				rulesText += "}\n";				
 				
 				
@@ -7465,9 +7656,6 @@ DC_LoaTS_Helper.raids =
 	// Gotta jumpstart this bucket of giggles	
     function bootstrap_DC_LoaTS_Helper(loadSubFrames)
     {
-    	// Start time used to calculate overall start up time
-    	var startTime = new Date()/1;
-    	 
     	// Only run if the script is running in the top frame
     	if (top !== self && loadSubFrames != true)
     	{
@@ -7519,12 +7707,8 @@ DC_LoaTS_Helper.raids =
 			window._dc_loats_helper = new DC_LoaTS_Helper();
     	}
     	
-    	// End time used to calculate overall start up time
-    	var endTime = new Date()/1;
-    	
     	// Everything is done
-        console.info("DC LoaTS Link Helper started! (took " + (endTime-startTime) + "ms)");
-        
+        console.info("DC LoaTS Link Helper started!");
     }
     
     // Hit the go button and activate the main script.

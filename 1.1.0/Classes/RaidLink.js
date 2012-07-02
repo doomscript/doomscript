@@ -235,7 +235,6 @@
 						newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 						newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 						newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
-						newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 						newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 						newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -339,7 +338,6 @@
 					newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 					newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 					newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
-					newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 					newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 					newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -586,5 +584,50 @@
 		RaidLink.defaultLinkFormat_v2 = "<a style=\"{linkStyle}\" class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event);\" onmousedown=\"return DC_LoaTS_Helper.raidLinkMouseDown(event);\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
 		
 		// Fix broken images, an inline handler
-		RaidLink.fixBrokenImage = function() {if (this.src != RaidLink.defaultImageSRC){this.src = RaidLink.defaultImageSRC;}else{this.src="";}};
+		RaidLink.fixBrokenImage = function()
+		{
+			// Get the relevant raid link
+			var raidLink = new RaidLink(this.parentNode.href);
+			
+			// First time failed, check for alternate fail names
+			if (this.src == "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
+			{
+				switch(raidLink.raidTypeId)
+				{
+					case "dule_warmaster":
+						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/dule_1.jpg";
+						break;
+					case "hultex_quibberath":
+						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/hultex_1.jpg";
+						break;
+					case "warden_ramiro":
+						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/ramiro_1.jpg";
+						break;
+					case "purple_lion":
+						this.src = RaidLink.defaultImageSRC;
+						break;
+					case "kang":
+						this.src = RaidLink.defaultImageSRC;
+						break;
+					case "tourniquet":
+						this.src = RaidLink.defaultImageSRC;
+						break;
+					case "flora":
+						this.src = RaidLink.defaultImageSRC;
+						break;
+					default:
+						this.src = RaidLink.defaultImageSRC;
+				}
+			}
+			// Second time failed, switch to default
+			else if (this.src != RaidLink.defaultImageSRC)
+			{
+				this.src = RaidLink.defaultImageSRC;
+			}
+			// Default failed, no image
+			else
+			{
+				this.src="";
+			}
+		};
 		
