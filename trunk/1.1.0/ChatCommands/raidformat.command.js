@@ -114,10 +114,11 @@
 					helpText += "<span class=\"abbr\" title=\"Kongregate LoaTS icon\">image</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Break to the next line\">line</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Official Raid Name\">name</span>, ";
-					helpText += "<span class=\"abbr\" title=\"Same as target\">ofs</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Same as target\">os</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Same as target\">optimal</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Official Short Raid Name\">short-name</span>, ";
-					helpText += "<span class=\"abbr\" title=\"Short raid name\">shorter-name</span>, ";
+					helpText += "<span class=\"abbr\" title=\"User defined short name\">shorter-name</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Shortest identifiable name of the raid\">shortest-name</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Raid Size = Max raid members\">size</span>, ";
 					helpText += "<span class=\"abbr\" title=\"S, E, and/or H if the raid uses Stamina, Energy, and/or Health\">stat</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Target (Damage) = FS * multiplier. Changes per raid size.\">target</span>, ";
@@ -135,7 +136,7 @@
 					helpText += "<i class=\"smallText\">(<code>" + this.getCommandLink("reset") + "</code> will set your format back to this)</i>\n";
 					helpText += "\n";
 					helpText += "<b>Alternate Default:</b>\n";
-					helpText += "<code>" + this.getCommandLink("{image} {visited} Raid: [{size}-{stat}-{difficulty}-{target}] {name}") + "</code>";
+					helpText += "<code>" + this.getCommandLink("{image} {visited} Raid: [{size}-{stat}-{difficulty}-{os}] {name}") + "</code>";
 					helpText += "\n";
 					helpText += "<b>Short:</b>\n";
 					helpText += "<code>" + this.getCommandLink("{cache-state-short} {diff} {shorter-name}") + "</code>";

@@ -351,6 +351,38 @@
 
 		};
 		
+		// Force the download of some data as a file
+		// Works nice on some browsers
+		// Title parameter only works in some browsers as well.
+		DC_LoaTS_Helper.forceDownload = function(data, title)
+		{
+			// Awesome style
+//			if (window.webkitRequestFileSystem)
+//			{
+//				window.webkitRequestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
+//	        		fs.root.getFile(title, {create: true}, function(fileEntry) {
+//	            		fileEntry.createWriter(function(fileWriter) {
+//			                var builder = new WebKitBlobBuilder();
+//			                builder.append(data);
+//			                var blob = builder.getBlob();
+//			    
+//			                fileWriter.onwriteend = function() {
+//			                    // navigate to file, will download
+//			                    location.href = fileEntry.toURL();
+//			                };
+//			    
+//			                fileWriter.write(blob);
+//			            }, function() {});
+//			        }, function() {});
+//			    }, function() {});​
+//			}
+			// Sad style
+//			else
+//			{
+		    	window.location='data:text/csv;charset=utf8,' + encodeURIComponent(data);
+//			}
+		    return true; 
+		}
 		
 		// Load raid without refreshing page
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
@@ -757,53 +789,6 @@
 			if (typeof displayText == "undefined"){displayText = commandText};
 			return "<a href=\"#\" class=\"chatCommandLink\" onclick=\"holodeck.processChatCommand('" + commandText + "'); return false;\">" + displayText + "</a>";
 		};
-		
-		
-		// Calculate shortest names
-		DC_LoaTS_Helper.calculateShortestRaidNames = function()
-		{
-			Timer.start("calculateShortestRaidNames calc");
-			// Borrowed from: http://stackoverflow.com/questions/11245481/find-the-smallest-unique-substring-for-each-string-in-an-array
-			var uniqueNames = [], nameInd, windowSize, substrInd, substr, otherNameInd, foundMatch;
-			// For each name
-			for (nameInd in DC_LoaTS_Helper.raids)
-			{
-			    var name = DC_LoaTS_Helper.raids[nameInd].getSearchableName();
-			    // For each possible substring length
-			    windowLoop:
-			    for (windowSize = 1; windowSize <= name.length; windowSize++)
-			    {
-			        // For each starting index of a substring
-			        for (substrInd = 0; substrInd <= name.length-windowSize; substrInd++)
-			        {
-			            substr = name.substring(substrInd,substrInd+windowSize).toLowerCase();
-			            if (substr.trim().replace(/[^\w\s]/gi) !== substr){continue;}
-			            foundMatch = false;
-			            // For each other name
-			            for (otherNameInd in DC_LoaTS_Helper.raids)
-			            {
-			                if (nameInd != otherNameInd && DC_LoaTS_Helper.raids[otherNameInd].getSearchableName().toLowerCase().indexOf(substr) > -1)
-			                {
-			                    foundMatch = true;
-			                    break;
-			                }
-			            }
-			
-			            if (!foundMatch)
-			            {
-			                // This substr works!
-			                DC_LoaTS_Helper.raids[nameInd].shortestName = substr;
-			                break windowLoop;
-			            }
-			        }
-			    }
-			}
-			Timer.stop("calculateShortestRaidNames calc");
-		};
-		
-		// Go ahead and execute this, too
-		DC_LoaTS_Helper.calculateShortestRaidNames();
-		
 		
 		// Debug log wrapping function
 		// Special scope debugging for just this script
