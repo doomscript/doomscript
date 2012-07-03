@@ -6083,156 +6083,6 @@ function main()
 			}
 		);
 		
-//TODO: Rename to loadAll command. AutoLoad should be for incoming new raids, not loading existing ones
-		RaidCommand.create(
-			{
-				commandName: "autoload",
-				aliases: [],
-				parsingClass: RaidFilter,
-
-				handler: function(deck, raidFilter, params, text, context)
-				{
-					// Declare ret object
-					var ret = {};
-					
-					// Cancel the previous timer, if there is one
-					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined")
-					{
-						// Clear out the raidLinks array from the previous one.
-						// The timeout will detect that there are suddenly no more links
-						// and acknowledge the error state and quit.
-						DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
-					}
-					
-					
-					// This only works with a valid filter
-					if (raidFilter && raidFilter.isValid())
-					{
-						// Fetch all the links
-						var raidLinks = RaidManager.fetchByFilter(raidFilter);
-						
-						// If there were any matched links
-						if (raidLinks.length > 0)
-						{
-							// private variable to be closed over in the autoLoader
-							var autoLoadCounter = 0;
-							var startTime = new Date()/1;
-							
-							// Create function closure to be called repeatedly
-							var autoLoader = function __autoload()
-							{
-								// This shouldn't be called without links, but just in case
-								if (raidLinks.length > 0)
-								{
-									// Load the next raid
-									DC_LoaTS_Helper.loadRaid(raidLinks.pop());
-									
-									// Keep track of how many we've loaded
-									autoLoadCounter++;
-									
-									// If there are any links left, we'll need to continue loading them
-									if (raidLinks.length > 0)
-									{
-										// Fire the loader again after a while
-										DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, 6000);
-									}
-									else
-									{
-										// Calculate how long it took to load them all
-										var endTime = new Date()/1;
-										var took = (endTime - startTime)/1000;
-										holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " complete! " + autoLoadCounter + " raids loaded in " + took + "s.");
-									}
-								}
-								else
-								{
-									// Calculate how long it took to load them all
-									var endTime = new Date()/1;
-									var took = (endTime - startTime)/1000;
-									holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " ended abruptly. " + autoLoadCounter + " raids loaded in " + took + "s.");
-								}
-							}
-							
-							ret.success = true;
-							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString();
-							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
-						}
-						else
-						{
-							ret.statusMessage = "AutoLoad could not find any raids matching your filter to load.";							
-						}
-						
-						ret.success = true;
-					}
-					else
-					{
-						ret.success = false;
-						ret.statusMessage = "Could not execute autoload due to invalid raid filter.";
-					}
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					//TODO: Better options here
-					var commandOptions = {					
-						initialText: {
-							text: "Load all raids matching the filter",
-						},
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
-					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
-					helpText += "\n";
-					helpText += "Loads all seen raids that match the given filter\n";
-					helpText += "\n";
-					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
-		RaidCommand.create( 
-			{
-				commandName: "timerdata",
-				aliases: [],
-				// No parsing needed
-				/*parsingClass: ,*/
-
-				handler: function(deck, parser, params, text, context)
-				{
-					// Declare ret object
-					var ret = {success: true};
-						
-					deck.activeDialogue().raidBotMessage(Timer.getReport());
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					var commandOptions = {					
-						initialText: {
-							text: "Print the timer report",
-						},
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
-					helpText += "Prints out timing and performance data about the script\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
 // List of all raid ids and names. Any raid without a real raid id will not show up nicely.
 DC_LoaTS_Helper.raids = 
 {
@@ -6259,7 +6109,7 @@ DC_LoaTS_Helper.raids =
     warden_ramiro:      new RaidType("warden_ramiro",       "Z7", "Warden Ramiro", "Ramiro", "Ramiro",                72,  50, "S",   60000000),
     vulture_gunship:    new RaidType("vulture_gunship",     "Z8", "Vulture Gunship", "Vulture", "Vulture",            72,  50, "S",   65000000),
     xarpa:              new RaidType("xarpa",               "Z9", "Centurian Fleet Commander", "Fleet Com.", "Fleet Comm",72,50,"S",  70000000),
-    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50,"S",    [75000000, 97500000,/*confirmed*/ 120000000,/*confirmed*/ 150000000]),
+    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50,"S",    [75000000, 97500000, 120000000, 150000000]),
     
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -6270,7 +6120,7 @@ DC_LoaTS_Helper.raids =
     agony_and_ecstasy:  new RaidType("agony_and_ecstasy",   "Z6", "Agony and Ecstasy", "Agony, Ecstasy", "A&E",       72, 100, "S",   95000000),
     sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  100000000),
     sludge_serpent:     new RaidType("sludge_serpent",      "Z8", "Sludge Serpent", "Serpent", "Serpent",             72, 100, "S",  120000000),
-    kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S",  [/*confirmed*/ 180000000,/*confirmed*/ 234000000, 256000000 ,/*confirmed*/ 320000000]),
+    kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S",  [180000000, 234000000, 288000000, 320000000]),
                 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Colo",           168, 250, "S",  150000000),
@@ -6282,7 +6132,7 @@ DC_LoaTS_Helper.raids =
     hultex_quibberath:  new RaidType("hultex_quibberath",   "Z7", "Guldax Quibberath", "Quibberath", "Quib",         168, 250, "S",  800000000),
     commander_veck:     new RaidType("commander_veck",      "Z8", "Centurian Storm Commander", "Storm", "Storm",     168, 250, "S",  900000000),
     reaver:             new RaidType("reaver",              "Z9", "Galactic Reaver", "Reaver", "Reaver",              72, 250, "S", 1000000000),
-    the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [/*confirmed*/ 1100000000,/*confirmed*/ 1475000000, /*confirmed*/ 1850000000,/*confirmed*/ 2200000000]),
+    the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [1100000000, 1475000000, 1850000000, 2200000000]),
     
     // Colossal Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
