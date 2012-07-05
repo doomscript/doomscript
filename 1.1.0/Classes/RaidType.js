@@ -15,12 +15,13 @@
 				this.fullName = fullName;
 				this.shortName = shortName;
 				this.colloqName = colloqName;
+				this.shortestName = colloqName;
 				this.time = time;
 				this.size = size;
 				this.stat = stat;
 				
 				// Calculate Health
-				if (typeof health == "number")
+				if (typeof health === "number")
 				{
 					this.health = [health*RaidType.difficultyHealthFactor[1], 
 								   health*RaidType.difficultyHealthFactor[2], 
@@ -28,11 +29,11 @@
 								   health*RaidType.difficultyHealthFactor[4], 
 								   ];
 				}
-				else if (typeof health == "string")
+				else if (typeof health === "string")
 				{
 					this.health = [health, health, health, health];
 				}
-				else if (typeof health == "object" && typeof health !== null)
+				else if (typeof health === "object" && typeof health !== null)
 				{
 					this.health = health;
 				}
@@ -42,11 +43,11 @@
 				}
 				
 				// Calculate Fair Share
-				if (typeof fairShare == "number" || typeof fairShare == "string")
+				if (typeof fairShare === "number" || typeof fairShare === "string")
 				{
 					this.fairShare = [fairShare, fairShare, fairShare, fairShare];
 				}
-				else if (typeof fairShare == "object" && fairShare !== null)
+				else if (typeof fairShare === "object" && fairShare !== null)
 				{
 					this.fairShare = fairShare;
 				}
@@ -55,11 +56,11 @@
 
 
 				// Calculate Target
-				if (typeof target == "number" || typeof target == "string")
+				if (typeof target === "number" || typeof target === "string")
 				{
 					this.target = [target, target, target, target];
 				}
-				else if (typeof target == "object" && target !== null)
+				else if (typeof target === "object" && target !== null)
 				{
 					this.target = target;
 				}
@@ -76,15 +77,15 @@
 				var fs = 0;
 				
 				// If there is a hardcoded fair share, use that
-				if (typeof this.fairShare != "undefined")
+				if (typeof this.fairShare !== "undefined")
 				{
 					fs = this.fairShare[difficulty-1];
 				}
 				// IF there is no hardcoded fair share, calculate it
 				// Also, we must have healths, difficulty, and size to calculate it
-				else if (typeof difficulty != "undefined" 
-					  && typeof this.size == "number" 
-					  && typeof this.getHealth(difficulty) == "number")
+				else if (typeof difficulty !== "undefined" 
+					  && typeof this.size === "number" 
+					  && typeof this.getHealth(difficulty) === "number")
 				{
 					fs = this.getHealth(difficulty) / this.size;
 				}

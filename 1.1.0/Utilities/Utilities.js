@@ -790,6 +790,52 @@
 			return "<a href=\"#\" class=\"chatCommandLink\" onclick=\"holodeck.processChatCommand('" + commandText + "'); return false;\">" + displayText + "</a>";
 		};
 		
+		
+		// Calculate shortest names
+		DC_LoaTS_Helper.calculateShortestRaidNames = function()
+		{
+			Timer.start("calculateShortestRaidNames calc");
+			// Borrowed from: http://stackoverflow.com/questions/11245481/find-the-smallest-unique-substring-for-each-string-in-an-array
+			var uniqueNames = [], nameInd, windowSize, substrInd, substr, otherNameInd, foundMatch;
+			// For each name
+			for (nameInd in DC_LoaTS_Helper.raids)
+			{
+			    var name = DC_LoaTS_Helper.raids[nameInd].getSearchableName();
+			    // For each possible substring length
+			    windowLoop:
+			    for (windowSize = 1; windowSize <= name.length; windowSize++)
+			    {
+			        // For each starting index of a substring
+			        for (substrInd = 0; substrInd <= name.length-windowSize; substrInd++)
+			        {
+			            substr = name.substring(substrInd,substrInd+windowSize).toLowerCase();
+			            if (/^\w_/gi.test(substr)){continue;}
+			            foundMatch = false;
+			            // For each other name
+			            for (otherNameInd in DC_LoaTS_Helper.raids)
+			            {
+			                if (nameInd != otherNameInd && DC_LoaTS_Helper.raids[otherNameInd].getSearchableName().toLowerCase().indexOf(substr) > -1)
+			                {
+			                    foundMatch = true;
+			                    break;
+			                }
+			            }
+			
+			            if (!foundMatch)
+			            {
+			                // This substr works!
+			                DC_LoaTS_Helper.raids[nameInd].shortestName = substr;
+			                break windowLoop;
+			            }
+			        }
+			    }
+			}
+			Timer.stop("calculateShortestRaidNames calc");
+		};
+		
+		// Go ahead and execute this, too
+		DC_LoaTS_Helper.calculateShortestRaidNames();
+
 		// Debug log wrapping function
 		// Special scope debugging for just this script
 		window.DCDebug = function()
