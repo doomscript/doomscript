@@ -235,6 +235,7 @@
 						newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 						newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 						newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
+						newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 						newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 						newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -338,6 +339,7 @@
 					newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 					newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 					newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
+					newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 					newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 					newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));

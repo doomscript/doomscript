@@ -1983,6 +1983,7 @@ function main()
 						newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 						newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 						newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
+						newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 						newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 						newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -2086,6 +2087,7 @@ function main()
 					newMessage = newMessage.replace(/{name}/gi, raid.fullName);
 					newMessage = newMessage.replace(/{short-name}/gi, raid.shortName);
 					newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
+					newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 					newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
 
 					newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
@@ -3973,14 +3975,14 @@ function main()
 				this.zone = zone;
 				this.fullName = fullName;
 				this.shortName = shortName;
-				this.shortestName = "!"; // This will actually be calculated after all raids are known
 				this.colloqName = colloqName;
+				this.shortestName = colloqName;
 				this.time = time;
 				this.size = size;
 				this.stat = stat;
 				
 				// Calculate Health
-				if (typeof health == "number")
+				if (typeof health === "number")
 				{
 					this.health = [health*RaidType.difficultyHealthFactor[1], 
 								   health*RaidType.difficultyHealthFactor[2], 
@@ -3988,11 +3990,11 @@ function main()
 								   health*RaidType.difficultyHealthFactor[4], 
 								   ];
 				}
-				else if (typeof health == "string")
+				else if (typeof health === "string")
 				{
 					this.health = [health, health, health, health];
 				}
-				else if (typeof health == "object" && typeof health !== null)
+				else if (typeof health === "object" && typeof health !== null)
 				{
 					this.health = health;
 				}
@@ -4002,11 +4004,11 @@ function main()
 				}
 				
 				// Calculate Fair Share
-				if (typeof fairShare == "number" || typeof fairShare == "string")
+				if (typeof fairShare === "number" || typeof fairShare === "string")
 				{
 					this.fairShare = [fairShare, fairShare, fairShare, fairShare];
 				}
-				else if (typeof fairShare == "object" && fairShare !== null)
+				else if (typeof fairShare === "object" && fairShare !== null)
 				{
 					this.fairShare = fairShare;
 				}
@@ -4015,11 +4017,11 @@ function main()
 
 
 				// Calculate Target
-				if (typeof target == "number" || typeof target == "string")
+				if (typeof target === "number" || typeof target === "string")
 				{
 					this.target = [target, target, target, target];
 				}
-				else if (typeof target == "object" && target !== null)
+				else if (typeof target === "object" && target !== null)
 				{
 					this.target = target;
 				}
@@ -4036,15 +4038,15 @@ function main()
 				var fs = 0;
 				
 				// If there is a hardcoded fair share, use that
-				if (typeof this.fairShare != "undefined")
+				if (typeof this.fairShare !== "undefined")
 				{
 					fs = this.fairShare[difficulty-1];
 				}
 				// IF there is no hardcoded fair share, calculate it
 				// Also, we must have healths, difficulty, and size to calculate it
-				else if (typeof difficulty != "undefined" 
-					  && typeof this.size == "number" 
-					  && typeof this.getHealth(difficulty) == "number")
+				else if (typeof difficulty !== "undefined" 
+					  && typeof this.size === "number" 
+					  && typeof this.getHealth(difficulty) === "number")
 				{
 					fs = this.getHealth(difficulty) / this.size;
 				}
@@ -4121,7 +4123,7 @@ function main()
 				text += "Raid Size: " + this.size + " \n";
 				text += "Stat(s) Used: " + this.stat + " \n";
 				text += "Duration: " + this.getTimeText() + " \n";
-				text += "Zone: " + this.zone + "\n";
+				text += "Zone: " + this.zone + " \n";
 
 				// If the user passed in difficulty 0, they only want the above listed stuff
 				if (difficulty != 0)
@@ -4147,7 +4149,7 @@ function main()
 						
 						if (difficulties.length > 1)
 						{
-							text += "\n--\n";
+							text += " \n-- \n";
 						}
 						
 						// Get text for the difficulty
@@ -4165,7 +4167,7 @@ function main()
 						text += "Health: " + healthText + " \n";
 						text += "<acronym title=\"FS = Fair Share (of damage) = Raid Health (" + healthText + 
 								") / Raid Size (" + this.size + ")\">FS</acronym>: " + this.getFairShareText(d) + " \n";
-						text += "<span class=\"abbr\" title=\"Target Damage is FS * Raid Size Multiplier. The multiplier is calculated from user tests in the spreadsheet.\">Target</span>: " +  this.getTargetDamageText(d);
+						text += "<span class=\"abbr\" title=\"Target Damage is FS * Raid Size Multiplier. The multiplier is calculated from user tests in the spreadsheet.\">Target(OS)</span>: " +  this.getTargetDamageText(d) + " ";
 	
 					}
 				}
@@ -4608,7 +4610,6 @@ function main()
 					}
 					
 					this.pane.appendChild(this.optionRowTemplate);
-					
 				},
 				
 		});
@@ -6273,7 +6274,7 @@ DC_LoaTS_Helper.raids =
     kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S",  [180000000, 234000000, 288000000, 320000000]),
                 
     // Epic Raids
-    colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Colo",           168, 250, "S",  150000000),
+    colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
     vespasia:           new RaidType("vespasia",            "Z2", "Vespasia's Android", "Vespasia Bot", "Vesp",      168, 250, "S",  250000000),
     generalrahn:        new RaidType("generalrahn",         "Z3", "Centurian General", "CC General", "General",      168, 250, "S",  350000000),
     natasha:            new RaidType("natasha",             "Z4", "Natasha Cybersmash", "Cybersmash", "Cyber-S",     168, 250, "S",  450000000),
@@ -6319,7 +6320,7 @@ DC_LoaTS_Helper.raids =
     kaltharan_devourer: new RaidType("kaltharan_devourer",  "A4", "Kaltharan Devourer", "Devourer", "Devourer",      168,  100, "H",  180000000),        
     terminus_juggernaut: new RaidType("terminus_juggernaut","A5", "Terminus Juggernaut", "Juggernaut", "Juggernaut", 168,  100, "H",  200000000),
     legacy_bot:         new RaidType("legacy_bot",          "A6", "Legacy Bot",    "Legacy", "Legacy",               168,  100, "H",  250000000),
-    wahsh:              new RaidType("wahsh",               "A7", "Wahsh Al-Sahraa", "Wahsh", "Wahsh",                84,  100, "H", [500000000, 1200000000, 3125000000, 7812500000]),
+    wahsh:              new RaidType("wahsh",               "AX", "Wahsh Al-Sahraa", "Wahsh", "Wahsh",                84,  100, "H", [500000000, 1200000000, 3125000000, 7812500000]),
     
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
@@ -6327,6 +6328,7 @@ DC_LoaTS_Helper.raids =
     mecha_wyrm:         new RaidType("mecha_wyrm",          "A4", "Mecha-Wyrm", "Wyrm", "Wyrm",                      168,  250, "H",  350000000),
     contest_winners:    new RaidType("contest_winners",     "A6", "Shadows of the Void", "Shadows", "Shadows",       168,  250, "H",  500000000),
     genesis:            new RaidType("genesis",             "A5", "Genesis", "Genesis", "Genesis",                   165,  250, "H", 1000000000),
+    celebration_enhancer_1: new RaidType("celebration_enhancer_1","AX","Celebration Enhancer J-54","Celebrator","Celeb",84, 250, "H",  600000000),
 
     // Galactic Raids
     // Infestation Trilogy
@@ -7134,6 +7136,52 @@ DC_LoaTS_Helper.raids =
 			return "<a href=\"#\" class=\"chatCommandLink\" onclick=\"holodeck.processChatCommand('" + commandText + "'); return false;\">" + displayText + "</a>";
 		};
 		
+		
+		// Calculate shortest names
+		DC_LoaTS_Helper.calculateShortestRaidNames = function()
+		{
+			Timer.start("calculateShortestRaidNames calc");
+			// Borrowed from: http://stackoverflow.com/questions/11245481/find-the-smallest-unique-substring-for-each-string-in-an-array
+			var uniqueNames = [], nameInd, windowSize, substrInd, substr, otherNameInd, foundMatch;
+			// For each name
+			for (nameInd in DC_LoaTS_Helper.raids)
+			{
+			    var name = DC_LoaTS_Helper.raids[nameInd].getSearchableName();
+			    // For each possible substring length
+			    windowLoop:
+			    for (windowSize = 1; windowSize <= name.length; windowSize++)
+			    {
+			        // For each starting index of a substring
+			        for (substrInd = 0; substrInd <= name.length-windowSize; substrInd++)
+			        {
+			            substr = name.substring(substrInd,substrInd+windowSize).toLowerCase();
+			            if (/^\w_/gi.test(substr)){continue;}
+			            foundMatch = false;
+			            // For each other name
+			            for (otherNameInd in DC_LoaTS_Helper.raids)
+			            {
+			                if (nameInd != otherNameInd && DC_LoaTS_Helper.raids[otherNameInd].getSearchableName().toLowerCase().indexOf(substr) > -1)
+			                {
+			                    foundMatch = true;
+			                    break;
+			                }
+			            }
+			
+			            if (!foundMatch)
+			            {
+			                // This substr works!
+			                DC_LoaTS_Helper.raids[nameInd].shortestName = substr;
+			                break windowLoop;
+			            }
+			        }
+			    }
+			}
+			Timer.stop("calculateShortestRaidNames calc");
+		};
+		
+		// Go ahead and execute this, too
+		DC_LoaTS_Helper.calculateShortestRaidNames();
+
 		// Debug log wrapping function
 		// Special scope debugging for just this script
 		window.DCDebug = function()
