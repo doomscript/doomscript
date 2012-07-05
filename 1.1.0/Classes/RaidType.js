@@ -14,7 +14,6 @@
 				this.zone = zone;
 				this.fullName = fullName;
 				this.shortName = shortName;
-				this.shortestName = "!"; // This will actually be calculated after all raids are known
 				this.colloqName = colloqName;
 				this.time = time;
 				this.size = size;
@@ -162,7 +161,7 @@
 				text += "Raid Size: " + this.size + " \n";
 				text += "Stat(s) Used: " + this.stat + " \n";
 				text += "Duration: " + this.getTimeText() + " \n";
-				text += "Zone: " + this.zone + "\n";
+				text += "Zone: " + this.zone + " \n";
 
 				// If the user passed in difficulty 0, they only want the above listed stuff
 				if (difficulty != 0)
@@ -188,7 +187,7 @@
 						
 						if (difficulties.length > 1)
 						{
-							text += "\n--\n";
+							text += " \n-- \n";
 						}
 						
 						// Get text for the difficulty
@@ -206,7 +205,7 @@
 						text += "Health: " + healthText + " \n";
 						text += "<acronym title=\"FS = Fair Share (of damage) = Raid Health (" + healthText + 
 								") / Raid Size (" + this.size + ")\">FS</acronym>: " + this.getFairShareText(d) + " \n";
-						text += "<span class=\"abbr\" title=\"Target Damage is FS * Raid Size Multiplier. The multiplier is calculated from user tests in the spreadsheet.\">Target</span>: " +  this.getTargetDamageText(d);
+						text += "<span class=\"abbr\" title=\"Target Damage is FS * Raid Size Multiplier. The multiplier is calculated from user tests in the spreadsheet.\">Target(OS)</span>: " +  this.getTargetDamageText(d) + " ";
 	
 					}
 				}
