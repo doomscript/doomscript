@@ -4189,7 +4189,7 @@ function main()
 		// List of *FS modifiers for Target Damage based on raid size.
 		// From the raid spreadsheet:
 		//		https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4
-		RaidType.targetDamageModifier = {10: 1.25, 50: 2.2, 100: 2.3, 250: 1, 500: 1.5};
+		RaidType.targetDamageModifier = {1: 1, 10: 1.25, 50: 2.2, 100: 2.3, 250: 1, 500: 1.5};
 
 		/************************************/
 		/********** Timing Utility **********/
@@ -6238,7 +6238,7 @@ function main()
 DC_LoaTS_Helper.raids = 
 {
 	// Personal Raids
-    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    6000000),
+    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    [6000000, "N/A", "N/A", "N/A"]),
 	
     // Public raids
     // Small Raids
