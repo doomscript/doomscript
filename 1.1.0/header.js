@@ -5,7 +5,7 @@
 // @author         doomcat
 // @version        1.1.0
 // @date           02.01.2012
-// @include        http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns*
+// @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
 
 /**********************************************\
