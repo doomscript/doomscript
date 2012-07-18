@@ -2,7 +2,7 @@
 DC_LoaTS_Helper.raids = 
 {
 	// Personal Raids
-    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    6000000),
+    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    [6000000, "N/A", "N/A", "N/A"]),
 	
     // Public raids
     // Small Raids
