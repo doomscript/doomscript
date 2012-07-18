@@ -563,6 +563,9 @@
 
 // This injects our script onto the page.
 // Borrowed from: http://stackoverflow.com/a/2303228
-var script = document.createElement('script');
-script.appendChild(document.createTextNode('('+ main +')();'));
-(document.body || document.head || document.documentElement).appendChild(script);
+if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))
+{
+	var script = document.createElement('script');
+	script.appendChild(document.createTextNode('('+ main +')();'));
+	(document.body || document.head || document.documentElement).appendChild(script);
+}

@@ -5,7 +5,7 @@
 // @author         doomcat
 // @version        1.1.0
 // @date           02.01.2012
-// @include        http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns*
+// @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
 
 /**********************************************\
@@ -6237,6 +6237,9 @@ function main()
 // List of all raid ids and names. Any raid without a real raid id will not show up nicely.
 DC_LoaTS_Helper.raids = 
 {
+	// Personal Raids
+    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    6000000),
+	
     // Public raids
     // Small Raids
     commander:          new RaidType("commander",           "Z1", "Centurian Commander", "CC Commander", "CC Comm",  168,  10, "S",     150000),
@@ -6328,7 +6331,7 @@ DC_LoaTS_Helper.raids =
     mecha_wyrm:         new RaidType("mecha_wyrm",          "A4", "Mecha-Wyrm", "Wyrm", "Wyrm",                      168,  250, "H",  350000000),
     contest_winners:    new RaidType("contest_winners",     "A6", "Shadows of the Void", "Shadows", "Shadows",       168,  250, "H",  500000000),
     genesis:            new RaidType("genesis",             "A5", "Genesis", "Genesis", "Genesis",                   165,  250, "H", 1000000000),
-    celebration_enhancer_1: new RaidType("celebration_enhancer_1","AX","Celebration Enhancer J-54","Celebrator","Celeb",84, 250, "H",  600000000),
+    celebration_enhancer_1: new RaidType("celebration_enhancer_1","AX","Celebration Enhancer J-54","Celebrator","Celeb",84,250, "H",  600000000),
 
     // Galactic Raids
     // Infestation Trilogy
@@ -7766,6 +7769,9 @@ DC_LoaTS_Helper.raids =
 
 // This injects our script onto the page.
 // Borrowed from: http://stackoverflow.com/a/2303228
-var script = document.createElement('script');
-script.appendChild(document.createTextNode('('+ main +')();'));
-(document.body || document.head || document.documentElement).appendChild(script);
+if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))
+{
+	var script = document.createElement('script');
+	script.appendChild(document.createTextNode('('+ main +')();'));
+	(document.body || document.head || document.documentElement).appendChild(script);
+}

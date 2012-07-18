@@ -1,6 +1,9 @@
 // List of all raid ids and names. Any raid without a real raid id will not show up nicely.
 DC_LoaTS_Helper.raids = 
 {
+	// Personal Raids
+    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    6000000),
+	
     // Public raids
     // Small Raids
     commander:          new RaidType("commander",           "Z1", "Centurian Commander", "CC Commander", "CC Comm",  168,  10, "S",     150000),
