@@ -2314,9 +2314,9 @@ function main()
 
 		// Define the regular expression (regex) that tells us if a link is a raid link or not
 		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?(?!\?4217\-op)\?([^,"]*)\b/i;
-		
+
 		// Define a regular expresson to catch busted links
-		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/cdn2\.kongregate\.com\/game_icons\/0033\/2679\/i\.gif\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
+		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/.*?\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
 		
 		// Fallback image url if we can't get the provided one
 		RaidLink.defaultImageFormat = '<img style="raidIcon" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
