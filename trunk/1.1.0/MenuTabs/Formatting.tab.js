@@ -159,6 +159,6 @@
 				{
 					this.currentMessageFormat = this.messageFormatTextArea.value.replace(/(?:\r\n|\r|\n)/g, "{line}");
 					this.messageSpan.innerHTML = this.sampleRaidLink.getFormattedRaidLink(this.currentMessageFormat);
-				},
+				}
 		});
 		

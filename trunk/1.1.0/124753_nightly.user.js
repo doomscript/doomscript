@@ -209,8 +209,8 @@ function main()
 	    	behaviorPrefs: "DC_LoaTS_behaviorPreferences",
 	    	
 	    	// Quarantine addendum
-	    	quarantine: "_quarantine",
-    	},
+	    	quarantine: "_quarantine"
+    	}
 	};
 
 	
@@ -735,7 +735,7 @@ function main()
 			execute: function(clickEvent)
 			{
 				this.callback(clickEvent);
-			},
+			}
 			
 		});
 
@@ -1122,7 +1122,7 @@ function main()
 					clearInterval(this.omniboxOptionRefreshInterval);
 					delete this.omniboxOptionRefreshInterval;
 				}
-			},
+			}
 		});
 		
 		RaidCommand.create = function(classObject)
@@ -1196,7 +1196,7 @@ function main()
 				// 		(Not the command output text) will forward on to chat
 				// otherwise, we default to absorbing the command locally
 				return commandRet.sendToChat || false;
-			},
+			}
 			
 			
 		});
@@ -2305,7 +2305,7 @@ function main()
 			{
 				// All a link needs to be valid is an id and a hash
 				return typeof this.id != "undefined" && typeof this.hash != "undefined" && this.id != "" && this.hash != "";
-			},
+			}
 			
 		});
 		
@@ -3066,15 +3066,7 @@ function main()
 					console.warn(ex);
 				}
 				Timer.stop("fetchByFilter");
-			},
-			
-			// DB Commands
-			fetchByFilterDB: function(command)
-			{
-				
-			},
-			
-			
+			}
 		}
 
 		/************************************/
@@ -3277,7 +3269,7 @@ function main()
 				delete this.preDragTop;
 				delete this.startingMouseX;
 				delete this.startingMouseY;
-			},
+			}
 		});
 		
 		// Put in a place holder for the tabs
@@ -3394,8 +3386,7 @@ function main()
 						return {wrapper: outerWrapper, option: option};
 					}
 				}
-			}, 
-			
+			}
 		});
 		
 		RaidMenuTab.create = function(classObject)
@@ -4173,7 +4164,7 @@ function main()
 				}
 				
 				return text;
-			},
+			}
 			
 		});// End RaidType Class
 		
@@ -4425,7 +4416,7 @@ function main()
 				{
 					this.currentMessageFormat = this.messageFormatTextArea.value.replace(/(?:\r\n|\r|\n)/g, "{line}");
 					this.messageSpan.innerHTML = this.sampleRaidLink.getFormattedRaidLink(this.currentMessageFormat);
-				},
+				}
 		});
 		
 		/************************************/
@@ -4463,7 +4454,7 @@ function main()
 					);
 
 					this.pane.appendChild(htmlRet.wrapper);
-				},
+				}
 							
 		});
 		
@@ -4559,7 +4550,7 @@ function main()
 				clearResults: function()
 				{
 					this.resultsBox.childElements().invoke("remove");
-				},
+				}
 			
 		});
 		
@@ -4610,7 +4601,7 @@ function main()
 					}
 					
 					this.pane.appendChild(this.optionRowTemplate);
-				},
+				}
 				
 		});
 
@@ -4628,7 +4619,7 @@ function main()
 				initPane: function()
 				{
 					//TODO: Fill out utilities tab
-				},
+				}
 							
 		});
 		
@@ -4706,7 +4697,7 @@ function main()
 					helpText += " at the top of the screen offering the option to update.\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 	
@@ -5076,7 +5067,7 @@ function main()
 								DC_LoaTS_Properties.farmSpreadsheetURL + "\" target=\"_blank\">this spreadsheet</a>\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		
@@ -5348,7 +5339,7 @@ function main()
 					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		
@@ -5500,7 +5491,7 @@ function main()
 					helpText += "Use <code>{line}</code> for new lines, and can be used multiple times.\n"
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		
@@ -5535,7 +5526,7 @@ function main()
 					helpText += "Displays the help info for the script\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		
@@ -5604,7 +5595,7 @@ function main()
 					helpText += "\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		
@@ -5640,7 +5631,7 @@ function main()
 					helpText += "Attempts to reload just the game and not the window\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		
@@ -5945,7 +5936,7 @@ function main()
 					// Aliases for the command will be automatically appended to the bottom
 					
 					return helpText;
-				},
+				}
 			}
 		);
 		
@@ -5995,7 +5986,7 @@ function main()
 					var localDate = new Date();
 					var serverDate =  new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60 * 1000);
 					return serverDate.toLocaleString().substring(0,25) + "GMT+0000 (UTC)";
-				},
+				}
 			}
 		);
 		
@@ -6255,7 +6246,7 @@ DC_LoaTS_Helper.raids =
     quiskerian_temple:  new RaidType("quiskerian_temple",   "L1", "Quiskerian Temple", "Temple", "Temple",            10,  25, "S", [200000000, 1000000000, 2000000000, 3000000000]),
     
     // Medium Raids
-    void:               new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
+    "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
     carnus:             new RaidType("carnus",              "Z2", "Carnus 9000", "Carnus", "Carnus",                 120,  50, "S",   15000000),
     cruiser:            new RaidType("cruiser",             "Z3", "Centurian Cruiser", "CC Cruiser", "Cruiser",       72,  50, "S",   25000000),
     china:              new RaidType("china",               "Z4", "Blood Alley Gang", "Gang", "Gang",                 72,  50, "S",   35000000),
@@ -6344,7 +6335,7 @@ DC_LoaTS_Helper.raids =
     general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorzeny",        120,  9999,"S",[1000000000, 50000000000, 250000000000, 500000000000],/*FS calculated normally*/null,5000000),
     
     // Galaxy Dome Raids
-    vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000),
+    vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000)
     
 };
 

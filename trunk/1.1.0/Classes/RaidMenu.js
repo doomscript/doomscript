@@ -198,7 +198,7 @@
 				delete this.preDragTop;
 				delete this.startingMouseX;
 				delete this.startingMouseY;
-			},
+			}
 		});
 		
 		// Put in a place holder for the tabs

@@ -44,7 +44,7 @@
 					var localDate = new Date();
 					var serverDate =  new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60 * 1000);
 					return serverDate.toLocaleString().substring(0,25) + "GMT+0000 (UTC)";
-				},
+				}
 			}
 		);
 		

@@ -617,14 +617,6 @@
 					console.warn(ex);
 				}
 				Timer.stop("fetchByFilter");
-			},
-			
-			// DB Commands
-			fetchByFilterDB: function(command)
-			{
-				
-			},
-			
-			
+			}
 		}
 

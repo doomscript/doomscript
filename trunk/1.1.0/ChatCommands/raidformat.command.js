@@ -146,7 +146,7 @@
 					helpText += "Use <code>{line}</code> for new lines, and can be used multiple times.\n"
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		

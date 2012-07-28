@@ -30,7 +30,7 @@
 					helpText += "Attempts to reload just the game and not the window\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		

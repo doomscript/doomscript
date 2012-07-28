@@ -20,7 +20,7 @@
 			execute: function(clickEvent)
 			{
 				this.callback(clickEvent);
-			},
+			}
 			
 		});
 

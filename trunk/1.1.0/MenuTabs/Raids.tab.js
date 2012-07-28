@@ -90,7 +90,7 @@
 				clearResults: function()
 				{
 					this.resultsBox.childElements().invoke("remove");
-				},
+				}
 			
 		});
 		

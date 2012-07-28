@@ -72,7 +72,7 @@
 					helpText += " at the top of the screen offering the option to update.\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 	

@@ -106,7 +106,7 @@
 								DC_LoaTS_Properties.farmSpreadsheetURL + "\" target=\"_blank\">this spreadsheet</a>\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		

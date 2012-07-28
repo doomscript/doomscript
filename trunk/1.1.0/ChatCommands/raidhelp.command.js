@@ -29,7 +29,7 @@
 					helpText += "Displays the help info for the script\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		

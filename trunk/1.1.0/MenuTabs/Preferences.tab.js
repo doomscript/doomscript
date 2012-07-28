@@ -33,7 +33,7 @@
 					);
 
 					this.pane.appendChild(htmlRet.wrapper);
-				},
+				}
 							
 		});
 		
