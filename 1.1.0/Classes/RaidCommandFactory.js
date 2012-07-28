@@ -27,7 +27,7 @@
 				// 		(Not the command output text) will forward on to chat
 				// otherwise, we default to absorbing the command locally
 				return commandRet.sendToChat || false;
-			},
+			}
 			
 			
 		});

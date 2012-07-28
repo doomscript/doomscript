@@ -381,7 +381,7 @@
 					clearInterval(this.omniboxOptionRefreshInterval);
 					delete this.omniboxOptionRefreshInterval;
 				}
-			},
+			}
 		});
 		
 		RaidCommand.create = function(classObject)

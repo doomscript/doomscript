@@ -84,8 +84,7 @@
 						return {wrapper: outerWrapper, option: option};
 					}
 				}
-			}, 
-			
+			}
 		});
 		
 		RaidMenuTab.create = function(classObject)

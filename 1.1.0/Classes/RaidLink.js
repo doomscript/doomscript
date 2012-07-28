@@ -557,7 +557,7 @@
 			{
 				// All a link needs to be valid is an id and a hash
 				return typeof this.id != "undefined" && typeof this.hash != "undefined" && this.id != "" && this.hash != "";
-			},
+			}
 			
 		});
 		

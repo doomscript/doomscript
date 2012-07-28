@@ -212,7 +212,7 @@
 				}
 				
 				return text;
-			},
+			}
 			
 		});// End RaidType Class
 		

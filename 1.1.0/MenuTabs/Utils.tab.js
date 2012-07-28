@@ -12,7 +12,7 @@
 				initPane: function()
 				{
 					//TODO: Fill out utilities tab
-				},
+				}
 							
 		});
 		

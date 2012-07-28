@@ -209,8 +209,8 @@ function main()
 	    	behaviorPrefs: "DC_LoaTS_behaviorPreferences",
 	    	
 	    	// Quarantine addendum
-	    	quarantine: "_quarantine",
-    	},
+	    	quarantine: "_quarantine"
+    	}
 	};
 
 	

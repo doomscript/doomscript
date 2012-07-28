@@ -63,7 +63,7 @@
 					helpText += "\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		

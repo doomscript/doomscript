@@ -43,7 +43,7 @@
 					}
 					
 					this.pane.appendChild(this.optionRowTemplate);
-				},
+				}
 				
 		});
 

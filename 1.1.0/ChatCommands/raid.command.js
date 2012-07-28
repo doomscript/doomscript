@@ -117,7 +117,7 @@
 					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
 					
 					return helpText;
-				},	
+				}
 			}
 		);
 		

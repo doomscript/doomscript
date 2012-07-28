@@ -119,7 +119,7 @@
 					// Aliases for the command will be automatically appended to the bottom
 					
 					return helpText;
-				},
+				}
 			}
 		);
 		
