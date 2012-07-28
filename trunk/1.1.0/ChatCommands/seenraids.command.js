@@ -127,8 +127,8 @@
 							{
 								DCDebug("Seen Nightmare " + this.parser.name);
 								this.parser.difficulty = 4;
-							},
-						},
+							}
+						}
 					};
 					
 					return commandOptions;

@@ -51,8 +51,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Execute this raid style command",
-						},
+							text: "Execute this raid style command"
+						}
 					};
 					
 					return commandOptions;

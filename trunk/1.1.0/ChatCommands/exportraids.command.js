@@ -73,8 +73,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Export matching data",
-						},
+							text: "Export matching data"
+						}
 					};
 					
 					return commandOptions;

@@ -95,9 +95,8 @@
 									  	// to be called next. 
 									  	// If this code starts to get long, you
 									  	// might consider going about it differently.
-									  },
-							
-						},
+									  }
+						}
 					};
 					
 					// Make sure to return the options we just made

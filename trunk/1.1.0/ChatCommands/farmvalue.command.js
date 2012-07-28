@@ -93,8 +93,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Display farm values",
-						},
+							text: "Display farm values"
+						}
 					};
 					
 					return commandOptions;

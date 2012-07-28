@@ -17,8 +17,7 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Load raid: " + this.parser.getDifficultyText() + " " + this.parser.getName(),
-							callback: function(){/*this.execute();*/},
+							text: "Load raid: " + this.parser.getDifficultyText() + " " + this.parser.getName()
 						},
 					};
 					

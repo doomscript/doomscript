@@ -70,16 +70,16 @@
 					{
 						commandOptions = {
 							initialText: {
-								text: "Clear all raids from memory",
-							},
+								text: "Clear all raids from memory"
+							}
 						};
 					}
 					else
 					{
 						commandOptions = {
 							initialText: {
-								text: "Clear raids from memory matching " + this.parser.toString(),
-							},
+								text: "Clear raids from memory matching " + this.parser.toString()
+							}
 						};
 					}
 					

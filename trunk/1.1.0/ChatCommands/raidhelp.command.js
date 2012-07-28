@@ -17,8 +17,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Script help",
-						},
+							text: "Display doomscript help"
+						}
 					};
 					
 					return commandOptions;

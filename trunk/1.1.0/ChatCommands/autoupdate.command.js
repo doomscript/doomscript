@@ -54,8 +54,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Get autoupdate status",
-						},
+							text: "Get autoupdate status"
+						}
 					};
 					
 					return commandOptions;
