@@ -51,8 +51,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Set raid format to " + this.processedText,
-						},
+							text: "Set raid format to " + this.processedText
+						}
 					};
 					
 					return commandOptions;

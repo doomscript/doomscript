@@ -18,8 +18,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Reload the game",
-						},
+							text: "Reload the game"
+						}
 					};
 					
 					return commandOptions;

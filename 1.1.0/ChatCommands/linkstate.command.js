@@ -74,7 +74,7 @@
 					var commandOptions = {					
 						initialText: {
 							text: "Mark this " + linkState.niceText + " " + this.parser.getName(),
-							executable: false,
+							executable: false
 						},
 					};
 					
@@ -97,7 +97,7 @@
 				{
 					return {
 						text: state.niceText,
-						callback: function(state){this.parser.state = state.id}.bind(this, state),
+						callback: function(state){this.parser.state = state.id}.bind(this, state)
 					};
 				},
 				

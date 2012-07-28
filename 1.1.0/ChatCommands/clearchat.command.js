@@ -18,8 +18,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Clear chat?",
-						},
+							text: "Clear chat?"
+						}
 					};
 					
 					return commandOptions;

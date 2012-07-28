@@ -18,8 +18,8 @@
 				{
 					var commandOptions = {
 						initialText: {
-							text: "Install the current stable script",
-						},
+							text: "Install the current stable script"
+						}
 					};
 					
 					return commandOptions;

@@ -21,8 +21,8 @@
 							refreshEvery: 1000,
 						},
 						initialText: {
-							text: "Local Time: " + this.getLocalDateText() + "<br>Server Time: " + this.getServerDateText(),
-						},
+							text: "Local Time: " + this.getLocalDateText() + "<br>Server Time: " + this.getServerDateText()
+						}
 					};
 					
 					return commandOptions;

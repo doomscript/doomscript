@@ -25,8 +25,8 @@
 							text: "Search Zoywiki for: " + this.processedText,
 							linkParams: {href: this.createURL(this.processedText), target: "_blank"},
 							doNotCallHandler: true,
-							followLink: true,
-						},
+							followLink: true
+						}
 					};
 					
 					return commandOptions;

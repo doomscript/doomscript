@@ -4679,8 +4679,8 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Get autoupdate status",
-						},
+							text: "Get autoupdate status"
+						}
 					};
 					
 					return commandOptions;
@@ -4721,8 +4721,8 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Clear chat?",
-						},
+							text: "Clear chat?"
+						}
 					};
 					
 					return commandOptions;
@@ -4809,16 +4809,16 @@ function main()
 					{
 						commandOptions = {
 							initialText: {
-								text: "Clear all raids from memory",
-							},
+								text: "Clear all raids from memory"
+							}
 						};
 					}
 					else
 					{
 						commandOptions = {
 							initialText: {
-								text: "Clear raids from memory matching " + this.parser.toString(),
-							},
+								text: "Clear raids from memory matching " + this.parser.toString()
+							}
 						};
 					}
 					
@@ -4936,8 +4936,8 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Export matching data",
-						},
+							text: "Export matching data"
+						}
 					};
 					
 					return commandOptions;
@@ -5054,8 +5054,8 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Display farm values",
-						},
+							text: "Display farm values"
+						}
 					};
 					
 					return commandOptions;
@@ -5147,7 +5147,7 @@ function main()
 					var commandOptions = {					
 						initialText: {
 							text: "Mark this " + linkState.niceText + " " + this.parser.getName(),
-							executable: false,
+							executable: false
 						},
 					};
 					
@@ -5170,7 +5170,7 @@ function main()
 				{
 					return {
 						text: state.niceText,
-						callback: function(state){this.parser.state = state.id}.bind(this, state),
+						callback: function(state){this.parser.state = state.id}.bind(this, state)
 					};
 				},
 				
@@ -5203,8 +5203,7 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Load raid: " + this.parser.getDifficultyText() + " " + this.parser.getName(),
-							callback: function(){/*this.execute();*/},
+							text: "Load raid: " + this.parser.getDifficultyText() + " " + this.parser.getName()
 						},
 					};
 					
@@ -5325,9 +5324,8 @@ function main()
 							{
 								DCDebug("Info Nightmare " + this.parser.name);
 								this.parser.difficulty = 4;
-							},
-						},
-
+							}
+						}
 					};
 					
 					return commandOptions;
@@ -5396,8 +5394,8 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Set raid format to " + this.processedText,
-						},
+							text: "Set raid format to " + this.processedText
+						}
 					};
 					
 					return commandOptions;
@@ -5514,8 +5512,8 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Script help",
-						},
+							text: "Display doomscript help"
+						}
 					};
 					
 					return commandOptions;
@@ -5583,8 +5581,8 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Execute this raid style command",
-						},
+							text: "Execute this raid style command"
+						}
 					};
 					
 					return commandOptions;
@@ -5619,8 +5617,8 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Reload the game",
-						},
+							text: "Reload the game"
+						}
 					};
 					
 					return commandOptions;
@@ -5764,8 +5762,8 @@ function main()
 							{
 								DCDebug("Seen Nightmare " + this.parser.name);
 								this.parser.difficulty = 4;
-							},
-						},
+							}
+						}
 					};
 					
 					return commandOptions;
@@ -5912,9 +5910,8 @@ function main()
 									  	// to be called next. 
 									  	// If this code starts to get long, you
 									  	// might consider going about it differently.
-									  },
-							
-						},
+									  }
+						}
 					};
 					
 					// Make sure to return the options we just made
@@ -5963,8 +5960,8 @@ function main()
 							refreshEvery: 1000,
 						},
 						initialText: {
-							text: "Local Time: " + this.getLocalDateText() + "<br>Server Time: " + this.getServerDateText(),
-						},
+							text: "Local Time: " + this.getLocalDateText() + "<br>Server Time: " + this.getServerDateText()
+						}
 					};
 					
 					return commandOptions;
@@ -6010,8 +6007,8 @@ function main()
 				{
 					var commandOptions = {
 						initialText: {
-							text: "Install the current stable script",
-						},
+							text: "Install the current stable script"
+						}
 					};
 					
 					return commandOptions;
@@ -6053,8 +6050,8 @@ function main()
 							text: "Search Zoywiki for: " + this.processedText,
 							linkParams: {href: this.createURL(this.processedText), target: "_blank"},
 							doNotCallHandler: true,
-							followLink: true,
-						},
+							followLink: true
+						}
 					};
 					
 					return commandOptions;
