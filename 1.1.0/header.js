@@ -164,6 +164,10 @@ Fixed bug with command aliases being case sensitive. /SEENRAID colo should now w
 Added /clearchat command
 Added /raidstyle command
 Kong added some padding to their text boxes that has now been removed from the Omnibox
+
+2012.08.01 - 1.1.0 Stable
+Too much to even list. See above and tickets.
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
