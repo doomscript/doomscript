@@ -29,12 +29,12 @@
 					{
 						var raid = DC_LoaTS_Helper.raids[raidId];
 						var label = document.createElement("label");
-						label.for = "StyleTab-RaidOption-" + raid.shortestName + "-" + this.optionIndex++;
+						label["for"] = "StyleTab-RaidOption-" + raid.shortestName + "-" + this.optionIndex++;
 						label.appendChild(document.createTextNode(raid.colloqName));
 						
 						var checkbox = document.createElement("input");
 						checkbox.type = "checkbox";
-						checkbox.id = label.for;
+						checkbox.id = label["for"];
 						label.appendChild(checkbox);
 						
 						selectedRaidsOptionHolder.appendChild(label);

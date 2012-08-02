@@ -48,7 +48,7 @@
 
 							}
 						),
-						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload),
+						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload)
 					};
 					for (var buttonName in this.buttons)
 					{
@@ -360,9 +360,7 @@
 			hide: function()
 			{
 				this.container.hide();
-			},
-
-			
+			}
 		});
 		
 		// Toggle the visibility of the raid toolbar

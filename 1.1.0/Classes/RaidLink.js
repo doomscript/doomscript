@@ -177,7 +177,7 @@
 											difficulty: this.difficulty,
 											fs:  this.getRaid().getFairShare(this.difficulty),
 											name: this.getRaid().getSearchableName(),
-											state: RaidManager.fetchState(this),
+											state: RaidManager.fetchState(this)
 										})
 							)
 							{

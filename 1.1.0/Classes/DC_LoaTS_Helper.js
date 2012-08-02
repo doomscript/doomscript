@@ -119,16 +119,16 @@
 							}
 							
 							// Make sure attributes.class exists
-							if (typeof attributes.class === "undefined")
+							if (typeof attributes["class"] === "undefined")
 							{
-								attributes.class = "";
+								attributes["class"] = "";
 							}
 							
 							// Get the className of the link
 							var className = raidLink.getMatchedStyles().className;
 							if (typeof className !== "undefined")
 							{
-								attributes.class += className;
+								attributes["class"] += className;
 							}
 							
 							
@@ -155,7 +155,7 @@
 					// and since we can't control what other scripts and addons have also replaced it
 					this.DC_LoaTS_displayUnsanitizedMessage(user, msg, attributes, options);
 					Timer.stop("Process Message");
-				}
+				};
 								
 				// Take all the chat commands and register them with Kongregate
 				for (var commandName in DC_LoaTS_Helper.chatCommands)

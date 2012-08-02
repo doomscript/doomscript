@@ -554,7 +554,7 @@
 											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
-											count: raidCount,
+											count: raidCount
 										}
 										))
 									{
@@ -597,7 +597,7 @@
 											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
-											count: raidCount,
+											count: raidCount
 										}
 									);
 								}
