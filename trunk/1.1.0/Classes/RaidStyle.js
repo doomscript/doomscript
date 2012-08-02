@@ -97,7 +97,7 @@
 												 	{property: "text-decoration", 	capture: 0, replace: 0, pattern: /\bunderline(?: overline)\b/i},												 	
 												 	{property: "font-style", 		capture: 0, replace: 0, pattern: /\b(?:italic|oblique|normal)\b/i},												 	
 												 	{property: "whitespace", 		capture: 0, replace: 0, pattern: /\b(?:pre|pre-wrap|pre-line|-moz-pre-wrap|-o-pre-wrap|nowrap|normal)\b/i},												 	
-												 	{property: "display", 			capture: 0, replace: 0, pattern: /\b(?:none|inline|block|inline-block|list-item|marker|compact|run-in|table-header-group|table-footer-group|table|inline-table|table-caption|table-cell|table-row|table-row-group|table-column|table-column-group)\b/i},												 	
+												 	{property: "display", 			capture: 0, replace: 0, pattern: /\b(?:none|inline|block|inline-block|list-item|marker|compact|run-in|table-header-group|table-footer-group|table|inline-table|table-caption|table-cell|table-row|table-row-group|table-column|table-column-group)\b/i}
 												 ];
 		
 		RaidStyle.getNaturalLanguageParseElements = function()

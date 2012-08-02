@@ -175,7 +175,7 @@
 						callback: function()
 						{
 							console.log("mainOption " + this.commandName);
-						},
+						}
 					},
 					
 					secondOption: {
@@ -183,8 +183,8 @@
 						callback: function()
 						{
 							console.log("secondOption " + this.commandName);
-						},
-					},
+						}
+					}
 					
 				};
 				

@@ -23,10 +23,10 @@
 				// Calculate Health
 				if (typeof health === "number")
 				{
-					this.health = [health*RaidType.difficultyHealthFactor[1], 
-								   health*RaidType.difficultyHealthFactor[2], 
-								   health*RaidType.difficultyHealthFactor[3], 
-								   health*RaidType.difficultyHealthFactor[4], 
+					this.health = [health*RaidType.difficultyHealthFactor[1],
+								   health*RaidType.difficultyHealthFactor[2],
+								   health*RaidType.difficultyHealthFactor[3],
+								   health*RaidType.difficultyHealthFactor[4]
 								   ];
 				}
 				else if (typeof health === "string")

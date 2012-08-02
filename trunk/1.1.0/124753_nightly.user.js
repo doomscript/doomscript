@@ -338,16 +338,16 @@ function main()
 							}
 							
 							// Make sure attributes.class exists
-							if (typeof attributes.class === "undefined")
+							if (typeof attributes["class"] === "undefined")
 							{
-								attributes.class = "";
+								attributes["class"] = "";
 							}
 							
 							// Get the className of the link
 							var className = raidLink.getMatchedStyles().className;
 							if (typeof className !== "undefined")
 							{
-								attributes.class += className;
+								attributes["class"] += className;
 							}
 							
 							
@@ -374,7 +374,7 @@ function main()
 					// and since we can't control what other scripts and addons have also replaced it
 					this.DC_LoaTS_displayUnsanitizedMessage(user, msg, attributes, options);
 					Timer.stop("Process Message");
-				}
+				};
 								
 				// Take all the chat commands and register them with Kongregate
 				for (var commandName in DC_LoaTS_Helper.chatCommands)
@@ -916,7 +916,7 @@ function main()
 						callback: function()
 						{
 							console.log("mainOption " + this.commandName);
-						},
+						}
 					},
 					
 					secondOption: {
@@ -924,8 +924,8 @@ function main()
 						callback: function()
 						{
 							console.log("secondOption " + this.commandName);
-						},
-					},
+						}
+					}
 					
 				};
 				
@@ -1925,7 +1925,7 @@ function main()
 											difficulty: this.difficulty,
 											fs:  this.getRaid().getFairShare(this.difficulty),
 											name: this.getRaid().getSearchableName(),
-											state: RaidManager.fetchState(this),
+											state: RaidManager.fetchState(this)
 										})
 							)
 							{
@@ -3003,7 +3003,7 @@ function main()
 											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
-											count: raidCount,
+											count: raidCount
 										}
 										))
 									{
@@ -3046,7 +3046,7 @@ function main()
 											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
-											count: raidCount,
+											count: raidCount
 										}
 									);
 								}
@@ -3513,7 +3513,7 @@ function main()
 												 	{property: "text-decoration", 	capture: 0, replace: 0, pattern: /\bunderline(?: overline)\b/i},												 	
 												 	{property: "font-style", 		capture: 0, replace: 0, pattern: /\b(?:italic|oblique|normal)\b/i},												 	
 												 	{property: "whitespace", 		capture: 0, replace: 0, pattern: /\b(?:pre|pre-wrap|pre-line|-moz-pre-wrap|-o-pre-wrap|nowrap|normal)\b/i},												 	
-												 	{property: "display", 			capture: 0, replace: 0, pattern: /\b(?:none|inline|block|inline-block|list-item|marker|compact|run-in|table-header-group|table-footer-group|table|inline-table|table-caption|table-cell|table-row|table-row-group|table-column|table-column-group)\b/i},												 	
+												 	{property: "display", 			capture: 0, replace: 0, pattern: /\b(?:none|inline|block|inline-block|list-item|marker|compact|run-in|table-header-group|table-footer-group|table|inline-table|table-caption|table-cell|table-row|table-row-group|table-column|table-column-group)\b/i}
 												 ];
 		
 		RaidStyle.getNaturalLanguageParseElements = function()
@@ -3578,7 +3578,7 @@ function main()
 
 							}
 						),
-						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload),
+						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload)
 					};
 					for (var buttonName in this.buttons)
 					{
@@ -3890,9 +3890,7 @@ function main()
 			hide: function()
 			{
 				this.container.hide();
-			},
-
-			
+			}
 		});
 		
 		// Toggle the visibility of the raid toolbar
@@ -3975,10 +3973,10 @@ function main()
 				// Calculate Health
 				if (typeof health === "number")
 				{
-					this.health = [health*RaidType.difficultyHealthFactor[1], 
-								   health*RaidType.difficultyHealthFactor[2], 
-								   health*RaidType.difficultyHealthFactor[3], 
-								   health*RaidType.difficultyHealthFactor[4], 
+					this.health = [health*RaidType.difficultyHealthFactor[1],
+								   health*RaidType.difficultyHealthFactor[2],
+								   health*RaidType.difficultyHealthFactor[3],
+								   health*RaidType.difficultyHealthFactor[4]
 								   ];
 				}
 				else if (typeof health === "string")
@@ -4587,12 +4585,12 @@ function main()
 					{
 						var raid = DC_LoaTS_Helper.raids[raidId];
 						var label = document.createElement("label");
-						label.for = "StyleTab-RaidOption-" + raid.shortestName + "-" + this.optionIndex++;
+						label["for"] = "StyleTab-RaidOption-" + raid.shortestName + "-" + this.optionIndex++;
 						label.appendChild(document.createTextNode(raid.colloqName));
 						
 						var checkbox = document.createElement("input");
 						checkbox.type = "checkbox";
-						checkbox.id = label.for;
+						checkbox.id = label["for"];
 						label.appendChild(checkbox);
 						
 						selectedRaidsOptionHolder.appendChild(label);
@@ -6068,156 +6066,6 @@ function main()
 				{
 					searchInput = searchInput || "";
 					return this.urlPattern.format(escape(searchInput.replace(" ", "+")));
-				}
-			}
-		);
-		
-//TODO: Rename to loadAll command. AutoLoad should be for incoming new raids, not loading existing ones
-		RaidCommand.create(
-			{
-				commandName: "autoload",
-				aliases: [],
-				parsingClass: RaidFilter,
-
-				handler: function(deck, raidFilter, params, text, context)
-				{
-					// Declare ret object
-					var ret = {};
-					
-					// Cancel the previous timer, if there is one
-					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined")
-					{
-						// Clear out the raidLinks array from the previous one.
-						// The timeout will detect that there are suddenly no more links
-						// and acknowledge the error state and quit.
-						DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
-					}
-					
-					
-					// This only works with a valid filter
-					if (raidFilter && raidFilter.isValid())
-					{
-						// Fetch all the links
-						var raidLinks = RaidManager.fetchByFilter(raidFilter);
-						
-						// If there were any matched links
-						if (raidLinks.length > 0)
-						{
-							// private variable to be closed over in the autoLoader
-							var autoLoadCounter = 0;
-							var startTime = new Date()/1;
-							
-							// Create function closure to be called repeatedly
-							var autoLoader = function __autoload()
-							{
-								// This shouldn't be called without links, but just in case
-								if (raidLinks.length > 0)
-								{
-									// Load the next raid
-									DC_LoaTS_Helper.loadRaid(raidLinks.pop());
-									
-									// Keep track of how many we've loaded
-									autoLoadCounter++;
-									
-									// If there are any links left, we'll need to continue loading them
-									if (raidLinks.length > 0)
-									{
-										// Fire the loader again after a while
-										DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, 6000);
-									}
-									else
-									{
-										// Calculate how long it took to load them all
-										var endTime = new Date()/1;
-										var took = (endTime - startTime)/1000;
-										holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " complete! " + autoLoadCounter + " raids loaded in " + took + "s.");
-									}
-								}
-								else
-								{
-									// Calculate how long it took to load them all
-									var endTime = new Date()/1;
-									var took = (endTime - startTime)/1000;
-									holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " ended abruptly. " + autoLoadCounter + " raids loaded in " + took + "s.");
-								}
-							}
-							
-							ret.success = true;
-							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString();
-							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
-						}
-						else
-						{
-							ret.statusMessage = "AutoLoad could not find any raids matching your filter to load.";							
-						}
-						
-						ret.success = true;
-					}
-					else
-					{
-						ret.success = false;
-						ret.statusMessage = "Could not execute autoload due to invalid raid filter.";
-					}
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					//TODO: Better options here
-					var commandOptions = {					
-						initialText: {
-							text: "Load all raids matching the filter",
-						},
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
-					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
-					helpText += "\n";
-					helpText += "Loads all seen raids that match the given filter\n";
-					helpText += "\n";
-					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
-		RaidCommand.create( 
-			{
-				commandName: "timerdata",
-				aliases: [],
-				// No parsing needed
-				/*parsingClass: ,*/
-
-				handler: function(deck, parser, params, text, context)
-				{
-					// Declare ret object
-					var ret = {success: true};
-						
-					deck.activeDialogue().raidBotMessage(Timer.getReport());
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					var commandOptions = {					
-						initialText: {
-							text: "Print the timer report",
-						},
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
-					helpText += "Prints out timing and performance data about the script\n";
-					
-					return helpText;
 				}
 			}
 		);
