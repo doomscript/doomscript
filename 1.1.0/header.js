@@ -1,9 +1,10 @@
+
 // ==UserScript==
 // @name           Kongregate Legacy of a Thousand Suns Raid Link Helper
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.0
+// @version        1.1.1
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -168,6 +169,9 @@ Kong added some padding to their text boxes that has now been removed from the O
 2012.08.01 - 1.1.0 Stable
 Too much to even list. See above and tickets.
 
+
+2012.08.25 - 1.1.1 
+Mostly just updated Skorzeny and Temple info
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -176,7 +180,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.0",
+    	version: "1.1.1",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
