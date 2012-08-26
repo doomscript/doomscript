@@ -105,7 +105,7 @@ DC_LoaTS_Helper.raids =
     inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     
-    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",           70,  90000, "SEH","Infinite","N/A", 100000000000),
+    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",           72,  90000, "SEH","Infinite","N/A", 100000000000),
     
     // Galaxy Dome Raids
     vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000)
