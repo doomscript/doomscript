@@ -1,3 +1,4 @@
+
 // List of all raid ids and names. Any raid without a real raid id will not show up nicely.
 DC_LoaTS_Helper.raids = 
 {
@@ -104,8 +105,7 @@ DC_LoaTS_Helper.raids =
     inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     
-    // This is probably irrelevant since we'll never see another health based Skornzeny
-    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorzeny",        120,  9999,"S",[1000000000, 50000000000, 250000000000, 500000000000],/*FS calculated normally*/null,5000000),
+    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",           70,  90000, "SEH","Infinite","N/A", 100000000000),
     
     // Galaxy Dome Raids
     vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000)

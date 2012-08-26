@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.0
+// @version        1.1.1
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -168,6 +168,9 @@ Kong added some padding to their text boxes that has now been removed from the O
 2012.08.01 - 1.1.0 Stable
 Too much to even list. See above and tickets.
 
+
+2012.08.25 - 1.1.1 
+Mostly just updated Skorzeny and Temple info
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -176,7 +179,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.0",
+    	version: "1.1.1",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -4182,7 +4185,7 @@ function main()
 		// List of *FS modifiers for Target Damage based on raid size.
 		// From the raid spreadsheet:
 		//		https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4
-		RaidType.targetDamageModifier = {1: 1, 10: 1.25, 50: 2.2, 100: 2.3, 250: 1, 500: 1.5};
+		RaidType.targetDamageModifier = {1: 1, 10: 1.25, 25: 1.5, 50: 2.2, 100: 2.3, 250: 1, 500: 1.5};
 
 		/************************************/
 		/********** Timing Utility **********/
@@ -6074,6 +6077,157 @@ function main()
 			}
 		);
 		
+//TODO: Rename to loadAll command. AutoLoad should be for incoming new raids, not loading existing ones
+		RaidCommand.create(
+			{
+				commandName: "autoload",
+				aliases: [],
+				parsingClass: RaidFilter,
+
+				handler: function(deck, raidFilter, params, text, context)
+				{
+					// Declare ret object
+					var ret = {};
+					
+					// Cancel the previous timer, if there is one
+					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined")
+					{
+						// Clear out the raidLinks array from the previous one.
+						// The timeout will detect that there are suddenly no more links
+						// and acknowledge the error state and quit.
+						DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+					}
+					
+					
+					// This only works with a valid filter
+					if (raidFilter && raidFilter.isValid())
+					{
+						// Fetch all the links
+						var raidLinks = RaidManager.fetchByFilter(raidFilter);
+						
+						// If there were any matched links
+						if (raidLinks.length > 0)
+						{
+							// private variable to be closed over in the autoLoader
+							var autoLoadCounter = 0;
+							var startTime = new Date()/1;
+							
+							// Create function closure to be called repeatedly
+							var autoLoader = function __autoload()
+							{
+								// This shouldn't be called without links, but just in case
+								if (raidLinks.length > 0)
+								{
+									// Load the next raid
+									DC_LoaTS_Helper.loadRaid(raidLinks.pop());
+									
+									// Keep track of how many we've loaded
+									autoLoadCounter++;
+									
+									// If there are any links left, we'll need to continue loading them
+									if (raidLinks.length > 0)
+									{
+										// Fire the loader again after a while
+										DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, 6000);
+									}
+									else
+									{
+										// Calculate how long it took to load them all
+										var endTime = new Date()/1;
+										var took = (endTime - startTime)/1000;
+										holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " complete! " + autoLoadCounter + " raids loaded in " + took + "s.");
+									}
+								}
+								else
+								{
+									// Calculate how long it took to load them all
+									var endTime = new Date()/1;
+									var took = (endTime - startTime)/1000;
+									holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " ended abruptly. " + autoLoadCounter + " raids loaded in " + took + "s.");
+								}
+							}
+							
+							ret.success = true;
+							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString();
+							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
+						}
+						else
+						{
+							ret.statusMessage = "AutoLoad could not find any raids matching your filter to load.";							
+						}
+						
+						ret.success = true;
+					}
+					else
+					{
+						ret.success = false;
+						ret.statusMessage = "Could not execute autoload due to invalid raid filter.";
+					}
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					//TODO: Better options here
+					var commandOptions = {					
+						initialText: {
+							text: "Load all raids matching the filter",
+						},
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
+					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
+					helpText += "\n";
+					helpText += "Loads all seen raids that match the given filter\n";
+					helpText += "\n";
+					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
+				commandName: "timerdata",
+				aliases: [],
+				// No parsing needed
+				/*parsingClass: ,*/
+
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+						
+					deck.activeDialogue().raidBotMessage(Timer.getReport());
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Print the timer report",
+						},
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
+					helpText += "Prints out timing and performance data about the script\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+
 // List of all raid ids and names. Any raid without a real raid id will not show up nicely.
 DC_LoaTS_Helper.raids = 
 {
@@ -6180,8 +6334,7 @@ DC_LoaTS_Helper.raids =
     inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     
-    // This is probably irrelevant since we'll never see another health based Skornzeny
-    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorzeny",        120,  9999,"S",[1000000000, 50000000000, 250000000000, 500000000000],/*FS calculated normally*/null,5000000),
+    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",           70,  90000, "SEH","Infinite","N/A", 100000000000),
     
     // Galaxy Dome Raids
     vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000)
