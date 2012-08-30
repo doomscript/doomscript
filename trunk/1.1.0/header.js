@@ -1,4 +1,3 @@
-
 // ==UserScript==
 // @name           Kongregate Legacy of a Thousand Suns Raid Link Helper
 // @namespace      tag://kongregate
@@ -173,6 +172,7 @@ Too much to even list. See above and tickets.
 2012.08.29 - 1.1.1 
 Updated Skorzeny and Temple info
 Updated to add Gut-Phager raid
+Updated autoload timer
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
