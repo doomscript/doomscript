@@ -6130,7 +6130,7 @@ function main()
 									if (raidLinks.length > 0)
 									{
 										// Fire the loader again after a while
-										DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, 6000);
+										DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, 2000);
 									}
 									else
 									{
