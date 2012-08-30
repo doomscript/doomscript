@@ -170,8 +170,9 @@ Kong added some padding to their text boxes that has now been removed from the O
 Too much to even list. See above and tickets.
 
 
-2012.08.25 - 1.1.1 
-Mostly just updated Skorzeny and Temple info
+2012.08.29 - 1.1.1 
+Updated Skorzeny and Temple info
+Updated to add Gut-Phager raid
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.

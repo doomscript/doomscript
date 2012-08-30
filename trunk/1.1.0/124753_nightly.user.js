@@ -1,3 +1,4 @@
+
 // ==UserScript==
 // @name           Kongregate Legacy of a Thousand Suns Raid Link Helper
 // @namespace      tag://kongregate
@@ -169,8 +170,9 @@ Kong added some padding to their text boxes that has now been removed from the O
 Too much to even list. See above and tickets.
 
 
-2012.08.25 - 1.1.1 
-Mostly just updated Skorzeny and Temple info
+2012.08.29 - 1.1.1 
+Updated Skorzeny and Temple info
+Updated to add Gut-Phager raid
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -6258,7 +6260,8 @@ DC_LoaTS_Helper.raids =
     warden_ramiro:      new RaidType("warden_ramiro",       "Z7", "Warden Ramiro", "Ramiro", "Ramiro",                72,  50, "S",   60000000),
     vulture_gunship:    new RaidType("vulture_gunship",     "Z8", "Vulture Gunship", "Vulture", "Vulture",            72,  50, "S",   65000000),
     xarpa:              new RaidType("xarpa",               "Z9", "Centurian Fleet Commander", "Fleet Com.", "Fleet Comm",72,50,"S",  70000000),
-    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50,"S",    [75000000, 97500000, 120000000, 150000000]),
+    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50, "S",   [75000000, 97500000, 120000000, 150000000]),
+    gut_phager:         new RaidType("gut_phager",         "Z11", "Gut-Phager", "Gut-Phager", "Phager",               72,  50, "S",   80000000),
     
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -6334,7 +6337,7 @@ DC_LoaTS_Helper.raids =
     inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     
-    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",           70,  90000, "SEH","Infinite","N/A", 100000000000),
+    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",           72,  90000, "SEH","Infinite","N/A", 100000000000),
     
     // Galaxy Dome Raids
     vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000)
