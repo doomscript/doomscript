@@ -439,11 +439,29 @@
 							iframe_options['kv_raid_boss'] = raidLink.raidTypeId;
 							iframe_options['kv_raid_id'] = raidLink.id;
 							
-							// Destroy the old iframe and replace with blank one
-							$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
-							
-							// Set location of new game window
-							$('gameiframe').contentWindow.location.replace("http://web1.legacyofathousandsuns.com/kong?" + Object.toQueryString(iframe_options));
+							if (DC_LoaTS_Helper.getPref("LoadRaidsInBackground") === true)
+							{
+								var collapsedOptions = "";
+								
+								for (var option in iframe_options)
+								{
+									collapsedOptions += option + "=" + iframe_options[option] + "&";
+								}
+								
+								DC_LoaTS_Helper.ajax({
+													  url: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php?" + collapsedOptions,
+													  method: "GET",
+													  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink)
+								});
+							}
+							else	
+							{
+								// Destroy the old iframe and replace with blank one
+								$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
+								
+								// Set location of new game window
+								$('gameiframe').contentWindow.location.replace("http://web1.legacyofathousandsuns.com/kong?" + Object.toQueryString(iframe_options));
+							}
 						}
 						else
 						{
@@ -465,6 +483,23 @@
 			
 			// Follow the HTML link because we failed here
 			return true;
+		};
+		
+		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, response)
+		{
+			if (response.responseText.indexOf("You have successfully joined the raid!"))
+			{
+				// Joined
+			}
+			else if (response.responseText.indexOf("You are already a member of this raid!"))
+			{
+				// Already visited
+			}
+			else
+			{
+				RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
+				DC_LoaTS_Helper.updatePostedLinks(raidLink);
+			}
 		};
 		
 		DC_LoaTS_Helper.reload = function()
@@ -555,6 +590,58 @@
 				Timer.stop("updatePostedLinksTimeout");
 			}.bind(window, raidLink), 500);
 		};
+		
+		DC_LoaTS_Helper.ajax = function(params){
+            if (!params.method)
+            {
+                params.method = "GET";
+            }
+            else if (["POST", "GET", "HEAD"].indexOf(params.method.toUpperCase()) === -1)
+            {
+                if (params.data.length > 0)
+                {
+                    params.data = "_method=" + params.method + "&" + params.data;
+                }
+                else
+                {
+                    params.data = "_method=" + params.method;
+                }
+                params.method = "POST";
+            }
+            if (params.method.toUpperCase() === "POST" && (!params.headers || !params.headers["Content-Type"]))
+            {
+                (params.headers||(params.headers={}))["Content-Type"] = "application/x-www-form-urlencoded";
+            }
+            if (typeof params.synchronous === "undefined")
+            {
+                params.synchronous = false;
+            }
+            params.UUID = DC_LoaTS_Helper.generateUUID();
+            document.addEventListener(params.UUID, function listener(event)
+            {
+                if (event.data.responseObj.readyState == 4)
+                {
+                    document.removeEventListener(params.UUID, listener);
+                }
+                
+                if (typeof params[event.data.callbackName] === "function")
+                {
+                    params[event.data.callbackName](event.data.responseObj);
+                }
+            });
+            for (var param in params)
+            {
+                if (params.hasOwnProperty(param) && typeof params[param] === "function" && param.toLowerCase().indexOf("on") === 0)
+                {
+                    params["__callback_" + param] = "function";
+                }
+            }
+            var origin = window.location.protocol + "//" + window.location.host;
+            var evt = document.createEvent("MessageEvent");
+            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, Object.create(params), origin, 1, window, null);
+            document.dispatchEvent(evt);
+        };
+		
 		
 		// Check for updates
 		DC_LoaTS_Helper.checkForUpdates = function()
@@ -831,6 +918,14 @@
 			    }
 			}
 			Timer.stop("calculateShortestRaidNames calc");
+		};
+
+		DC_LoaTS_Helper.generateUUID = function()
+		{
+		    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+		        return v.toString(16);
+		    });
 		};
 		
 		// Go ahead and execute this, too

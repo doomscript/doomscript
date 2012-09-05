@@ -10,8 +10,10 @@
 					// Declare ret object
 					var ret = {};
 					
+					var isCancelled = params === "cancel";
+										
 					// Cancel the previous timer, if there is one
-					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined")
+					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined" || isCancelled)
 					{
 						// Clear out the raidLinks array from the previous one.
 						// The timeout will detect that there are suddenly no more links
@@ -21,7 +23,7 @@
 					
 					
 					// This only works with a valid filter
-					if (raidFilter && raidFilter.isValid())
+					if (!isCancelled && raidFilter && raidFilter.isValid())
 					{
 						// Fetch all the links
 						var raidLinks = RaidManager.fetchByFilter(raidFilter);
@@ -69,20 +71,25 @@
 							}
 							
 							ret.success = true;
-							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString();
+							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
 							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
 						}
 						else
 						{
-							ret.statusMessage = "AutoLoad could not find any raids matching your filter to load.";							
+							ret.statusMessage = "AutoLoad could not find any raids matching " + raidFilter.toString() + " to load.";							
 						}
 						
 						ret.success = true;
 					}
-					else
+					else if (!isCancelled)
 					{
 						ret.success = false;
-						ret.statusMessage = "Could not execute autoload due to invalid raid filter.";
+						ret.statusMessage = "Could not execute autoload due to invalid raid filter: '" + raidFilter.toString() + "'.";
+					}
+					else 
+					{
+						ret.success = true;
+						ret.statusMessage = "AutoLoad cancelled.";
 					}
 						
 					return ret;
@@ -103,7 +110,9 @@
 					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
 					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
 					helpText += "\n";
-					helpText += "Loads all seen raids that match the given filter\n";
+					helpText += "\nLoads all seen raids that match the given filter";
+					helpText += "\n";
+					helpText += "\nFor example, " + this.getCommandLink("colonel {state: !visited}") + " would load all colonels not previously visited";
 					helpText += "\n";
 					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
 					

@@ -561,6 +561,46 @@
 }
 
 
+// GM Layer
+function xhrGo(event)
+{
+	var params = event.data;
+	for (var param in params)
+	{
+		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
+		{
+			var funcName = param.substring("__callback_".length);
+			if (typeof params[funcName] !== "function")
+			{
+				params[funcName] = this.gmCallBack.bind(this, params.UUID, funcName);
+			}
+		}
+	}
+	setTimeout(function(){GM_xmlhttpRequest(params);},0);
+};
+
+function gmCallBack(UUID, funcName, response)
+{
+	setTimeout(function()
+	{
+		var origin = window.location.protocol + "//" + window.location.host;
+		var evt = document.createEvent("MessageEvent");
+		evt.initMessageEvent(UUID, true, true, {callbackName: funcName, responseObj: response}, origin, 1, window, null);
+		document.dispatchEvent(evt);
+	}, 0);
+};
+
+document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
+
+
+
+
+
+
+
+
+
+
 // This injects our script onto the page.
 // Borrowed from: http://stackoverflow.com/a/2303228
 if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))

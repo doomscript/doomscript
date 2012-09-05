@@ -1,3 +1,4 @@
+
 		RaidCommand.create( 
 			{
 				commandName: "raidformat",
