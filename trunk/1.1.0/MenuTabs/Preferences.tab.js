@@ -9,15 +9,13 @@
 				tabPosition: 100,
 				
 				rightClickVisitedKey: "RightClickVisited",
+				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				
 				initPane: function()
 				{
-//					this.header = document.createElement("h1");
-//					this.header.className = "RaidMenuTab-Header";
-//					this.header.update("Preferences");
-//					this.pane.appendChild(this.header);
-//
-					var htmlRet = this.createSimpleOptionHTML(
+					var wrapper = document.createElement("div");
+					
+					var rightClickOption = this.createSimpleOptionHTML(
 									"PreferencesMenu-RightClickVisitedInput",
 									"boolean", 
 									DC_LoaTS_Helper.getPref(this.rightClickVisitedKey), 
@@ -32,7 +30,25 @@
 									}
 					);
 
-					this.pane.appendChild(htmlRet.wrapper);
+					var loadBackgroundOption = this.createSimpleOptionHTML(
+									"PreferencesMenu-LoadRaidsInBackgroundInput",
+									"boolean", 
+									DC_LoaTS_Helper.getPref(this.loadRaidsInBackgroundKey), 
+									"Raids should load in background rather than in the game area.", 
+									"If checked, raids won't load in game area.", 
+									{
+										onclick: function()
+										{
+											//TODO: Obviously, this should come from a key
+											DC_LoaTS_Helper.setPref("LoadRaidsInBackground", this.checked);
+										}
+									}
+					);
+					
+					wrapper.appendChild(rightClickOption.wrapper);
+					wrapper.appendChild(loadBackgroundOption.wrapper);
+
+					this.pane.appendChild(wrapper);
 				}
 							
 		});

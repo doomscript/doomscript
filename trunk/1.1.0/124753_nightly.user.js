@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.1
+// @version        1.1.2
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -173,6 +173,10 @@ Too much to even list. See above and tickets.
 Updated Skorzeny and Temple info
 Updated to add Gut-Phager raid
 Updated autoload timer
+
+2012.09.04 - 1.1.2
+Improved AutoLoad to have more descriptive messages
+Added Load Raids In Background
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -181,7 +185,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.1",
+    	version: "1.1.2",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -4437,15 +4441,13 @@ function main()
 				tabPosition: 100,
 				
 				rightClickVisitedKey: "RightClickVisited",
+				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				
 				initPane: function()
 				{
-//					this.header = document.createElement("h1");
-//					this.header.className = "RaidMenuTab-Header";
-//					this.header.update("Preferences");
-//					this.pane.appendChild(this.header);
-//
-					var htmlRet = this.createSimpleOptionHTML(
+					var wrapper = document.createElement("div");
+					
+					var rightClickOption = this.createSimpleOptionHTML(
 									"PreferencesMenu-RightClickVisitedInput",
 									"boolean", 
 									DC_LoaTS_Helper.getPref(this.rightClickVisitedKey), 
@@ -4460,7 +4462,25 @@ function main()
 									}
 					);
 
-					this.pane.appendChild(htmlRet.wrapper);
+					var loadBackgroundOption = this.createSimpleOptionHTML(
+									"PreferencesMenu-LoadRaidsInBackgroundInput",
+									"boolean", 
+									DC_LoaTS_Helper.getPref(this.loadRaidsInBackgroundKey), 
+									"Raids should load in background rather than in the game area.", 
+									"If checked, raids won't load in game area.", 
+									{
+										onclick: function()
+										{
+											//TODO: Obviously, this should come from a key
+											DC_LoaTS_Helper.setPref("LoadRaidsInBackground", this.checked);
+										}
+									}
+					);
+					
+					wrapper.appendChild(rightClickOption.wrapper);
+					wrapper.appendChild(loadBackgroundOption.wrapper);
+
+					this.pane.appendChild(wrapper);
 				}
 							
 		});
@@ -5348,6 +5368,7 @@ function main()
 			}
 		);
 		
+
 		RaidCommand.create( 
 			{
 				commandName: "raidformat",
@@ -6091,8 +6112,10 @@ function main()
 					// Declare ret object
 					var ret = {};
 					
+					var isCancelled = params === "cancel";
+										
 					// Cancel the previous timer, if there is one
-					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined")
+					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined" || isCancelled)
 					{
 						// Clear out the raidLinks array from the previous one.
 						// The timeout will detect that there are suddenly no more links
@@ -6102,7 +6125,7 @@ function main()
 					
 					
 					// This only works with a valid filter
-					if (raidFilter && raidFilter.isValid())
+					if (!isCancelled && raidFilter && raidFilter.isValid())
 					{
 						// Fetch all the links
 						var raidLinks = RaidManager.fetchByFilter(raidFilter);
@@ -6150,20 +6173,25 @@ function main()
 							}
 							
 							ret.success = true;
-							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString();
+							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
 							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
 						}
 						else
 						{
-							ret.statusMessage = "AutoLoad could not find any raids matching your filter to load.";							
+							ret.statusMessage = "AutoLoad could not find any raids matching " + raidFilter.toString() + " to load.";							
 						}
 						
 						ret.success = true;
 					}
-					else
+					else if (!isCancelled)
 					{
 						ret.success = false;
-						ret.statusMessage = "Could not execute autoload due to invalid raid filter.";
+						ret.statusMessage = "Could not execute autoload due to invalid raid filter: '" + raidFilter.toString() + "'.";
+					}
+					else 
+					{
+						ret.success = true;
+						ret.statusMessage = "AutoLoad cancelled.";
 					}
 						
 					return ret;
@@ -6184,7 +6212,9 @@ function main()
 					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
 					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
 					helpText += "\n";
-					helpText += "Loads all seen raids that match the given filter\n";
+					helpText += "\nLoads all seen raids that match the given filter";
+					helpText += "\n";
+					helpText += "\nFor example, " + this.getCommandLink("colonel {state: !visited}") + " would load all colonels not previously visited";
 					helpText += "\n";
 					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
 					
@@ -6785,11 +6815,29 @@ DC_LoaTS_Helper.raids =
 							iframe_options['kv_raid_boss'] = raidLink.raidTypeId;
 							iframe_options['kv_raid_id'] = raidLink.id;
 							
-							// Destroy the old iframe and replace with blank one
-							$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
-							
-							// Set location of new game window
-							$('gameiframe').contentWindow.location.replace("http://web1.legacyofathousandsuns.com/kong?" + Object.toQueryString(iframe_options));
+							if (DC_LoaTS_Helper.getPref("LoadRaidsInBackground") === true)
+							{
+								var collapsedOptions = "";
+								
+								for (var option in iframe_options)
+								{
+									collapsedOptions += option + "=" + iframe_options[option] + "&";
+								}
+								
+								DC_LoaTS_Helper.ajax({
+													  url: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php?" + collapsedOptions,
+													  method: "GET",
+													  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink)
+								});
+							}
+							else	
+							{
+								// Destroy the old iframe and replace with blank one
+								$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
+								
+								// Set location of new game window
+								$('gameiframe').contentWindow.location.replace("http://web1.legacyofathousandsuns.com/kong?" + Object.toQueryString(iframe_options));
+							}
 						}
 						else
 						{
@@ -6811,6 +6859,23 @@ DC_LoaTS_Helper.raids =
 			
 			// Follow the HTML link because we failed here
 			return true;
+		};
+		
+		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, response)
+		{
+			if (response.responseText.indexOf("You have successfully joined the raid!"))
+			{
+				// Joined
+			}
+			else if (response.responseText.indexOf("You are already a member of this raid!"))
+			{
+				// Already visited
+			}
+			else
+			{
+				RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
+				DC_LoaTS_Helper.updatePostedLinks(raidLink);
+			}
 		};
 		
 		DC_LoaTS_Helper.reload = function()
@@ -6901,6 +6966,58 @@ DC_LoaTS_Helper.raids =
 				Timer.stop("updatePostedLinksTimeout");
 			}.bind(window, raidLink), 500);
 		};
+		
+		DC_LoaTS_Helper.ajax = function(params){
+            if (!params.method)
+            {
+                params.method = "GET";
+            }
+            else if (["POST", "GET", "HEAD"].indexOf(params.method.toUpperCase()) === -1)
+            {
+                if (params.data.length > 0)
+                {
+                    params.data = "_method=" + params.method + "&" + params.data;
+                }
+                else
+                {
+                    params.data = "_method=" + params.method;
+                }
+                params.method = "POST";
+            }
+            if (params.method.toUpperCase() === "POST" && (!params.headers || !params.headers["Content-Type"]))
+            {
+                (params.headers||(params.headers={}))["Content-Type"] = "application/x-www-form-urlencoded";
+            }
+            if (typeof params.synchronous === "undefined")
+            {
+                params.synchronous = false;
+            }
+            params.UUID = DC_LoaTS_Helper.generateUUID();
+            document.addEventListener(params.UUID, function listener(event)
+            {
+                if (event.data.responseObj.readyState == 4)
+                {
+                    document.removeEventListener(params.UUID, listener);
+                }
+                
+                if (typeof params[event.data.callbackName] === "function")
+                {
+                    params[event.data.callbackName](event.data.responseObj);
+                }
+            });
+            for (var param in params)
+            {
+                if (params.hasOwnProperty(param) && typeof params[param] === "function" && param.toLowerCase().indexOf("on") === 0)
+                {
+                    params["__callback_" + param] = "function";
+                }
+            }
+            var origin = window.location.protocol + "//" + window.location.host;
+            var evt = document.createEvent("MessageEvent");
+            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, Object.create(params), origin, 1, window, null);
+            document.dispatchEvent(evt);
+        };
+		
 		
 		// Check for updates
 		DC_LoaTS_Helper.checkForUpdates = function()
@@ -7177,6 +7294,14 @@ DC_LoaTS_Helper.raids =
 			    }
 			}
 			Timer.stop("calculateShortestRaidNames calc");
+		};
+
+		DC_LoaTS_Helper.generateUUID = function()
+		{
+		    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+		        return v.toString(16);
+		    });
 		};
 		
 		// Go ahead and execute this, too
@@ -7762,6 +7887,46 @@ DC_LoaTS_Helper.raids =
     // Hit the go button and activate the main script.
     bootstrap_DC_LoaTS_Helper();
 }
+
+
+// GM Layer
+function xhrGo(event)
+{
+	var params = event.data;
+	for (var param in params)
+	{
+		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
+		{
+			var funcName = param.substring("__callback_".length);
+			if (typeof params[funcName] !== "function")
+			{
+				params[funcName] = this.gmCallBack.bind(this, params.UUID, funcName);
+			}
+		}
+	}
+	setTimeout(function(){GM_xmlhttpRequest(params);},0);
+};
+
+function gmCallBack(UUID, funcName, response)
+{
+	setTimeout(function()
+	{
+		var origin = window.location.protocol + "//" + window.location.host;
+		var evt = document.createEvent("MessageEvent");
+		evt.initMessageEvent(UUID, true, true, {callbackName: funcName, responseObj: response}, origin, 1, window, null);
+		document.dispatchEvent(evt);
+	}, 0);
+};
+
+document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
+
+
+
+
+
+
+
+
 
 
 // This injects our script onto the page.
