@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.2
+// @version        1.1.3
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -177,6 +177,10 @@ Updated autoload timer
 2012.09.04 - 1.1.2
 Improved AutoLoad to have more descriptive messages
 Added Load Raids In Background
+
+2012.09.05 - 1.1.3
+Commented out Load Raids In Background due to ToS concerns
+Added new Hound alliance raid
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -185,7 +189,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.2",
+    	version: "1.1.3",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
