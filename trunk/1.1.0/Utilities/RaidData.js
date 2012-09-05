@@ -99,6 +99,7 @@ DC_LoaTS_Helper.raids =
     contest_winners:    new RaidType("contest_winners",     "A6", "Shadows of the Void", "Shadows", "Shadows",       168,  250, "H",  500000000),
     genesis:            new RaidType("genesis",             "A5", "Genesis", "Genesis", "Genesis",                   165,  250, "H", 1000000000),
     celebration_enhancer_1: new RaidType("celebration_enhancer_1","AX","Celebration Enhancer J-54","Celebrator","Celeb",84,250, "H",  600000000),
+    quiskan_psi_hound: new RaidType("quiskan_psi_hound",    "A7","Quiskan Psi-Hound","Psi-Hound","Hound",            168,  250, "H", [1000000000, 1500000000, 2500000000, 10000000000]),
 
     // Galactic Raids
     // Infestation Trilogy
