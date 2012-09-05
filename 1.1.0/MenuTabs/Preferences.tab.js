@@ -46,7 +46,10 @@
 					);
 					
 					wrapper.appendChild(rightClickOption.wrapper);
-					wrapper.appendChild(loadBackgroundOption.wrapper);
+					
+					// This is commented out until we decide if it can be used.
+					// Reminder: Uncomment this line to re-enable loading in the background
+					//wrapper.appendChild(loadBackgroundOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}
