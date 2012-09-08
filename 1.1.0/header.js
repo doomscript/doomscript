@@ -8,6 +8,13 @@
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
 
+/*
+License: "Kongregate Legacy of a Thousand Suns Raid Link Helper for Chat" (henceforth known as "doomscript") is free to download and use unlimited times on unlimited devices. You're allowed to modify the script for personal use, but you need written permission from doomcat to distribute those modifications. If you plan to distribute doomscript in whole or in part, modified or not, as part of an application other than in userscript form, some fees may apply. Contact doomcat for pricing. 
+
+Warranty: This userscript comes with no assurance or guarantee of functionality, suitability, or other promise of working as you intend. doomcsript is provided as-is.
+*/
+
+
 /**********************************************\
 |** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! **|
 |** !!!!!!!!!! NOTE TO DEVELOPERS !!!!!!!!!! **|
