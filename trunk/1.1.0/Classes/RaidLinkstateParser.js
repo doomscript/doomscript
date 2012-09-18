@@ -6,6 +6,7 @@
 			initialize: function(params)
 			{
 				var paramsParts = params.trim().replace(/\s+/g, " ").split(" ");
+				var ret;
 				if (paramsParts.length != 1 && paramsParts.length != 2)
 				{
 					ret.success = false;
@@ -42,6 +43,8 @@
 						DCDebug("State Param: " + this.state);
 					}
 				}
+				
+				return ret;
 			},
 			
 			getName: function()

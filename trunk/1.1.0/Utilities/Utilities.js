@@ -388,15 +388,6 @@
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		DC_LoaTS_Helper.loadRaid = function(raidParam)
 		{
-			// If we're not actually on LoaTS right now, we have to actually go to the link
-			// UPDATE: Script doesn't even load on non LoaTS pages now anyway
-			// if (window.location.href.indexOf("http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns") != 0)
-			// {
-				// // Will let the browser actually alter the location of the page
-				// return true;
-			// }
-			
-			
 			try
 			{
 				// Regex to locate the iframe properties as defined by Kong
@@ -476,9 +467,7 @@
 			catch(ex)
 			{
 				// Don't really care
-				console.error("FAILED TO PROCESS LOADRAID");
-				console.error(raidParam);
-				console.error(ex);
+				console.error("FAILED TO PROCESS LOADRAID", raidParam, ex);
 			}
 			
 			// Follow the HTML link because we failed here
