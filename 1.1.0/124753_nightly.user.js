@@ -3,10 +3,17 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.3
+// @version        1.1.5
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
+
+/*
+License: "Kongregate Legacy of a Thousand Suns Raid Link Helper for Chat" (henceforth known as "doomscript") is free to download and use unlimited times on unlimited devices. You're allowed to modify the script for personal use, but you need written permission from doomcat to distribute those modifications. If you plan to distribute doomscript in whole or in part, modified or not, as part of an application other than in userscript form, some fees may apply. Contact doomcat for pricing. 
+
+Warranty: This userscript comes with no assurance or guarantee of functionality, suitability, or other promise of working as you intend. doomcsript is provided as-is.
+*/
+
 
 /**********************************************\
 |** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! **|
@@ -181,6 +188,14 @@ Added Load Raids In Background
 2012.09.05 - 1.1.3
 Commented out Load Raids In Background due to ToS concerns
 Added new Hound alliance raid
+
+2012.09.12 - 1.1.4
+Added new G. Rahn raid
+
+2012.09.18 - 1.1.5
+Added /loadpastebin command
+Fixed weird height layout issue with game and chat area
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -189,7 +204,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.3",
+    	version: "1.1.5",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -730,6 +745,46 @@ function main()
 	DC_LoaTS_Helper.chatCommands = {};
 	DC_LoaTS_Helper.raidStyles = {};
 
+		/************************************/
+		/** PasteBinLinkParsingFilter Class */
+		/************************************/
+		
+		window.PasteBinLinkParsingFilter = Class.create({
+			initialize: function(params)
+			{
+				var paramsClean = params.trim().replace(/\s+/g, " ");
+				var indexOfSpace = paramsClean.indexOf(" ");
+				var pastebinURL = paramsClean.substring(0, indexOfSpace > 0 ? indexOfSpace : paramsClean.length);
+				if (PasteBinLinkParsingFilter.pastebinPattern.test(pastebinURL))
+				{
+					this.pastebinURL = pastebinURL;
+				}
+				if (indexOfSpace > 0)
+				{
+					this.raidFilter = new RaidFilter(paramsClean.substring(indexOfSpace))
+				}
+			},
+			getPasteLink: function()
+			{
+				return "<a href=\"" + this.pastebinURL + "\" target=\"_blank\">" + this.pastebinURL + "</a>";
+			},
+			
+			isValid: function()
+			{
+				return typeof this.pastebinURL !== "undefined";
+			}
+		});
+		
+		// Parameter text for this parser
+		PasteBinLinkParsingFilter.paramText = "pastebinURL [raidFilter]";
+		
+		// Pattern to match pastebin links
+		PasteBinLinkParsingFilter.pastebinPattern = /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i;
+		
+		// Where to get raw pastebin data
+		PasteBinLinkParsingFilter.rawBase = "http://pastebin.com/raw.php?i=";
+
+		
 		/************************************/
 		/********* RaidButton Class *********/
 		/************************************/
@@ -2330,7 +2385,7 @@ function main()
 		RaidLink.paramText = "url";
 
 		// Define the regular expression (regex) that tells us if a link is a raid link or not
-		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?(?!\?4217\-op)\?([^,"]*)\b/i;
+		RaidLink.linkPattern = /(?:https?:\/\/www\.kongregate\.com)?(?:\/games\/)?(?:5thPlanetGames\/legacy-of-a-thousand-suns)?(?!\?4217\-op)\?([^\s,"]*)\b/i;
 
 		// Define a regular expresson to catch busted links
 		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/.*?\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
@@ -2406,6 +2461,7 @@ function main()
 			initialize: function(params)
 			{
 				var paramsParts = params.trim().replace(/\s+/g, " ").split(" ");
+				var ret;
 				if (paramsParts.length != 1 && paramsParts.length != 2)
 				{
 					ret.success = false;
@@ -2442,6 +2498,8 @@ function main()
 						DCDebug("State Param: " + this.state);
 					}
 				}
+				
+				return ret;
 			},
 			
 			getName: function()
@@ -3573,6 +3631,10 @@ function main()
 					ccc.remove();
 					td.insert({after: ccc});
 					ccc.setAttribute("rowspan", 2);
+					
+					$("maingame").style.height = parseInt($("maingame").style.height) + 20 + "px";
+					$("chat_container").style.height = parseInt($("chat_container").style.height) + 20 + "px";
+					$("chat_tab_pane").style.height = parseInt($("chat_tab_pane").style.height) + 20 + "px";
 					
 					//TODO: Should break these out like the commands?
 					this.buttons = {
@@ -5218,6 +5280,154 @@ function main()
 			}
 		);
 		
+		
+		DC_LoaTS_Helper.bulkRaids = {};
+		RaidCommand.create( 
+			{
+				commandName: "loadpastebin",
+				aliases: ["loadpaste", "loadbin", "lpb"],
+				parsingClass: PasteBinLinkParsingFilter,
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {};
+					
+					this.commandStartTime = new Date()/1;
+						
+					ret.success = parser.isValid();
+					
+					if (ret.success)
+					{
+						var match = PasteBinLinkParsingFilter.pastebinPattern.exec(parser.pastebinURL);
+						DC_LoaTS_Helper.ajax({
+							url: PasteBinLinkParsingFilter.rawBase + match[1],
+							onload: this.receiveAjax.bind(this),
+							});
+							
+						ret.statusMessage = "Loading data from " + parser.getPasteLink();
+					}
+						
+					return ret;
+				},
+							
+				receiveAjax: function(response)
+				{
+					DCDebug("Got back pastebin data", response);
+					if (response.status === 200)
+					{
+						var text = response.responseText,
+							xx = 100,
+						    matchedRaidsList = [],
+						    match,
+						    regex = new RegExp(RaidLink.linkPattern.source, "gi"),
+						    hasRaidFilter = typeof this.parser.raidFilter !== "undefined";
+						    
+						while ((match = regex.exec(text)) !== null && xx--)
+						{
+							var raidLink = new RaidLink(match[0]);
+							if (raidLink.isValid())
+							{
+								if (hasRaidFilter)
+								{
+									var raidData = RaidManager.fetch(raidLink);
+									var currentState = RaidManager.fetchState(raidLink);
+									var didMatch = false;
+									if (typeof raidData !== "undefined")
+									{
+										didMatch = this.parser.raidFilter.matches(
+										{
+											age: this.commandStartTime - raidData.firstSeen,
+											difficulty: raidLink.difficulty,
+											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+											name: raidLink.getRaid().getSearchableName(),
+											state: currentState,
+											count: matchedRaidsList.length
+										});
+									}
+									else
+									{
+										didMatch = this.parser.raidFilter.matches(
+										{
+											difficulty: raidLink.difficulty,
+											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+											name: raidLink.getRaid().getSearchableName(),
+											state: currentState,
+											count: matchedRaidsList.length
+										});
+									}
+										
+									if (didMatch)
+									{
+										matchedRaidsList.push(raidLink);
+									}
+								}
+								else 
+								{
+									matchedRaidsList.push(raidLink);
+								}
+							}
+						}
+						
+						var str = "Found " + matchedRaidsList.length + " raids in " + this.parser.getPasteLink();
+						
+						if (hasRaidFilter)
+						{
+							str += " matching filter " + this.parser.raidFilter.toString();
+						}
+						var guid = DC_LoaTS_Helper.generateUUID();
+						DC_LoaTS_Helper.bulkRaids[guid] = {
+														   loadSource: this.parser.getPasteLink(), 
+														   raids: matchedRaidsList, 
+														   canceled: false
+														  };
+						
+						str += ". " + DC_LoaTS_Helper.getCommandLink("/raidbulkcallback " + guid, "Load these raids")  + ".";
+						console.log(str);
+//						setTimeout(function(){holodeck.activeDialogue().raidBotMessage(str.escapeHTML().unescapeHTML());}, 100);
+						holodeck.processChatCommand("/raidbulkcallback " + guid);
+					}
+					else if (response.status === 404)
+					{
+						holodeck.activeDialogue().raidBotMessage("Pastebin could not locate a valid paste at " + this.parser.getPasteLink());
+					}
+					else if (response.status >= 500 && response.status < 600)
+					{
+						holodeck.activeDialogue().raidBotMessage("Pastebin is having server trouble trying to load " + this.parser.getPasteLink() 
+						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+					}
+					else 
+					{
+						holodeck.activeDialogue().raidBotMessage("Trouble loading " + this.parser.getPasteLink() 
+						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+					}
+					
+					console.log("11111111111111")
+				},			
+
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Load bin raids from: " + this.parser.getPastebinURL()
+						},
+					};
+					
+					return commandOptions;
+				},
+				
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/loadpastebin pastebinURL raidFilter</code>\n";
+					helpText += "where <code>pastebinURL</code> is the url of a raid pastebin\n";
+					helpText += "where <code>raidFilter</code> (optional) is a seenraids style filter to limit what's loaded from the bin\n";
+					helpText += "\n";
+					helpText += "Loads all raids from the pastebin, or whichever ones match the filter\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
 		RaidCommand.create( 
 			{
 				commandName: "loadraid",
@@ -5371,6 +5581,86 @@ function main()
 					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
 					
 					return helpText;
+				}
+			}
+		);
+		
+
+		RaidCommand.create( 
+			{
+				commandName: "raidbulkcallback",
+				aliases: [],
+				doNotEnumerateInHelp: true,
+				
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {};
+					
+					// Break apart the guid and possible cancel message
+					var paramsParts = params.split(" "),
+					    guid = paramsParts[0],
+					    bulkRaidObject = DC_LoaTS_Helper.bulkRaids[guid],
+					    cancel = paramsParts[1];
+					    
+					DCDebug(paramsParts, guid, bulkRaidObject, cancel);
+					
+					// If this load was canceled
+					if ( (typeof cancel !== "undefined" && cancel === "cancel") || bulkRaidObject.canceled)
+					{
+						// Keep track of the total run time so far
+						if (typeof bulkRaidObject.runTime === "undefined")
+						{
+							bulkRaidObject.runTime = 0;
+						}
+						bulkRaidObject.runTime += (new Date()/1) - bulkRaidObject.startTime;
+						bulkRaidObject.canceled = true;
+						if (bulkRaidObject.timeout)
+						{
+							clearTimeout(bulkRaidObject.timeout);
+							delete bulkRaidObject.timeout;
+						}
+						ret.success = true;
+						ret.statusMessage = "Canceled bulk load from " + bulkRaidObject.loadSource;
+					}
+					else
+					{
+						if (typeof bulkRaidObject.iteration === "undefined")
+						{
+							bulkRaidObject.iteration = 0;
+							bulkRaidObject.startTime = new Date()/1;
+							holodeck.activeDialogue().raidBotMessage("Loading bulk raids from " + bulkRaidObject.loadSource + ". " + DC_LoaTS_Helper.getCommandLink("/raidbulkcallback " + guid + " cancel", "Cancel?"));
+						}
+						
+						var raidIndexToLoad = bulkRaidObject.iteration++;
+						var raidToLoad = bulkRaidObject.raids[raidIndexToLoad];
+						if (raidIndexToLoad < bulkRaidObject.raids.length)
+						{
+							DC_LoaTS_Helper.loadRaid(raidToLoad);
+							
+							bulkRaidObject.iteration >= bulkRaidObject.raids.length
+							
+							bulkRaidObject.timeout = setTimeout("holodeck.processChatCommand(\"/raidbulkcallback " + guid + "\");", 2000);
+						}
+						else 
+						{
+							ret.statusMessage = "Completed bulk load from " + bulkRaidObject.loadSource + " in " + ((new Date()/1) - bulkRaidObject.startTime) + "ms.";
+						}
+						ret.success = true;
+					}
+					
+					
+					return ret;
+				},
+				
+				getOptions: function()
+				{
+					return {};
+				},
+				
+				buildHelpText: function()
+				{
+					return "";
 				}
 			}
 		);
@@ -6322,6 +6612,8 @@ DC_LoaTS_Helper.raids =
     commander_veck:     new RaidType("commander_veck",      "Z8", "Centurian Storm Commander", "Storm", "Storm",     168, 250, "S",  900000000),
     reaver:             new RaidType("reaver",              "Z9", "Galactic Reaver", "Reaver", "Reaver",              72, 250, "S", 1000000000),
     the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [1100000000, 1475000000, 1850000000, 2200000000]),
+    g_rahn:             new RaidType("g_rahn",             "Z12", "G. Rahn", "G. Rahn", "G. Rahn",                    72, 250, "S", 1200000000),
+    
     
     // Colossal Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
@@ -6772,15 +7064,6 @@ DC_LoaTS_Helper.raids =
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		DC_LoaTS_Helper.loadRaid = function(raidParam)
 		{
-			// If we're not actually on LoaTS right now, we have to actually go to the link
-			// UPDATE: Script doesn't even load on non LoaTS pages now anyway
-			// if (window.location.href.indexOf("http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns") != 0)
-			// {
-				// // Will let the browser actually alter the location of the page
-				// return true;
-			// }
-			
-			
 			try
 			{
 				// Regex to locate the iframe properties as defined by Kong
@@ -6860,9 +7143,7 @@ DC_LoaTS_Helper.raids =
 			catch(ex)
 			{
 				// Don't really care
-				console.error("FAILED TO PROCESS LOADRAID");
-				console.error(raidParam);
-				console.error(ex);
+				console.error("FAILED TO PROCESS LOADRAID", raidParam, ex);
 			}
 			
 			// Follow the HTML link because we failed here
@@ -7826,11 +8107,18 @@ DC_LoaTS_Helper.raids =
 		// Have the raid bot post a message to the user
 		ChatDialogue.prototype.raidBotMessage = function(message)
 		{
-			holodeck.activeDialogue().displayUnsanitizedMessage("RaidBot",
+			try 
+			{
+				holodeck.activeDialogue().displayUnsanitizedMessage("RaidBot",
 														 	message.replace(/\n/g, "<br />\n"),
 														 	{class: "whisper received_whisper"},
 															{non_user: true} 
 														   );
+			}
+			catch (ex) 
+			{
+				console.warn("Unexpected exception during raidBotMessage", ex);
+			}
 		}
 	}
 	
@@ -7906,10 +8194,7 @@ function xhrGo(event)
 		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
 		{
 			var funcName = param.substring("__callback_".length);
-			if (typeof params[funcName] !== "function")
-			{
-				params[funcName] = this.gmCallBack.bind(this, params.UUID, funcName);
-			}
+			params[funcName] = gmCallBack.bind(this, params.UUID, funcName);
 		}
 	}
 	setTimeout(function(){GM_xmlhttpRequest(params);},0);

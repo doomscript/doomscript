@@ -27,6 +27,10 @@
 					td.insert({after: ccc});
 					ccc.setAttribute("rowspan", 2);
 					
+					$("maingame").style.height = parseInt($("maingame").style.height) + 20 + "px";
+					$("chat_container").style.height = parseInt($("chat_container").style.height) + 20 + "px";
+					$("chat_tab_pane").style.height = parseInt($("chat_tab_pane").style.height) + 20 + "px";
+					
 					//TODO: Should break these out like the commands?
 					this.buttons = {
 						toggleMenu: new RaidButton("toggleMenu", "DC_LoaTS_menuButton", 

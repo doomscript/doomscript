@@ -490,11 +490,18 @@
 		// Have the raid bot post a message to the user
 		ChatDialogue.prototype.raidBotMessage = function(message)
 		{
-			holodeck.activeDialogue().displayUnsanitizedMessage("RaidBot",
+			try 
+			{
+				holodeck.activeDialogue().displayUnsanitizedMessage("RaidBot",
 														 	message.replace(/\n/g, "<br />\n"),
 														 	{class: "whisper received_whisper"},
 															{non_user: true} 
 														   );
+			}
+			catch (ex) 
+			{
+				console.warn("Unexpected exception during raidBotMessage", ex);
+			}
 		}
 	}
 	
@@ -570,10 +577,7 @@ function xhrGo(event)
 		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
 		{
 			var funcName = param.substring("__callback_".length);
-			if (typeof params[funcName] !== "function")
-			{
-				params[funcName] = this.gmCallBack.bind(this, params.UUID, funcName);
-			}
+			params[funcName] = gmCallBack.bind(this, params.UUID, funcName);
 		}
 	}
 	setTimeout(function(){GM_xmlhttpRequest(params);},0);
