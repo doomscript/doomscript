@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.5
+// @version        1.1.7
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -196,6 +196,12 @@ Added new G. Rahn raid
 Added /loadpastebin command
 Fixed weird height layout issue with game and chat area
 
+2012.09.21 - 1.1.6
+Added Cerebral Destroyer WR
+
+2012.10.02 - 1.1.7
+Fixed export function in Chrome
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -204,7 +210,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.5",
+    	version: "1.1.7",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -7033,30 +7039,114 @@ DC_LoaTS_Helper.raids =
 		DC_LoaTS_Helper.forceDownload = function(data, title)
 		{
 			// Awesome style
-//			if (window.webkitRequestFileSystem)
-//			{
-//				window.webkitRequestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
-//	        		fs.root.getFile(title, {create: true}, function(fileEntry) {
-//	            		fileEntry.createWriter(function(fileWriter) {
-//			                var builder = new WebKitBlobBuilder();
-//			                builder.append(data);
-//			                var blob = builder.getBlob();
-//			    
-//			                fileWriter.onwriteend = function() {
-//			                    // navigate to file, will download
-//			                    location.href = fileEntry.toURL();
-//			                };
-//			    
-//			                fileWriter.write(blob);
-//			            }, function() {});
-//			        }, function() {});
-//			    }, function() {});​
-//			}
+			window.requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
+			if (window.requestFileSystem)
+			{
+				
+				function onInitFs(fs) {
+
+					fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
+				
+						fileEntry.createWriter(function(fileWriter) {
+						
+							fileWriter.onwriteend = function(e) {
+//								if (typeof fileEntry.toURI === "function") {
+//									location.href = fileEntry.toURI();
+//								}
+//								else {
+									window.open(fileEntry.toURL());
+//								}
+								holodeck.activeDialogue().raidBotMessage('Finished writing ' + title);
+							};
+							
+							fileWriter.onerror = function(e) {
+								holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + e.toString());
+							};
+							
+							// Create a new Blob and write it
+							var blob = new Blob([data], {type: 'text/plain'});
+							
+							console.log("Writing ", data, blob);
+							
+							fileWriter.write(blob);
+						
+						}, errorHandler);
+					
+					}, errorHandler);
+				
+				}
+				
+				function errorHandler(e) {
+					var msg = '';
+					
+					switch (e.code) {
+						case FileError.QUOTA_EXCEEDED_ERR:
+							msg = 'QUOTA_EXCEEDED_ERR';
+							break;
+						case FileError.NOT_FOUND_ERR:
+							msg = 'NOT_FOUND_ERR';
+							break;
+						case FileError.SECURITY_ERR:
+							msg = 'SECURITY_ERR';
+							break;
+						case FileError.INVALID_MODIFICATION_ERR:
+							msg = 'INVALID_MODIFICATION_ERR';
+							break;
+						case FileError.INVALID_STATE_ERR:
+							msg = 'INVALID_STATE_ERR';
+							break;
+						default:
+							msg = 'Unknown Error';
+							break;
+					};
+					
+					holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + msg);
+				}
+
+				
+				window.requestFileSystem(window.TEMPORARY, 8*data.length, onInitFs, errorHandler);
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+//				 window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
+//				    fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
+//				        fileEntry.createWriter(function(fileWriter) {
+////				            var arr = new Uint8Array(3); // data length
+////				
+////				            arr[0] = 97; // byte data; these are codes for 'abc'
+////				            arr[1] = 98;
+////				            arr[2] = 99;
+////				
+////				            var blob = new Blob([arr]);
+////				
+////				            fileWriter.addEventListener("writeend", function() {
+////				                // navigate to file, will download
+////				                location.href = fileEntry.toURL();
+////				            }, false);
+//				
+//				            fileWriter.write(data);
+//				        }, function() {});
+//				    }, function() {});
+//				}, function() {});
+			}
 			// Sad style
-//			else
-//			{
+			else
+			{
 		    	window.location='data:text/csv;charset=utf8,' + encodeURIComponent(data);
-//			}
+			}
 		    return true; 
 		}
 		

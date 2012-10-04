@@ -357,30 +357,114 @@
 		DC_LoaTS_Helper.forceDownload = function(data, title)
 		{
 			// Awesome style
-//			if (window.webkitRequestFileSystem)
-//			{
-//				window.webkitRequestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
-//	        		fs.root.getFile(title, {create: true}, function(fileEntry) {
-//	            		fileEntry.createWriter(function(fileWriter) {
-//			                var builder = new WebKitBlobBuilder();
-//			                builder.append(data);
-//			                var blob = builder.getBlob();
-//			    
-//			                fileWriter.onwriteend = function() {
-//			                    // navigate to file, will download
-//			                    location.href = fileEntry.toURL();
-//			                };
-//			    
-//			                fileWriter.write(blob);
-//			            }, function() {});
-//			        }, function() {});
-//			    }, function() {});​
-//			}
+			window.requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
+			if (window.requestFileSystem)
+			{
+				
+				function onInitFs(fs) {
+
+					fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
+				
+						fileEntry.createWriter(function(fileWriter) {
+						
+							fileWriter.onwriteend = function(e) {
+//								if (typeof fileEntry.toURI === "function") {
+//									location.href = fileEntry.toURI();
+//								}
+//								else {
+									window.open(fileEntry.toURL());
+//								}
+								holodeck.activeDialogue().raidBotMessage('Finished writing ' + title);
+							};
+							
+							fileWriter.onerror = function(e) {
+								holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + e.toString());
+							};
+							
+							// Create a new Blob and write it
+							var blob = new Blob([data], {type: 'text/plain'});
+							
+							console.log("Writing ", data, blob);
+							
+							fileWriter.write(blob);
+						
+						}, errorHandler);
+					
+					}, errorHandler);
+				
+				}
+				
+				function errorHandler(e) {
+					var msg = '';
+					
+					switch (e.code) {
+						case FileError.QUOTA_EXCEEDED_ERR:
+							msg = 'QUOTA_EXCEEDED_ERR';
+							break;
+						case FileError.NOT_FOUND_ERR:
+							msg = 'NOT_FOUND_ERR';
+							break;
+						case FileError.SECURITY_ERR:
+							msg = 'SECURITY_ERR';
+							break;
+						case FileError.INVALID_MODIFICATION_ERR:
+							msg = 'INVALID_MODIFICATION_ERR';
+							break;
+						case FileError.INVALID_STATE_ERR:
+							msg = 'INVALID_STATE_ERR';
+							break;
+						default:
+							msg = 'Unknown Error';
+							break;
+					};
+					
+					holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + msg);
+				}
+
+				
+				window.requestFileSystem(window.TEMPORARY, 8*data.length, onInitFs, errorHandler);
+
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+//				 window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
+//				    fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
+//				        fileEntry.createWriter(function(fileWriter) {
+////				            var arr = new Uint8Array(3); // data length
+////				
+////				            arr[0] = 97; // byte data; these are codes for 'abc'
+////				            arr[1] = 98;
+////				            arr[2] = 99;
+////				
+////				            var blob = new Blob([arr]);
+////				
+////				            fileWriter.addEventListener("writeend", function() {
+////				                // navigate to file, will download
+////				                location.href = fileEntry.toURL();
+////				            }, false);
+//				
+//				            fileWriter.write(data);
+//				        }, function() {});
+//				    }, function() {});
+//				}, function() {});
+			}
 			// Sad style
-//			else
-//			{
+			else
+			{
 		    	window.location='data:text/csv;charset=utf8,' + encodeURIComponent(data);
-//			}
+			}
 		    return true; 
 		}
 		
