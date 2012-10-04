@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.5
+// @version        1.1.7
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -196,6 +196,12 @@ Added new G. Rahn raid
 Added /loadpastebin command
 Fixed weird height layout issue with game and chat area
 
+2012.09.21 - 1.1.6
+Added Cerebral Destroyer WR
+
+2012.10.02 - 1.1.7
+Fixed export function in Chrome
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -204,7 +210,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.5",
+    	version: "1.1.7",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
