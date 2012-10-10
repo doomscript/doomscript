@@ -105,7 +105,7 @@ DC_LoaTS_Helper.raids =
 
     // Galactic Raids
     // Infestation Trilogy
-    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python",                  100,  90000, "SEH", "Infinite", "N/A", 1000000000),
+    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python",                   24,  90000, "SEH", "Infinite", "N/A", 2000000000),
     inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A", 1000000000),
     
