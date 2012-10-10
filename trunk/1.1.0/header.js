@@ -202,7 +202,7 @@ Added Cerebral Destroyer WR
 2012.10.02 - 1.1.7
 Fixed export function in Chrome
 Updated hotlinked image location
-TODO: Add new alliance raid
+Updated Python Data
 
 */
 
