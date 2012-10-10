@@ -7743,7 +7743,7 @@ DC_LoaTS_Helper.raids =
 //				rulesText += "\theight: 60%;\n";
 				rulesText += "\twidth: 775px;\n";
 //				rulesText += "\tbackground: #062834;\n";
-//				rulesText += "\tbackground: #0E5969 url(http://jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+//				rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
 				rulesText += "\tposition: fixed;\n";
 				rulesText += "\tleft: 7%;\n";
 				rulesText += "\ttop: 20%;\n";
@@ -7762,7 +7762,7 @@ DC_LoaTS_Helper.raids =
 
 
 				rulesText += "\n#DC_LoaTS_raidMenuTitleBar {\n";
-				rulesText += "\tbackground: #347D87 url(http://jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
+				rulesText += "\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding:  2px 10px;\n";
 				rulesText += "\tborder-top-left-radius: 5px;\n";
 //				rulesText += "\tborder-top-right-radius: 5px;\n";
@@ -7794,7 +7794,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "}\n";
 				
 				rulesText += "\n#DC_LoaTS_raidMenuBodyWrapper {\n";
-				rulesText += "\tbackground: #0E5969 url(http://jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
 				rulesText += "\tborder: 3px solid #93CDD0;\n";
 				rulesText += "\tborder-top-width: 0px;\n";
 				rulesText += "\tborder-bottom-left-radius: 5px;\n";
@@ -7860,7 +7860,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_raidMenuPane {\n";
-				rulesText += "\tbackground: #77C0C0 url(http://jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;\n";
+				rulesText += "\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;\n";
 				rulesText += "\tfont-size: 1.2em;\n";
 				rulesText += "\tpadding: 5px 10px;\n";
 				rulesText += "\tmin-height: 200px;\n";
@@ -7915,7 +7915,7 @@ DC_LoaTS_Helper.raids =
 				
 				
 				rulesText += "\n#DC_LoaTS_notifitcationBar {\n";
-				rulesText += "\tbackground: #f8dc5a url(http://jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
+				rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding:  4px 10px; 0px\n";
 				rulesText += "\twidth: 100%;\n";
 				rulesText += "\tfont-size: 12pt;\n";
@@ -7966,7 +7966,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer {\n";
 				rulesText += "\tcolor: #FFFFFF;\n"								
 				rulesText += "\tlist-style: none;\n"								
-				rulesText += "\tbackground: #113552 url(http://jqueryui.com/themeroller/images/?new=113552&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(http://old.jqueryui.com/themeroller/images/?new=113552&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
 				rulesText += "\t-moz-border-radius: 5px;\n";
 				rulesText += "\t-webkit-border-radius: 5px;\n";
 				rulesText += "\tborder-radius: 5px;\n";
@@ -7983,7 +7983,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\na.DC_LoaTS_button {\n";
 				rulesText += "\twidth: 16px;\n";
 				rulesText += "\theight: 16px;\n";
-				rulesText += "\tbackground: url(http://jqueryui.com/themeroller/images/?new=e0fdff&w=256&h=240&f=png&fltr[]=rcd|256&fltr[]=mask|icons/icons.png);\n";
+				rulesText += "\tbackground: url(http://old.jqueryui.com/themeroller/images/?new=e0fdff&w=256&h=240&f=png&fltr[]=rcd|256&fltr[]=mask|icons/icons.png);\n";
 				rulesText += "\tbackground-repeat: no-repeat;\n";
 				rulesText += "\tcursor: pointer;\n";
 				rulesText += "\tdisplay: block;\n";
@@ -8021,7 +8021,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_omniboxCommandsWrapper {\n";
-				rulesText += "\tbackground: #113552 url(http://jqueryui.com/themeroller/images/?new=113552&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(http://old.jqueryui.com/themeroller/images/?new=113552&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
 				rulesText += "\tlist-style: none;\n";
 				rulesText += "\tz-index: 999;\n";
 				rulesText += "\tposition: absolute;\n";
