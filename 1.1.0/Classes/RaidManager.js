@@ -478,7 +478,7 @@
 					if (typeof filterParam == "string")
 					{
 						// Parse the command into a RaidFilter
-						var raidFilter = new RaidFilter(filterParam);
+						raidFilter = new RaidFilter(filterParam);
 					}
 					// We got something other than text. Assume it's a RaidFilter
 					else if (filterParam instanceof RaidFilter)
@@ -617,6 +617,119 @@
 					console.warn(ex);
 				}
 				Timer.stop("fetchByFilter");
+			},
+			
+			markByFilter: function(filter, state) {
+				Timer.start("markByFilter");
+				
+				if (typeof filter === "string") {
+					filter = new RaidFilter(filter);
+				}
+				
+				if (typeof state === "string") {
+					state = RaidManager.STATE.valueOf(state.toUpperCase());
+				}
+				
+				// Count of raids seen
+				var raidCount = 0;
+				
+				// If the command makes a valid filter
+				if (filter.isValid())
+				{
+					// Get all raids
+					Timer.start("markByFilter > loading hardRaidStorage");
+					// Load up the storage object
+					var raidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
+					Timer.stop("markByFilter > loading hardRaidStorage");
+					
+					// Count of raids seen
+					var resultsPage = 1;
+					
+					// Start time of the run
+					var commandStartTime = (new Date() / 1);
+					
+					// Iterate over all raids
+					for (var key in raidStorage)
+					{
+						// Get the raid data from storage
+						var raidData = raidStorage[key];
+						
+						// Get the link from the data
+						var raidLink = raidData.raidLink;
+						
+						// Convert to RaidLink
+						Object.extend(raidLink, RaidLink.prototype);
+						
+						// Get the state of the link
+						var currentState;
+						if (typeof raidData.stateId != "undefined")
+						{
+							currentState = RaidManager.STATE.valueOf(raidData.stateId);
+						}
+						else if (typeof raidData.state != "undefined" && typeof raidData.state.text != "undefined")
+						{
+							currentState = RaidManager.STATE.valueOf(raidData.state.text);
+						}
+						
+						if (typeof currentState == "undefined")
+						{
+							console.warn("Could not locate a state for " + raidLink.getSimpleText() + ". This may cause unexpected matching behavior.");
+						}
+						
+						try
+						{
+							// If this link matches the filter
+							if (filter.matches(
+								{
+									age: commandStartTime - raidData.firstSeen,
+									difficulty: raidLink.difficulty,
+									fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+									name: raidLink.getRaid().getSearchableName(),
+									state: currentState,
+									count: raidCount
+								}
+								))
+							{
+								raidData.stateId = state.id;
+								
+								// Keep track of how many raids match the query so we can deal with pagination
+								raidCount++;
+								if (filter.count != "undefined" && raidCount % filter.count == 0) {resultsPage++;raidCount=0;}
+								
+								// Once we've changed enough links, bail
+								// If count is not set, we'll only break when we've iterated over all raids
+								if (raidCount == filter.count)
+								{
+									break;
+								}
+							}
+						}
+						catch(ex)
+						{
+							console.warn(ex);
+							console.warn("Failure while trying to match ");
+							console.warn(
+								{
+									age: commandStartTime - raidData.firstSeen,
+									difficulty: raidLink.difficulty,
+									fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+									name: raidLink.getRaid().getSearchableName(),
+									state: currentState,
+									count: raidCount
+								}
+							);
+						}
+					}
+					
+					Timer.start("markByFilter > storing hardRaidStorage");
+					// Store the storage data back into the browser storage
+					GM_setValue(DC_LoaTS_Properties.storage.raidStorage, JSON.stringify(raidStorage));
+					Timer.stop("markByFilter > storing hardRaidStorage");
+				}
+				
+				Timer.stop("markByFilter");
+				
+				return raidCount;
 			}
 		}
 
