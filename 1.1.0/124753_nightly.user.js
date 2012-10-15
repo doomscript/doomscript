@@ -207,7 +207,7 @@ Updated Python Data
 2012.10.14 - 1.1.8
 Added /markall filter state command
 Altered /autoload timer in some cases
-Added /linktools command to list tools
+Added /linktools command to list tools links
 
 */
 
@@ -5424,8 +5424,8 @@ function main()
 
 					
 					if (params.trim() === "post") {
-						var toolsText = "\ndoomscript: " + DC_LoaTS_Properties.scriptURL + " ";
-						toolsText += "SRLTSX: " + DC_LoaTS_Properties.SRLTSXURL + " ";
+						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " OR ";
+						toolsText += "SRLTSX: " + DC_LoaTS_Properties.SRLTSXURL + " (only 1) and get any of: ";
 						toolsText += "RaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
 						toolsText += "QuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
 						toolsText += "Play Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;

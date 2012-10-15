@@ -11,8 +11,8 @@
 
 					
 					if (params.trim() === "post") {
-						var toolsText = "\ndoomscript: " + DC_LoaTS_Properties.scriptURL + " ";
-						toolsText += "SRLTSX: " + DC_LoaTS_Properties.SRLTSXURL + " ";
+						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " OR ";
+						toolsText += "SRLTSX: " + DC_LoaTS_Properties.SRLTSXURL + " (only 1) and get any of: ";
 						toolsText += "RaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
 						toolsText += "QuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
 						toolsText += "Play Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
