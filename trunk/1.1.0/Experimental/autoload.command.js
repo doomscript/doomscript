@@ -72,7 +72,15 @@
 							
 							ret.success = true;
 							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
-							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
+
+							var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground");
+							if (lrib && lrib === true) {
+								DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 100), raidLinks: raidLinks};								
+							}
+							else {
+								DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
+							}
+							
 						}
 						else
 						{

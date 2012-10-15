@@ -20,8 +20,12 @@
 					
 					var count = RaidManager.markByFilter(filter, state);
 					
-					ret.statusMessage = "Marked " + count + " raid" + (count!=1?"s":"") + " as " + state;
+					ret.statusMessage = "Marked " + count + " raid" + (count!=1?"s":"") + " matching \"<code>" + filter + "</code>\" as " + state;
 					ret.success = true;
+					
+					if (count > 0) {
+						DC_LoaTS_Helper.updatePostedLinks();
+					}
 					
 					return ret;
 				},

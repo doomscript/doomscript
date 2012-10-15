@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.7
+// @version        1.1.8
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -204,6 +204,11 @@ Fixed export function in Chrome
 Updated hotlinked image location
 Updated Python Data
 
+2012.10.14 - 1.1.8
+Added /markall filter state command
+Altered /autoload timer in some cases
+Added /linktools command to list tools
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -212,15 +217,20 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.7",
+    	version: "1.1.8",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
-    	scriptURL: "http://userscripts.org/scripts/show/124753",
+    	scriptURL: "http://userscripts.org/124753",
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
+    	// Other URLS
+    	SRLTSXURL: "http://userscripts.org/128721",
+    	RaidToolsURL: "http://userscripts.org/132671",
+    	QuickFriendURL: "http://userscripts.org/125666",
+    	PlayNowFixURL: "http://userscripts.org/142619",
     	farmSpreadsheetURL: "https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4",
     	
     	debugMode: false,
@@ -5401,6 +5411,61 @@ function main()
 			}
 		);
 		
+		RaidCommand.create( 
+			{
+				commandName: "linktools",
+				aliases: [],
+				// No parsing needed
+				/*parsingClass: ,*/
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+
+					
+					if (params.trim() === "post") {
+						var toolsText = "\ndoomscript: " + DC_LoaTS_Properties.scriptURL + " ";
+						toolsText += "SRLTSX: " + DC_LoaTS_Properties.SRLTSXURL + " ";
+						toolsText += "RaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
+						toolsText += "QuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
+						toolsText += "Play Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
+
+						holodeck._chat_window._active_room.sendRoomMessage(toolsText);
+					}
+					else {
+						var toolsText = "\ndoomscript: <a href=\"" + DC_LoaTS_Properties.scriptURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.scriptURL + "</a> \n";
+						toolsText += "SRLTSX: <a href=\"" + DC_LoaTS_Properties.SRLTSXURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.SRLTSXURL + "</a> \n";
+						toolsText += "RaidTools: <a href=\"" + DC_LoaTS_Properties.RaidToolsURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.RaidToolsURL + "</a> \n";
+						toolsText += "QuickFriend: <a href=\"" + DC_LoaTS_Properties.QuickFriendURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.QuickFriendURL + "</a> \n";
+						toolsText += "Play Now Fix: <a href=\"" + DC_LoaTS_Properties.PlayNowFixURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.PlayNowFixURL + "</a> \n";
+
+						deck.activeDialogue().raidBotMessage(toolsText);
+					}
+					
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Display tools links"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/linktools [post]</code>\n";
+					helpText += "Displays a list of scripts that you might find useful.\n";
+					helpText += "<code>" + this.getCommandLink("") + "</code> will post the links just to you.\n";
+					helpText += "<code>" + this.getCommandLink("post") + "</code> will post the links to chat.";
+					
+					return helpText;
+				}
+			}
+		);
+		
 		
 		DC_LoaTS_Helper.bulkRaids = {};
 		RaidCommand.create( 
@@ -5606,8 +5671,12 @@ function main()
 					
 					var count = RaidManager.markByFilter(filter, state);
 					
-					ret.statusMessage = "Marked " + count + " raid" + (count!=1?"s":"") + " as " + state;
+					ret.statusMessage = "Marked " + count + " raid" + (count!=1?"s":"") + " matching \"<code>" + filter + "</code>\" as " + state;
 					ret.success = true;
+					
+					if (count > 0) {
+						DC_LoaTS_Helper.updatePostedLinks();
+					}
 					
 					return ret;
 				},
@@ -6641,7 +6710,15 @@ function main()
 							
 							ret.success = true;
 							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
-							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
+
+							var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground");
+							if (lrib && lrib === true) {
+								DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 100), raidLinks: raidLinks};								
+							}
+							else {
+								DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
+							}
+							
 						}
 						else
 						{
