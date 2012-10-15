@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.7
+// @version        1.1.8
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -204,6 +204,11 @@ Fixed export function in Chrome
 Updated hotlinked image location
 Updated Python Data
 
+2012.10.14 - 1.1.8
+Added /markall filter state command
+Altered /autoload timer in some cases
+Added /linktools command to list tools links
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -212,15 +217,20 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.7",
+    	version: "1.1.8",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
-    	scriptURL: "http://userscripts.org/scripts/show/124753",
+    	scriptURL: "http://userscripts.org/124753",
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
+    	// Other URLS
+    	SRLTSXURL: "http://userscripts.org/128721",
+    	RaidToolsURL: "http://userscripts.org/132671",
+    	QuickFriendURL: "http://userscripts.org/125666",
+    	PlayNowFixURL: "http://userscripts.org/142619",
     	farmSpreadsheetURL: "https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4",
     	
     	debugMode: false,
