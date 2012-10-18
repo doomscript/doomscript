@@ -80,8 +80,8 @@
 				},
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/exportraids raidName difficulty {state: stateName} {age: timeFormat} {fs: fsFormat} {count: numberResults} {page: resultsPage}</code>\n";
-					helpText += "Exports to file raids that you've seen before in chat"
+					var helpText = "<b>Raid Command:</b> <code>/pasteraids raidName difficulty {state: stateName} {age: timeFormat} {fs: fsFormat} {count: numberResults} {page: resultsPage}</code>\n";
+					helpText += "Exports to pastebin raids that you've seen before in chat"
 					helpText += "where <code>raidName</code> <i>(optional)</i> is any partial or full raid name\n";
 					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
 					helpText += "where <code>stateName</code> <i>(optional)</i> is either seen or visited\n";
