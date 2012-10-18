@@ -407,7 +407,7 @@
 					// If there's a difficulty
 					if (typeof this.difficulty !== "undefined") {
 						if (this.difficulty >= 1 && this.difficulty <= 4) {
-							ret += RaidType.difficulty[this.difficulty];
+							ret += RaidType.difficulty[this.difficulty] + " ";
 						}
 						else {
 							return "Filter does not match any raid difficulties";
