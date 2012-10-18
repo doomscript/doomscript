@@ -1702,7 +1702,7 @@ function main()
 				{
 					// If there's a difficulty
 					if (typeof this.difficulty !== "undefined") {
-						if (this.difficulty > 0 && this.difficulty < 4) {
+						if (this.difficulty >= 1 && this.difficulty <= 4) {
 							ret += RaidType.difficulty[this.difficulty];
 						}
 						else {
