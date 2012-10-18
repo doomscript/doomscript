@@ -1729,7 +1729,7 @@ function main()
 						}
 						else {
 							var tmp = raids.join(", ");
-							ret += tmp.substring(0, tmp.lastIndexOf(", ") + 2) + " and " + tmp.substring(tmp.lastIndexOf(", ") + 2);
+							ret += tmp.substring(0, tmp.lastIndexOf(", ") + 2) + "and " + tmp.substring(tmp.lastIndexOf(", ") + 2);
 						}
 
 					}
