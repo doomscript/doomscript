@@ -1,14 +1,10 @@
 		RaidCommand.create( 
 			{
 				commandName: "exportraids",
-				aliases: ["dumpraids"],
 				parsingClass: RaidFilter,
 				
 				handler: function(deck, raidFilter, params, text, context)
 				{
-					// Declare ret object
-					var ret = {sucess: true};
-						
 					// Capture the start time of the query
 					var queryStartTime = new Date()/1;
 				

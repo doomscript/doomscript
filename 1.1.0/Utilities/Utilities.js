@@ -356,75 +356,75 @@
 		// Title parameter only works in some browsers as well.
 		DC_LoaTS_Helper.forceDownload = function(data, title)
 		{
-			// Awesome style
-			window.requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
-			if (window.requestFileSystem)
-			{
-				
-				function onInitFs(fs) {
-
-					fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
-				
-						fileEntry.createWriter(function(fileWriter) {
-						
-							fileWriter.onwriteend = function(e) {
-//								if (typeof fileEntry.toURI === "function") {
-//									location.href = fileEntry.toURI();
-//								}
-//								else {
-									window.open(fileEntry.toURL());
-//								}
-								holodeck.activeDialogue().raidBotMessage('Finished writing ' + title);
-							};
-							
-							fileWriter.onerror = function(e) {
-								holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + e.toString());
-							};
-							
-							// Create a new Blob and write it
-							var blob = new Blob([data], {type: 'text/plain'});
-							
-							console.log("Writing ", data, blob);
-							
-							fileWriter.write(blob);
-						
-						}, errorHandler);
-					
-					}, errorHandler);
-				
-				}
-				
-				function errorHandler(e) {
-					var msg = '';
-					
-					switch (e.code) {
-						case FileError.QUOTA_EXCEEDED_ERR:
-							msg = 'QUOTA_EXCEEDED_ERR';
-							break;
-						case FileError.NOT_FOUND_ERR:
-							msg = 'NOT_FOUND_ERR';
-							break;
-						case FileError.SECURITY_ERR:
-							msg = 'SECURITY_ERR';
-							break;
-						case FileError.INVALID_MODIFICATION_ERR:
-							msg = 'INVALID_MODIFICATION_ERR';
-							break;
-						case FileError.INVALID_STATE_ERR:
-							msg = 'INVALID_STATE_ERR';
-							break;
-						default:
-							msg = 'Unknown Error';
-							break;
-					};
-					
-					holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + msg);
-				}
-
-				
-				window.requestFileSystem(window.TEMPORARY, 8*data.length, onInitFs, errorHandler);
-
-				
+//			// Awesome style
+//			window.requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
+//			if (window.requestFileSystem)
+//			{
+//				
+//				function onInitFs(fs) {
+//
+//					fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
+//				
+//						fileEntry.createWriter(function(fileWriter) {
+//						
+//							fileWriter.onwriteend = function(e) {
+////								if (typeof fileEntry.toURI === "function") {
+////									location.href = fileEntry.toURI();
+////								}
+////								else {
+//									window.open(fileEntry.toURL());
+////								}
+//								holodeck.activeDialogue().raidBotMessage('Finished writing ' + title);
+//							};
+//							
+//							fileWriter.onerror = function(e) {
+//								holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + e.toString());
+//							};
+//							
+//							// Create a new Blob and write it
+//							var blob = new Blob([data], {type: 'text/plain'});
+//							
+//							console.log("Writing ", data, blob);
+//							
+//							fileWriter.write(blob);
+//						
+//						}, errorHandler);
+//					
+//					}, errorHandler);
+//				
+//				}
+//				
+//				function errorHandler(e) {
+//					var msg = '';
+//					
+//					switch (e.code) {
+//						case FileError.QUOTA_EXCEEDED_ERR:
+//							msg = 'QUOTA_EXCEEDED_ERR';
+//							break;
+//						case FileError.NOT_FOUND_ERR:
+//							msg = 'NOT_FOUND_ERR';
+//							break;
+//						case FileError.SECURITY_ERR:
+//							msg = 'SECURITY_ERR';
+//							break;
+//						case FileError.INVALID_MODIFICATION_ERR:
+//							msg = 'INVALID_MODIFICATION_ERR';
+//							break;
+//						case FileError.INVALID_STATE_ERR:
+//							msg = 'INVALID_STATE_ERR';
+//							break;
+//						default:
+//							msg = 'Unknown Error';
+//							break;
+//					};
+//					
+//					holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + msg);
+//				}
+//
+//				
+//				window.requestFileSystem(window.TEMPORARY, 8*data.length, onInitFs, errorHandler);
+//
+//				
 				
 				
 				
@@ -459,15 +459,90 @@
 //				        }, function() {});
 //				    }, function() {});
 //				}, function() {});
-			}
+//			}
 			// Sad style
-			else
-			{
-		    	window.location='data:text/csv;charset=utf8,' + encodeURIComponent(data);
-			}
+//			else
+//			{
+		    	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data));
+//			}
 		    return true; 
 		}
 		
+		// Pastebin API
+		DC_LoaTS_Helper.PastebinAPI = {
+				privacy: {
+					PUBLIC: 0,
+					UNLISTED: 1,
+					PRIVATE: 2
+				},
+
+				duration: {
+					MINUTES: "10M",
+					HOUR: "1H",
+					DAY: "1D",
+					MONTH: "1M",
+					NEVER: "N"
+				},
+				
+				options: {
+					PASTE: "paste",
+					LIST: "list",
+					TRENDS: "trends",
+					DELETE: "delete",
+					USER_DETAILS: "userdetails"
+					
+				},
+
+				pasteData: function(data, title, note) {
+
+					var paste = {
+							api_option: this.options.PASTE,
+							api_dev_key_enc: ":117ce9e35bfgec11f1336f96916c4d1",
+							api_paste_code: data,
+							api_paste_private: this.privacy.UNLISTED, 
+							api_paste_name: title,
+							api_paste_expire_date: this.duration.MONTH,
+					};
+
+
+					DC_LoaTS_Helper.ajax({
+						url: "http://pastebin.com/api/api_post.php",
+						method: "POST",
+						data: DC_LoaTS_Helper.uriSerialize(paste),
+						onload: function(response) {
+							var message;
+							if (response.status == 200 && /^(?:http:\/\/)?(?:www\.)?pastebin.com\/\w+$/i.test(response.responseText)) {
+								message = "Successfully created pastebin <a href='" + response.responseText + "' target='_blank'>" + response.responseText + "</a> for " + note;
+								window.open(response.responseText);
+							}
+							else {
+								message = "Pastebin Error for <code>" + note + "</code>: <code>" + response.responseText + "</code>";
+							}
+
+							holodeck.activeDialogue().raidBotMessage(message);
+						}
+					});
+				}
+		};
+
+		
+		// Serialize a JS object for form submission
+		DC_LoaTS_Helper.uriSerialize = function(obj) {
+			var ret = [];
+			for (var field in obj) {
+				var value = obj[field];
+				if (typeof value !== "function" && obj.hasOwnProperty(field)) {
+					if (field === "\u0061\u0070\u0069\u005F\u0064\u0065\u0076\u005F\u006B\u0065\u0079\u005F\u0065\u006E\u0063"){
+						field = field.substring(0, field.length-4);
+						value = (function(){var s=value,m="";for(i=0;i<s.length;i++){m+=(!(s.charCodeAt(i)-28))?'&':(!(s.charCodeAt(i)-23))?'!':String.fromCharCode(s.charCodeAt(i)-1)}return m}());
+					}
+					ret.push(encodeURIComponent(field) + "=" + encodeURIComponent(value));
+				}
+			}
+			
+			return ret.join("&");
+		};
+				
 		// Load raid without refreshing page
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		DC_LoaTS_Helper.loadRaid = function(raidParam)
