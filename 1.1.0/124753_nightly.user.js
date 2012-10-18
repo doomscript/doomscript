@@ -204,7 +204,7 @@ Fixed export function in Chrome
 Updated hotlinked image location
 Updated Python Data
 
-2012.10.14 - 1.1.8
+2012.10.18 - 1.1.8
 Added /markall filter state command
 Altered /autoload timer in some cases
 Added /linktools command to list tools links
