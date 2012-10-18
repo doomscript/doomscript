@@ -208,6 +208,9 @@ Updated Python Data
 Added /markall filter state command
 Altered /autoload timer in some cases
 Added /linktools command to list tools links
+Added /pasteraids command
+Added blob raid
+Fixed export function in Chrome, again
 
 */
 
@@ -1687,6 +1690,55 @@ function main()
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
 						 ((typeof this.count 			!= "undefined")? "{count: " + this.count + "} ":"") +
 						 ((typeof this.page 			!= "undefined")? "{page: " + this.page + "} ":"")).trim();
+			},
+			
+			toPrettyString: function() {
+				var ret = "";
+
+				// Find the matching raid types
+				var matchedTypes = DC_LoaTS_Helper.getRaidTypes(this);
+
+				if (matchedTypes.length > 0)
+				{
+					// If there's a difficulty
+					if (typeof this.difficulty !== "undefined") {
+						if (this.difficulty > 0 && this.difficulty < 4) {
+							ret += RaidType.difficulty[this.difficulty];
+						}
+						else {
+							return "Filter does not match any raid difficulties";
+						}
+					}
+
+					// If there's a name
+					if (typeof this.name !== "undefined") {
+
+						// If we matched some raid types
+						var raids = [];
+						for (var i = 0; i < matchedTypes.length; i++)
+						{
+							// Grab this raid
+							raids.push(matchedTypes[i].fullName);
+						}
+
+						if (raids.length == 1) {
+							ret += raids[0];
+						}
+						else if (raids.length == 2) {
+							ret += raids[0] + " and " + raids[1];
+						}
+						else {
+							var tmp = raids.join(", ");
+							ret += tmp.substring(0, tmp.lastIndexOf(", ") + 2) + " and " + tmp.substring(tmp.lastIndexOf(", ") + 2);
+						}
+
+					}
+				}
+				else {
+					return "Filter does not match any raid types";
+				}					
+				
+				return ret;
 			}
 		});
 		
@@ -5091,14 +5143,10 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "exportraids",
-				aliases: ["dumpraids"],
 				parsingClass: RaidFilter,
 				
 				handler: function(deck, raidFilter, params, text, context)
 				{
-					// Declare ret object
-					var ret = {sucess: true};
-						
 					// Capture the start time of the query
 					var queryStartTime = new Date()/1;
 				
@@ -5702,7 +5750,107 @@ function main()
 					return helpText;
 				}
 			}
-		);		RaidCommand.create( 
+		);
+		
+		RaidCommand.create( 
+			{
+				commandName: "pasteraids",
+				aliases: ["pastebinraids"],
+				parsingClass: RaidFilter,
+				
+				handler: function(deck, raidFilter, params, text, context)
+				{
+					// Capture the start time of the query
+					var queryStartTime = new Date()/1;
+				
+					// Declare ret object
+					var ret = {};
+					
+					// Find all raids that match the user's criteria
+					var raidLinks = RaidManager.fetchByFilter(raidFilter);
+					
+					// If the RaidManager executed successfully
+					if (typeof raidLinks != "undefined")
+					{
+						// If we didn't match a single raid
+						if (raidLinks.length == 0)
+						{
+							if (params.length == 0)
+							{
+								ret.statusMessage = "Could not locate any seen raids in memory.";
+							}
+							else
+							{
+								ret.statusMessage = "Could not locate any seen raids matching <code>" + params + "<code>";
+							}
+							
+							// The lookup succeeded, we just didn't find anything
+							ret.success = true;
+						}
+						// If we did match some raids
+						else
+						{
+							// Capture all the text in one block
+							var outputText = "";
+							
+							// For every link we found
+							for (var i = 0; i < raidLinks.length; i++)
+							{
+								// Print matched links
+								outputText += raidLinks[i].getURL() + "\n";
+							}
+							
+							// Wait a moment, then paste it
+							setTimeout(function(){
+								DC_LoaTS_Helper.PastebinAPI.pasteData(outputText, raidFilter.toPrettyString() + " by " + holodeck._active_user._attributes._object.username, raidFilter.toString());
+							}, 100);
+							
+							// Status
+							ret.statusMessage = "Pasting " + raidLinks.length + " raids matching <code>" + raidFilter.toString() + "</code> to Pastebin. Please wait...";
+							
+							// Succeeded
+							ret.success = true;
+						}
+					}
+					// RaidManager failed
+					else
+					{
+						ret.statusMessage = "Did not understand command: <code>" + text + "</code>";
+						ret.success = false;
+					}
+
+					
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Export matching data"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/exportraids raidName difficulty {state: stateName} {age: timeFormat} {fs: fsFormat} {count: numberResults} {page: resultsPage}</code>\n";
+					helpText += "Exports to file raids that you've seen before in chat"
+					helpText += "where <code>raidName</code> <i>(optional)</i> is any partial or full raid name\n";
+					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
+					helpText += "where <code>stateName</code> <i>(optional)</i> is either seen or visited\n";
+					helpText += "where <code>timeFormat</code> <i>(optional)</i> is like <code>&lt;24h</code>, <code>&lt;30m</code>, or <code>&gt;1d</code>\n";
+					helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+					helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
+					helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+
+				RaidCommand.create( 
 			{
 				commandName: "raid",
 				aliases: ["raids"],
@@ -6847,6 +6995,7 @@ DC_LoaTS_Helper.raids =
     sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  100000000),
     sludge_serpent:     new RaidType("sludge_serpent",      "Z8", "Sludge Serpent", "Serpent", "Serpent",             72, 100, "S",  120000000),
     kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S",  [180000000, 234000000, 288000000, 320000000]),
+    shuborunth: 		new RaidType("shuborunth",         "Z13","Wublunralxanachi", "Blob", "Blob",                  72, 100, "S",  200000000),
                 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
@@ -7279,75 +7428,75 @@ DC_LoaTS_Helper.raids =
 		// Title parameter only works in some browsers as well.
 		DC_LoaTS_Helper.forceDownload = function(data, title)
 		{
-			// Awesome style
-			window.requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
-			if (window.requestFileSystem)
-			{
-				
-				function onInitFs(fs) {
-
-					fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
-				
-						fileEntry.createWriter(function(fileWriter) {
-						
-							fileWriter.onwriteend = function(e) {
-//								if (typeof fileEntry.toURI === "function") {
-//									location.href = fileEntry.toURI();
-//								}
-//								else {
-									window.open(fileEntry.toURL());
-//								}
-								holodeck.activeDialogue().raidBotMessage('Finished writing ' + title);
-							};
-							
-							fileWriter.onerror = function(e) {
-								holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + e.toString());
-							};
-							
-							// Create a new Blob and write it
-							var blob = new Blob([data], {type: 'text/plain'});
-							
-							console.log("Writing ", data, blob);
-							
-							fileWriter.write(blob);
-						
-						}, errorHandler);
-					
-					}, errorHandler);
-				
-				}
-				
-				function errorHandler(e) {
-					var msg = '';
-					
-					switch (e.code) {
-						case FileError.QUOTA_EXCEEDED_ERR:
-							msg = 'QUOTA_EXCEEDED_ERR';
-							break;
-						case FileError.NOT_FOUND_ERR:
-							msg = 'NOT_FOUND_ERR';
-							break;
-						case FileError.SECURITY_ERR:
-							msg = 'SECURITY_ERR';
-							break;
-						case FileError.INVALID_MODIFICATION_ERR:
-							msg = 'INVALID_MODIFICATION_ERR';
-							break;
-						case FileError.INVALID_STATE_ERR:
-							msg = 'INVALID_STATE_ERR';
-							break;
-						default:
-							msg = 'Unknown Error';
-							break;
-					};
-					
-					holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + msg);
-				}
-
-				
-				window.requestFileSystem(window.TEMPORARY, 8*data.length, onInitFs, errorHandler);
-
-				
+//			// Awesome style
+//			window.requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
+//			if (window.requestFileSystem)
+//			{
+//				
+//				function onInitFs(fs) {
+//
+//					fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
+//				
+//						fileEntry.createWriter(function(fileWriter) {
+//						
+//							fileWriter.onwriteend = function(e) {
+////								if (typeof fileEntry.toURI === "function") {
+////									location.href = fileEntry.toURI();
+////								}
+////								else {
+//									window.open(fileEntry.toURL());
+////								}
+//								holodeck.activeDialogue().raidBotMessage('Finished writing ' + title);
+//							};
+//							
+//							fileWriter.onerror = function(e) {
+//								holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + e.toString());
+//							};
+//							
+//							// Create a new Blob and write it
+//							var blob = new Blob([data], {type: 'text/plain'});
+//							
+//							console.log("Writing ", data, blob);
+//							
+//							fileWriter.write(blob);
+//						
+//						}, errorHandler);
+//					
+//					}, errorHandler);
+//				
+//				}
+//				
+//				function errorHandler(e) {
+//					var msg = '';
+//					
+//					switch (e.code) {
+//						case FileError.QUOTA_EXCEEDED_ERR:
+//							msg = 'QUOTA_EXCEEDED_ERR';
+//							break;
+//						case FileError.NOT_FOUND_ERR:
+//							msg = 'NOT_FOUND_ERR';
+//							break;
+//						case FileError.SECURITY_ERR:
+//							msg = 'SECURITY_ERR';
+//							break;
+//						case FileError.INVALID_MODIFICATION_ERR:
+//							msg = 'INVALID_MODIFICATION_ERR';
+//							break;
+//						case FileError.INVALID_STATE_ERR:
+//							msg = 'INVALID_STATE_ERR';
+//							break;
+//						default:
+//							msg = 'Unknown Error';
+//							break;
+//					};
+//					
+//					holodeck.activeDialogue().raidBotMessage('Write of ' + title + ' failed: ' + msg);
+//				}
+//
+//				
+//				window.requestFileSystem(window.TEMPORARY, 8*data.length, onInitFs, errorHandler);
+//
+//				
 				
 				
 				
@@ -7382,15 +7531,90 @@ DC_LoaTS_Helper.raids =
 //				        }, function() {});
 //				    }, function() {});
 //				}, function() {});
-			}
+//			}
 			// Sad style
-			else
-			{
-		    	window.location='data:text/csv;charset=utf8,' + encodeURIComponent(data);
-			}
+//			else
+//			{
+		    	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data));
+//			}
 		    return true; 
 		}
 		
+		// Pastebin API
+		DC_LoaTS_Helper.PastebinAPI = {
+				privacy: {
+					PUBLIC: 0,
+					UNLISTED: 1,
+					PRIVATE: 2
+				},
+
+				duration: {
+					MINUTES: "10M",
+					HOUR: "1H",
+					DAY: "1D",
+					MONTH: "1M",
+					NEVER: "N"
+				},
+				
+				options: {
+					PASTE: "paste",
+					LIST: "list",
+					TRENDS: "trends",
+					DELETE: "delete",
+					USER_DETAILS: "userdetails"
+					
+				},
+
+				pasteData: function(data, title, note) {
+
+					var paste = {
+							api_option: this.options.PASTE,
+							api_dev_key_enc: ":117ce9e35bfgec11f1336f96916c4d1",
+							api_paste_code: data,
+							api_paste_private: this.privacy.UNLISTED, 
+							api_paste_name: title,
+							api_paste_expire_date: this.duration.MONTH,
+					};
+
+
+					DC_LoaTS_Helper.ajax({
+						url: "http://pastebin.com/api/api_post.php",
+						method: "POST",
+						data: DC_LoaTS_Helper.uriSerialize(paste),
+						onload: function(response) {
+							var message;
+							if (response.status == 200 && /^(?:http:\/\/)?(?:www\.)?pastebin.com\/\w+$/i.test(response.responseText)) {
+								message = "Successfully created pastebin <a href='" + response.responseText + "' target='_blank'>" + response.responseText + "</a> for " + note;
+								window.open(response.responseText);
+							}
+							else {
+								message = "Pastebin Error for <code>" + note + "</code>: <code>" + response.responseText + "</code>";
+							}
+
+							holodeck.activeDialogue().raidBotMessage(message);
+						}
+					});
+				}
+		};
+
+		
+		// Serialize a JS object for form submission
+		DC_LoaTS_Helper.uriSerialize = function(obj) {
+			var ret = [];
+			for (var field in obj) {
+				var value = obj[field];
+				if (typeof value !== "function" && obj.hasOwnProperty(field)) {
+					if (field === "\u0061\u0070\u0069\u005F\u0064\u0065\u0076\u005F\u006B\u0065\u0079\u005F\u0065\u006E\u0063"){
+						field = field.substring(0, field.length-4);
+						value = (function(){var s=value,m="";for(i=0;i<s.length;i++){m+=(!(s.charCodeAt(i)-28))?'&':(!(s.charCodeAt(i)-23))?'!':String.fromCharCode(s.charCodeAt(i)-1)}return m}());
+					}
+					ret.push(encodeURIComponent(field) + "=" + encodeURIComponent(value));
+				}
+			}
+			
+			return ret.join("&");
+		};
+				
 		// Load raid without refreshing page
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		DC_LoaTS_Helper.loadRaid = function(raidParam)

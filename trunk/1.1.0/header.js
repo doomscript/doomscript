@@ -208,6 +208,9 @@ Updated Python Data
 Added /markall filter state command
 Altered /autoload timer in some cases
 Added /linktools command to list tools links
+Added /pasteraids command
+Added blob raid
+Fixed export function in Chrome, again
 
 */
 

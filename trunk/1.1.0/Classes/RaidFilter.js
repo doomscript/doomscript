@@ -394,6 +394,55 @@
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
 						 ((typeof this.count 			!= "undefined")? "{count: " + this.count + "} ":"") +
 						 ((typeof this.page 			!= "undefined")? "{page: " + this.page + "} ":"")).trim();
+			},
+			
+			toPrettyString: function() {
+				var ret = "";
+
+				// Find the matching raid types
+				var matchedTypes = DC_LoaTS_Helper.getRaidTypes(this);
+
+				if (matchedTypes.length > 0)
+				{
+					// If there's a difficulty
+					if (typeof this.difficulty !== "undefined") {
+						if (this.difficulty > 0 && this.difficulty < 4) {
+							ret += RaidType.difficulty[this.difficulty];
+						}
+						else {
+							return "Filter does not match any raid difficulties";
+						}
+					}
+
+					// If there's a name
+					if (typeof this.name !== "undefined") {
+
+						// If we matched some raid types
+						var raids = [];
+						for (var i = 0; i < matchedTypes.length; i++)
+						{
+							// Grab this raid
+							raids.push(matchedTypes[i].fullName);
+						}
+
+						if (raids.length == 1) {
+							ret += raids[0];
+						}
+						else if (raids.length == 2) {
+							ret += raids[0] + " and " + raids[1];
+						}
+						else {
+							var tmp = raids.join(", ");
+							ret += tmp.substring(0, tmp.lastIndexOf(", ") + 2) + " and " + tmp.substring(tmp.lastIndexOf(", ") + 2);
+						}
+
+					}
+				}
+				else {
+					return "Filter does not match any raid types";
+				}					
+				
+				return ret;
 			}
 		});
 		
