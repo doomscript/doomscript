@@ -1044,7 +1044,7 @@
 			        for (substrInd = 0; substrInd <= name.length-windowSize; substrInd++)
 			        {
 			            substr = name.substring(substrInd,substrInd+windowSize).toLowerCase();
-			            if (/^\w_/gi.test(substr)){continue;}
+			            if (/\W|_|^[1-4]$/gi.test(substr)){continue;}
 			            foundMatch = false;
 			            // For each other name
 			            for (otherNameInd in DC_LoaTS_Helper.raids)
