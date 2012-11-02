@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.8
+// @version        1.1.9
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -211,6 +211,10 @@ Added /linktools command to list tools links
 Added /pasteraids command
 Added blob raid
 Fixed export function in Chrome, again
+
+2012.11.02 - 1.1.9
+Fixed bug with exportraids killing the omnibox
+Added two new raids, Nosferatu Nick and Haunted House
 
 */
 
