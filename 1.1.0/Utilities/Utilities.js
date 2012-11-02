@@ -635,11 +635,12 @@
 		
 		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, response)
 		{
-			if (response.responseText.indexOf("You have successfully joined the raid!"))
+			console.log("Raid Ajax Returned ", arugments);
+			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
 			}
-			else if (response.responseText.indexOf("You are already a member of this raid!"))
+			else if (response.responseText.indexOf("You are already a member of this raid!") >= 0)
 			{
 				// Already visited
 			}
