@@ -386,6 +386,15 @@
 		
 		RaidCommand.create = function(classObject)
 		{
+			if (typeof classObject.commandName === "undefined") {
+				throw {message: "Cannot create command without name", cls: classObject}; 
+			}
+			
+			if (typeof classObject.aliases === "undefined") {
+				classObject.aliases = [];
+				console.warn(classObject.commandName + " did not define its aliases");
+			}
+			
 			var commandClass = Class.create(RaidCommand, classObject);
 			//TODO: Need to clean this up
 			commandClass.commandName = classObject.commandName;
