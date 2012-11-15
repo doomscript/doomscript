@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.9
+// @version        1.1.10
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -216,6 +216,9 @@ Fixed export function in Chrome, again
 Fixed bug with exportraids killing the omnibox
 Added two new raids, Nosferatu Nick and Haunted House
 
+2012.11.02 - 1.1.10
+Added 3 new Zone A raids, Boar, Cake, and Guan Yu
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -224,7 +227,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.9",
+    	version: "1.1.10",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
