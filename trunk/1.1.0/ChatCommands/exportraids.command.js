@@ -47,7 +47,9 @@
 							}
 							
 							// Export the data we found
-							DC_LoaTS_Helper.forceDownload(outputText, raidFilter.toString().replace(" ", "_").replace(/\W/gi, ""));
+							//DC_LoaTS_Helper.forceDownload(outputText, raidFilter.toString().replace(" ", "_").replace(/\W/gi, ""));
+							RaidMenuTab.createDataDumpTab(outputText, raidFilter.toString());
+							
 							
 							// Print out the stats for the query
 							ret.statusMessage = "<code>/" + this.commandName + " " + raidFilter.toString() + "</code> took " + (new Date()/1 - queryStartTime) + " ms and exported " + raidLinks.length + " results.";

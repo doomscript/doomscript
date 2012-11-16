@@ -6,7 +6,7 @@
 		RaidMenuTab.create(
 			{
 				tabName: "Utils",
-				tabHeader: "Utilities",
+				tabHeader: "Utilities (Under Construction)",
 				tabPosition: 50,
 				
 				initPane: function()

@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.11
+// @version        1.1.12
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -222,6 +222,11 @@ Added 3 new Zone A raids, Boar, Cake, and Guan Yu
 2012.11.15 - 1.1.11
 Added 3 new Zone A raids, Missile Strike, Bashan, and Your Wrath
 
+2012.11.16 - 1.1.12
+Fixed bug where Cerebral Destroyed had gotten deleted
+Altered the way export raids works until a longer term solution can be provided
+
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -230,7 +235,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.11",
+    	version: "1.1.12",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -3436,7 +3441,7 @@ function main()
 					this.tabs = new Control.Tabs('DC_LoaTS_raidMenuTabs');
 
 					// Holder for activated tabs
-					this.activatedTabs = [];
+					this.activatedTabs = {};
 					
 					// Activate tabs
 					this._activateTabs();
@@ -3450,6 +3455,20 @@ function main()
 				this.container.toggle();
 			},
 			
+			// Show the raid menu
+			/*public void*/
+			show: function()
+			{
+				this.container.show();
+			},
+			
+			// Hide the raid menu
+			/*public void*/
+			hide: function()
+			{
+				this.container.hide();
+			},
+			
 			// Activates the tab classes. Probably don't call this except once in initialize
 			/*private void*/
 			_activateTabs: function()
@@ -3459,7 +3478,7 @@ function main()
 				{
 					try 
 					{
-						this.activatedTabs.push(new RaidMenu.tabClasses[tabPosition](this));
+						this.activatedTabs[tabPosition] = new RaidMenu.tabClasses[tabPosition](this);
 					}
 					catch (ex)
 					{
@@ -3470,6 +3489,10 @@ function main()
 				
 				// Activate first tab
 				this.tabs.first();
+			},
+			
+			activateTab: function(tabClass) {
+				this.activatedTabs[tabClass.tabPosition] = new tabClass(this);
 			},
 			
 			// Event fired as the menu title has been clicked
@@ -3552,9 +3575,9 @@ function main()
 		// Put in a place holder for the tabs
 		RaidMenu.tabClasses = {};
 		
-		// Toggle the visibility of the raid menu
-		/*public static void*/
-		RaidMenu.toggle = function()
+		// Ensure the raid menu is available
+		/*public static RaidMenu*/
+		RaidMenu.getInstance = function()
 		{
 			// Locate or create a raid menu
 			var raidMenu = window.raidMenu;
@@ -3573,9 +3596,37 @@ function main()
 				}
 			}
 			
-			// Toggle its visibility
-			raidMenu.toggle();
+			return raidMenu;
 		}
+
+
+		
+		// Toggle the visibility of the raid menu
+		/*public static void*/
+		RaidMenu.toggle = function()
+		{
+			// Toggle its visibility
+			RaidMenu.getInstance().toggle();
+		}
+
+
+		// Show the raid menu
+		/*public static void*/
+		RaidMenu.show = function()
+		{
+			// Show it
+			RaidMenu.getInstance().show();
+		}
+
+
+		// Hide the raid menu
+		/*public static void*/
+		RaidMenu.hide = function()
+		{
+			// Hide it
+			RaidMenu.getInstance().hide();
+		}
+
 
 		/************************************/
 		/******** RaidMenuTab Class *********/
@@ -3585,30 +3636,63 @@ function main()
 		window.RaidMenuTab = Class.create({
 			initialize: function(parentMenu)
 			{
+				console.log("Creating tab ", arguments);
 				this.parentMenu = parentMenu;
+				var me = this;
 				
-				var sanitaryName = this.getSanitizedName();
-				this.tabLi = document.createElement("li");
-				this.tabLi.className = "DC_LoaTS_raidMenuTab";
-				this.parentMenu.tabsList.appendChild(this.tabLi);
+				var sanitaryName = me.getSanitizedName();
+				me.tabLi = document.createElement("li");
+				me.tabLi.className = "DC_LoaTS_raidMenuTab";
+				me.parentMenu.tabsList.appendChild(me.tabLi);
 				
-				this.tabA = document.createElement("a");
-				this.tabA.href = "#DC_LoaTS_raidMenu" + sanitaryName + "Pane";
-				this.tabA.appendChild(document.createTextNode(this.tabName));
-				this.tabLi.appendChild(this.tabA);
+				me.tabA = document.createElement("a");
+				me.tabA.href = "#DC_LoaTS_raidMenu" + sanitaryName + "Pane";
+				me.tabA.appendChild(document.createTextNode(me.tabName));
+				me.tabLi.appendChild(me.tabA);
 				
-				this.pane = document.createElement("div");
-				this.pane.id = "DC_LoaTS_raidMenu" + sanitaryName + "Pane";
-				this.pane.className = "DC_LoaTS_raidMenuPane";
-				this.pane.style.display = "none";
-				this.parentMenu.bodyWrapper.appendChild(this.pane);
+				me.pane = document.createElement("div");
+				me.pane.id = "DC_LoaTS_raidMenu" + sanitaryName + "Pane";
+				me.pane.className = "DC_LoaTS_raidMenuPane";
+				me.pane.style.display = "none";
+				me.parentMenu.bodyWrapper.appendChild(me.pane);
 				
-				this.parentMenu.tabs.addTab(this.tabA);
+				me.parentMenu.tabs.addTab(me.tabA);
+
 				
-				this.header = this.createHeader(this.tabHeader || this.tabName);
-				this.pane.appendChild(this.header);
+				if (me.closeable) {
+					me.tabCloseA = document.createElement("a");
+					me.tabCloseA.href = "#";
+					me.tabCloseA.className = "DC_LoaTS_raidMenuCloseTabA";
+					me.tabCloseA.innerText = "X";
+					me.tabCloseA.onclick = function() {
+						me.parentMenu.tabsList.removeChild(me.tabLi);
+						me.parentMenu.bodyWrapper.removeChild(me.pane);
+						delete RaidMenu.tabClasses[me.tabPosition];
+						delete me.parentMenu.tabs.containers._object[me.tabA.href];
+						var links = me.parentMenu.tabs.links;
+						for (var i = 0; i < links.length; i++) {
+							var link = links[i];
+							if (link.key == me.tabA.href) {
+								var rest = links.slice((i-1 || i) + 1 || links.length);
+								links.length = i < 0 ? links.length + i : i;
+								me.parentMenu.tabs.links = links.push.apply(links, rest);
+
+								break;
+							}
+						}
+						me.parentMenu.tabs.previous();
+						return false;
+					}
+					me.tabLi.appendChild(me.tabCloseA);
+				} // End closeable logic
 				
-				this.initPane();
+				me.header = me.createHeader(me.tabHeader || me.tabName);
+				me.pane.appendChild(me.header);
+								
+				
+				if (typeof me.initPane === "function") {
+					me.initPane();
+				}
 			},
 			
 			getSanitizedName: function()
@@ -3668,10 +3752,11 @@ function main()
 		
 		RaidMenuTab.create = function(classObject)
 		{
+			console.log(classObject);
 			try
 			{
 				// Don't collide with other poorly positioned tabs
-				while (typeof RaidMenu.tabClasses[classObject.tabPosition] != "undefined")
+				while (typeof RaidMenu.tabClasses[classObject.tabPosition] !== "undefined")
 				{
 					classObject.tabPosition++;
 				}
@@ -3679,16 +3764,43 @@ function main()
 				var tabClass = Class.create(RaidMenuTab, classObject);
 				tabClass.tabName = classObject.tabName;
 				tabClass.tabPosition = classObject.tabPosition;
+				tabClass.closeable = classObject.closeable;
 				RaidMenu.tabClasses[classObject.tabPosition] = tabClass;
+				return tabClass;
 			}
 			catch(ex)
 			{
-				var tabName = (typeof classObject != "undefined" && typeof classObject.tabName != "undefined")?classObject.tabName:"";
+				var tabName = (typeof classObject !== "undefined" && typeof classObject.tabName !== "undefined")?classObject.tabName:"";
 				
 				console.warn("Error while creating RaidMenu tab class " + tabName);
 				console.warn(classObject);
 				console.warn(ex);
 			}
+		};
+
+		RaidMenuTab.createDataDumpTab = function(data, title)
+		{
+			var tabTitle = title.length == 0?"Data Export":title.length > 25?title.substring(0,25):title;
+			var tabA;
+			RaidMenu.show();
+			var tabClass = RaidMenuTab.create({
+				tabName: tabTitle,
+				tabHeader: "Export: " + title,
+				tabPosition: 150,
+				closeable: true,
+				
+				initPane: function()
+				{
+					var textArea = document.createElement("textarea");
+					textArea.className = "DataDumpTab-Data";
+					textArea.innerHTML = data;
+					
+					tabA = this.tabA;
+					this.pane.appendChild(textArea);
+				}
+			});
+			RaidMenu.getInstance().activateTab(tabClass);
+			RaidMenu.getInstance().tabs.setActiveTab(tabA);
 		};
 
 		/************************************/
@@ -4862,7 +4974,7 @@ function main()
 		RaidMenuTab.create(
 			{
 				tabName: "Styles",
-				tabHeader: "Raid Styles",
+				tabHeader: "Raid Styles (Under construction)",
 				tabPosition: 20,
 				optionIndex: 0,
 				
@@ -4894,8 +5006,7 @@ function main()
 						label.appendChild(checkbox);
 						
 						selectedRaidsOptionHolder.appendChild(label);
-						
-						
+						selectedRaidsOptionHolder.appendChild(document.createElement("br"));
 					}
 					
 					this.pane.appendChild(this.optionRowTemplate);
@@ -4911,7 +5022,7 @@ function main()
 		RaidMenuTab.create(
 			{
 				tabName: "Utils",
-				tabHeader: "Utilities",
+				tabHeader: "Utilities (Under Construction)",
 				tabPosition: 50,
 				
 				initPane: function()
@@ -5208,7 +5319,9 @@ function main()
 							}
 							
 							// Export the data we found
-							DC_LoaTS_Helper.forceDownload(outputText, raidFilter.toString().replace(" ", "_").replace(/\W/gi, ""));
+							//DC_LoaTS_Helper.forceDownload(outputText, raidFilter.toString().replace(" ", "_").replace(/\W/gi, ""));
+							RaidMenuTab.createDataDumpTab(outputText, raidFilter.toString());
+							
 							
 							// Print out the stats for the query
 							ret.statusMessage = "<code>/" + this.commandName + " " + raidFilter.toString() + "</code> took " + (new Date()/1 - queryStartTime) + " ms and exported " + raidLinks.length + " results.";
@@ -5846,7 +5959,7 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Export matching data"
+							text: "Export matching data to pastebin"
 						}
 					};
 					
@@ -6739,7 +6852,7 @@ function main()
 				{
 					var commandOptions = {
 						initialText: {
-							text: "Install the current stable script"
+							text: "Get the current stable script"
 						}
 					};
 					
@@ -6748,7 +6861,38 @@ function main()
 				buildHelpText: function()
 				{
 					var helpText = "<b>Raid Command:</b> <code>/update</code>\n";
-					helpText += "Attempts to install the latest stable version on <a href=\"" + DC_LoaTS_Properties.scriptURL + "\">" + DC_LoaTS_Properties.scriptURL + "</a>.\n";
+					helpText += "Attempts to install the latest stable doomscript version from <a href=\"" + DC_LoaTS_Properties.scriptURL + "\">" + DC_LoaTS_Properties.scriptURL + "</a>.\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
+				commandName: "version",
+				aliases: [],
+				// No parsing needed
+				/*parsingClass: ,*/
+				handler: function(deck, parser, params, text, context)
+				{
+					return {success: true, statusMessage: "Your doomscript version is <b>" + DC_LoaTS_Properties.version + "</b>"};
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Your doomscript version is <b>" + DC_LoaTS_Properties.version + "</b>",
+							doNotCallHandler: true
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/version</code>\n";
+					helpText += "Tells the current version of the installed script.\n";
 					
 					return helpText;
 				}
@@ -6977,7 +7121,7 @@ DC_LoaTS_Helper.raids =
 {
 	// Personal Raids
     sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    [6000000, "N/A", "N/A", "N/A"]),
-    your_wrath:         new RaidType("your_wrate",          "ZA", "Your Wrath", "Your Wrath", "Wrath",                12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
+    your_wrath:         new RaidType("your_wrath",          "ZA", "Your Wrath", "Your Wrath", "Wrath",                12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
 	
     // Public raids
     // Small Raids
@@ -7086,16 +7230,21 @@ DC_LoaTS_Helper.raids =
     celebration_enhancer_1: new RaidType("celebration_enhancer_1","AX","Celebration Enhancer J-54","Celebrator","Celeb",84,250, "H",  600000000),
     quiskan_psi_hound: new RaidType("quiskan_psi_hound",    "A7","Quiskan Psi-Hound","Psi-Hound","Hound",            168,  250, "H", [1000000000, 1500000000, 2500000000, 10000000000]),
 
-    // Galactic Raids
-    // Infestation Trilogy
-    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python",                   24,  90000, "SEH", "Infinite", "N/A", 2000000000),
-    inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A", 1000000000),
-    inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A", 1000000000),
-    
-    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",           72,  90000, "SEH","Infinite","N/A", 100000000000),
-    
     // Galaxy Dome Raids
-    vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000)
+    vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000),
+    
+    // World Raids
+    // Infestation Trilogy
+    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python",                  100,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    
+    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",            72,  90000, "SEH", "Infinite", "N/A", 100000000000),
+
+    cerebral_destroyer: new RaidType("cerebral_destroyer",  "WR", "Cerebral Destroyer", "Cerebral", "Cerebral Destroyer",72,90000,"SEH", "Infinite", "N/A",  10000000000),
+    
+    wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",  10000000000)
+
     
 };
 
@@ -7736,7 +7885,6 @@ DC_LoaTS_Helper.raids =
 		
 		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, response)
 		{
-			console.log("Raid Ajax Returned ", arguments);
 			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
@@ -8361,6 +8509,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tmin-height: 200px;\n";
 				rulesText += "\tmax-height: 600px;\n";
 				rulesText += "\toverflow: auto;\n";
+				rulesText += "\tclear: both;\n";
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_raidMenuPane h1{\n";
@@ -8616,6 +8765,37 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare:hover {\n";
 				rulesText += "\tcolor:#FFFFFF;\n";
 				rulesText += "\tbackground-color:#B84EFE;\n";
+				rulesText += "}\n";
+				
+
+				rulesText += "\na.raidDiffNormal:hover {\n";
+				rulesText += "\tcolor:#48C957;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\na.raidDiffHard:hover {\n";
+				rulesText += "\tcolor:#828505;\n";
+				rulesText += "}\n";
+
+				rulesText += "\na.raidDiffLegendary:hover {\n";
+				rulesText += "\tcolor:#CB0039;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\na.raidDiffNightmare:hover {\n";
+				rulesText += "\tcolor:#B84EFE;\n";
+				rulesText += "}\n";
+				
+				
+				rulesText += "\n.DataDumpTab-Data {\n";
+				rulesText += "\twidth: 100%;\n";
+				rulesText += "\theight: 400px;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\n.DC_LoaTS_raidMenuCloseTabA {\n";
+				rulesText += "\tborder-radius: 100px;\n";
+				rulesText += "\twidth: 5px;\n";
+				rulesText += "\theight: 5px;\n";
+				rulesText += "\tcolor: #FFFFFF;\n";
+				rulesText += "\tbackground-color: #CCCCCC;\n";
 				rulesText += "}\n";
 				
 

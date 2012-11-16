@@ -6,30 +6,63 @@
 		window.RaidMenuTab = Class.create({
 			initialize: function(parentMenu)
 			{
+				console.log("Creating tab ", arguments);
 				this.parentMenu = parentMenu;
+				var me = this;
 				
-				var sanitaryName = this.getSanitizedName();
-				this.tabLi = document.createElement("li");
-				this.tabLi.className = "DC_LoaTS_raidMenuTab";
-				this.parentMenu.tabsList.appendChild(this.tabLi);
+				var sanitaryName = me.getSanitizedName();
+				me.tabLi = document.createElement("li");
+				me.tabLi.className = "DC_LoaTS_raidMenuTab";
+				me.parentMenu.tabsList.appendChild(me.tabLi);
 				
-				this.tabA = document.createElement("a");
-				this.tabA.href = "#DC_LoaTS_raidMenu" + sanitaryName + "Pane";
-				this.tabA.appendChild(document.createTextNode(this.tabName));
-				this.tabLi.appendChild(this.tabA);
+				me.tabA = document.createElement("a");
+				me.tabA.href = "#DC_LoaTS_raidMenu" + sanitaryName + "Pane";
+				me.tabA.appendChild(document.createTextNode(me.tabName));
+				me.tabLi.appendChild(me.tabA);
 				
-				this.pane = document.createElement("div");
-				this.pane.id = "DC_LoaTS_raidMenu" + sanitaryName + "Pane";
-				this.pane.className = "DC_LoaTS_raidMenuPane";
-				this.pane.style.display = "none";
-				this.parentMenu.bodyWrapper.appendChild(this.pane);
+				me.pane = document.createElement("div");
+				me.pane.id = "DC_LoaTS_raidMenu" + sanitaryName + "Pane";
+				me.pane.className = "DC_LoaTS_raidMenuPane";
+				me.pane.style.display = "none";
+				me.parentMenu.bodyWrapper.appendChild(me.pane);
 				
-				this.parentMenu.tabs.addTab(this.tabA);
+				me.parentMenu.tabs.addTab(me.tabA);
+
 				
-				this.header = this.createHeader(this.tabHeader || this.tabName);
-				this.pane.appendChild(this.header);
+				if (me.closeable) {
+					me.tabCloseA = document.createElement("a");
+					me.tabCloseA.href = "#";
+					me.tabCloseA.className = "DC_LoaTS_raidMenuCloseTabA";
+					me.tabCloseA.innerText = "X";
+					me.tabCloseA.onclick = function() {
+						me.parentMenu.tabsList.removeChild(me.tabLi);
+						me.parentMenu.bodyWrapper.removeChild(me.pane);
+						delete RaidMenu.tabClasses[me.tabPosition];
+						delete me.parentMenu.tabs.containers._object[me.tabA.href];
+						var links = me.parentMenu.tabs.links;
+						for (var i = 0; i < links.length; i++) {
+							var link = links[i];
+							if (link.key == me.tabA.href) {
+								var rest = links.slice((i-1 || i) + 1 || links.length);
+								links.length = i < 0 ? links.length + i : i;
+								me.parentMenu.tabs.links = links.push.apply(links, rest);
+
+								break;
+							}
+						}
+						me.parentMenu.tabs.previous();
+						return false;
+					}
+					me.tabLi.appendChild(me.tabCloseA);
+				} // End closeable logic
 				
-				this.initPane();
+				me.header = me.createHeader(me.tabHeader || me.tabName);
+				me.pane.appendChild(me.header);
+								
+				
+				if (typeof me.initPane === "function") {
+					me.initPane();
+				}
 			},
 			
 			getSanitizedName: function()
@@ -89,10 +122,11 @@
 		
 		RaidMenuTab.create = function(classObject)
 		{
+			console.log(classObject);
 			try
 			{
 				// Don't collide with other poorly positioned tabs
-				while (typeof RaidMenu.tabClasses[classObject.tabPosition] != "undefined")
+				while (typeof RaidMenu.tabClasses[classObject.tabPosition] !== "undefined")
 				{
 					classObject.tabPosition++;
 				}
@@ -100,15 +134,42 @@
 				var tabClass = Class.create(RaidMenuTab, classObject);
 				tabClass.tabName = classObject.tabName;
 				tabClass.tabPosition = classObject.tabPosition;
+				tabClass.closeable = classObject.closeable;
 				RaidMenu.tabClasses[classObject.tabPosition] = tabClass;
+				return tabClass;
 			}
 			catch(ex)
 			{
-				var tabName = (typeof classObject != "undefined" && typeof classObject.tabName != "undefined")?classObject.tabName:"";
+				var tabName = (typeof classObject !== "undefined" && typeof classObject.tabName !== "undefined")?classObject.tabName:"";
 				
 				console.warn("Error while creating RaidMenu tab class " + tabName);
 				console.warn(classObject);
 				console.warn(ex);
 			}
+		};
+
+		RaidMenuTab.createDataDumpTab = function(data, title)
+		{
+			var tabTitle = title.length == 0?"Data Export":title.length > 25?title.substring(0,25):title;
+			var tabA;
+			RaidMenu.show();
+			var tabClass = RaidMenuTab.create({
+				tabName: tabTitle,
+				tabHeader: "Export: " + title,
+				tabPosition: 150,
+				closeable: true,
+				
+				initPane: function()
+				{
+					var textArea = document.createElement("textarea");
+					textArea.className = "DataDumpTab-Data";
+					textArea.innerHTML = data;
+					
+					tabA = this.tabA;
+					this.pane.appendChild(textArea);
+				}
+			});
+			RaidMenu.getInstance().activateTab(tabClass);
+			RaidMenu.getInstance().tabs.setActiveTab(tabA);
 		};
 

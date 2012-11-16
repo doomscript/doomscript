@@ -159,6 +159,7 @@
 				rulesText += "\tmin-height: 200px;\n";
 				rulesText += "\tmax-height: 600px;\n";
 				rulesText += "\toverflow: auto;\n";
+				rulesText += "\tclear: both;\n";
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_raidMenuPane h1{\n";
@@ -414,6 +415,37 @@
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare:hover {\n";
 				rulesText += "\tcolor:#FFFFFF;\n";
 				rulesText += "\tbackground-color:#B84EFE;\n";
+				rulesText += "}\n";
+				
+
+				rulesText += "\na.raidDiffNormal:hover {\n";
+				rulesText += "\tcolor:#48C957;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\na.raidDiffHard:hover {\n";
+				rulesText += "\tcolor:#828505;\n";
+				rulesText += "}\n";
+
+				rulesText += "\na.raidDiffLegendary:hover {\n";
+				rulesText += "\tcolor:#CB0039;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\na.raidDiffNightmare:hover {\n";
+				rulesText += "\tcolor:#B84EFE;\n";
+				rulesText += "}\n";
+				
+				
+				rulesText += "\n.DataDumpTab-Data {\n";
+				rulesText += "\twidth: 100%;\n";
+				rulesText += "\theight: 400px;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\n.DC_LoaTS_raidMenuCloseTabA {\n";
+				rulesText += "\tborder-radius: 100px;\n";
+				rulesText += "\twidth: 5px;\n";
+				rulesText += "\theight: 5px;\n";
+				rulesText += "\tcolor: #FFFFFF;\n";
+				rulesText += "\tbackground-color: #CCCCCC;\n";
 				rulesText += "}\n";
 				
 

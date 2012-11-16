@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.10
+// @version        1.1.12
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -219,6 +219,14 @@ Added two new raids, Nosferatu Nick and Haunted House
 2012.11.02 - 1.1.10
 Added 3 new Zone A raids, Boar, Cake, and Guan Yu
 
+2012.11.15 - 1.1.11
+Added 3 new Zone A raids, Missile Strike, Bashan, and Your Wrath
+
+2012.11.16 - 1.1.12
+Fixed bug where Cerebral Destroyed had gotten deleted
+Altered the way export raids works until a longer term solution can be provided
+
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -227,7 +235,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.10",
+    	version: "1.1.12",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

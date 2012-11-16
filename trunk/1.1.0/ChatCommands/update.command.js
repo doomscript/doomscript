@@ -18,7 +18,7 @@
 				{
 					var commandOptions = {
 						initialText: {
-							text: "Install the current stable script"
+							text: "Get the current stable script"
 						}
 					};
 					
@@ -27,7 +27,7 @@
 				buildHelpText: function()
 				{
 					var helpText = "<b>Raid Command:</b> <code>/update</code>\n";
-					helpText += "Attempts to install the latest stable version on <a href=\"" + DC_LoaTS_Properties.scriptURL + "\">" + DC_LoaTS_Properties.scriptURL + "</a>.\n";
+					helpText += "Attempts to install the latest stable doomscript version from <a href=\"" + DC_LoaTS_Properties.scriptURL + "\">" + DC_LoaTS_Properties.scriptURL + "</a>.\n";
 					
 					return helpText;
 				}
