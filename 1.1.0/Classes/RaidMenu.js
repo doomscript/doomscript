@@ -88,7 +88,7 @@
 					this.tabs = new Control.Tabs('DC_LoaTS_raidMenuTabs');
 
 					// Holder for activated tabs
-					this.activatedTabs = [];
+					this.activatedTabs = {};
 					
 					// Activate tabs
 					this._activateTabs();
@@ -102,6 +102,20 @@
 				this.container.toggle();
 			},
 			
+			// Show the raid menu
+			/*public void*/
+			show: function()
+			{
+				this.container.show();
+			},
+			
+			// Hide the raid menu
+			/*public void*/
+			hide: function()
+			{
+				this.container.hide();
+			},
+			
 			// Activates the tab classes. Probably don't call this except once in initialize
 			/*private void*/
 			_activateTabs: function()
@@ -111,7 +125,7 @@
 				{
 					try 
 					{
-						this.activatedTabs.push(new RaidMenu.tabClasses[tabPosition](this));
+						this.activatedTabs[tabPosition] = new RaidMenu.tabClasses[tabPosition](this);
 					}
 					catch (ex)
 					{
@@ -122,6 +136,10 @@
 				
 				// Activate first tab
 				this.tabs.first();
+			},
+			
+			activateTab: function(tabClass) {
+				this.activatedTabs[tabClass.tabPosition] = new tabClass(this);
 			},
 			
 			// Event fired as the menu title has been clicked
@@ -204,9 +222,9 @@
 		// Put in a place holder for the tabs
 		RaidMenu.tabClasses = {};
 		
-		// Toggle the visibility of the raid menu
-		/*public static void*/
-		RaidMenu.toggle = function()
+		// Ensure the raid menu is available
+		/*public static RaidMenu*/
+		RaidMenu.getInstance = function()
 		{
 			// Locate or create a raid menu
 			var raidMenu = window.raidMenu;
@@ -225,7 +243,35 @@
 				}
 			}
 			
-			// Toggle its visibility
-			raidMenu.toggle();
+			return raidMenu;
 		}
+
+
+		
+		// Toggle the visibility of the raid menu
+		/*public static void*/
+		RaidMenu.toggle = function()
+		{
+			// Toggle its visibility
+			RaidMenu.getInstance().toggle();
+		}
+
+
+		// Show the raid menu
+		/*public static void*/
+		RaidMenu.show = function()
+		{
+			// Show it
+			RaidMenu.getInstance().show();
+		}
+
+
+		// Hide the raid menu
+		/*public static void*/
+		RaidMenu.hide = function()
+		{
+			// Hide it
+			RaidMenu.getInstance().hide();
+		}
+
 

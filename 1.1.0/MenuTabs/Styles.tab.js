@@ -6,7 +6,7 @@
 		RaidMenuTab.create(
 			{
 				tabName: "Styles",
-				tabHeader: "Raid Styles",
+				tabHeader: "Raid Styles (Under construction)",
 				tabPosition: 20,
 				optionIndex: 0,
 				
@@ -38,8 +38,7 @@
 						label.appendChild(checkbox);
 						
 						selectedRaidsOptionHolder.appendChild(label);
-						
-						
+						selectedRaidsOptionHolder.appendChild(document.createElement("br"));
 					}
 					
 					this.pane.appendChild(this.optionRowTemplate);

@@ -635,7 +635,6 @@
 		
 		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, response)
 		{
-			console.log("Raid Ajax Returned ", arguments);
 			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
