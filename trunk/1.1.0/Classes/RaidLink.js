@@ -133,7 +133,7 @@
 					var savedLink = RaidManager.fetch(this);
 					
 					// If there's a previous version of the link
-					if (typeof savedLink != "undefined")
+					if (typeof savedLink !== "undefined")
 					{
 						// Capture the save params into this link
 						this.raidTypeId = savedLink.raidTypeId;
@@ -214,14 +214,14 @@
 				{
 					if (this.isValid())
 					{
+						// Grab the raid type
+						var raid = this.getRaid();
+						
 						// Start with just an empty template
 						var newMessage = messageFormat;
 						
 						// Grab the link state
 						var linkState = RaidManager.fetchState(this);
-						
-						// Grab the raid type
-						var raid = this.getRaid();
 						
 						// Fill in the basic data to the template
 						newMessage = newMessage.replace(/{id}/gi, this.id);
@@ -411,13 +411,13 @@
 				Timer.start("getFormattedRaidLink");
 				
 				// If there was no message format, look it up
-				if (typeof messageFormat == "undefined")
+				if (typeof messageFormat === "undefined")
 				{
 					messageFormat = DC_LoaTS_Helper.getMessageFormat();
 				}
 				
 				// If there was no link format, look it up
-				if (typeof linkFormat == "undefined")
+				if (typeof linkFormat === "undefined")
 				{
 					linkFormat = DC_LoaTS_Helper.getLinkFormat();
 				}

@@ -11,14 +11,14 @@
 			initialize: function(id, zone, fullName, shortName, colloqName, time, size, stat, health, fairShare, target)
 			{
 				this.id = id;
-				this.zone = zone;
-				this.fullName = fullName;
-				this.shortName = shortName;
-				this.colloqName = colloqName;
-				this.shortestName = colloqName;
-				this.time = time;
-				this.size = size;
-				this.stat = stat;
+				this.zone = zone || "?";
+				this.fullName = fullName || id;
+				this.shortName = shortName || id;
+				this.colloqName = colloqName || id;
+				this.shortestName = colloqName || id;
+				this.time = time || "?";
+				this.size = size || "?";
+				this.stat = stat || "?";
 				
 				// Calculate Health
 				if (typeof health === "number")
@@ -39,7 +39,7 @@
 				}
 				else
 				{
-					this.health = ["Unknown", "Unknown", "Unknown", "Unknown"];
+					this.health = ["?", "?", "?", "?"];
 				}
 				
 				// Calculate Fair Share
