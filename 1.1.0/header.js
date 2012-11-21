@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.12
+// @version        1.1.13
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -226,6 +226,9 @@ Added 3 new Zone A raids, Missile Strike, Bashan, and Your Wrath
 Fixed bug where Cerebral Destroyed had gotten deleted
 Altered the way export raids works until a longer term solution can be provided
 
+2012.11.16 - 1.1.13
+Added 3 new Zone A2 raids, Cyborg Shark, Vlarg Relic Hunter, and Anthropist Xenocide Warship
+Fixed unknown links to not say Undefined Undefined over and over
 
 */
 
@@ -235,7 +238,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.12",
+    	version: "1.1.13",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

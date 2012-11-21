@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.12
+// @version        1.1.13
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -226,6 +226,9 @@ Added 3 new Zone A raids, Missile Strike, Bashan, and Your Wrath
 Fixed bug where Cerebral Destroyed had gotten deleted
 Altered the way export raids works until a longer term solution can be provided
 
+2012.11.16 - 1.1.13
+Added 3 new Zone A2 raids, Cyborg Shark, Vlarg Relic Hunter, and Anthropist Xenocide Warship
+Fixed unknown links to not say Undefined Undefined over and over
 
 */
 
@@ -235,7 +238,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.12",
+    	version: "1.1.13",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -2047,7 +2050,7 @@ function main()
 					var savedLink = RaidManager.fetch(this);
 					
 					// If there's a previous version of the link
-					if (typeof savedLink != "undefined")
+					if (typeof savedLink !== "undefined")
 					{
 						// Capture the save params into this link
 						this.raidTypeId = savedLink.raidTypeId;
@@ -2128,14 +2131,14 @@ function main()
 				{
 					if (this.isValid())
 					{
+						// Grab the raid type
+						var raid = this.getRaid();
+						
 						// Start with just an empty template
 						var newMessage = messageFormat;
 						
 						// Grab the link state
 						var linkState = RaidManager.fetchState(this);
-						
-						// Grab the raid type
-						var raid = this.getRaid();
 						
 						// Fill in the basic data to the template
 						newMessage = newMessage.replace(/{id}/gi, this.id);
@@ -2325,13 +2328,13 @@ function main()
 				Timer.start("getFormattedRaidLink");
 				
 				// If there was no message format, look it up
-				if (typeof messageFormat == "undefined")
+				if (typeof messageFormat === "undefined")
 				{
 					messageFormat = DC_LoaTS_Helper.getMessageFormat();
 				}
 				
 				// If there was no link format, look it up
-				if (typeof linkFormat == "undefined")
+				if (typeof linkFormat === "undefined")
 				{
 					linkFormat = DC_LoaTS_Helper.getLinkFormat();
 				}
@@ -4354,14 +4357,14 @@ function main()
 			initialize: function(id, zone, fullName, shortName, colloqName, time, size, stat, health, fairShare, target)
 			{
 				this.id = id;
-				this.zone = zone;
-				this.fullName = fullName;
-				this.shortName = shortName;
-				this.colloqName = colloqName;
-				this.shortestName = colloqName;
-				this.time = time;
-				this.size = size;
-				this.stat = stat;
+				this.zone = zone || "?";
+				this.fullName = fullName || id;
+				this.shortName = shortName || id;
+				this.colloqName = colloqName || id;
+				this.shortestName = colloqName || id;
+				this.time = time || "?";
+				this.size = size || "?";
+				this.stat = stat || "?";
 				
 				// Calculate Health
 				if (typeof health === "number")
@@ -4382,7 +4385,7 @@ function main()
 				}
 				else
 				{
-					this.health = ["Unknown", "Unknown", "Unknown", "Unknown"];
+					this.health = ["?", "?", "?", "?"];
 				}
 				
 				// Calculate Fair Share
@@ -7151,6 +7154,7 @@ DC_LoaTS_Helper.raids =
     bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50, "S",   [75000000, 97500000, 120000000, 150000000]),
     gut_phager:         new RaidType("gut_phager",         "Z11", "Gut-Phager", "Gut-Phager", "Phager",               72,  50, "S",   80000000),
     bashan:             new RaidType("bashan",              "ZA", "Bashan", "Bashan", "Bashan",                       72,  50, "S",   85000000),
+    cyborg_shark:       new RaidType("cyborg_shark",        "ZA2", "Cyborg Shark", "C. Shark", "Shark",                72,  50, "S",   90000000),
     
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -7164,7 +7168,8 @@ DC_LoaTS_Helper.raids =
     kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S",  [180000000, 234000000, 288000000, 320000000]),
     shuborunth: 		new RaidType("shuborunth",         "Z13","Wublunralxanachi", "Blob", "Blob",                  72, 100, "S",  200000000),
     birthday_cake_of_doom: new RaidType("birthday_cake_of_doom", "ZA","Birthday Cake of Doom", "Cake", "Cake",        72, 100, "S",  250000000),
-                
+    anthropist_xenocide_warship:new RaidType("anthropist_xenocide_warship","ZA2","Anthropist Xenocide Warship","Xenocide","Xeno",72,100,"S",300000000),
+
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
     vespasia:           new RaidType("vespasia",            "Z2", "Vespasia's Android", "Vespasia Bot", "Vesp",      168, 250, "S",  250000000),
@@ -7189,6 +7194,7 @@ DC_LoaTS_Helper.raids =
     crush_colossa:      new RaidType("crush_colossa",      "Z10", "Crush Colossa", "Colossa", "Crush",                72, 500, "S", 3000000000),
     nosferatu_nick:     new RaidType("nosferatu_nick",     "Z14", "Nosferatu Nick", "Nick", "Nick",                   24, 500, "S", 3500000000),
     niflung_boar:       new RaidType("niflung_boar",        "ZA", "Niflung Boar", "Boar", "Boar",                     30, 500, "S", 4000000000),
+    vlarg_relic_hunter: new RaidType("vlarg_relic_hunter",  "ZA2", "Vlarg Relic Hunter", "R. Hunter", "Vlarg",         30, 500, "S", 4500000000),
     
     
     // Aliance Raids
