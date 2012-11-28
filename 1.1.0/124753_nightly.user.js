@@ -231,7 +231,7 @@ Added 3 new Zone A2 raids, Cyborg Shark, Vlarg Relic Hunter, and Anthropist Xeno
 Fixed unknown links to not say Undefined Undefined over and over
 
 2012.11.28 - 1.1.14
-Added 3 new Zone A2 raids. Bile Beast, Pi, and 
+Added 3 new Zone A2 raids. Bile Beast, Pi, and Lubu
 Added aliases of /loadpastebin as /loadraidbin and /lrb
 Added aliases of /exportraids as /exportraid and /er
 Added /updateraiddata or /updatedata or /urd command to pull down new raid data as it's available without updating script
@@ -6326,7 +6326,7 @@ function main()
 					helpText += "<span class=\"abbr\" title=\"User defined short name\">shorter-name</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Shortest unique name of the raid\">shortest-name</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Raid Size = Max raid members\">size</span>, ";
-					helpText += "<span class=\"abbr\" title=\"S, E, and/or H if the raid uses Stamina, Energy, and/or Health\">stat</span>, ";
+					helpText += "<span class=\"abbr\" title=\"S, E, and/or H if the raid uses Stamina, Energy, and/or Honor\">stat</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Target (Damage) = FS * multiplier. Changes per raid size.\">target</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Duration of the raid\">time</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Full text url of the raid\">url</span>, ";
@@ -6341,8 +6341,8 @@ function main()
 					helpText += "<code>" + this.getCommandLink(RaidLink.defaultMessageFormat) + "</code>\n";
 					helpText += "<i class=\"smallText\">(<code>" + this.getCommandLink("reset") + "</code> will set your format back to this)</i>\n";
 					helpText += "\n";
-					helpText += "<b>Alternate Default:</b>\n";
-					helpText += "<code>" + this.getCommandLink("{image} {visited} Raid: [{size}-{stat}-{difficulty}-{os}] {name}") + "</code>";
+					helpText += "<b>SRLTSX Default:</b>\n";
+					helpText += "<code>" + this.getCommandLink("{visited} {name} - {diff} - {fs}/{os}"] {name}") + "</code>";
 					helpText += "\n";
 					helpText += "<b>Short:</b>\n";
 					helpText += "<code>" + this.getCommandLink("{cache-state-short} {diff} {shorter-name}") + "</code>";
@@ -7174,8 +7174,9 @@ function main()
 DC_LoaTS_Helper.raids = 
 {
 	// Personal Raids
-    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    [6000000, "N/A", "N/A", "N/A"]),
+    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",             12,   1, "S",    [6000000, "N/A", "N/A", "N/A"]),
     your_wrath:         new RaidType("your_wrath",          "ZA", "Your Wrath", "Your Wrath", "Wrath",                12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
+    lubu:               new RaidType("lubu",               "ZA2", "LU BU", "LU BU", "Lubu",                           12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
 	
     // Public raids
     // Small Raids
@@ -8335,10 +8336,8 @@ DC_LoaTS_Helper.raids =
 					var message;
 					if (response.status == 200) {
 						eval(response.responseText.replace("DC_LoaTS_Helper.raids", "var data"));
-						console.log(data);
 						var added = [];
 						for (var i in data) {
-							console.log(i, data[i]);
 							if (data.hasOwnProperty(i) && typeof DC_LoaTS_Helper.raids[i] === "undefined") {
 								DC_LoaTS_Helper.raids[i] = data[i];
 								added.push(data[i].fullName);
