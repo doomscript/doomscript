@@ -237,16 +237,13 @@
 						newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
 						newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 						newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
-
-						newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
-						newMessage = newMessage.replace(/{target}/gi, raid.getTargetDamageText(this.difficulty));
-						newMessage = newMessage.replace(/{optimal}/gi, raid.getTargetDamageText(this.difficulty));
-						newMessage = newMessage.replace(/{ofs}/gi, raid.getTargetDamageText(this.difficulty));
-						newMessage = newMessage.replace(/{os}/gi, raid.getTargetDamageText(this.difficulty));
 						
+						newMessage = newMessage.replace(/{(?:fs|fair|fairshare)}/gi, raid.getFairShareText(this.difficulty));
+						newMessage = newMessage.replace(/{(?:os|opt|optimal|ofs|target)}/gi, raid.getTargetDamageText(this.difficulty));
+
 						newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
-						newMessage = newMessage.replace(/{cache-state-nice}/gi, linkState.niceText);
-						newMessage = newMessage.replace(/{cache-state-short}/gi, linkState.shortText);
+						newMessage = newMessage.replace(/{(?:cache-state-nice|state|status)}/gi, linkState.niceText);
+						newMessage = newMessage.replace(/{(?:cache-state|state|status)-short}/gi, linkState.shortText);
 						newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.niceText:"");
 						newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.shortText:"");
 						

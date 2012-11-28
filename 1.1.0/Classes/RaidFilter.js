@@ -284,6 +284,17 @@
 				// Init matched to true
 				var matched = true;
 				
+				// Shortcut to fail any visited, completed, or ignored raids unless you're specifically filtering those
+				if (typeof params.state !== "undefined" && 
+						(
+								(RaidManager.STATE.equals(params.state, RaidManager.STATE.VISITED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.VISITED)) ||
+								(RaidManager.STATE.equals(params.state, RaidManager.STATE.COMPLETED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.COMPLETED)) ||
+								(RaidManager.STATE.equals(params.state, RaidManager.STATE.IGNORED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.IGNORED))
+						)
+					) {
+					return false;
+				}
+				
 				// Iterate over all the params
 				for (var field in params)
 				{

@@ -687,7 +687,7 @@
 				try 
 				{
 					// Look up all raid links in chat
-					var elems = $("chat_window").getElementsByClassName("raidMessage");
+					var elems = $("play").getElementsByClassName("raidMessage");
 					
 					// Retrieve the message format
 					var messageFormat = DC_LoaTS_Helper.getMessageFormat();

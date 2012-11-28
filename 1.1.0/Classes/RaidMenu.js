@@ -95,6 +95,15 @@
 				}
 			},
 			
+			// Resorts the tabs according to their position
+			// TODO: RaidMenu should probably have an addTab() where it manages this
+			resortTabs: function() {
+				
+				var tabs = this.tabsList.getElementsByTagName("li");
+				console.log(tabs);
+				
+			},
+			
 			// Toggles the visibility of the raid menu
 			/*public void*/
 			toggle: function()

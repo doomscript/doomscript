@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "loadraid",
-				aliases: ["addraid", "joinraid", "loadraids", "raidload", "raidadd", "raidjoin"],
+				aliases: ["addraid", "joinraid", "loadraids", "raidload", "raidadd", "raidjoin", "lr"],
 				parsingClass: RaidLink,
 				handler: function(deck, raidLink, params, text, context)
 				{

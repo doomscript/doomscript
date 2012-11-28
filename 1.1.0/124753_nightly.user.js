@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.13
+// @version        1.1.14
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -230,6 +230,19 @@ Altered the way export raids works until a longer term solution can be provided
 Added 3 new Zone A2 raids, Cyborg Shark, Vlarg Relic Hunter, and Anthropist Xenocide Warship
 Fixed unknown links to not say Undefined Undefined over and over
 
+2012.11.28 - 1.1.14
+Added 3 new raids TODO: Add new raids
+Added an alias of /loadpastebin to /loadraidbin and /lrb
+Visted and Completed raids won't be matched by a filter unless {state: visited} or {state: completed} are specifically used
+Accepted a patch from sycdan doing the following:
+- Formatting: Added {state} and {status} as aliases to {cache-state-nice}
+- Formatting: Added {state-short} and {status-short} as aliases to {cache-state-short}
+- Raids Tab: Links should now get their state updated to match what they do in chat
+- Formatting Tab: Sample raid (when all raids are cleared) will now always have FS/OS
+- Chat Commands: /clearchat now aliased with /cc and /cls
+- Chat Commands: /raid now aliased with some typo checks
+- Chat Commands: /loadraid now aliased with /lr
+- Chat Commands: /seenraids now aliased with /sr
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -238,7 +251,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.13",
+    	version: "1.1.14",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -1607,6 +1620,17 @@ function main()
 				// Init matched to true
 				var matched = true;
 				
+				// Shortcut to fail any visited, completed, or ignored raids unless you're specifically filtering those
+				if (typeof params.state !== "undefined" && 
+						(
+								(RaidManager.STATE.equals(params.state, RaidManager.STATE.VISITED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.VISITED)) ||
+								(RaidManager.STATE.equals(params.state, RaidManager.STATE.COMPLETED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.COMPLETED)) ||
+								(RaidManager.STATE.equals(params.state, RaidManager.STATE.IGNORED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.IGNORED))
+						)
+					) {
+					return false;
+				}
+				
 				// Iterate over all the params
 				for (var field in params)
 				{
@@ -2154,16 +2178,13 @@ function main()
 						newMessage = newMessage.replace(/{shorter-name}/gi, raid.colloqName);
 						newMessage = newMessage.replace(/{shortest-name}/gi, raid.shortestName);
 						newMessage = newMessage.replace(/{time}/gi, raid.getTimeText());
-
-						newMessage = newMessage.replace(/{fs}/gi, raid.getFairShareText(this.difficulty));
-						newMessage = newMessage.replace(/{target}/gi, raid.getTargetDamageText(this.difficulty));
-						newMessage = newMessage.replace(/{optimal}/gi, raid.getTargetDamageText(this.difficulty));
-						newMessage = newMessage.replace(/{ofs}/gi, raid.getTargetDamageText(this.difficulty));
-						newMessage = newMessage.replace(/{os}/gi, raid.getTargetDamageText(this.difficulty));
 						
+						newMessage = newMessage.replace(/{(?:fs|fair|fairshare)}/gi, raid.getFairShareText(this.difficulty));
+						newMessage = newMessage.replace(/{(?:os|opt|optimal|ofs|target)}/gi, raid.getTargetDamageText(this.difficulty));
+
 						newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
-						newMessage = newMessage.replace(/{cache-state-nice}/gi, linkState.niceText);
-						newMessage = newMessage.replace(/{cache-state-short}/gi, linkState.shortText);
+						newMessage = newMessage.replace(/{(?:cache-state-nice|state|status)}/gi, linkState.niceText);
+						newMessage = newMessage.replace(/{(?:cache-state|state|status)-short}/gi, linkState.shortText);
 						newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.niceText:"");
 						newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.shortText:"");
 						
@@ -3451,6 +3472,15 @@ function main()
 				}
 			},
 			
+			// Resorts the tabs according to their position
+			// TODO: RaidMenu should probably have an addTab() where it manages this
+			resortTabs: function() {
+				
+				var tabs = this.tabsList.getElementsByTagName("li");
+				console.log(tabs);
+				
+			},
+			
 			// Toggles the visibility of the raid menu
 			/*public void*/
 			toggle: function()
@@ -4723,35 +4753,8 @@ function main()
 					samplePostHeader.update("Sample Post");
 					samplePostHeader.style.marginTop = "15px";
 					this.pane.appendChild(samplePostHeader);
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+
 					// --- Sample Link --- \\
-					
 					// Create the sample raid link area to display the results of the format
 					var raidStorage = RaidManager.fetchStorage();
 					
@@ -4760,7 +4763,10 @@ function main()
 					for (var id_hash in raidStorage)
 					{
 						this.sampleRaidLink = raidStorage[id_hash].raidLink;
-						if (typeof this.sampleRaidLink.getRaid().fullName == "undefined")
+						var tmpRaid = this.sampleRaidLink.getRaid();
+						// Don't sample with invalid links (same full name and id, essentially Unknown raids)
+						// Don't pick raids with the same FS and OS (size 250 raids)
+						if (tmpRaid.fullName === tmpRaid.id || tmpRaid.size === 250)
 						{
 							continue;
 						}
@@ -4768,10 +4774,10 @@ function main()
 					}
 					
 					// If there wasn't a valid sample in the local storage, generate one
-					if (typeof this.sampleRaidLink == "undefined")
+					if (typeof this.sampleRaidLink === "undefined")
 					{
 						// Will not have state info, though
-						this.sampleRaidLink = new RaidLink(1234567890, "abcdefghij", 4, "colonel");
+						this.sampleRaidLink = new RaidLink(9999999999, "hash11hash", 4, "ragebeasts");
 					}
 
 					this.messageFormatExampleLinkContainer = document.createElement("div");
@@ -5116,7 +5122,7 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "clearchat",
-				aliases: [],
+				aliases: ["cc", "cls"],
 				// No parsing
 				//parsingClass: ,
 				handler: function(deck, raidLink, params, text, context)
@@ -5655,7 +5661,7 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "loadpastebin",
-				aliases: ["loadpaste", "loadbin", "lpb"],
+				aliases: ["loadpaste", "loadbin", "lpb", "loadraidbin", "lrb"],
 				parsingClass: PasteBinLinkParsingFilter,
 				handler: function(deck, parser, params, text, context)
 				{
@@ -5753,7 +5759,7 @@ function main()
 						
 						str += ". " + DC_LoaTS_Helper.getCommandLink("/raidbulkcallback " + guid, "Load these raids")  + ".";
 						console.log(str);
-//						setTimeout(function(){holodeck.activeDialogue().raidBotMessage(str.escapeHTML().unescapeHTML());}, 100);
+
 						holodeck.processChatCommand("/raidbulkcallback " + guid);
 					}
 					else if (response.status === 404)
@@ -5770,8 +5776,6 @@ function main()
 						holodeck.activeDialogue().raidBotMessage("Trouble loading " + this.parser.getPasteLink() 
 						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
-					
-					console.log("11111111111111")
 				},			
 
 				getOptions: function()
@@ -5801,7 +5805,7 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "loadraid",
-				aliases: ["addraid", "joinraid", "loadraids", "raidload", "raidadd", "raidjoin"],
+				aliases: ["addraid", "joinraid", "loadraids", "raidload", "raidadd", "raidjoin", "lr"],
 				parsingClass: RaidLink,
 				handler: function(deck, raidLink, params, text, context)
 				{
@@ -5989,7 +5993,7 @@ function main()
 				RaidCommand.create( 
 			{
 				commandName: "raid",
-				aliases: ["raids"],
+				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis"],
 				parsingClass: RaidFilter,
 				
 				// Doesn't use all the filter params
@@ -6163,7 +6167,7 @@ function main()
 							
 							bulkRaidObject.iteration >= bulkRaidObject.raids.length
 							
-							bulkRaidObject.timeout = setTimeout("holodeck.processChatCommand(\"/raidbulkcallback " + guid + "\");", 2000);
+							bulkRaidObject.timeout = setTimeout("holodeck.processChatCommand(\"/raidbulkcallback " + guid + "\");", 1500);
 						}
 						else 
 						{
@@ -6296,10 +6300,16 @@ function main()
 					helpText += "<b>Format options (hover for description):</b>\n";
 					helpText += "<span class=\"abbr\" title=\"" + cache_state_text + "\">cache-state</span>, ";
 					helpText += "<span class=\"abbr\" title=\"" + cache_state_nice_text + "\">cache-state-nice</span>, ";
+					helpText += "<span class=\"abbr\" title=\"" + cache_state_nice_text + "\">state</span>, ";
+					helpText += "<span class=\"abbr\" title=\"" + cache_state_nice_text + "\">status</span>, ";
 					helpText += "<span class=\"abbr\" title=\"" + cache_state_short_text + "\">cache-state-short</span>, ";
+					helpText += "<span class=\"abbr\" title=\"" + cache_state_short_text + "\">state-short</span>, ";
+					helpText += "<span class=\"abbr\" title=\"" + cache_state_short_text + "\">status-short</span>, ";
 					helpText += "<span class=\"abbr\" title=\"" + difficulty_text + "\">difficulty</span>, ";
 					helpText += "<span class=\"abbr\" title=\"" + diff_text + "\">diff</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Fair Share (of damage) = Max raid health / Max raid members\">fs</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Fair Share (of damage) = Max raid health / Max raid members\">fair</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Fair Share (of damage) = Max raid health / Max raid members\">fairshare</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Raid Health\">health</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Unique Raid ID Number\">id</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Kongregate LoaTS icon\">image</span>, ";
@@ -6309,7 +6319,7 @@ function main()
 					helpText += "<span class=\"abbr\" title=\"Same as target\">optimal</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Official Short Raid Name\">short-name</span>, ";
 					helpText += "<span class=\"abbr\" title=\"User defined short name\">shorter-name</span>, ";
-					helpText += "<span class=\"abbr\" title=\"Shortest identifiable name of the raid\">shortest-name</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Shortest unique name of the raid\">shortest-name</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Raid Size = Max raid members\">size</span>, ";
 					helpText += "<span class=\"abbr\" title=\"S, E, and/or H if the raid uses Stamina, Energy, and/or Health\">stat</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Target (Damage) = FS * multiplier. Changes per raid size.\">target</span>, ";
@@ -6484,7 +6494,7 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "seenraids",
-				aliases: ["seenraid", "raidseen", "raidseen"],
+				aliases: ["seenraid", "raidseen", "raidseen", "sr"],
 				parsingClass: RaidFilter,
 				handler: function(deck, raidFilter, params, text, context)
 				{
@@ -7027,7 +7037,7 @@ function main()
 							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
 
 							var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground");
-							if (lrib && lrib === true) {
+							if (lrib && lrib == true) {
 								DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 100), raidLinks: raidLinks};								
 							}
 							else {
@@ -7943,7 +7953,7 @@ DC_LoaTS_Helper.raids =
 				try 
 				{
 					// Look up all raid links in chat
-					var elems = $("chat_window").getElementsByClassName("raidMessage");
+					var elems = $("play").getElementsByClassName("raidMessage");
 					
 					// Retrieve the message format
 					var messageFormat = DC_LoaTS_Helper.getMessageFormat();

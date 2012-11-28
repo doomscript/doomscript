@@ -106,10 +106,16 @@
 					helpText += "<b>Format options (hover for description):</b>\n";
 					helpText += "<span class=\"abbr\" title=\"" + cache_state_text + "\">cache-state</span>, ";
 					helpText += "<span class=\"abbr\" title=\"" + cache_state_nice_text + "\">cache-state-nice</span>, ";
+					helpText += "<span class=\"abbr\" title=\"" + cache_state_nice_text + "\">state</span>, ";
+					helpText += "<span class=\"abbr\" title=\"" + cache_state_nice_text + "\">status</span>, ";
 					helpText += "<span class=\"abbr\" title=\"" + cache_state_short_text + "\">cache-state-short</span>, ";
+					helpText += "<span class=\"abbr\" title=\"" + cache_state_short_text + "\">state-short</span>, ";
+					helpText += "<span class=\"abbr\" title=\"" + cache_state_short_text + "\">status-short</span>, ";
 					helpText += "<span class=\"abbr\" title=\"" + difficulty_text + "\">difficulty</span>, ";
 					helpText += "<span class=\"abbr\" title=\"" + diff_text + "\">diff</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Fair Share (of damage) = Max raid health / Max raid members\">fs</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Fair Share (of damage) = Max raid health / Max raid members\">fair</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Fair Share (of damage) = Max raid health / Max raid members\">fairshare</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Raid Health\">health</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Unique Raid ID Number\">id</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Kongregate LoaTS icon\">image</span>, ";
@@ -119,7 +125,7 @@
 					helpText += "<span class=\"abbr\" title=\"Same as target\">optimal</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Official Short Raid Name\">short-name</span>, ";
 					helpText += "<span class=\"abbr\" title=\"User defined short name\">shorter-name</span>, ";
-					helpText += "<span class=\"abbr\" title=\"Shortest identifiable name of the raid\">shortest-name</span>, ";
+					helpText += "<span class=\"abbr\" title=\"Shortest unique name of the raid\">shortest-name</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Raid Size = Max raid members\">size</span>, ";
 					helpText += "<span class=\"abbr\" title=\"S, E, and/or H if the raid uses Stamina, Energy, and/or Health\">stat</span>, ";
 					helpText += "<span class=\"abbr\" title=\"Target (Damage) = FS * multiplier. Changes per raid size.\">target</span>, ";
