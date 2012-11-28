@@ -231,8 +231,10 @@ Added 3 new Zone A2 raids, Cyborg Shark, Vlarg Relic Hunter, and Anthropist Xeno
 Fixed unknown links to not say Undefined Undefined over and over
 
 2012.11.28 - 1.1.14
-Added 3 new raids TODO: Add new raids
-Added an alias of /loadpastebin to /loadraidbin and /lrb
+Added 3 new Zone A2 raids. Bile Beast, Pi, and 
+Added aliases of /loadpastebin as /loadraidbin and /lrb
+Added aliases of /exportraids as /exportraid and /er
+Added /updateraiddata or /updatedata or /urd command to pull down new raid data as it's available without updating script
 Visted and Completed raids won't be matched by a filter unless {state: visited} or {state: completed} are specifically used
 Accepted a patch from sycdan doing the following:
 - Formatting: Added {state} and {status} as aliases to {cache-state-nice}
@@ -5284,7 +5286,7 @@ function main()
 			{
 				commandName: "exportraids",
 				parsingClass: RaidFilter,
-				aliases: [],
+				aliases: ["exportraid", "er"],
 				
 				handler: function(deck, raidFilter, params, text, context)
 				{
@@ -7187,7 +7189,7 @@ DC_LoaTS_Helper.raids =
     space_pox:          new RaidType("space_pox",           "P1", "Space Pox", "Pox", "Pox",                           5,  12, "S", [100000000, 500000000, 1000000000, 1500000000],/*FS calculated normally*/null,[35000000, 175000000, 350000000, 525000000]),
     quiskerian_temple:  new RaidType("quiskerian_temple",   "L1", "Quiskerian Temple", "Temple", "Temple",            10,  25, "S", [200000000, 1000000000, 2000000000, 3000000000]),
     missile_strike:     new RaidType("missile_strike",      "ZA", "Missile Strike", "Missiles", "Missile",            72,  10, "S",   22000000),
-    pi:                 new RaidType("pi",                 "ZA2", "Pi", "Pi", "Pi",                                   72,  10, "S",   24000000),
+    //pi:                 new RaidType("pi",                 "ZA2", "Pi", "Pi", "Pi",                                   72,  10, "S",   24000000),
     
     // Medium Raids
     "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
@@ -8326,7 +8328,7 @@ DC_LoaTS_Helper.raids =
 		
 		DC_LoaTS_Helper.updateRaidData = function() {
 			DC_LoaTS_Helper.ajax({
-				url: DC_LoaTS_Properties.raidDataURL,
+				url: DC_LoaTS_Properties.raidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
 				onload: function(response) {
 					var message;
 					if (response.status == 200) {

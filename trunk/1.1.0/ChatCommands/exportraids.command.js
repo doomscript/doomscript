@@ -2,7 +2,7 @@
 			{
 				commandName: "exportraids",
 				parsingClass: RaidFilter,
-				aliases: [],
+				aliases: ["exportraid", "er"],
 				
 				handler: function(deck, raidFilter, params, text, context)
 				{
