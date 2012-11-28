@@ -257,6 +257,7 @@ function main()
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
     	scriptURL: "http://userscripts.org/124753",
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
+    	raidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/RaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
@@ -6883,6 +6884,42 @@ function main()
 		
 		RaidCommand.create( 
 			{
+				commandName: "updateraiddata",
+				aliases: ["urd", "updatedata"],
+				// No parsing needed
+				/*parsingClass: ,*/
+
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+						
+					DC_LoaTS_Helper.updateRaidData();
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {
+						initialText: {
+							text: "Update your local raid data"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/updateraiddata</code>\n";
+					helpText += "Attempts to update to the latest raid data (All the raid types).\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
 				commandName: "version",
 				aliases: [],
 				// No parsing needed
@@ -7148,8 +7185,8 @@ DC_LoaTS_Helper.raids =
     lieutenant_targe:   new RaidType("lieutenant_targe",    "Z8", "Lieutenant Targe", "Targe", "Targe",              120,  10, "S",   14000000),
     sigurd:             new RaidType("sigurd",              "Z9", "Sigurd Spinebreaker", "Sigurd", "Sigurd",          72,  10, "S",   16000000),
     space_pox:          new RaidType("space_pox",           "P1", "Space Pox", "Pox", "Pox",                           5,  12, "S", [100000000, 500000000, 1000000000, 1500000000],/*FS calculated normally*/null,[35000000, 175000000, 350000000, 525000000]),
-    quiskerian_temple:  new RaidType("quiskerian_temple",   "L1", "Quiskerian Temple", "Temple", "Temple",            10,  25, "S", [200000000, 1000000000, 2000000000, 3000000000]),
-    missile_strike:     new RaidType("missile_strike",      "ZA", "Missile Strike", "Missiles", "Missile",            72,  10, "S",   22000000),
+    //quiskerian_temple:  new RaidType("quiskerian_temple",   "L1", "Quiskerian Temple", "Temple", "Temple",            10,  25, "S", [200000000, 1000000000, 2000000000, 3000000000]),
+    //missile_strike:     new RaidType("missile_strike",      "ZA", "Missile Strike", "Missiles", "Missile",            72,  10, "S",   22000000),
     
     // Medium Raids
     "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
@@ -7193,6 +7230,7 @@ DC_LoaTS_Helper.raids =
     the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [1100000000, 1475000000, 1850000000, 2200000000]),
     g_rahn:             new RaidType("g_rahn",             "Z12", "G. Rahn", "G. Rahn", "G. Rahn",                    72, 250, "S", 1200000000),
     guan_yu:            new RaidType("guan_yu",             "ZA", "Guan Yu", "Guan", "Guan",                          72, 250, "S", 1300000000),
+    bile_beast:         new RaidType("bile_beast",         "ZA2", "Bile Beast", "Bile", "Bile",                       72, 250, "S", 1400000000),
     
     
     // Colossal Raids
@@ -7204,7 +7242,7 @@ DC_LoaTS_Helper.raids =
     crush_colossa:      new RaidType("crush_colossa",      "Z10", "Crush Colossa", "Colossa", "Crush",                72, 500, "S", 3000000000),
     nosferatu_nick:     new RaidType("nosferatu_nick",     "Z14", "Nosferatu Nick", "Nick", "Nick",                   24, 500, "S", 3500000000),
     niflung_boar:       new RaidType("niflung_boar",        "ZA", "Niflung Boar", "Boar", "Boar",                     30, 500, "S", 4000000000),
-    vlarg_relic_hunter: new RaidType("vlarg_relic_hunter",  "ZA2", "Vlarg Relic Hunter", "R. Hunter", "Vlarg",         30, 500, "S", 4500000000),
+    vlarg_relic_hunter: new RaidType("vlarg_relic_hunter", "ZA2", "Vlarg Relic Hunter", "R. Hunter", "Vlarg",         30, 500, "S", 4500000000),
     
     
     // Aliance Raids
@@ -8285,6 +8323,45 @@ DC_LoaTS_Helper.raids =
 			}
 		};
 		
+		DC_LoaTS_Helper.updateRaidData = function() {
+			DC_LoaTS_Helper.ajax({
+				url: DC_LoaTS_Properties.raidDataURL,
+				onload: function(response) {
+					var message;
+					if (response.status == 200) {
+						eval(response.responseText.replace("DC_LoaTS_Helper.raids", "var data"));
+						console.log(data);
+						var added = [];
+						for (var i in data) {
+							console.log(i, data[i]);
+							if (data.hasOwnProperty(i) && typeof DC_LoaTS_Helper.raids[i] === "undefined") {
+								DC_LoaTS_Helper.raids[i] = data[i];
+								added.push(data[i].fullName);
+							}
+						}
+						if (added.length > 0) {
+							message = "Loaded " + added.length + " new raid type" + ((added.length!=1)?"s":"") + ".\n" + added.join("\n");
+							DC_LoaTS_Helper.updatePostedLinks();
+						}
+					}
+					else {
+						message = "Unable to check for updated raid data from update site.";
+					}
+
+					if (message) {
+						function eventuallyPost() {
+							if (holodeck.activeDialogue()) {
+								holodeck.activeDialogue().raidBotMessage(message);
+							}
+							else {
+								setTimeout(eventuallyPost, 1000);
+							}
+						}
+					}
+				}
+			});
+		};
+		
 		DC_LoaTS_Helper.getCommandLink = function(commandText, displayText)
 		{
 			if (typeof displayText == "undefined"){displayText = commandText};
@@ -8955,6 +9032,9 @@ DC_LoaTS_Helper.raids =
 	        
     		// Throw a reference to this onto the window I guess in case anyone else wants to use it?
 			window._dc_loats_helper = new DC_LoaTS_Helper();
+			
+			// Update raid data
+			DC_LoaTS_Helper.updateRaidData();
     	}
     	
     	// Everything is done

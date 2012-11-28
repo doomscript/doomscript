@@ -1019,6 +1019,45 @@
 			}
 		};
 		
+		DC_LoaTS_Helper.updateRaidData = function() {
+			DC_LoaTS_Helper.ajax({
+				url: DC_LoaTS_Properties.raidDataURL,
+				onload: function(response) {
+					var message;
+					if (response.status == 200) {
+						eval(response.responseText.replace("DC_LoaTS_Helper.raids", "var data"));
+						console.log(data);
+						var added = [];
+						for (var i in data) {
+							console.log(i, data[i]);
+							if (data.hasOwnProperty(i) && typeof DC_LoaTS_Helper.raids[i] === "undefined") {
+								DC_LoaTS_Helper.raids[i] = data[i];
+								added.push(data[i].fullName);
+							}
+						}
+						if (added.length > 0) {
+							message = "Loaded " + added.length + " new raid type" + ((added.length!=1)?"s":"") + ".\n" + added.join("\n");
+							DC_LoaTS_Helper.updatePostedLinks();
+						}
+					}
+					else {
+						message = "Unable to check for updated raid data from update site.";
+					}
+
+					if (message) {
+						function eventuallyPost() {
+							if (holodeck.activeDialogue()) {
+								holodeck.activeDialogue().raidBotMessage(message);
+							}
+							else {
+								setTimeout(eventuallyPost, 1000);
+							}
+						}
+					}
+				}
+			});
+		};
+		
 		DC_LoaTS_Helper.getCommandLink = function(commandText, displayText)
 		{
 			if (typeof displayText == "undefined"){displayText = commandText};

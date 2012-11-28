@@ -257,6 +257,7 @@ function main()
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
     	scriptURL: "http://userscripts.org/124753",
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
+    	raidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/RaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
