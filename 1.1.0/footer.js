@@ -589,6 +589,9 @@
 	        
     		// Throw a reference to this onto the window I guess in case anyone else wants to use it?
 			window._dc_loats_helper = new DC_LoaTS_Helper();
+			
+			// Update raid data
+			DC_LoaTS_Helper.updateRaidData();
     	}
     	
     	// Everything is done
