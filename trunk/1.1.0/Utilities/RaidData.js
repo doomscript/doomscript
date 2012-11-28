@@ -3,8 +3,9 @@
 DC_LoaTS_Helper.raids = 
 {
 	// Personal Raids
-    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",              6,   1, "S",    [6000000, "N/A", "N/A", "N/A"]),
+    sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",             12,   1, "S",    [6000000, "N/A", "N/A", "N/A"]),
     your_wrath:         new RaidType("your_wrath",          "ZA", "Your Wrath", "Your Wrath", "Wrath",                12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
+    lubu:               new RaidType("lubu",               "ZA2", "LU BU", "LU BU", "Lubu",                           12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
 	
     // Public raids
     // Small Raids
