@@ -1039,6 +1039,9 @@
 							message = "Loaded " + added.length + " new raid type" + ((added.length!=1)?"s":"") + ".\n" + added.join("\n");
 							DC_LoaTS_Helper.updatePostedLinks();
 						}
+						else {
+							message = "No new raid types found."
+						}
 					}
 					else {
 						message = "Unable to check for updated raid data from update site.";
@@ -1053,6 +1056,7 @@
 								setTimeout(eventuallyPost, 1000);
 							}
 						}
+						eventuallyPost();
 					}
 				}
 			});
