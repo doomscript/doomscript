@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "raid",
-				aliases: ["raids"],
+				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis"],
 				parsingClass: RaidFilter,
 				
 				// Doesn't use all the filter params

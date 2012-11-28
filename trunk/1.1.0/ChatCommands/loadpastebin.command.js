@@ -3,7 +3,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "loadpastebin",
-				aliases: ["loadpaste", "loadbin", "lpb"],
+				aliases: ["loadpaste", "loadbin", "lpb", "loadraidbin", "lrb"],
 				parsingClass: PasteBinLinkParsingFilter,
 				handler: function(deck, parser, params, text, context)
 				{
@@ -101,7 +101,7 @@
 						
 						str += ". " + DC_LoaTS_Helper.getCommandLink("/raidbulkcallback " + guid, "Load these raids")  + ".";
 						console.log(str);
-//						setTimeout(function(){holodeck.activeDialogue().raidBotMessage(str.escapeHTML().unescapeHTML());}, 100);
+
 						holodeck.processChatCommand("/raidbulkcallback " + guid);
 					}
 					else if (response.status === 404)
@@ -118,8 +118,6 @@
 						holodeck.activeDialogue().raidBotMessage("Trouble loading " + this.parser.getPasteLink() 
 						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
-					
-					console.log("11111111111111")
 				},			
 
 				getOptions: function()

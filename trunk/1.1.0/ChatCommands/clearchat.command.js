@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "clearchat",
-				aliases: [],
+				aliases: ["cc", "cls"],
 				// No parsing
 				//parsingClass: ,
 				handler: function(deck, raidLink, params, text, context)

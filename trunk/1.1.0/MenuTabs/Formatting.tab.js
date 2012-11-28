@@ -72,35 +72,8 @@
 					samplePostHeader.update("Sample Post");
 					samplePostHeader.style.marginTop = "15px";
 					this.pane.appendChild(samplePostHeader);
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+
 					// --- Sample Link --- \\
-					
 					// Create the sample raid link area to display the results of the format
 					var raidStorage = RaidManager.fetchStorage();
 					
@@ -109,7 +82,10 @@
 					for (var id_hash in raidStorage)
 					{
 						this.sampleRaidLink = raidStorage[id_hash].raidLink;
-						if (typeof this.sampleRaidLink.getRaid().fullName == "undefined")
+						var tmpRaid = this.sampleRaidLink.getRaid();
+						// Don't sample with invalid links (same full name and id, essentially Unknown raids)
+						// Don't pick raids with the same FS and OS (size 250 raids)
+						if (tmpRaid.fullName === tmpRaid.id || tmpRaid.size === 250)
 						{
 							continue;
 						}
@@ -117,10 +93,10 @@
 					}
 					
 					// If there wasn't a valid sample in the local storage, generate one
-					if (typeof this.sampleRaidLink == "undefined")
+					if (typeof this.sampleRaidLink === "undefined")
 					{
 						// Will not have state info, though
-						this.sampleRaidLink = new RaidLink(1234567890, "abcdefghij", 4, "colonel");
+						this.sampleRaidLink = new RaidLink(9999999999, "hash11hash", 4, "ragebeasts");
 					}
 
 					this.messageFormatExampleLinkContainer = document.createElement("div");

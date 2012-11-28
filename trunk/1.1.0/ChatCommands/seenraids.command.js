@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "seenraids",
-				aliases: ["seenraid", "raidseen", "raidseen"],
+				aliases: ["seenraid", "raidseen", "raidseen", "sr"],
 				parsingClass: RaidFilter,
 				handler: function(deck, raidFilter, params, text, context)
 				{

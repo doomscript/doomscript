@@ -53,7 +53,7 @@
 							
 							bulkRaidObject.iteration >= bulkRaidObject.raids.length
 							
-							bulkRaidObject.timeout = setTimeout("holodeck.processChatCommand(\"/raidbulkcallback " + guid + "\");", 2000);
+							bulkRaidObject.timeout = setTimeout("holodeck.processChatCommand(\"/raidbulkcallback " + guid + "\");", 1500);
 						}
 						else 
 						{

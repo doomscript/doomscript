@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.13
+// @version        1.1.14
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -230,6 +230,19 @@ Altered the way export raids works until a longer term solution can be provided
 Added 3 new Zone A2 raids, Cyborg Shark, Vlarg Relic Hunter, and Anthropist Xenocide Warship
 Fixed unknown links to not say Undefined Undefined over and over
 
+2012.11.28 - 1.1.14
+Added 3 new raids TODO: Add new raids
+Added an alias of /loadpastebin to /loadraidbin and /lrb
+Visted and Completed raids won't be matched by a filter unless {state: visited} or {state: completed} are specifically used
+Accepted a patch from sycdan doing the following:
+- Formatting: Added {state} and {status} as aliases to {cache-state-nice}
+- Formatting: Added {state-short} and {status-short} as aliases to {cache-state-short}
+- Raids Tab: Links should now get their state updated to match what they do in chat
+- Formatting Tab: Sample raid (when all raids are cleared) will now always have FS/OS
+- Chat Commands: /clearchat now aliased with /cc and /cls
+- Chat Commands: /raid now aliased with some typo checks
+- Chat Commands: /loadraid now aliased with /lr
+- Chat Commands: /seenraids now aliased with /sr
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -238,7 +251,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.13",
+    	version: "1.1.14",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
