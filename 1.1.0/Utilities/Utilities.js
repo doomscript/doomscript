@@ -1021,7 +1021,7 @@
 		
 		DC_LoaTS_Helper.updateRaidData = function() {
 			DC_LoaTS_Helper.ajax({
-				url: DC_LoaTS_Properties.raidDataURL,
+				url: DC_LoaTS_Properties.raidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
 				onload: function(response) {
 					var message;
 					if (response.status == 200) {
