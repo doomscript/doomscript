@@ -231,7 +231,7 @@ Added 3 new Zone A2 raids, Cyborg Shark, Vlarg Relic Hunter, and Anthropist Xeno
 Fixed unknown links to not say Undefined Undefined over and over
 
 2012.11.28 - 1.1.14
-Added 3 new Zone A2 raids. Bile Beast, Pi, and 
+Added 3 new Zone A2 raids. Bile Beast, Pi, and Lubu
 Added aliases of /loadpastebin as /loadraidbin and /lrb
 Added aliases of /exportraids as /exportraid and /er
 Added /updateraiddata or /updatedata or /urd command to pull down new raid data as it's available without updating script

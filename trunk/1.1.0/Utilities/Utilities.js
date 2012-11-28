@@ -1026,10 +1026,8 @@
 					var message;
 					if (response.status == 200) {
 						eval(response.responseText.replace("DC_LoaTS_Helper.raids", "var data"));
-						console.log(data);
 						var added = [];
 						for (var i in data) {
-							console.log(i, data[i]);
 							if (data.hasOwnProperty(i) && typeof DC_LoaTS_Helper.raids[i] === "undefined") {
 								DC_LoaTS_Helper.raids[i] = data[i];
 								added.push(data[i].fullName);
