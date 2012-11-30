@@ -143,7 +143,7 @@
 					helpText += "<i class=\"smallText\">(<code>" + this.getCommandLink("reset") + "</code> will set your format back to this)</i>\n";
 					helpText += "\n";
 					helpText += "<b>SRLTSX Default:</b>\n";
-					helpText += "<code>" + this.getCommandLink("{visited} {name} - {diff} - {fs}/{os}"] {name}") + "</code>";
+					helpText += "<code>" + this.getCommandLink("{visited} {name} - {diff} - {fs}/{os}") + "</code>";
 					helpText += "\n";
 					helpText += "<b>Short:</b>\n";
 					helpText += "<code>" + this.getCommandLink("{cache-state-short} {diff} {shorter-name}") + "</code>";

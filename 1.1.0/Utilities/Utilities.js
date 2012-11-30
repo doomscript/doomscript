@@ -1108,6 +1108,71 @@
 			}
 			Timer.stop("calculateShortestRaidNames calc");
 		};
+		
+		DC_LoaTS_Helper.showWRInfo = function() {
+			if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
+				
+				var wr = DC_LoaTS_Helper.worldRaidInfo;
+				
+				var wrtab = document.getElementById("#DC_LoaTS_raidMenuWorld_RaidPane");
+				if (!wrtab) {
+					// Need to create a WR Info Div
+					RaidMenu.show();
+					var tabClass = RaidMenuTab.create({
+						tabName: "World Raid",
+						tabHeader: wr.name + " World Raid. " + wr.startDate,
+						tabPosition: 150,
+						closeable: true,
+						
+						initPane: function()
+						{
+							var timerDiv = document.createElement("div");
+							timerDiv.className = "DC_LoaTS_WR_Timer";
+							timerDiv.appendChild(document.createTextNode("Please Wait, Starting Timer..."));
+							this.pane.appendChild(timerDiv);
+							
+							if (wr.raidUrl) {
+								var wrlink = new RaidLink(wr.raidUrl);
+								var wrlinkDiv = document.createElement("div");
+								wrlinkDiv.innerHTML = wrlink.getFormattedRaidLink();
+								this.pane.appendChild(wrlinkDiv);
+							}
+							
+							var infoDiv = document.createElement("div");
+							
+							if (wr.infoUrl) {
+								var infoLink = document.createElement("a");
+								infoLink.href = wr.infoUrl;
+								infoLink.appendChild(document.createTextNode(wr.infoUrlTitle||wr.infoUrl));
+								infoDiv.appendChild(infoLink);
+							}
+							
+							if (wr.lootTableImageUrl) {
+								infoDiv.appendChild(document.createElement("br"));
+								var lootTable = document.createElement("img");
+								lootTable.src = wr.lootTableImageUrl;
+								lootTable.title = wr.name  + " Loot Table. " + wr.startDate;
+								infoDiv.appendChild(lootTable);
+							}
+							
+							this.pane.appendChild(infoDiv);
+							
+							wrtab = this.tabA;
+							
+							DC_LoaTS_Helper.doWRTimer();
+						}
+					});
+					RaidMenu.getInstance().activateTab(tabClass);
+				}
+	
+				RaidMenu.getInstance().tabs.setActiveTab(wrtab);
+			}
+		};
+
+		DC_LoaTS_Helper.doWRTimer = function() {
+			// TODO
+		}
+		
 
 		DC_LoaTS_Helper.generateUUID = function()
 		{
