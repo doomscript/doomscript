@@ -1185,7 +1185,7 @@
 					var hours = Math.floor(diff/3600);
 					var minutes = Math.floor((diff%3600)/60);
 					var seconds = Math.floor((diff%60));
-					timerText = "Time Remaining on WR: " + 
+					timerText = "Estimated Time Remaining on WR: " + 
 								(hours<10?"0"+hours:hours) + ":" + 
 								(minutes<10?"0"+minutes:minutes) + ":" + 
 								(seconds<10?"0"+seconds:seconds);
@@ -1201,9 +1201,7 @@
 						elems[i].innerHTML = timerText;
 					}
 					
-					if (!wr.timerEndsTimeout) {
-						wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
-					}
+					wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
 				}
 			}
 		}

@@ -3677,7 +3677,7 @@ function main()
 		window.RaidMenuTab = Class.create({
 			initialize: function(parentMenu)
 			{
-				console.log("Creating tab ", arguments);
+				//console.log("Creating tab ", arguments);
 				this.parentMenu = parentMenu;
 				var me = this;
 				
@@ -3794,7 +3794,7 @@ function main()
 		
 		RaidMenuTab.create = function(classObject)
 		{
-			console.log(classObject);
+			//console.log(classObject);
 			try
 			{
 				// Don't collide with other poorly positioned tabs
@@ -8508,7 +8508,7 @@ DC_LoaTS_Helper.raids =
 					var hours = Math.floor(diff/3600);
 					var minutes = Math.floor((diff%3600)/60);
 					var seconds = Math.floor((diff%60));
-					timerText = "Time Remaining on WR: " + 
+					timerText = "Estimated Time Remaining on WR: " + 
 								(hours<10?"0"+hours:hours) + ":" + 
 								(minutes<10?"0"+minutes:minutes) + ":" + 
 								(seconds<10?"0"+seconds:seconds);
@@ -8524,9 +8524,7 @@ DC_LoaTS_Helper.raids =
 						elems[i].innerHTML = timerText;
 					}
 					
-					if (!wr.timerEndsTimeout) {
-						wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
-					}
+					wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
 				}
 			}
 		}
@@ -8568,9 +8566,9 @@ DC_LoaTS_Helper.raids =
 		name: "Kraken",
 		
 		startDate: "11/30/2012",
-		timerEnds: "2012-12-03T21:30:00Z",
+		timerEnds: "2012-12-03T22:28:13Z",
 		
-		// raidUrl: "",
+		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_boss=kraken&kv_difficulty=1&kv_raid_id=5489589&kv_hash=oAoUCIzQv9",
 		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10585-Release-the-Kraken!",
 		infoUrlTitle: "'Release the Kraken!' Official Announcement",
 		
