@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.14
+// @version        1.1.15
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -245,6 +245,12 @@ Accepted a patch from sycdan doing the following:
 - Chat Commands: /raid now aliased with some typo checks
 - Chat Commands: /loadraid now aliased with /lr
 - Chat Commands: /seenraids now aliased with /sr
+
+2012.11.30 - 1.1.15
+Added new World Raid: Kraken
+Added new World Raid Tab, Timer, and Loot Table
+
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -253,7 +259,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.14",
+    	version: "1.1.15",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
