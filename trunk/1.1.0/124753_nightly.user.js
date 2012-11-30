@@ -1623,12 +1623,14 @@ function main()
 				// Init matched to true
 				var matched = true;
 				
-				// Shortcut to fail any visited, completed, or ignored raids unless you're specifically filtering those
-				if (typeof params.state !== "undefined" && 
+				var STATE = RaidManager.STATE;
+				
+				// Shortcut to fail any visited, completed, or ignored raids when no state filter is specified
+				if (typeof params.state !== "undefined" && !this.state && 
 						(
-								(RaidManager.STATE.equals(params.state, RaidManager.STATE.VISITED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.VISITED)) ||
-								(RaidManager.STATE.equals(params.state, RaidManager.STATE.COMPLETED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.COMPLETED)) ||
-								(RaidManager.STATE.equals(params.state, RaidManager.STATE.IGNORED) && !RaidManager.STATE.equals(this.state, RaidManager.STATE.IGNORED))
+								STATE.equals(params.state, STATE.VISITED) ||
+								STATE.equals(params.state, STATE.COMPLETED) ||
+								STATE.equals(params.state, STATE.IGNORED)
 						)
 					) {
 					return false;
@@ -4109,6 +4111,11 @@ function main()
 							DCDebug("Pressed Enter")							
 						}
 					});
+					
+					if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
+						var wrButton = new RaidButton("World Raid", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo());
+					}
+					
 				}
 				// Else if it does exist, grab the hooks
 				//TODO
@@ -6342,7 +6349,7 @@ function main()
 					helpText += "<i class=\"smallText\">(<code>" + this.getCommandLink("reset") + "</code> will set your format back to this)</i>\n";
 					helpText += "\n";
 					helpText += "<b>SRLTSX Default:</b>\n";
-					helpText += "<code>" + this.getCommandLink("{visited} {name} - {diff} - {fs}/{os}"] {name}") + "</code>";
+					helpText += "<code>" + this.getCommandLink("{visited} {name} - {diff} - {fs}/{os}") + "</code>";
 					helpText += "\n";
 					helpText += "<b>Short:</b>\n";
 					helpText += "<code>" + this.getCommandLink("{cache-state-short} {diff} {shorter-name}") + "</code>";
@@ -7303,10 +7310,12 @@ DC_LoaTS_Helper.raids =
 
     cerebral_destroyer: new RaidType("cerebral_destroyer",  "WR", "Cerebral Destroyer", "Cerebral", "Cerebral Destroyer",72,90000,"SEH", "Infinite", "N/A",  10000000000),
     
-    wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",  10000000000)
+    wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",  10000000000),
 
+    kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken",                       72,  90000, "SEH", "Infinite", "N/A",  50000000000)
     
 };
+
 
 		/************************************/
 		/********* Utility Functions ********/
@@ -8418,6 +8427,71 @@ DC_LoaTS_Helper.raids =
 			}
 			Timer.stop("calculateShortestRaidNames calc");
 		};
+		
+		DC_LoaTS_Helper.showWRInfo = function() {
+			if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
+				
+				var wr = DC_LoaTS_Helper.worldRaidInfo;
+				
+				var wrtab = document.getElementById("#DC_LoaTS_raidMenuWorld_RaidPane");
+				if (!wrtab) {
+					// Need to create a WR Info Div
+					RaidMenu.show();
+					var tabClass = RaidMenuTab.create({
+						tabName: "World Raid",
+						tabHeader: wr.name + " World Raid. " + wr.startDate,
+						tabPosition: 150,
+						closeable: true,
+						
+						initPane: function()
+						{
+							var timerDiv = document.createElement("div");
+							timerDiv.className = "DC_LoaTS_WR_Timer";
+							timerDiv.appendChild(document.createTextNode("Please Wait, Starting Timer..."));
+							this.pane.appendChild(timerDiv);
+							
+							if (wr.raidUrl) {
+								var wrlink = new RaidLink(wr.raidUrl);
+								var wrlinkDiv = document.createElement("div");
+								wrlinkDiv.innerHTML = wrlink.getFormattedRaidLink();
+								this.pane.appendChild(wrlinkDiv);
+							}
+							
+							var infoDiv = document.createElement("div");
+							
+							if (wr.infoUrl) {
+								var infoLink = document.createElement("a");
+								infoLink.href = wr.infoUrl;
+								infoLink.appendChild(document.createTextNode(wr.infoUrlTitle||wr.infoUrl));
+								infoDiv.appendChild(infoLink);
+							}
+							
+							if (wr.lootTableImageUrl) {
+								infoDiv.appendChild(document.createElement("br"));
+								var lootTable = document.createElement("img");
+								lootTable.src = wr.lootTableImageUrl;
+								lootTable.title = wr.name  + " Loot Table. " + wr.startDate;
+								infoDiv.appendChild(lootTable);
+							}
+							
+							this.pane.appendChild(infoDiv);
+							
+							wrtab = this.tabA;
+							
+							DC_LoaTS_Helper.doWRTimer();
+						}
+					});
+					RaidMenu.getInstance().activateTab(tabClass);
+				}
+	
+				RaidMenu.getInstance().tabs.setActiveTab(wrtab);
+			}
+		};
+
+		DC_LoaTS_Helper.doWRTimer = function() {
+			// TODO
+		}
+		
 
 		DC_LoaTS_Helper.generateUUID = function()
 		{
@@ -8449,7 +8523,27 @@ DC_LoaTS_Helper.raids =
 				return typeof args[number] != 'undefined'?args[number]:match;
 			});
 		};
-	}// End declareClasses function
+	// World Raid Data, if there is any
+	
+	DC_LoaTS_Helper.worldRaidInfo = {
+		name: "Kraken",
+		
+		startDate: "11/30/2012",
+		timerEnds: "2012-12-03T21:30:00",
+		
+		// raidUrl: "",
+		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10585-Release-the-Kraken!",
+		infoUrlTitle: "'Release the Kraken!' Official Announcement",
+		
+		lootTableImageUrl: "http://i.imgur.com/yjDKc.jpg"
+		
+	};
+	
+	
+	// End World Raid Data
+	
+	
+		}// End declareClasses function
 	
 	// Define some CSS Styles
 	function defineStyles()
@@ -9081,13 +9175,6 @@ function gmCallBack(UUID, funcName, response)
 };
 
 document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
-
-
-
-
-
-
-
 
 
 

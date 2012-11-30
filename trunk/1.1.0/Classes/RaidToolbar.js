@@ -152,6 +152,11 @@
 							DCDebug("Pressed Enter")							
 						}
 					});
+					
+					if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
+						var wrButton = new RaidButton("World Raid", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo());
+					}
+					
 				}
 				// Else if it does exist, grab the hooks
 				//TODO

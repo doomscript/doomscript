@@ -633,13 +633,6 @@ document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
 
 
 
-
-
-
-
-
-
-
 // This injects our script onto the page.
 // Borrowed from: http://stackoverflow.com/a/2303228
 if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))
