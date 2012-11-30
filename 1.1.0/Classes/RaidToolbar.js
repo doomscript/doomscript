@@ -153,8 +153,10 @@
 						}
 					});
 					
-					if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
-						var wrButton = new RaidButton("World Raid", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo());
+					var wr = DC_LoaTS_Helper.worldRaidInfo;
+					if (typeof wr === "object" && (!wr.timerEnds || new Date(wr.timerEnds) > new Date())) {
+						var wrButton = new RaidButton(DC_LoaTS_Helper.worldRaidInfo.name + " Info", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo);
+						this.container.insert({bottom: wrButton.node});
 					}
 					
 				}

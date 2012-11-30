@@ -847,10 +847,11 @@ function main()
 		window.RaidButton = Class.create({
 			initialize: function(name, className, callback)
 			{
-				this.name = name;
+				this.name = name || "";
 				this.callback = callback;
-				this.node = new Element("li");
+				this.node = new Element("li", {"class": "DC_LoaTS_button_wrapper " + className + "Wrapper"});
 				this.anchor = new Element("a", {"class": "DC_LoaTS_button " + className});
+				this.anchor.appendChild(document.createTextNode(this.name));
 				this.anchor.observe("click", function(clickEvent)
 				{
 					this.execute(clickEvent);
@@ -3687,6 +3688,7 @@ function main()
 				
 				me.tabA = document.createElement("a");
 				me.tabA.href = "#DC_LoaTS_raidMenu" + sanitaryName + "Pane";
+				me.tabA.id = "DC_LoaTS_raidMenu" + sanitaryName + "PaneTab";
 				me.tabA.appendChild(document.createTextNode(me.tabName));
 				me.tabLi.appendChild(me.tabA);
 				
@@ -4112,8 +4114,10 @@ function main()
 						}
 					});
 					
-					if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
-						var wrButton = new RaidButton("World Raid", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo());
+					var wr = DC_LoaTS_Helper.worldRaidInfo;
+					if (typeof wr === "object" && (!wr.timerEnds || new Date(wr.timerEnds) > new Date())) {
+						var wrButton = new RaidButton(DC_LoaTS_Helper.worldRaidInfo.name + " Info", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo);
+						this.container.insert({bottom: wrButton.node});
 					}
 					
 				}
@@ -8433,7 +8437,7 @@ DC_LoaTS_Helper.raids =
 				
 				var wr = DC_LoaTS_Helper.worldRaidInfo;
 				
-				var wrtab = document.getElementById("#DC_LoaTS_raidMenuWorld_RaidPane");
+				var wrtab = document.getElementById("#DC_LoaTS_raidMenuWorld_RaidPaneTab");
 				if (!wrtab) {
 					// Need to create a WR Info Div
 					RaidMenu.show();
@@ -8447,8 +8451,10 @@ DC_LoaTS_Helper.raids =
 						{
 							var timerDiv = document.createElement("div");
 							timerDiv.className = "DC_LoaTS_WR_Timer";
+							timerDiv.style.fontWeight = "Bold";
 							timerDiv.appendChild(document.createTextNode("Please Wait, Starting Timer..."));
 							this.pane.appendChild(timerDiv);
+							this.pane.appendChild(document.createElement("br"));
 							
 							if (wr.raidUrl) {
 								var wrlink = new RaidLink(wr.raidUrl);
@@ -8471,6 +8477,7 @@ DC_LoaTS_Helper.raids =
 								var lootTable = document.createElement("img");
 								lootTable.src = wr.lootTableImageUrl;
 								lootTable.title = wr.name  + " Loot Table. " + wr.startDate;
+								lootTable.style.borderRadius = "5px";
 								infoDiv.appendChild(lootTable);
 							}
 							
@@ -8489,7 +8496,41 @@ DC_LoaTS_Helper.raids =
 		};
 
 		DC_LoaTS_Helper.doWRTimer = function() {
-			// TODO
+			var wr = DC_LoaTS_Helper.worldRaidInfo;
+			var timerText = "No current WR or WR is over."
+			if (typeof wr === "object" && wr.timerEnds) {
+				var now = new Date();
+				var timerEnds = new Date(wr.timerEnds);
+				
+				if (timerEnds > now) {
+					// WR is on
+					var diff = Math.floor((timerEnds.getTime() - now.getTime()) / 1000);
+					var hours = Math.floor(diff/3600);
+					var minutes = Math.floor((diff%3600)/60);
+					var seconds = Math.floor((diff%60));
+					timerText = "Time Remaining on WR: " + 
+								(hours<10?"0"+hours:hours) + ":" + 
+								(minutes<10?"0"+minutes:minutes) + ":" + 
+								(seconds<10?"0"+seconds:seconds);
+				}
+				else {
+					// WR is over
+					timerText = wr.name + " WR is over.";
+				}
+				
+				var elems = document.getElementsByClassName("DC_LoaTS_WR_Timer");
+				if (elems) { 
+					for (var i = 0; i < elems.length; i++) {
+						elems[i].innerHTML = timerText;
+					}
+					
+					if (!wr.timerEndsTimeout) {
+						wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
+					}
+				}
+				
+			}
+
 		}
 		
 
@@ -8827,6 +8868,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tcursor: pointer;\n";
 				rulesText += "\tdisplay: block;\n";
 				rulesText += "\tfloat: left;\n";
+				rulesText += "\ttext-indent: -99999px;\n";
 				rulesText += "}\n";
 
 				rulesText += "\na.DC_LoaTS_menuButton {\n";
@@ -8836,6 +8878,23 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\na.DC_LoaTS_reloadButton {\n";
 				rulesText += "\tbackground-position: -160px -64px;";
 				rulesText += "}\n";
+				
+				rulesText += "\na.DC_LoaTS_WRButton {\n";
+				rulesText += "\ttext-indent: 0px;\n";
+				rulesText += "\tbackground: none;\n";
+				rulesText += "\twidth: auto;\n";
+				rulesText += "\tborder-radius: 5px;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\na.DC_LoaTS_WRButton:hover {\n";
+				rulesText += "\ttext-decoration: none;\n";
+				rulesText += "\tbackground-color: #71A5CE;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\n#DC_LoaTS_raidToolbarContainer li.DC_LoaTS_WRButtonWrapper {\n";
+				rulesText += "\tfloat: right;\n";
+				rulesText += "}\n";
+				
 
 				rulesText += "\n.DC_LoaTS_omnibox {\n";
 				rulesText += "\t-moz-border-radius: 5px;\n";
@@ -8992,7 +9051,6 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tcolor: #FFFFFF;\n";
 				rulesText += "\tbackground-color: #CCCCCC;\n";
 				rulesText += "}\n";
-				
 
 				var head = document.getElementsByTagName('head')[0],
 				    style = document.createElement('style'),

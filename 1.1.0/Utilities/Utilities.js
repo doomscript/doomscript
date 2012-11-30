@@ -1114,7 +1114,7 @@
 				
 				var wr = DC_LoaTS_Helper.worldRaidInfo;
 				
-				var wrtab = document.getElementById("#DC_LoaTS_raidMenuWorld_RaidPane");
+				var wrtab = document.getElementById("#DC_LoaTS_raidMenuWorld_RaidPaneTab");
 				if (!wrtab) {
 					// Need to create a WR Info Div
 					RaidMenu.show();
@@ -1128,8 +1128,10 @@
 						{
 							var timerDiv = document.createElement("div");
 							timerDiv.className = "DC_LoaTS_WR_Timer";
+							timerDiv.style.fontWeight = "Bold";
 							timerDiv.appendChild(document.createTextNode("Please Wait, Starting Timer..."));
 							this.pane.appendChild(timerDiv);
+							this.pane.appendChild(document.createElement("br"));
 							
 							if (wr.raidUrl) {
 								var wrlink = new RaidLink(wr.raidUrl);
@@ -1152,6 +1154,7 @@
 								var lootTable = document.createElement("img");
 								lootTable.src = wr.lootTableImageUrl;
 								lootTable.title = wr.name  + " Loot Table. " + wr.startDate;
+								lootTable.style.borderRadius = "5px";
 								infoDiv.appendChild(lootTable);
 							}
 							
@@ -1170,7 +1173,41 @@
 		};
 
 		DC_LoaTS_Helper.doWRTimer = function() {
-			// TODO
+			var wr = DC_LoaTS_Helper.worldRaidInfo;
+			var timerText = "No current WR or WR is over."
+			if (typeof wr === "object" && wr.timerEnds) {
+				var now = new Date();
+				var timerEnds = new Date(wr.timerEnds);
+				
+				if (timerEnds > now) {
+					// WR is on
+					var diff = Math.floor((timerEnds.getTime() - now.getTime()) / 1000);
+					var hours = Math.floor(diff/3600);
+					var minutes = Math.floor((diff%3600)/60);
+					var seconds = Math.floor((diff%60));
+					timerText = "Time Remaining on WR: " + 
+								(hours<10?"0"+hours:hours) + ":" + 
+								(minutes<10?"0"+minutes:minutes) + ":" + 
+								(seconds<10?"0"+seconds:seconds);
+				}
+				else {
+					// WR is over
+					timerText = wr.name + " WR is over.";
+				}
+				
+				var elems = document.getElementsByClassName("DC_LoaTS_WR_Timer");
+				if (elems) { 
+					for (var i = 0; i < elems.length; i++) {
+						elems[i].innerHTML = timerText;
+					}
+					
+					if (!wr.timerEndsTimeout) {
+						wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
+					}
+				}
+				
+			}
+
 		}
 		
 

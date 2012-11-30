@@ -17,6 +17,7 @@
 				
 				me.tabA = document.createElement("a");
 				me.tabA.href = "#DC_LoaTS_raidMenu" + sanitaryName + "Pane";
+				me.tabA.id = "DC_LoaTS_raidMenu" + sanitaryName + "PaneTab";
 				me.tabA.appendChild(document.createTextNode(me.tabName));
 				me.tabLi.appendChild(me.tabA);
 				

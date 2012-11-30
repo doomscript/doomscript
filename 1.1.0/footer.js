@@ -282,6 +282,7 @@
 				rulesText += "\tcursor: pointer;\n";
 				rulesText += "\tdisplay: block;\n";
 				rulesText += "\tfloat: left;\n";
+				rulesText += "\ttext-indent: -99999px;\n";
 				rulesText += "}\n";
 
 				rulesText += "\na.DC_LoaTS_menuButton {\n";
@@ -291,6 +292,23 @@
 				rulesText += "\na.DC_LoaTS_reloadButton {\n";
 				rulesText += "\tbackground-position: -160px -64px;";
 				rulesText += "}\n";
+				
+				rulesText += "\na.DC_LoaTS_WRButton {\n";
+				rulesText += "\ttext-indent: 0px;\n";
+				rulesText += "\tbackground: none;\n";
+				rulesText += "\twidth: auto;\n";
+				rulesText += "\tborder-radius: 5px;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\na.DC_LoaTS_WRButton:hover {\n";
+				rulesText += "\ttext-decoration: none;\n";
+				rulesText += "\tbackground-color: #71A5CE;\n";
+				rulesText += "}\n";
+				
+				rulesText += "\n#DC_LoaTS_raidToolbarContainer li.DC_LoaTS_WRButtonWrapper {\n";
+				rulesText += "\tfloat: right;\n";
+				rulesText += "}\n";
+				
 
 				rulesText += "\n.DC_LoaTS_omnibox {\n";
 				rulesText += "\t-moz-border-radius: 5px;\n";
@@ -447,7 +465,6 @@
 				rulesText += "\tcolor: #FFFFFF;\n";
 				rulesText += "\tbackground-color: #CCCCCC;\n";
 				rulesText += "}\n";
-				
 
 				var head = document.getElementsByTagName('head')[0],
 				    style = document.createElement('style'),
