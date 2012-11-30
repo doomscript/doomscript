@@ -6,7 +6,7 @@
 		window.RaidMenuTab = Class.create({
 			initialize: function(parentMenu)
 			{
-				console.log("Creating tab ", arguments);
+				//console.log("Creating tab ", arguments);
 				this.parentMenu = parentMenu;
 				var me = this;
 				
@@ -123,7 +123,7 @@
 		
 		RaidMenuTab.create = function(classObject)
 		{
-			console.log(classObject);
+			//console.log(classObject);
 			try
 			{
 				// Don't collide with other poorly positioned tabs
