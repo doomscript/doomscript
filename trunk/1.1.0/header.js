@@ -249,7 +249,8 @@ Accepted a patch from sycdan doing the following:
 2012.11.30 - 1.1.15
 Added new World Raid: Kraken
 Added new World Raid Tab, Timer, and Loot Table
-
+Fixed visited links not showing up ever in /exportraids
+Fixed update raid data being annoying
 
 */
 
