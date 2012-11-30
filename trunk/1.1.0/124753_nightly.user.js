@@ -8369,15 +8369,15 @@ DC_LoaTS_Helper.raids =
 					}
 
 					if (message) {
-						function eventuallyPost() {
+//						function eventuallyPost() {
 							if (holodeck.activeDialogue()) {
 								holodeck.activeDialogue().raidBotMessage(message);
 							}
-							else {
-								setTimeout(eventuallyPost, 1000);
-							}
-						}
-						eventuallyPost();
+//							else {
+//								setTimeout(eventuallyPost, 1000);
+//							}
+//						}
+//						eventuallyPost();
 					}
 				}
 			});
@@ -8519,7 +8519,7 @@ DC_LoaTS_Helper.raids =
 				}
 				
 				var elems = document.getElementsByClassName("DC_LoaTS_WR_Timer");
-				if (elems) { 
+				if (elems && elems.length > 0) { 
 					for (var i = 0; i < elems.length; i++) {
 						elems[i].innerHTML = timerText;
 					}
@@ -8528,9 +8528,7 @@ DC_LoaTS_Helper.raids =
 						wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
 					}
 				}
-				
 			}
-
 		}
 		
 
@@ -8570,7 +8568,7 @@ DC_LoaTS_Helper.raids =
 		name: "Kraken",
 		
 		startDate: "11/30/2012",
-		timerEnds: "2012-12-03T21:30:00",
+		timerEnds: "2012-12-03T21:30:00Z",
 		
 		// raidUrl: "",
 		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10585-Release-the-Kraken!",
