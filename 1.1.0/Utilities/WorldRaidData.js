@@ -4,7 +4,7 @@
 		name: "Kraken",
 		
 		startDate: "11/30/2012",
-		timerEnds: "2012-12-03T21:30:00",
+		timerEnds: "2012-12-03T21:30:00Z",
 		
 		// raidUrl: "",
 		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10585-Release-the-Kraken!",

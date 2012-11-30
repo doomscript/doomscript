@@ -1046,15 +1046,15 @@
 					}
 
 					if (message) {
-						function eventuallyPost() {
+//						function eventuallyPost() {
 							if (holodeck.activeDialogue()) {
 								holodeck.activeDialogue().raidBotMessage(message);
 							}
-							else {
-								setTimeout(eventuallyPost, 1000);
-							}
-						}
-						eventuallyPost();
+//							else {
+//								setTimeout(eventuallyPost, 1000);
+//							}
+//						}
+//						eventuallyPost();
 					}
 				}
 			});
@@ -1196,7 +1196,7 @@
 				}
 				
 				var elems = document.getElementsByClassName("DC_LoaTS_WR_Timer");
-				if (elems) { 
+				if (elems && elems.length > 0) { 
 					for (var i = 0; i < elems.length; i++) {
 						elems[i].innerHTML = timerText;
 					}
@@ -1205,9 +1205,7 @@
 						wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
 					}
 				}
-				
 			}
-
 		}
 		
 
