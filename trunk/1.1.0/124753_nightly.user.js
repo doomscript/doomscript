@@ -7066,7 +7066,9 @@ function main()
 									loaded: 0, 
 									visited: 0, 
 									completed: 0, 
-									getReport: function() {return "Loaded: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
+									reported: false,
+									isValid: function() {return this.loaded + this.visited + this.completed == this.attempted;},
+									getReport: function() {this.reported = true; return "Loaded: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
 							};
 							var startTime = new Date()/1;
 							var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
@@ -7096,7 +7098,7 @@ function main()
 												autoLoadCounter.loaded++;
 											}
 											
-											if (raidLinks.length === 0) {
+											if (raidLinks.length === 0 && autoLoadCounter.isValid() && !autoLoadCounter.reported) {
 												// Calculate how long it took to load them all
 												var endTime = new Date()/1;
 												var took = (endTime - startTime)/1000;
