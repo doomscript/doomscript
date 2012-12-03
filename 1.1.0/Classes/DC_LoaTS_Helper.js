@@ -333,13 +333,13 @@
 	    }
 	    
 	    // Retrieve a preference value from storage
-	    DC_LoaTS_Helper.getPref = function(prefName)
+	    DC_LoaTS_Helper.getPref = function(prefName, defaultValue)
 	    {
 	    	// Fetch the json
 	    	var json = GM_getValue(DC_LoaTS_Properties.storage.behaviorPrefs);
 	    	
 	    	// Make sure there's JSON
-	    	if (typeof json == "undefined" || json.length == 0)
+	    	if (typeof json === "undefined" || json.length == 0)
 	    	{
 				json = "{}";
 	    	}
@@ -356,7 +356,7 @@
 	    		console.warn(ex);
 	    	}
 	    	
-	    	return ret;
+	    	return ret || defaultValue;
 	    }
 	    
 	    // Store a preference value into storage

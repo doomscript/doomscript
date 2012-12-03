@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.15
+// @version        1.1.16
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -252,6 +252,10 @@ Added new World Raid Tab, Timer, and Loot Table
 Fixed visited links not showing up ever in /exportraids
 Fixed update raid data being annoying
 
+2012.12.?? - 1.1.16
+TODO: Removed Kraken World Raid info
+Performance tuned some raid loading code
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -260,7 +264,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.15",
+    	version: "1.1.16",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -269,6 +273,9 @@ function main()
     	raidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/RaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
+    	
+    	joinRaidURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
+    	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong",
     	
     	// Other URLS
     	SRLTSXURL: "http://userscripts.org/128721",
@@ -646,13 +653,13 @@ function main()
 	    }
 	    
 	    // Retrieve a preference value from storage
-	    DC_LoaTS_Helper.getPref = function(prefName)
+	    DC_LoaTS_Helper.getPref = function(prefName, defaultValue)
 	    {
 	    	// Fetch the json
 	    	var json = GM_getValue(DC_LoaTS_Properties.storage.behaviorPrefs);
 	    	
 	    	// Make sure there's JSON
-	    	if (typeof json == "undefined" || json.length == 0)
+	    	if (typeof json === "undefined" || json.length == 0)
 	    	{
 				json = "{}";
 	    	}
@@ -669,7 +676,7 @@ function main()
 	    		console.warn(ex);
 	    	}
 	    	
-	    	return ret;
+	    	return ret || defaultValue;
 	    }
 	    
 	    // Store a preference value into storage
@@ -7023,8 +7030,8 @@ function main()
 //TODO: Rename to loadAll command. AutoLoad should be for incoming new raids, not loading existing ones
 		RaidCommand.create(
 			{
-				commandName: "autoload",
-				aliases: [],
+				commandName: "loadall",
+				aliases: ["autoload"],
 				parsingClass: RaidFilter,
 
 				handler: function(deck, raidFilter, params, text, context)
@@ -7053,34 +7060,63 @@ function main()
 						// If there were any matched links
 						if (raidLinks.length > 0)
 						{
-							// private variable to be closed over in the autoLoader
-							var autoLoadCounter = 0;
+							// Private variable to be closed over in the autoLoader
+							var autoLoadCounter = {
+									attempted: 0, 
+									loaded: 0, 
+									visited: 0, 
+									completed: 0, 
+									getReport: function() {return "Loaded: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
+							};
 							var startTime = new Date()/1;
-							
+							var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
+							var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 500);
+							var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
+							var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
+
 							// Create function closure to be called repeatedly
 							var autoLoader = function __autoload()
 							{
 								// This shouldn't be called without links, but just in case
 								if (raidLinks.length > 0)
 								{
-									// Load the next raid
-									DC_LoaTS_Helper.loadRaid(raidLinks.pop());
+									// Keep track of how many we've tried to load
+									autoLoadCounter.attempted++;
 									
-									// Keep track of how many we've loaded
-									autoLoadCounter++;
+									// Load the next raid, capture the visitation marking
+									DC_LoaTS_Helper.loadRaid(raidLinks.pop(), iframe_options, lrib, 
+										function(oldState, newState){
+											if (RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED)) {
+												autoLoadCounter.completed++;
+											}
+											else if (RaidManager.STATE.equals(oldState, RaidManager.STATE.VISITED)) {
+												autoLoadCounter.visited++;
+											}
+											else {
+												autoLoadCounter.loaded++;
+											}
+											
+											if (raidLinks.length === 0) {
+												// Calculate how long it took to load them all
+												var endTime = new Date()/1;
+												var took = (endTime - startTime)/1000;
+												holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " complete! " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
+											}
+										}
+									);
 									
 									// If there are any links left, we'll need to continue loading them
 									if (raidLinks.length > 0)
 									{
 										// Fire the loader again after a while
-										DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, 2000);
-									}
-									else
-									{
-										// Calculate how long it took to load them all
-										var endTime = new Date()/1;
-										var took = (endTime - startTime)/1000;
-										holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " complete! " + autoLoadCounter + " raids loaded in " + took + "s.");
+										// Loading in Background
+										if (lrib) {
+											DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, lribDelay);
+										}
+										// Loading in Foreground
+										else {
+											DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, lrDelay);
+										}
 									}
 								}
 								else
@@ -7088,20 +7124,15 @@ function main()
 									// Calculate how long it took to load them all
 									var endTime = new Date()/1;
 									var took = (endTime - startTime)/1000;
-									holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " ended abruptly. " + autoLoadCounter + " raids loaded in " + took + "s.");
+									holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
 								}
 							}
 							
 							ret.success = true;
 							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
 
-							var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground");
-							if (lrib && lrib == true) {
-								DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 100), raidLinks: raidLinks};								
-							}
-							else {
-								DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 1500), raidLinks: raidLinks};
-							}
+							// Kick off the auto loading
+							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 500), raidLinks: raidLinks};
 							
 						}
 						else
@@ -7137,12 +7168,12 @@ function main()
 				},
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/autoload raidFilter</code>\n";
+					var helpText = "<b>Raid Command:</b> <code>/loadall raidFilter</code>\n";
 					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
 					helpText += "\n";
 					helpText += "\nLoads all seen raids that match the given filter";
 					helpText += "\n";
-					helpText += "\nFor example, " + this.getCommandLink("colonel {state: !visited}") + " would load all colonels not previously visited";
+					helpText += "\nFor example, " + this.getCommandLink("colonel 4") + " would load all nightmare colonels not previously visited";
 					helpText += "\n";
 					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
 					
@@ -7872,11 +7903,10 @@ DC_LoaTS_Helper.raids =
 			
 			return ret.join("&");
 		};
-				
-		// Load raid without refreshing page
-		// Returns true if the browser should load the raid itself, false if we loaded without refresh
-		DC_LoaTS_Helper.loadRaid = function(raidParam)
-		{
+		
+		
+		// Obtains the iframe_options from the game page
+		DC_LoaTS_Helper.getIFrameOptions = function() {
 			try
 			{
 				// Regex to locate the iframe properties as defined by Kong
@@ -7890,93 +7920,132 @@ DC_LoaTS_Helper.raids =
 					
 					// If we have the iframe options
 					if (match != null)
-					{
-						var raidLink;
-						if (typeof raidParam === "string")
-						{
-							// Create a raid link from the url
-							var raidLink = new RaidLink(raidParam);
-						}
-						else if (typeof raidParam.isValid === "function")
-						{
-							// Passed in value must've been a link
-							raidLink = raidParam;
-						}
+					{							
+						// Parse and return the existing iframe options
+						return eval('('+match[1]+')');
 						
-						// If the link is valid
-						if (typeof raidLink !== "undefined" && raidLink.isValid())
-						{
-							// Mark link as visited
-							RaidManager.store(raidLink, RaidManager.STATE.VISITED);
-							
-							// Parse the existing iframe options
-							var iframe_options = eval('('+match[1]+')');
-							
-							// Override properties that we're going to change
-							iframe_options['kv_action_type'] = 'raidhelp';
-							iframe_options['kv_difficulty'] = raidLink.difficulty;
-							iframe_options['kv_hash'] = raidLink.hash;
-							iframe_options['kv_raid_boss'] = raidLink.raidTypeId;
-							iframe_options['kv_raid_id'] = raidLink.id;
-							
-							if (DC_LoaTS_Helper.getPref("LoadRaidsInBackground") === true)
-							{
-								var collapsedOptions = "";
-								
-								for (var option in iframe_options)
-								{
-									collapsedOptions += option + "=" + iframe_options[option] + "&";
-								}
-								
-								DC_LoaTS_Helper.ajax({
-													  url: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php?" + collapsedOptions,
-													  method: "GET",
-													  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink)
-								});
-							}
-							else	
-							{
-								// Destroy the old iframe and replace with blank one
-								$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
-								
-								// Set location of new game window
-								$('gameiframe').contentWindow.location.replace("http://web1.legacyofathousandsuns.com/kong?" + Object.toQueryString(iframe_options));
-							}
-						}
-						else
-						{
-							// Notify the user that we don't know what that state is
-							holodeck.activeDialogue().raidBotMessage("Could not parse <code>" + raidParam + "</code> as a raid link url.");
-						}
-						// Don't follow the HTML link because we succeeded here
-						return false;
 					}
 				}
+			}
+			catch (ex) {
+				console.error("Failed to parse iframe_options.", ex);
+				return {};
+			}
+		};
+		
+		// Load raid without refreshing page
+		// Returns true if the browser should load the raid itself, false if we loaded without refresh
+		// callback should be a function that takes two parameters, oldState and newState
+		DC_LoaTS_Helper.loadRaid = function(raidParam, iframe_options, loadRaidsInBackground, callback)
+		{
+			// Gather the info we need to load a raid, either from params or utility methods
+			iframe_options = iframe_options || DC_LoaTS_Helper.getIFrameOptions();
+			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
+			
+			try
+			{
+				var raidLink;
+				if (typeof raidParam.isValid === "function")
+				{
+					// Param was a RaidLink
+					raidLink = raidParam;
+				}
+				else if (typeof raidParam === "string")
+				{
+					// Create a raid link from the url
+					var raidLink = new RaidLink(raidParam);
+				}
+				
+				// If the link is valid
+				if (typeof raidLink !== "undefined" && raidLink.isValid())
+				{
+					// Mark link as visited
+					var currentState = RaidManager.fetchState(raidLink);
+					var newState = currentState;
+					if (RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN) || RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)) {
+						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+						newState = RaidManager.STATE.VISITED;
+					}
+					
+					// Set necessary iframe options
+					iframe_options['kv_action_type'] = 'raidhelp';
+					iframe_options['kv_difficulty'] = raidLink.difficulty;
+					iframe_options['kv_hash'] = raidLink.hash;
+					iframe_options['kv_raid_boss'] = raidLink.raidTypeId;
+					iframe_options['kv_raid_id'] = raidLink.id;
+
+					
+					if (loadRaidsInBackground)
+					{
+						var collapsedOptions = "";
+						
+						for (var option in iframe_options)
+						{
+							collapsedOptions += option + "=" + iframe_options[option] + "&";
+						}
+						
+						DC_LoaTS_Helper.ajax({
+											  url: DC_LoaTS_Properties.joinRaidURL + "?" + collapsedOptions,
+											  method: "GET",
+											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(undefined, raidLink, currentState, callback)
+						});
+					}
+					else	
+					{
+						// Destroy the old iframe and replace with blank one
+						$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
+						
+						// Set location of new game window
+						$('gameiframe').contentWindow.location.replace(DC_LoaTS_Properties.kongLoaTSURL + "?" + Object.toQueryString(iframe_options));
+						
+						if (typeof callback === "function") {
+							callback.call(undefined, currentState, newState);
+						}
+					}
+				}
+				else
+				{
+					// Notify the user that we don't know what that state is
+					holodeck.activeDialogue().raidBotMessage("Could not parse <code>" + raidParam + "</code> as a raid link url.");
+				}
+				
+				// Don't follow the HTML link because we succeeded here
+				return false;
 			}
 			catch(ex)
 			{
 				// Don't really care
-				console.error("FAILED TO PROCESS LOADRAID", raidParam, ex);
+				console.error("FAILED TO PROCESS LOADRAID", arguments, ex);
 			}
-			
+						
 			// Follow the HTML link because we failed here
 			return true;
 		};
 		
-		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, response)
-		{
+		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, oldState, callback, response)
+		{			
 			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
+				if (typeof callback === "function") {
+					callback.call(this, oldState, RaidManager.STATE.VISITED);
+				}
 			}
 			else if (response.responseText.indexOf("You are already a member of this raid!") >= 0)
 			{
 				// Already visited
+				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+				if (typeof callback === "function") {
+					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.VISITED);
+				}
 			}
 			else
 			{
 				RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
 				DC_LoaTS_Helper.updatePostedLinks(raidLink);
+				if (typeof callback === "function") {
+					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.COMPLETED);
+				}
 			}
 		};
 		
@@ -8568,7 +8637,8 @@ DC_LoaTS_Helper.raids =
 			});
 		};
 	// World Raid Data, if there is any
-	
+
+
 	DC_LoaTS_Helper.worldRaidInfo = {
 		name: "Kraken",
 		
@@ -8582,7 +8652,7 @@ DC_LoaTS_Helper.raids =
 		lootTableImageUrl: "http://i.imgur.com/yjDKc.jpg"
 		
 	};
-	
+
 	
 	// End World Raid Data
 	
