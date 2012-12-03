@@ -542,11 +542,10 @@
 			
 			return ret.join("&");
 		};
-				
-		// Load raid without refreshing page
-		// Returns true if the browser should load the raid itself, false if we loaded without refresh
-		DC_LoaTS_Helper.loadRaid = function(raidParam)
-		{
+		
+		
+		// Obtains the iframe_options from the game page
+		DC_LoaTS_Helper.getIFrameOptions = function() {
 			try
 			{
 				// Regex to locate the iframe properties as defined by Kong
@@ -560,93 +559,132 @@
 					
 					// If we have the iframe options
 					if (match != null)
-					{
-						var raidLink;
-						if (typeof raidParam === "string")
-						{
-							// Create a raid link from the url
-							var raidLink = new RaidLink(raidParam);
-						}
-						else if (typeof raidParam.isValid === "function")
-						{
-							// Passed in value must've been a link
-							raidLink = raidParam;
-						}
+					{							
+						// Parse and return the existing iframe options
+						return eval('('+match[1]+')');
 						
-						// If the link is valid
-						if (typeof raidLink !== "undefined" && raidLink.isValid())
-						{
-							// Mark link as visited
-							RaidManager.store(raidLink, RaidManager.STATE.VISITED);
-							
-							// Parse the existing iframe options
-							var iframe_options = eval('('+match[1]+')');
-							
-							// Override properties that we're going to change
-							iframe_options['kv_action_type'] = 'raidhelp';
-							iframe_options['kv_difficulty'] = raidLink.difficulty;
-							iframe_options['kv_hash'] = raidLink.hash;
-							iframe_options['kv_raid_boss'] = raidLink.raidTypeId;
-							iframe_options['kv_raid_id'] = raidLink.id;
-							
-							if (DC_LoaTS_Helper.getPref("LoadRaidsInBackground") === true)
-							{
-								var collapsedOptions = "";
-								
-								for (var option in iframe_options)
-								{
-									collapsedOptions += option + "=" + iframe_options[option] + "&";
-								}
-								
-								DC_LoaTS_Helper.ajax({
-													  url: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php?" + collapsedOptions,
-													  method: "GET",
-													  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink)
-								});
-							}
-							else	
-							{
-								// Destroy the old iframe and replace with blank one
-								$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
-								
-								// Set location of new game window
-								$('gameiframe').contentWindow.location.replace("http://web1.legacyofathousandsuns.com/kong?" + Object.toQueryString(iframe_options));
-							}
-						}
-						else
-						{
-							// Notify the user that we don't know what that state is
-							holodeck.activeDialogue().raidBotMessage("Could not parse <code>" + raidParam + "</code> as a raid link url.");
-						}
-						// Don't follow the HTML link because we succeeded here
-						return false;
 					}
 				}
+			}
+			catch (ex) {
+				console.error("Failed to parse iframe_options.", ex);
+				return {};
+			}
+		};
+		
+		// Load raid without refreshing page
+		// Returns true if the browser should load the raid itself, false if we loaded without refresh
+		// callback should be a function that takes two parameters, oldState and newState
+		DC_LoaTS_Helper.loadRaid = function(raidParam, iframe_options, loadRaidsInBackground, callback)
+		{
+			// Gather the info we need to load a raid, either from params or utility methods
+			iframe_options = iframe_options || DC_LoaTS_Helper.getIFrameOptions();
+			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
+			
+			try
+			{
+				var raidLink;
+				if (typeof raidParam.isValid === "function")
+				{
+					// Param was a RaidLink
+					raidLink = raidParam;
+				}
+				else if (typeof raidParam === "string")
+				{
+					// Create a raid link from the url
+					var raidLink = new RaidLink(raidParam);
+				}
+				
+				// If the link is valid
+				if (typeof raidLink !== "undefined" && raidLink.isValid())
+				{
+					// Mark link as visited
+					var currentState = RaidManager.fetchState(raidLink);
+					var newState = currentState;
+					if (RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN) || RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)) {
+						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+						newState = RaidManager.STATE.VISITED;
+					}
+					
+					// Set necessary iframe options
+					iframe_options['kv_action_type'] = 'raidhelp';
+					iframe_options['kv_difficulty'] = raidLink.difficulty;
+					iframe_options['kv_hash'] = raidLink.hash;
+					iframe_options['kv_raid_boss'] = raidLink.raidTypeId;
+					iframe_options['kv_raid_id'] = raidLink.id;
+
+					
+					if (loadRaidsInBackground)
+					{
+						var collapsedOptions = "";
+						
+						for (var option in iframe_options)
+						{
+							collapsedOptions += option + "=" + iframe_options[option] + "&";
+						}
+						
+						DC_LoaTS_Helper.ajax({
+											  url: DC_LoaTS_Properties.joinRaidURL + "?" + collapsedOptions,
+											  method: "GET",
+											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(undefined, raidLink, currentState, callback)
+						});
+					}
+					else	
+					{
+						// Destroy the old iframe and replace with blank one
+						$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
+						
+						// Set location of new game window
+						$('gameiframe').contentWindow.location.replace(DC_LoaTS_Properties.kongLoaTSURL + "?" + Object.toQueryString(iframe_options));
+						
+						if (typeof callback === "function") {
+							callback.call(undefined, currentState, newState);
+						}
+					}
+				}
+				else
+				{
+					// Notify the user that we don't know what that state is
+					holodeck.activeDialogue().raidBotMessage("Could not parse <code>" + raidParam + "</code> as a raid link url.");
+				}
+				
+				// Don't follow the HTML link because we succeeded here
+				return false;
 			}
 			catch(ex)
 			{
 				// Don't really care
-				console.error("FAILED TO PROCESS LOADRAID", raidParam, ex);
+				console.error("FAILED TO PROCESS LOADRAID", arguments, ex);
 			}
-			
+						
 			// Follow the HTML link because we failed here
 			return true;
 		};
 		
-		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, response)
-		{
+		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, oldState, callback, response)
+		{			
 			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
+				if (typeof callback === "function") {
+					callback.call(this, oldState, RaidManager.STATE.VISITED);
+				}
 			}
 			else if (response.responseText.indexOf("You are already a member of this raid!") >= 0)
 			{
 				// Already visited
+				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+				if (typeof callback === "function") {
+					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.VISITED);
+				}
 			}
 			else
 			{
 				RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
 				DC_LoaTS_Helper.updatePostedLinks(raidLink);
+				if (typeof callback === "function") {
+					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.COMPLETED);
+				}
 			}
 		};
 		

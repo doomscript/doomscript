@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.15
+// @version        1.1.16
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -252,6 +252,10 @@ Added new World Raid Tab, Timer, and Loot Table
 Fixed visited links not showing up ever in /exportraids
 Fixed update raid data being annoying
 
+2012.12.?? - 1.1.16
+TODO: Removed Kraken World Raid info
+Performance tuned some raid loading code
+
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -260,7 +264,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.15",
+    	version: "1.1.16",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -269,6 +273,9 @@ function main()
     	raidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/RaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
+    	
+    	joinRaidURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
+    	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong",
     	
     	// Other URLS
     	SRLTSXURL: "http://userscripts.org/128721",
