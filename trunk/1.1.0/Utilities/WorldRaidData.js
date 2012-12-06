@@ -1,6 +1,6 @@
 	// World Raid Data, if there is any
 
-
+/*
 	DC_LoaTS_Helper.worldRaidInfo = {
 		name: "Kraken",
 		
@@ -14,7 +14,7 @@
 		lootTableImageUrl: "http://i.imgur.com/yjDKc.jpg"
 		
 	};
-
+*/
 	
 	// End World Raid Data
 	

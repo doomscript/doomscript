@@ -253,9 +253,10 @@ Fixed visited links not showing up ever in /exportraids
 Fixed update raid data being annoying
 
 2012.12.?? - 1.1.16
-TODO: Removed Kraken World Raid info
+Removed Kraken World Raid info
 Performance tuned some raid loading code
-
+Added link formatting for Alliance invites
+Added new Alliance Raid: Crazed Santa
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
