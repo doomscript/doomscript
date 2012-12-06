@@ -109,6 +109,7 @@ DC_LoaTS_Helper.raids =
     legacy_bot:         new RaidType("legacy_bot",          "A6", "Legacy Bot",    "Legacy", "Legacy",               168,  100, "H",  250000000),
     wahsh:              new RaidType("wahsh",               "AX", "Wahsh Al-Sahraa", "Wahsh", "Wahsh",                84,  100, "H", [500000000, 1200000000, 3125000000, 7812500000]),
     haunted_house:      new RaidType("haunted_house",       "AX", "Haunted House", "H. House", "House",              168,  100, "H",  350000000),
+    crazed_santa:       new RaidType("crazed_santa",        "AX", "Crazed Santa", "Santa", "Santa",                   84,  100, "H",  400000000),
     
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),

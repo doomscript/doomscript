@@ -70,6 +70,12 @@
 						// Try to create a RaidLink from this message
 						var raidLink = new RaidLink(msg);
 						
+						// Alliance Invite Link
+						var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)kv_fbuid=kong_([^<"']+)/i;
+						
+						var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance?</a>";
+						
+						
 						// Make sure we haven't already put a raid link in here and the link we found was valid
 						if (msg.indexOf("<span class=\"raidMessage\"") == -1 && raidLink.isValid())
 						{
@@ -148,6 +154,11 @@
 								console.warn($A(arguments));
 							}
 						}
+						else if (allianceInvitePattern.test(msg)) {
+							var match = allianceInvitePattern.exec(msg);
+							
+							msg = msg.replace(/<a(?:(?!<a class="reply_link).)*<\/a>/i, allianceInviteFormat.format(match[0], match[1]));
+						}
 					}
 					
 					// Make sure to run the normal version of this function because
@@ -164,7 +175,7 @@
 					var command = DC_LoaTS_Helper.chatCommands[commandName];
 					
 					// If there's really a command for this name
-					if (typeof command != "undefined")
+					if (typeof command !== "undefined")
 					{
 						// Create a command factory for this command
 						var commandFactory = new RaidCommandFactory(command, "chat");

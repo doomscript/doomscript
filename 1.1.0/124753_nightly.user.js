@@ -390,6 +390,12 @@ function main()
 						// Try to create a RaidLink from this message
 						var raidLink = new RaidLink(msg);
 						
+						// Alliance Invite Link
+						var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)kv_fbuid=kong_([^<"']+)/i;
+						
+						var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance?</a>";
+						
+						
 						// Make sure we haven't already put a raid link in here and the link we found was valid
 						if (msg.indexOf("<span class=\"raidMessage\"") == -1 && raidLink.isValid())
 						{
@@ -468,6 +474,11 @@ function main()
 								console.warn($A(arguments));
 							}
 						}
+						else if (allianceInvitePattern.test(msg)) {
+							var match = allianceInvitePattern.exec(msg);
+							
+							msg = msg.replace(/<a(?:(?!<a class="reply_link).)*<\/a>/i, allianceInviteFormat.format(match[0], match[1]));
+						}
 					}
 					
 					// Make sure to run the normal version of this function because
@@ -484,7 +495,7 @@ function main()
 					var command = DC_LoaTS_Helper.chatCommands[commandName];
 					
 					// If there's really a command for this name
-					if (typeof command != "undefined")
+					if (typeof command !== "undefined")
 					{
 						// Create a command factory for this command
 						var commandFactory = new RaidCommandFactory(command, "chat");
@@ -7331,6 +7342,7 @@ DC_LoaTS_Helper.raids =
     legacy_bot:         new RaidType("legacy_bot",          "A6", "Legacy Bot",    "Legacy", "Legacy",               168,  100, "H",  250000000),
     wahsh:              new RaidType("wahsh",               "AX", "Wahsh Al-Sahraa", "Wahsh", "Wahsh",                84,  100, "H", [500000000, 1200000000, 3125000000, 7812500000]),
     haunted_house:      new RaidType("haunted_house",       "AX", "Haunted House", "H. House", "House",              168,  100, "H",  350000000),
+    crazed_santa:       new RaidType("crazed_santa",        "AX", "Crazed Santa", "Santa", "Santa",                   84,  100, "H",  400000000),
     
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
