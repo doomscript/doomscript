@@ -252,8 +252,10 @@ Added new World Raid Tab, Timer, and Loot Table
 Fixed visited links not showing up ever in /exportraids
 Fixed update raid data being annoying
 
-2012.12.?? - 1.1.16
+2012.12.11 - 1.1.16
 Removed Kraken World Raid info
+Added Snowman Rare Spawn info
+Altered some WR display code
 Performance tuned some raid loading code
 Added link formatting for Alliance invites
 Added new Alliance Raid: Crazed Santa

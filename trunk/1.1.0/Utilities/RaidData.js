@@ -135,7 +135,9 @@ DC_LoaTS_Helper.raids =
     
     wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",  10000000000),
 
-    kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken",                       72,  90000, "SEH", "Infinite", "N/A",  50000000000)
+    kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken",                       72,  90000, "SEH", "Infinite", "N/A",  50000000000),
+    
+    raging_snowman:     new RaidType("raging_snowman",      "WR", "Raging Snowman", "Snowman", "Snowman",             24,  90000, "SEH", "Infinite", "N/A",   2000000000)
     
 };
 

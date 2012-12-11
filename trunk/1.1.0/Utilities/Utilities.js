@@ -1084,18 +1084,40 @@
 					}
 
 					if (message) {
-//						function eventuallyPost() {
-							if (holodeck.activeDialogue()) {
-								holodeck.activeDialogue().raidBotMessage(message);
-							}
-//							else {
-//								setTimeout(eventuallyPost, 1000);
-//							}
-//						}
-//						eventuallyPost();
+						if (holodeck.activeDialogue()) {
+							holodeck.activeDialogue().raidBotMessage(message);
+						}
 					}
 				}
 			});
+
+			DC_LoaTS_Helper.ajax({
+				url: DC_LoaTS_Properties.worldRaidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
+				onload: function(response) {
+					var message;
+					if (response.status == 200) {
+						var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
+						eval(response.responseText);
+						var WRData = DC_LoaTS_Helper.worldRaidInfo;
+						
+						if (!oldWRData && WRData) {
+							holodeck.activeDialogue().raidBotMessage("New " + (WRData.spawnType||"World Raid") + ": " + WRData.name);
+						}
+						
+						RaidToolbar.createWRButton();
+					}
+					else {
+						message = "Unable to check for updated world raid data from update site.";
+					}
+
+					if (message) {
+						if (holodeck.activeDialogue()) {
+							holodeck.activeDialogue().raidBotMessage(message);
+						}
+					}
+				}
+			});
+
 		};
 		
 		DC_LoaTS_Helper.getCommandLink = function(commandText, displayText)
@@ -1151,14 +1173,15 @@
 			if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
 				
 				var wr = DC_LoaTS_Helper.worldRaidInfo;
+				wr.spawnType = wr.spawnType || "World Raid";
 				
-				var wrtab = document.getElementById("#DC_LoaTS_raidMenuWorld_RaidPaneTab");
+				var wrtab = document.getElementById("DC_LoaTS_raidMenu" + wr.spawnType.trim().replace(" ", "_") + "PaneTab");
 				if (!wrtab) {
 					// Need to create a WR Info Div
 					RaidMenu.show();
 					var tabClass = RaidMenuTab.create({
-						tabName: "World Raid",
-						tabHeader: wr.name + " World Raid. " + wr.startDate,
+						tabName: wr.spawnType || "World Raid",
+						tabHeader: wr.name + " " + wr.spawnType + ". " + wr.startDate,
 						tabPosition: 150,
 						closeable: true,
 						
@@ -1223,14 +1246,14 @@
 					var hours = Math.floor(diff/3600);
 					var minutes = Math.floor((diff%3600)/60);
 					var seconds = Math.floor((diff%60));
-					timerText = "Estimated Time Remaining on WR: " + 
+					timerText = "Estimated Time Remaining: " + 
 								(hours<10?"0"+hours:hours) + ":" + 
 								(minutes<10?"0"+minutes:minutes) + ":" + 
 								(seconds<10?"0"+seconds:seconds);
 				}
 				else {
 					// WR is over
-					timerText = wr.name + " WR is over.";
+					timerText = wr.name + " is over.";
 				}
 				
 				var elems = document.getElementsByClassName("DC_LoaTS_WR_Timer");
