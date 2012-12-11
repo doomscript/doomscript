@@ -252,8 +252,10 @@ Added new World Raid Tab, Timer, and Loot Table
 Fixed visited links not showing up ever in /exportraids
 Fixed update raid data being annoying
 
-2012.12.?? - 1.1.16
+2012.12.11 - 1.1.16
 Removed Kraken World Raid info
+Added Snowman Rare Spawn info
+Altered some WR display code
 Performance tuned some raid loading code
 Added link formatting for Alliance invites
 Added new Alliance Raid: Crazed Santa
@@ -4140,11 +4142,6 @@ function main()
 						}
 					});
 					
-					var wr = DC_LoaTS_Helper.worldRaidInfo;
-					if (typeof wr === "object" && (!wr.timerEnds || new Date(wr.timerEnds) > new Date())) {
-						var wrButton = new RaidButton(DC_LoaTS_Helper.worldRaidInfo.name + " Info", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo);
-						this.container.insert({bottom: wrButton.node});
-					}
 					
 				}
 				// Else if it does exist, grab the hooks
@@ -4416,6 +4413,13 @@ function main()
 			$$(".DC_LoaTS_omnibox")[0].focus();			
 		}
 		
+		RaidToolbar.createWRButton = function() {
+			var wr = DC_LoaTS_Helper.worldRaidInfo;
+			if (!DC_LoaTS_Helper.wrButton && typeof wr === "object" && (!wr.timerEnds || new Date(wr.timerEnds) > new Date())) {
+				DC_LoaTS_Helper.wrButton = new RaidButton(DC_LoaTS_Helper.worldRaidInfo.name + " Info", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo);
+				this.container.insert({bottom: DC_LoaTS_Helper.wrButton.node});
+			}
+		}
 		/************************************/
 		/********** RaidType Class **********/
 		/************************************/
@@ -7369,7 +7373,9 @@ DC_LoaTS_Helper.raids =
     
     wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",  10000000000),
 
-    kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken",                       72,  90000, "SEH", "Infinite", "N/A",  50000000000)
+    kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken",                       72,  90000, "SEH", "Infinite", "N/A",  50000000000),
+    
+    raging_snowman:     new RaidType("raging_snowman",      "WR", "Raging Snowman", "Snowman", "Snowman",             24,  90000, "SEH", "Infinite", "N/A",   2000000000)
     
 };
 
@@ -8460,18 +8466,40 @@ DC_LoaTS_Helper.raids =
 					}
 
 					if (message) {
-//						function eventuallyPost() {
-							if (holodeck.activeDialogue()) {
-								holodeck.activeDialogue().raidBotMessage(message);
-							}
-//							else {
-//								setTimeout(eventuallyPost, 1000);
-//							}
-//						}
-//						eventuallyPost();
+						if (holodeck.activeDialogue()) {
+							holodeck.activeDialogue().raidBotMessage(message);
+						}
 					}
 				}
 			});
+
+			DC_LoaTS_Helper.ajax({
+				url: DC_LoaTS_Properties.worldRaidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
+				onload: function(response) {
+					var message;
+					if (response.status == 200) {
+						var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
+						eval(response.responseText);
+						var WRData = DC_LoaTS_Helper.worldRaidInfo;
+						
+						if (!oldWRData && WRData) {
+							holodeck.activeDialogue().raidBotMessage("New " + (WRData.spawnType||"World Raid") + ": " + WRData.name);
+						}
+						
+						RaidToolbar.createWRButton();
+					}
+					else {
+						message = "Unable to check for updated world raid data from update site.";
+					}
+
+					if (message) {
+						if (holodeck.activeDialogue()) {
+							holodeck.activeDialogue().raidBotMessage(message);
+						}
+					}
+				}
+			});
+
 		};
 		
 		DC_LoaTS_Helper.getCommandLink = function(commandText, displayText)
@@ -8527,14 +8555,15 @@ DC_LoaTS_Helper.raids =
 			if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
 				
 				var wr = DC_LoaTS_Helper.worldRaidInfo;
+				wr.spawnType = wr.spawnType || "World Raid";
 				
-				var wrtab = document.getElementById("#DC_LoaTS_raidMenuWorld_RaidPaneTab");
+				var wrtab = document.getElementById("DC_LoaTS_raidMenu" + wr.spawnType.trim().replace(" ", "_") + "PaneTab");
 				if (!wrtab) {
 					// Need to create a WR Info Div
 					RaidMenu.show();
 					var tabClass = RaidMenuTab.create({
-						tabName: "World Raid",
-						tabHeader: wr.name + " World Raid. " + wr.startDate,
+						tabName: wr.spawnType || "World Raid",
+						tabHeader: wr.name + " " + wr.spawnType + ". " + wr.startDate,
 						tabPosition: 150,
 						closeable: true,
 						
@@ -8599,14 +8628,14 @@ DC_LoaTS_Helper.raids =
 					var hours = Math.floor(diff/3600);
 					var minutes = Math.floor((diff%3600)/60);
 					var seconds = Math.floor((diff%60));
-					timerText = "Estimated Time Remaining on WR: " + 
+					timerText = "Estimated Time Remaining: " + 
 								(hours<10?"0"+hours:hours) + ":" + 
 								(minutes<10?"0"+minutes:minutes) + ":" + 
 								(seconds<10?"0"+seconds:seconds);
 				}
 				else {
 					// WR is over
-					timerText = wr.name + " WR is over.";
+					timerText = wr.name + " is over.";
 				}
 				
 				var elems = document.getElementsByClassName("DC_LoaTS_WR_Timer");
@@ -8653,22 +8682,22 @@ DC_LoaTS_Helper.raids =
 		};
 	// World Raid Data, if there is any
 
-/*
 	DC_LoaTS_Helper.worldRaidInfo = {
-		name: "Kraken",
+		name: "Raging Snowman",
 		
-		startDate: "11/30/2012",
-		timerEnds: "2012-12-03T22:28:13Z",
+		spawnType: "Rare Spawn",
 		
-		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_boss=kraken&kv_difficulty=1&kv_raid_id=5489589&kv_hash=oAoUCIzQv9",
-		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10585-Release-the-Kraken!",
-		infoUrlTitle: "'Release the Kraken!' Official Announcement",
+		startDate: "12/10/2012",
+		timerEnds: "2012-12-11T09:14:13Z",
 		
-		lootTableImageUrl: "http://i.imgur.com/yjDKc.jpg"
+		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=5675829&kv_difficulty=1&kv_raid_boss=raging_snowman&kv_hash=yWu6Wi6TV8",
+		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10785-Rare-Spawn-12-10-12-Raging-Snowman!",
+		infoUrlTitle: "'Rare Spawn 12/10/12 - Raging Snowman!' Official Announcement",
+		
+		lootTableImageUrl: "http://i.imgur.com/57n52.jpg?1"
 		
 	};
-*/
-	
+
 	// End World Raid Data
 	
 	
