@@ -153,6 +153,7 @@
 						}
 					});
 					
+					RaidToolbar.createWRButton();
 					
 				}
 				// Else if it does exist, grab the hooks
@@ -373,7 +374,7 @@
 		RaidToolbar.toggle = function()
 		{
 			// Locate or create a raid toolbar
-			var raidToolbar = window.raidtoolbar;
+			var raidToolbar = window.raidToolbar;
 			if (typeof raidToolbar == "undefined")
 			{
 				raidToolbar = new RaidToolbar();
@@ -388,7 +389,7 @@
 		RaidToolbar.show = function()
 		{
 			// Locate or create a raid toolbar
-			var raidToolbar = window.raidtoolbar;
+			var raidToolbar = window.raidToolbar;
 			if (typeof raidToolbar == "undefined")
 			{
 				raidToolbar = new RaidToolbar();
@@ -427,7 +428,15 @@
 		RaidToolbar.createWRButton = function() {
 			var wr = DC_LoaTS_Helper.worldRaidInfo;
 			if (!DC_LoaTS_Helper.wrButton && typeof wr === "object" && (!wr.timerEnds || new Date(wr.timerEnds) > new Date())) {
+				// Locate or create a raid toolbar
+				var raidToolbar = window.raidToolbar;
+				if (typeof raidToolbar == "undefined")
+				{
+					raidToolbar = new RaidToolbar();
+					window.raidToolbar = raidToolbar;
+				}
+				
 				DC_LoaTS_Helper.wrButton = new RaidButton(DC_LoaTS_Helper.worldRaidInfo.name + " Info", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo);
-				this.container.insert({bottom: DC_LoaTS_Helper.wrButton.node});
+				raidToolbar.container.insert({bottom: DC_LoaTS_Helper.wrButton.node});
 			}
 		}
