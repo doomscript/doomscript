@@ -259,6 +259,9 @@ Altered some WR display code
 Performance tuned some raid loading code
 Added link formatting for Alliance invites
 Added new Alliance Raid: Crazed Santa
+
+2012.12.?? - 1.1.17
+Added two new Alliance Raids: SANTA's Workshop and Rabid Reindeer
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -267,7 +270,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.16",
+    	version: "1.1.17",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

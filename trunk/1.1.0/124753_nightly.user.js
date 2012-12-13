@@ -259,6 +259,9 @@ Altered some WR display code
 Performance tuned some raid loading code
 Added link formatting for Alliance invites
 Added new Alliance Raid: Crazed Santa
+
+2012.12.?? - 1.1.17
+Added two new Alliance Raids: SANTA's Workshop and Rabid Reindeer
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -267,7 +270,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.16",
+    	version: "1.1.17",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -4142,6 +4145,7 @@ function main()
 						}
 					});
 					
+					RaidToolbar.createWRButton();
 					
 				}
 				// Else if it does exist, grab the hooks
@@ -4362,7 +4366,7 @@ function main()
 		RaidToolbar.toggle = function()
 		{
 			// Locate or create a raid toolbar
-			var raidToolbar = window.raidtoolbar;
+			var raidToolbar = window.raidToolbar;
 			if (typeof raidToolbar == "undefined")
 			{
 				raidToolbar = new RaidToolbar();
@@ -4377,7 +4381,7 @@ function main()
 		RaidToolbar.show = function()
 		{
 			// Locate or create a raid toolbar
-			var raidToolbar = window.raidtoolbar;
+			var raidToolbar = window.raidToolbar;
 			if (typeof raidToolbar == "undefined")
 			{
 				raidToolbar = new RaidToolbar();
@@ -4416,8 +4420,16 @@ function main()
 		RaidToolbar.createWRButton = function() {
 			var wr = DC_LoaTS_Helper.worldRaidInfo;
 			if (!DC_LoaTS_Helper.wrButton && typeof wr === "object" && (!wr.timerEnds || new Date(wr.timerEnds) > new Date())) {
+				// Locate or create a raid toolbar
+				var raidToolbar = window.raidToolbar;
+				if (typeof raidToolbar == "undefined")
+				{
+					raidToolbar = new RaidToolbar();
+					window.raidToolbar = raidToolbar;
+				}
+				
 				DC_LoaTS_Helper.wrButton = new RaidButton(DC_LoaTS_Helper.worldRaidInfo.name + " Info", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo);
-				this.container.insert({bottom: DC_LoaTS_Helper.wrButton.node});
+				raidToolbar.container.insert({bottom: DC_LoaTS_Helper.wrButton.node});
 			}
 		}
 		/************************************/
@@ -7326,6 +7338,7 @@ DC_LoaTS_Helper.raids =
     colonel_mustard:    new RaidType("colonel_mustard",     "A3", "Colonel Mustard", "Mustard", "Mustard",           120,  10, "H",   12000000),
     professor_squid:    new RaidType("professor_squid",     "A4", "Professor Squid", "Squid", "Squid",               120,  10, "H",   18000000),
     terminus_death_squad: new RaidType("terminus_death_squad","A5", "Terminus Death Squad", "Death Squad", "Death Squad",120,10,"H",  24000000),
+    rabid_reindeer:     new RaidType("rabid_reindeer",      "A8", "Rabid Reindeer", "Reindeer", "Reindeer",           60,  50, "H",   62500000),
     
     // Medium Raids
     infection:          new RaidType("infection",           "A0", "Infected Squad",    "Infected", "Infected",       144,  50, "H",   30000000),
@@ -7336,7 +7349,8 @@ DC_LoaTS_Helper.raids =
     terminus_interceptor_squadron: new RaidType("terminus_interceptor_squadron","A5", "Terminus Interceptor Squadron", "Interceptor", "Interceptor", 144, 50,"H",75000000),
     luna:               new RaidType("luna",                "A6", "Luna", "Luna", "Luna",                            120,  50, "H",   50000000),
     trashmaster:        new RaidType("trashmaster",         "A6", "Trashmaster Colby", "Colby", "Colby",             144,  50, "H",  100000000),
-    
+    santas_workshop:    new RaidType("santas_workshop",     "A8", "SANTA's Workshop", "Workshop", "Workshop",         72,  50, "H",  125000000),
+
     // Large Raids
     saucers:            new RaidType("saucers",             "A0", "Flying Saucers",    "Saucers", "Saucers",         168,  100, "H",   55000000),
     tourniquet:         new RaidType("tourniquet",          "A1", "Tourniquet 7", "Tourniquet 7", "T7",              168,  100, "H",   60000000),
@@ -8557,10 +8571,11 @@ DC_LoaTS_Helper.raids =
 				var wr = DC_LoaTS_Helper.worldRaidInfo;
 				wr.spawnType = wr.spawnType || "World Raid";
 				
+				RaidMenu.show();
+
 				var wrtab = document.getElementById("DC_LoaTS_raidMenu" + wr.spawnType.trim().replace(" ", "_") + "PaneTab");
 				if (!wrtab) {
 					// Need to create a WR Info Div
-					RaidMenu.show();
 					var tabClass = RaidMenuTab.create({
 						tabName: wr.spawnType || "World Raid",
 						tabHeader: wr.name + " " + wr.spawnType + ". " + wr.startDate,
@@ -8682,13 +8697,14 @@ DC_LoaTS_Helper.raids =
 		};
 	// World Raid Data, if there is any
 
+/*
 	DC_LoaTS_Helper.worldRaidInfo = {
 		name: "Raging Snowman",
 		
 		spawnType: "Rare Spawn",
 		
 		startDate: "12/10/2012",
-		timerEnds: "2012-12-11T09:14:13Z",
+		timerEnds: "2012-12-11T19:15:28Z",
 		
 		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=5675829&kv_difficulty=1&kv_raid_boss=raging_snowman&kv_hash=yWu6Wi6TV8",
 		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10785-Rare-Spawn-12-10-12-Raging-Snowman!",
@@ -8697,6 +8713,8 @@ DC_LoaTS_Helper.raids =
 		lootTableImageUrl: "http://i.imgur.com/57n52.jpg?1"
 		
 	};
+
+*/
 
 	// End World Raid Data
 	

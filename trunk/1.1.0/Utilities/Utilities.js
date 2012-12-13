@@ -1175,10 +1175,11 @@
 				var wr = DC_LoaTS_Helper.worldRaidInfo;
 				wr.spawnType = wr.spawnType || "World Raid";
 				
+				RaidMenu.show();
+
 				var wrtab = document.getElementById("DC_LoaTS_raidMenu" + wr.spawnType.trim().replace(" ", "_") + "PaneTab");
 				if (!wrtab) {
 					// Need to create a WR Info Div
-					RaidMenu.show();
 					var tabClass = RaidMenuTab.create({
 						tabName: wr.spawnType || "World Raid",
 						tabHeader: wr.name + " " + wr.spawnType + ". " + wr.startDate,
