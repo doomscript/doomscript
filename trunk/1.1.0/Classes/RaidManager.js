@@ -478,10 +478,10 @@
 					if (typeof filterParam == "string")
 					{
 						// Parse the command into a RaidFilter
-						raidFilter = new RaidFilter(filterParam);
+						raidFilter = new RaidMultiFilter(filterParam);
 					}
 					// We got something other than text. Assume it's a RaidFilter
-					else if (filterParam instanceof RaidFilter)
+					else if (filterParam instanceof RaidFilter || filterParam instanceof RaidMultiFilter)
 					{
 						// filterParam was already a raidFilter
 						raidFilter = filterParam;
@@ -623,7 +623,7 @@
 				Timer.start("markByFilter");
 				
 				if (typeof filter === "string") {
-					filter = new RaidFilter(filter);
+					filter = new RaidMultiFilter(filter);
 				}
 				
 				if (typeof state === "string") {

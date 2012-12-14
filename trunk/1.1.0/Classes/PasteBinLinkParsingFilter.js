@@ -14,7 +14,7 @@
 				}
 				if (indexOfSpace > 0)
 				{
-					this.raidFilter = new RaidFilter(paramsClean.substring(indexOfSpace))
+					this.raidFilter = new RaidMultiFilter(paramsClean.substring(indexOfSpace))
 				}
 			},
 			getPasteLink: function()

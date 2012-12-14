@@ -378,11 +378,7 @@
 				
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li a:first-child, #DC_LoaTS_raidToolbarContainer li li div:first-child{\n";
 				rulesText += "\tpadding-left: 10px !important;\n";
-				rulesText += "}\n";
-				
-				
-				
-				
+				rulesText += "}\n";				
 				
 				//--- Onnibox Option Styles ---\\
 				

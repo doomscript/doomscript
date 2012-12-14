@@ -2,7 +2,7 @@
 			{
 				commandName: "seenraids",
 				aliases: ["seenraid", "raidseen", "raidseen", "sr"],
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 				handler: function(deck, raidFilter, params, text, context)
 				{
 					// Capture the start time of the query

@@ -13,7 +13,7 @@
 				// Parse the first part as a raid filter
 				if (parts.length >= 1)
 				{
-					this.raidFilter = new RaidFilter(parts[0].trim()); 
+					this.raidFilter = new RaidMultiFilter(parts[0].trim()); 
 				}
 				
 				// The second part as the link style

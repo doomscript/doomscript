@@ -203,7 +203,7 @@
 					console.warn(this);
 					console.warn(ex);
 				}
-				
+								
 				return styleRet;
 			},
 			

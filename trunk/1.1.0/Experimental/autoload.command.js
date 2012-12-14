@@ -3,7 +3,7 @@
 			{
 				commandName: "loadall",
 				aliases: ["autoload"],
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 
 				handler: function(deck, raidFilter, params, text, context)
 				{

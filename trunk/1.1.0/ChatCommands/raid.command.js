@@ -2,7 +2,7 @@
 			{
 				commandName: "raid",
 				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis"],
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 				
 				// Doesn't use all the filter params
 				paramText: "[raidName] [raidDifficulty]",
