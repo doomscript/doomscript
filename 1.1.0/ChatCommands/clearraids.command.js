@@ -2,7 +2,7 @@
 			{
 				commandName: "clearraids",
 				aliases: ["clearraid", "raidclear", "raidsclear", "clearcache"],
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 				handler: function(deck, raidFilter, params, text, context)
 				{
 					// Declare ret object

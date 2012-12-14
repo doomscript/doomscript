@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "exportraids",
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 				aliases: ["exportraid", "er"],
 				
 				handler: function(deck, raidFilter, params, text, context)

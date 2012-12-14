@@ -3,7 +3,7 @@
 			{
 				commandName: "template", // This is the /template command
 				aliases: ["templateCommand", "commandTemplate"], // Also, /templateCommand and /commandTemplate
-				parsingClass: RaidFilter, // Comment out this line, and a parser will not be created
+				parsingClass: RaidMultiFilter, // Comment out this line, and a parser will not be created
 				myCustomAttribute: "Foo",
 				doNotEnumerateInHelp: true, // Don't list this in the help
 				

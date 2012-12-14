@@ -56,7 +56,7 @@
 						return;
 					}
 					
-					var tmpFilter = new RaidFilter(this.searchBox.value);
+					var tmpFilter = new RaidMultiFilter(this.searchBox.value);
 					
 					if (!this.currentRaidFilter || this.currentRaidFilter.toString() != tmpFilter.toString())
 					{

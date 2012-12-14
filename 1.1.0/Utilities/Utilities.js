@@ -741,18 +741,22 @@
 						var newRaidLink = new RaidLink(elem.children[0].href);
 						
 						// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-						if (newRaidLink.isValid() &&  (typeof raidLink === "undefined" || raidLink.getUniqueKey() == newRaidLink.getUniqueKey()))
+						if (newRaidLink.isValid() &&  (typeof raidLink === "undefined" || raidLink.getUniqueKey() === newRaidLink.getUniqueKey()))
 						{
-							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
-							elem.remove();
-							
 							// Restyle the message as appropriate
 							var styles = newRaidLink.getMatchedStyles();
 							if (typeof styles.messageStyle !== "undefined")
 							{
-								elem.setAttribute("style", styles.messageStyle);
-								elem.cssText = styles.messageStyle;
+								elem.parentNode.parentNode.className = styles.className;
 							}
+							else
+							{
+								elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "");
+							}
+
+							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
+							elem.remove();
+							
 						}
 						else if (!newRaidLink.isValid())
 						{
@@ -1062,7 +1066,7 @@
 				url: DC_LoaTS_Properties.raidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
 				onload: function(response) {
 					var message;
-					if (response.status == 200) {
+					if (response.status === 200) {
 						eval(response.responseText.replace("DC_LoaTS_Helper.raids", "var data"));
 						var added = [];
 						for (var i in data) {
@@ -1079,8 +1083,11 @@
 							message = "No new raid types found."
 						}
 					}
+					else if (response.status > 200 && response.status < 400) {
+						message = "No new raid types found."
+					}
 					else {
-						message = "Unable to check for updated raid data from update site.";
+						message = "Unable to check for updated raid data from update site. (status: " + response.status + ")";
 					}
 
 					if (message) {
@@ -1095,7 +1102,7 @@
 				url: DC_LoaTS_Properties.worldRaidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
 				onload: function(response) {
 					var message;
-					if (response.status == 200) {
+					if (response.status === 200) {
 						var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
 						eval(response.responseText);
 						var WRData = DC_LoaTS_Helper.worldRaidInfo;
@@ -1106,8 +1113,11 @@
 						
 						RaidToolbar.createWRButton();
 					}
+					else if (response.status > 200 && response.status < 400) {
+						message = "No new World Raids found."
+					}
 					else {
-						message = "Unable to check for updated world raid data from update site.";
+						message = "Unable to check for updated world raid data from update site. (status: " + response.status + ")";
 					}
 
 					if (message) {

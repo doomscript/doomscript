@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.16
+// @version        1.1.17
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -260,8 +260,14 @@ Performance tuned some raid loading code
 Added link formatting for Alliance invites
 Added new Alliance Raid: Crazed Santa
 
-2012.12.?? - 1.1.17
+2012.12.14 - 1.1.17
 Added two new Alliance Raids: SANTA's Workshop and Rabid Reindeer
+Updated Snowman rare spawn info, due to new snowman
+Added snull preference to snull the snulls in the snull
+Added ignore visited raids preference
+Added ignore invalid commands preference
+Added additional filtering capability to string multiple filters together using ||, like colo|tele 1 || rage|void 4 would give normal tele, normal colossa and colonel, nightmare ragebeasts, nightmare void
+Fixed bug loading WR data during update
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -277,6 +283,7 @@ function main()
     	scriptURL: "http://userscripts.org/124753",
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
     	raidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/RaidData.js",
+    	worldRaidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
@@ -594,6 +601,7 @@ function main()
 					
 					// Capture the resulting state of the chat command
 					var chatCommandResult = holodeck.DC_LoaTS_processChatCommand(str);
+					var ignoredByPreference = false;
 					DCDebug("Chat Command Result for " + str + ": ");
 					DCDebug(chatCommandResult);
 					
@@ -603,9 +611,12 @@ function main()
 						// Let the user know the command failed
 						holodeck.activeDialogue().raidBotMessage("Did not understand command: <code>" + str + "</code>");
 					}
+					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", false)) {
+						ignoredByPreference = true;
+					}
 					
-					// Only pass the message along if it wasn't a /w RaidBot and it's not a command
-					return !raidBotWhisper && chatCommandResult;
+					// Only pass the message along if it wasn't a /w RaidBot and it's not a command and we're not ignoring this message by preference
+					return !raidBotWhisper && chatCommandResult && !ignoredByPreference;
 				}; // End Replacement displayUnsanitizedMessage
 		    } // End initialize
 	    });	
@@ -847,7 +858,7 @@ function main()
 				}
 				if (indexOfSpace > 0)
 				{
-					this.raidFilter = new RaidFilter(paramsClean.substring(indexOfSpace))
+					this.raidFilter = new RaidMultiFilter(paramsClean.substring(indexOfSpace))
 				}
 			},
 			getPasteLink: function()
@@ -1853,7 +1864,7 @@ function main()
 				// Parse the first part as a raid filter
 				if (parts.length >= 1)
 				{
-					this.raidFilter = new RaidFilter(parts[0].trim()); 
+					this.raidFilter = new RaidMultiFilter(parts[0].trim()); 
 				}
 				
 				// The second part as the link style
@@ -2183,7 +2194,7 @@ function main()
 					console.warn(this);
 					console.warn(ex);
 				}
-				
+								
 				return styleRet;
 			},
 			
@@ -3159,10 +3170,10 @@ function main()
 					if (typeof filterParam == "string")
 					{
 						// Parse the command into a RaidFilter
-						raidFilter = new RaidFilter(filterParam);
+						raidFilter = new RaidMultiFilter(filterParam);
 					}
 					// We got something other than text. Assume it's a RaidFilter
-					else if (filterParam instanceof RaidFilter)
+					else if (filterParam instanceof RaidFilter || filterParam instanceof RaidMultiFilter)
 					{
 						// filterParam was already a raidFilter
 						raidFilter = filterParam;
@@ -3304,7 +3315,7 @@ function main()
 				Timer.start("markByFilter");
 				
 				if (typeof filter === "string") {
-					filter = new RaidFilter(filter);
+					filter = new RaidMultiFilter(filter);
 				}
 				
 				if (typeof state === "string") {
@@ -3877,6 +3888,130 @@ function main()
 		};
 
 		/************************************/
+		/********* RaidMultiFilter Class *********/
+		/************************************/
+		
+		// This class represents a group of filters
+		window.RaidMultiFilter = Class.create({
+			
+			// Constructor
+			initialize: function(filterText)
+			{
+				Timer.start("RaidMultiFilter init");
+
+				// Declare some vars for later
+				this.valid = true;
+
+				// Capture original filterText
+				this.filterText = filterText;
+				
+				// Break out any bunch
+				var filterTexts = this.filterText.split("||");
+				
+				// Prepare the filters
+				this.filters = [];
+				
+				for (var i = 0; i < filterTexts.length; i++) {
+					this.filters.push(new RaidFilter(filterTexts[i]));
+				}
+
+				Timer.stop("RaidMultiFilter init");
+			},
+			
+			// Based on this filter, does a given property match the filter
+			matches: function(params)
+			{				
+				var matched = true;
+				
+				for (var i = 0; i < this.filters.length; i++) {
+					matched = matched && this.filters[i].matches(params);
+				}
+				
+				return matched;
+			},
+			
+			// Gets a key to define this filter
+			getKey: function()
+			{
+				var key = "";
+				
+				for (var i = 0; i < this.filters.length; i++) {
+					key += (i>0?"||":"") + this.filters[i].getKey()
+				}
+				
+				return key;
+			},
+			
+			// If it has a name and optionally a difficulty and nothing else, it's simple
+			isSimple: function()
+			{
+				var simple = true;
+				
+				for (var i = 0; i < this.filters.length; i++) {
+					simple = simple && this.filters[i].isSimple();
+				}
+				
+				return simple;
+			},
+			
+			isEmpty: function()
+			{
+				var empty = true;
+				
+				for (var i = 0; i < this.filters.length; i++) {
+					empty = empty && this.filters[i].isEmpty();
+				}
+				
+				return empty;
+
+			},
+			
+			isValid: function()
+			{
+				var valid = true;
+				
+				for (var i = 0; i < this.filters.length; i++) {
+					valid = valid && this.filters[i].isValid();
+				}
+				
+				return valid;
+			},
+			
+			getDifficultyText: function()
+			{
+				var text = "";
+				
+				for (var i = 0; i < this.filters.length; i++) {
+					text += (i>0?"||":"") + this.filters[i].getDifficultyText()
+				}
+				
+				return text;
+			},
+			
+			toString: function()
+			{
+				var str = "";
+				
+				for (var i = 0; i < this.filters.length; i++) {
+					str += (i>0?"||":"") + this.filters[i].toString()
+				}
+				
+				return str;
+			},
+			
+			toPrettyString: function() {
+				var pretty = "";
+				
+				for (var i = 0; i < this.filters.length; i++) {
+					pretty += (i>0?"||":"") + this.filters[i].toPrettystring()
+				}
+				
+				return pretty;
+
+			}
+		});
+
+				/************************************/
 		/********** RaidStyle Class *********/
 		/************************************/
 		
@@ -4888,47 +5023,134 @@ function main()
 				tabPosition: 100,
 				
 				rightClickVisitedKey: "RightClickVisited",
+				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				
 				initPane: function()
 				{
 					var wrapper = document.createElement("div");
+					var me = this;
 					
-					var rightClickOption = this.createSimpleOptionHTML(
+					var rightClickOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-RightClickVisitedInput",
 									"boolean", 
-									DC_LoaTS_Helper.getPref(this.rightClickVisitedKey), 
-									"Right-click should mark visited.", 
+									DC_LoaTS_Helper.getPref(me.rightClickVisitedKey), 
+									"Right-click should mark raids visited.", 
 									"If checked, right clicking a link will mark it visited", 
 									{
 										onclick: function()
 										{
-											//TODO: Obviously, this should come from a key
-											DC_LoaTS_Helper.setPref("RightClickVisited", this.checked);
+											DC_LoaTS_Helper.setPref(me.rightClickVisitedKey, this.checked);
 										}
 									}
 					);
+					wrapper.appendChild(rightClickOption.wrapper);
 
-					var loadBackgroundOption = this.createSimpleOptionHTML(
+					var ignoreInvalidOption = me.createSimpleOptionHTML(
+							"PreferencesMenu-IgnoreInvalidCommandsInput",
+							"boolean", 
+							DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey), 
+							"Ignore invalid commands.", 
+							"If checked, any command that is not a valid command will be ignored", 
+							{
+								onclick: function()
+								{
+									DC_LoaTS_Helper.setPref(me.ignoreInvalidCommandsKey, this.checked);
+								}
+							}
+					);
+					wrapper.appendChild(ignoreInvalidOption.wrapper);
+
+			
+					var hideVisitedOption = me.createSimpleOptionHTML(
+							"PreferencesMenu-HideVisitedRaidsInput",
+							"boolean", 
+							DC_LoaTS_Helper.getPref(me.hideVisitedRaidsKey), 
+							"Hide Visited and Completed Raids.", 
+							"If checked, Visited and Completed Raids posted into chat will be hidden", 
+							{
+								onclick: function()
+								{
+									DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
+									
+									// Parser style for the hiding of these raids
+									var parser = new RaidFilterStyleParser("{state: visited}||{state: completed}||{state: ignored} ++none")
+									
+									// Find all the styles matching this filter
+									var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
+
+									if (this.checked === true) {
+										// Does the hide visited style already exist?
+										// - If yes, make sure it's enabled
+										// - If no, create it and make sure it's enabled
+										
+										if (typeof matchingStyles === "undefined")
+										{
+											matchingStyles = [];
+											DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
+											parser.injectStyles();
+											matchingStyles.push(parser);
+										}
+										else
+										{
+											var found = false;
+											for (var i = 0; i < matchingStyles.length; i++) {
+												if (parser.getKey() === matchingStyles[i].getKey()) {
+													found = true;
+													break;
+												}
+											}
+											if (!found) {
+												parser.injectStyles();
+												matchingStyles.push(parser);
+											}
+										}
+									}
+									else {
+										// Does the hide visited style already exist?
+										// - If yes, disable it
+										// - If no, do nothing
+										if (typeof matchingStyles !== "undefined") {
+											for (var i = 0; i < matchingStyles.length; i++) {
+												if (parser.getKey() === matchingStyles[i].getKey()) {
+													matchingStyles.splice(i, 1);
+													break;
+												}
+											}
+										}
+									}
+									
+									
+									
+									DC_LoaTS_Helper.updatePostedLinks();
+								}
+							}
+					);
+					wrapper.appendChild(hideVisitedOption.wrapper);
+
+			
+
+					var loadBackgroundOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
-									DC_LoaTS_Helper.getPref(this.loadRaidsInBackgroundKey), 
-									"Raids should load in background rather than in the game area.", 
-									"If checked, raids won't load in game area.", 
+									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey), 
+									//"Raids should load in background rather than in the game area.", 
+									//"If checked, raids won't load in game area.", 
+									"Snull Snulls in the Snull",
+									"Snull Snull Snull Snull Snull",
 									{
 										onclick: function()
 										{
 											//TODO: Obviously, this should come from a key
-											DC_LoaTS_Helper.setPref("LoadRaidsInBackground", this.checked);
+											DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundKey, this.checked);
 										}
 									}
 					);
 					
-					wrapper.appendChild(rightClickOption.wrapper);
 					
 					// This is commented out until we decide if it can be used.
 					// Reminder: Uncomment this line to re-enable loading in the background
-					//wrapper.appendChild(loadBackgroundOption.wrapper);
+					wrapper.appendChild(loadBackgroundOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}
@@ -4993,7 +5215,7 @@ function main()
 						return;
 					}
 					
-					var tmpFilter = new RaidFilter(this.searchBox.value);
+					var tmpFilter = new RaidMultiFilter(this.searchBox.value);
 					
 					if (!this.currentRaidFilter || this.currentRaidFilter.toString() != tmpFilter.toString())
 					{
@@ -5217,7 +5439,7 @@ function main()
 			{
 				commandName: "clearraids",
 				aliases: ["clearraid", "raidclear", "raidsclear", "clearcache"],
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 				handler: function(deck, raidFilter, params, text, context)
 				{
 					// Declare ret object
@@ -5340,7 +5562,7 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "exportraids",
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 				aliases: ["exportraid", "er"],
 				
 				handler: function(deck, raidFilter, params, text, context)
@@ -5950,109 +6172,106 @@ function main()
 			}
 		);
 		
-		RaidCommand.create( 
-			{
-				commandName: "pasteraids",
-				aliases: ["pastebinraids"],
-				parsingClass: RaidFilter,
-				
-				handler: function(deck, raidFilter, params, text, context)
-				{
-					// Capture the start time of the query
-					var queryStartTime = new Date()/1;
-				
-					// Declare ret object
-					var ret = {};
-					
-					// Find all raids that match the user's criteria
-					var raidLinks = RaidManager.fetchByFilter(raidFilter);
-					
-					// If the RaidManager executed successfully
-					if (typeof raidLinks != "undefined")
-					{
-						// If we didn't match a single raid
-						if (raidLinks.length == 0)
-						{
-							if (params.length == 0)
-							{
-								ret.statusMessage = "Could not locate any seen raids in memory.";
-							}
-							else
-							{
-								ret.statusMessage = "Could not locate any seen raids matching <code>" + params + "<code>";
-							}
-							
-							// The lookup succeeded, we just didn't find anything
-							ret.success = true;
-						}
-						// If we did match some raids
-						else
-						{
-							// Capture all the text in one block
-							var outputText = "";
-							
-							// For every link we found
-							for (var i = 0; i < raidLinks.length; i++)
-							{
-								// Print matched links
-								outputText += raidLinks[i].getURL() + "\n";
-							}
-							
-							// Wait a moment, then paste it
-							setTimeout(function(){
-								DC_LoaTS_Helper.PastebinAPI.pasteData(outputText, raidFilter.toPrettyString() + " by " + holodeck._active_user._attributes._object.username, raidFilter.toString());
-							}, 100);
-							
-							// Status
-							ret.statusMessage = "Pasting " + raidLinks.length + " raids matching <code>" + raidFilter.toString() + "</code> to Pastebin. Please wait...";
-							
-							// Succeeded
-							ret.success = true;
-						}
-					}
-					// RaidManager failed
-					else
-					{
-						ret.statusMessage = "Did not understand command: <code>" + text + "</code>";
-						ret.success = false;
-					}
+RaidCommand
+		.create({
+			commandName : "pasteraids",
+			aliases : [ "pastebinraids" ],
+			parsingClass : RaidMultiFilter,
 
-					
-					return ret;
-				},
-				getOptions: function()
-				{
-					var commandOptions = {					
-						initialText: {
-							text: "Export matching data to pastebin"
+			handler : function(deck, raidFilter, params, text, context) {
+				// Capture the start time of the query
+				var queryStartTime = new Date() / 1;
+
+				// Declare ret object
+				var ret = {};
+
+				// Find all raids that match the user's criteria
+				var raidLinks = RaidManager.fetchByFilter(raidFilter);
+
+				// If the RaidManager executed successfully
+				if (typeof raidLinks != "undefined") {
+					// If we didn't match a single raid
+					if (raidLinks.length == 0) {
+						if (params.length == 0) {
+							ret.statusMessage = "Could not locate any seen raids in memory.";
+						} else {
+							ret.statusMessage = "Could not locate any seen raids matching <code>"
+									+ params + "<code>";
 						}
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/pasteraids raidName difficulty {state: stateName} {age: timeFormat} {fs: fsFormat} {count: numberResults} {page: resultsPage}</code>\n";
-					helpText += "Exports to pastebin raids that you've seen before in chat"
-					helpText += "where <code>raidName</code> <i>(optional)</i> is any partial or full raid name\n";
-					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
-					helpText += "where <code>stateName</code> <i>(optional)</i> is either seen or visited\n";
-					helpText += "where <code>timeFormat</code> <i>(optional)</i> is like <code>&lt;24h</code>, <code>&lt;30m</code>, or <code>&gt;1d</code>\n";
-					helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
-					helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
-					helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
-					
-					return helpText;
+
+						// The lookup succeeded, we just didn't find anything
+						ret.success = true;
+					}
+					// If we did match some raids
+					else {
+						// Capture all the text in one block
+						var outputText = "";
+
+						// For every link we found
+						for ( var i = 0; i < raidLinks.length; i++) {
+							// Print matched links
+							outputText += raidLinks[i].getURL() + "\n";
+						}
+
+						// Wait a moment, then paste it
+						setTimeout(
+								function() {
+									DC_LoaTS_Helper.PastebinAPI
+											.pasteData(
+													outputText,
+													raidFilter.toPrettyString()
+															+ " by "
+															+ holodeck._active_user._attributes._object.username,
+													raidFilter.toString());
+								}, 100);
+
+						// Status
+						ret.statusMessage = "Pasting " + raidLinks.length
+								+ " raids matching <code>"
+								+ raidFilter.toString()
+								+ "</code> to Pastebin. Please wait...";
+
+						// Succeeded
+						ret.success = true;
+					}
 				}
-			}
-		);
-		
+				// RaidManager failed
+				else {
+					ret.statusMessage = "Did not understand command: <code>"
+							+ text + "</code>";
+					ret.success = false;
+				}
 
-				RaidCommand.create( 
+				return ret;
+			},
+			getOptions : function() {
+				var commandOptions = {
+					initialText : {
+						text : "Export matching data to pastebin"
+					}
+				};
+
+				return commandOptions;
+			},
+			buildHelpText : function() {
+				var helpText = "<b>Raid Command:</b> <code>/pasteraids raidName difficulty {state: stateName} {age: timeFormat} {fs: fsFormat} {count: numberResults} {page: resultsPage}</code>\n";
+				helpText += "Exports to pastebin raids that you've seen before in chat"
+				helpText += "where <code>raidName</code> <i>(optional)</i> is any partial or full raid name\n";
+				helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
+				helpText += "where <code>stateName</code> <i>(optional)</i> is either seen or visited\n";
+				helpText += "where <code>timeFormat</code> <i>(optional)</i> is like <code>&lt;24h</code>, <code>&lt;30m</code>, or <code>&gt;1d</code>\n";
+				helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+				helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
+				helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
+
+				return helpText;
+			}
+		});
+		RaidCommand.create( 
 			{
 				commandName: "raid",
 				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis"],
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 				
 				// Doesn't use all the filter params
 				paramText: "[raidName] [raidDifficulty]",
@@ -6412,7 +6631,7 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "raidhelp",
-				aliases: ["raidabout"],
+				aliases: ["raidabout", "raidbot"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)
@@ -6553,7 +6772,7 @@ function main()
 			{
 				commandName: "seenraids",
 				aliases: ["seenraid", "raidseen", "raidseen", "sr"],
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 				handler: function(deck, raidFilter, params, text, context)
 				{
 					// Capture the start time of the query
@@ -6734,7 +6953,7 @@ function main()
 			{
 				commandName: "template", // This is the /template command
 				aliases: ["templateCommand", "commandTemplate"], // Also, /templateCommand and /commandTemplate
-				parsingClass: RaidFilter, // Comment out this line, and a parser will not be created
+				parsingClass: RaidMultiFilter, // Comment out this line, and a parser will not be created
 				myCustomAttribute: "Foo",
 				doNotEnumerateInHelp: true, // Don't list this in the help
 				
@@ -7060,7 +7279,7 @@ function main()
 			{
 				commandName: "loadall",
 				aliases: ["autoload"],
-				parsingClass: RaidFilter,
+				parsingClass: RaidMultiFilter,
 
 				handler: function(deck, raidFilter, params, text, context)
 				{
@@ -8137,18 +8356,22 @@ DC_LoaTS_Helper.raids =
 						var newRaidLink = new RaidLink(elem.children[0].href);
 						
 						// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-						if (newRaidLink.isValid() &&  (typeof raidLink === "undefined" || raidLink.getUniqueKey() == newRaidLink.getUniqueKey()))
+						if (newRaidLink.isValid() &&  (typeof raidLink === "undefined" || raidLink.getUniqueKey() === newRaidLink.getUniqueKey()))
 						{
-							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
-							elem.remove();
-							
 							// Restyle the message as appropriate
 							var styles = newRaidLink.getMatchedStyles();
 							if (typeof styles.messageStyle !== "undefined")
 							{
-								elem.setAttribute("style", styles.messageStyle);
-								elem.cssText = styles.messageStyle;
+								elem.parentNode.parentNode.className = styles.className;
 							}
+							else
+							{
+								elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "");
+							}
+
+							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
+							elem.remove();
+							
 						}
 						else if (!newRaidLink.isValid())
 						{
@@ -8458,7 +8681,7 @@ DC_LoaTS_Helper.raids =
 				url: DC_LoaTS_Properties.raidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
 				onload: function(response) {
 					var message;
-					if (response.status == 200) {
+					if (response.status === 200) {
 						eval(response.responseText.replace("DC_LoaTS_Helper.raids", "var data"));
 						var added = [];
 						for (var i in data) {
@@ -8475,8 +8698,11 @@ DC_LoaTS_Helper.raids =
 							message = "No new raid types found."
 						}
 					}
+					else if (response.status > 200 && response.status < 400) {
+						message = "No new raid types found."
+					}
 					else {
-						message = "Unable to check for updated raid data from update site.";
+						message = "Unable to check for updated raid data from update site. (status: " + response.status + ")";
 					}
 
 					if (message) {
@@ -8491,7 +8717,7 @@ DC_LoaTS_Helper.raids =
 				url: DC_LoaTS_Properties.worldRaidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
 				onload: function(response) {
 					var message;
-					if (response.status == 200) {
+					if (response.status === 200) {
 						var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
 						eval(response.responseText);
 						var WRData = DC_LoaTS_Helper.worldRaidInfo;
@@ -8502,8 +8728,11 @@ DC_LoaTS_Helper.raids =
 						
 						RaidToolbar.createWRButton();
 					}
+					else if (response.status > 200 && response.status < 400) {
+						message = "No new World Raids found."
+					}
 					else {
-						message = "Unable to check for updated world raid data from update site.";
+						message = "Unable to check for updated world raid data from update site. (status: " + response.status + ")";
 					}
 
 					if (message) {
@@ -9099,11 +9328,7 @@ DC_LoaTS_Helper.raids =
 				
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li a:first-child, #DC_LoaTS_raidToolbarContainer li li div:first-child{\n";
 				rulesText += "\tpadding-left: 10px !important;\n";
-				rulesText += "}\n";
-				
-				
-				
-				
+				rulesText += "}\n";				
 				
 				//--- Onnibox Option Styles ---\\
 				

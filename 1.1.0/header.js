@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.16
+// @version        1.1.17
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -260,8 +260,14 @@ Performance tuned some raid loading code
 Added link formatting for Alliance invites
 Added new Alliance Raid: Crazed Santa
 
-2012.12.?? - 1.1.17
+2012.12.14 - 1.1.17
 Added two new Alliance Raids: SANTA's Workshop and Rabid Reindeer
+Updated Snowman rare spawn info, due to new snowman
+Added snull preference to snull the snulls in the snull
+Added ignore visited raids preference
+Added ignore invalid commands preference
+Added additional filtering capability to string multiple filters together using ||, like colo|tele 1 || rage|void 4 would give normal tele, normal colossa and colonel, nightmare ragebeasts, nightmare void
+Fixed bug loading WR data during update
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -277,6 +283,7 @@ function main()
     	scriptURL: "http://userscripts.org/124753",
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
     	raidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/RaidData.js",
+    	worldRaidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	

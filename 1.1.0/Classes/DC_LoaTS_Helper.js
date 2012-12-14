@@ -268,6 +268,7 @@
 					
 					// Capture the resulting state of the chat command
 					var chatCommandResult = holodeck.DC_LoaTS_processChatCommand(str);
+					var ignoredByPreference = false;
 					DCDebug("Chat Command Result for " + str + ": ");
 					DCDebug(chatCommandResult);
 					
@@ -277,9 +278,12 @@
 						// Let the user know the command failed
 						holodeck.activeDialogue().raidBotMessage("Did not understand command: <code>" + str + "</code>");
 					}
+					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", false)) {
+						ignoredByPreference = true;
+					}
 					
-					// Only pass the message along if it wasn't a /w RaidBot and it's not a command
-					return !raidBotWhisper && chatCommandResult;
+					// Only pass the message along if it wasn't a /w RaidBot and it's not a command and we're not ignoring this message by preference
+					return !raidBotWhisper && chatCommandResult && !ignoredByPreference;
 				}; // End Replacement displayUnsanitizedMessage
 		    } // End initialize
 	    });	
