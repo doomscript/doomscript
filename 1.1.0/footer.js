@@ -605,6 +605,10 @@
 			
 			// Update raid data
 			DC_LoaTS_Helper.updateRaidData();
+			
+			// Make sure the ignore visited thing is working
+			// TODO: If we ever do more of these, make a framework for it, or something
+			DC_LoaTS_Helper.handleIgnoreVisitedRaids();
     	}
     	
     	// Everything is done

@@ -613,6 +613,9 @@ function main()
 					}
 					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", false)) {
 						ignoredByPreference = true;
+
+						// Let the user know the command failed
+						holodeck.activeDialogue().raidBotMessage("Did not understand command: <code>" + str + "</code> " + DC_LoaTS_Helper.getCommandLink("/w RaidBot help", "Need Help?"));
 					}
 					
 					// Only pass the message along if it wasn't a /w RaidBot and it's not a command and we're not ignoring this message by preference
@@ -824,7 +827,7 @@ function main()
 				var command = DC_LoaTS_Helper.chatCommands[commandName];
 				if (typeof command.doNotEnumerateInHelp == "undefined" || command.doNotEnumerateInHelp === false)
 				{
-					if (typeof command.getParamText != "undefined")
+					if (typeof command.getParamText === "function")
 					{
 						helpText += "<code>/" + commandName + " " + command.getParamText() + "</code>\n";
 					}
@@ -1691,10 +1694,18 @@ function main()
 						switch(field.toLowerCase())
 						{
 							case "name":
-								// Dirty pi hacks. TODO: Do this better
-								var tmpName = (this.name.toLowerCase() === "pi")?"^pi_":this.name;
-								// If the user's text matches this raid name
-								matched = matched && new RegExp(tmpName, "i").test(value);
+								try {
+									// Dirty pi hacks. TODO: Do this better
+									var tmpName = (this.name.toLowerCase() === "pi")?"^pi_":this.name;
+
+									// If the user's text matches this raid name
+									matched = matched && new RegExp(tmpName, "i").test(value);
+								}
+								catch (ex){
+									holodeck.activeDialogue().raidBotMessage("Errors occurred while trying to match "  + tmpName + ". " + ex);
+									console.log(ex);
+									return false;
+								}
 								break;
 							case "difficulty":
 								// If the user's difficulty matches the raid
@@ -3921,10 +3932,10 @@ function main()
 			// Based on this filter, does a given property match the filter
 			matches: function(params)
 			{				
-				var matched = true;
+				var matched = false;
 				
 				for (var i = 0; i < this.filters.length; i++) {
-					matched = matched && this.filters[i].matches(params);
+					matched = matched || this.filters[i].matches(params);
 				}
 				
 				return matched;
@@ -4011,6 +4022,8 @@ function main()
 			}
 		});
 
+		RaidMultiFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
+
 				/************************************/
 		/********** RaidStyle Class *********/
 		/************************************/
@@ -4023,7 +4036,7 @@ function main()
 				var nativeCSS = "";
 				this.css = "";
 
-				console.log("Parsing styleText: \"" + styleText + "\"")
+//				console.log("Parsing styleText: \"" + styleText + "\"")
 				
 				// Extract from the inputted text the various natural language and native CSS bits
 				RaidStyle.parsePattern.lastIndex = 0;
@@ -4046,7 +4059,7 @@ function main()
 				naturalLanguage = naturalLanguage.trim().toLowerCase();
 				nativeCSS = nativeCSS.trim();
 				
-				console.log("styleText yielded naturalLanguage: \"" + naturalLanguage + "\" and nativeCSS: \"" + nativeCSS + "\"");
+//				console.log("styleText yielded naturalLanguage: \"" + naturalLanguage + "\" and nativeCSS: \"" + nativeCSS + "\"");
 				
 				// Try to parse the natural language bits
 				// First, get a copy of the parsable bits
@@ -4059,15 +4072,15 @@ function main()
 					var match = el.pattern.exec(naturalLanguage);
 					if (match != null && match[0] != "")
 					{
-						console.log(el.property + " captured \"" + match[el.capture] + "\" and will replace \"" + match[el.replace]) +"\"";
+//						console.log(el.property + " captured \"" + match[el.capture] + "\" and will replace \"" + match[el.replace]) +"\"";
 						this.css += el.property + ": " + match[el.capture] + "; ";
-						console.log("Natural language before: \"" + naturalLanguage + "\"");
+//						console.log("Natural language before: \"" + naturalLanguage + "\"");
 						naturalLanguage = naturalLanguage.replace(match[el.replace], "").trim();
-						console.log("Natural language after: \"" + naturalLanguage + "\"");
+//						console.log("Natural language after: \"" + naturalLanguage + "\"");
 					}
 					else
 					{
-						console.log(el.property + " did not match against \"" + naturalLanguage + "\"");
+//						console.log(el.property + " did not match against \"" + naturalLanguage + "\"");
 					}
 				}
 				
@@ -5024,6 +5037,7 @@ function main()
 				
 				rightClickVisitedKey: "RightClickVisited",
 				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
+				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				
 				initPane: function()
@@ -5073,56 +5087,7 @@ function main()
 								{
 									DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
 									
-									// Parser style for the hiding of these raids
-									var parser = new RaidFilterStyleParser("{state: visited}||{state: completed}||{state: ignored} ++none")
-									
-									// Find all the styles matching this filter
-									var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
-
-									if (this.checked === true) {
-										// Does the hide visited style already exist?
-										// - If yes, make sure it's enabled
-										// - If no, create it and make sure it's enabled
-										
-										if (typeof matchingStyles === "undefined")
-										{
-											matchingStyles = [];
-											DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
-											parser.injectStyles();
-											matchingStyles.push(parser);
-										}
-										else
-										{
-											var found = false;
-											for (var i = 0; i < matchingStyles.length; i++) {
-												if (parser.getKey() === matchingStyles[i].getKey()) {
-													found = true;
-													break;
-												}
-											}
-											if (!found) {
-												parser.injectStyles();
-												matchingStyles.push(parser);
-											}
-										}
-									}
-									else {
-										// Does the hide visited style already exist?
-										// - If yes, disable it
-										// - If no, do nothing
-										if (typeof matchingStyles !== "undefined") {
-											for (var i = 0; i < matchingStyles.length; i++) {
-												if (parser.getKey() === matchingStyles[i].getKey()) {
-													matchingStyles.splice(i, 1);
-													break;
-												}
-											}
-										}
-									}
-									
-									
-									
-									DC_LoaTS_Helper.updatePostedLinks();
+									DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
 								}
 							}
 					);
@@ -7665,8 +7630,8 @@ DC_LoaTS_Helper.raids =
 		// Pretty format health / damage numbers
 		DC_LoaTS_Helper.prettyFormatNumber = function(num)
 		{
-			var text = "Unknown";
-			if (typeof num == "number")
+			var text = "?";
+			if (typeof num === "number")
 			{
 				// Trillions
 				if (num >= 1000000000000)
@@ -7693,18 +7658,10 @@ DC_LoaTS_Helper.raids =
 				{
 					text = num + "";
 				}
-				else
-				{
-					console.warn("Cannot pretty format number: " + num);
-				}
 			}
-			else if (typeof num == "string")
+			else if (typeof num === "string")
 			{
 				text = num;				
-			}
-			else
-			{
-				console.warn("Cannot pretty format text \"" + num + "\" as a number");
 			}
 			return text;
 		};
@@ -8325,6 +8282,64 @@ DC_LoaTS_Helper.raids =
 			return didReload;
 		};
 		
+		DC_LoaTS_Helper.handleIgnoreVisitedRaids = function(ignore) {
+			
+			if (typeof ignore === "undefined") {
+				ignore = DC_LoaTS_Helper.getPref("IgnoreVisitedRaids", false);
+			}
+			
+			// Parser style for the hiding of these raids
+			var parser = new RaidFilterStyleParser("{state: visited}||{state: completed}||{state: ignored} ++none")
+			
+			// Find all the styles matching this filter
+			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
+
+			if (ignore === true) {
+				// Does the hide visited style already exist?
+				// - If yes, make sure it's enabled
+				// - If no, create it and make sure it's enabled
+				
+				if (typeof matchingStyles === "undefined")
+				{
+					matchingStyles = [];
+					DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
+					parser.injectStyles();
+					matchingStyles.push(parser);
+				}
+				else
+				{
+					var found = false;
+					for (var i = 0; i < matchingStyles.length; i++) {
+						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						parser.injectStyles();
+						matchingStyles.push(parser);
+					}
+				}
+			}
+			else {
+				// Does the hide visited style already exist?
+				// - If yes, disable it
+				// - If no, do nothing
+				if (typeof matchingStyles !== "undefined") {
+					for (var i = 0; i < matchingStyles.length; i++) {
+						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
+							matchingStyles.splice(i, 1);
+							break;
+						}
+					}
+				}
+			}
+			
+			
+			
+			DC_LoaTS_Helper.updatePostedLinks();
+		}
+		
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
@@ -8360,18 +8375,27 @@ DC_LoaTS_Helper.raids =
 						{
 							// Restyle the message as appropriate
 							var styles = newRaidLink.getMatchedStyles();
-							if (typeof styles.messageStyle !== "undefined")
-							{
-								elem.parentNode.parentNode.className = styles.className;
-							}
-							else
-							{
-								elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "");
-							}
+							
+							// TODO: Eventually figure out how to style whispers without it being a PITA especially raidbot seenraids whispers
+							if ((elem.parentNode.parentNode.parentNode.className || "").indexOf("hisper") < 0) {
+								
+								// Remove existing doomscript styles. We don't want to double them up or anything weird
+								elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "").trim();
 
+								// If there are styles, apply them
+								if (styles && styles.className)
+								{
+									// Append to the existing styles
+									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
+								}
+							}
+							else {
+								console.log("Not going to alter class when parent class is " + elem.parentNode.parentNode.parentNode.className)
+							}
+							
+							// Remove the old link, and shove in the new, formatted, styled one
 							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
 							elem.remove();
-							
 						}
 						else if (!newRaidLink.isValid())
 						{
@@ -8393,7 +8417,7 @@ DC_LoaTS_Helper.raids =
 					console.warn(e);
 				}
 				Timer.stop("updatePostedLinksTimeout");
-			}.bind(window, raidLink), 500);
+			}.bind(window, raidLink), 300);
 		};
 		
 		DC_LoaTS_Helper.ajax = function(params){
@@ -8723,7 +8747,7 @@ DC_LoaTS_Helper.raids =
 						var WRData = DC_LoaTS_Helper.worldRaidInfo;
 						
 						if (!oldWRData && WRData) {
-							holodeck.activeDialogue().raidBotMessage("New " + (WRData.spawnType||"World Raid") + ": " + WRData.name);
+							message = "New " + (WRData.spawnType||"World Raid") + ": " + WRData.name;
 						}
 						
 						RaidToolbar.createWRButton();
@@ -8933,7 +8957,7 @@ DC_LoaTS_Helper.raids =
 		spawnType: "Rare Spawn",
 		
 		startDate: "12/14/2012",
-		timerEnds: "2012-12-15T13:15:28Z",
+		timerEnds: "2012-12-15T18:15:09Z",
 		
 		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=5759546&kv_difficulty=1&kv_raid_boss=raging_snowman&kv_hash=vklLQtnhn7",
 		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10842-Raging-Snowman-12-14-12",
@@ -9555,6 +9579,10 @@ DC_LoaTS_Helper.raids =
 			
 			// Update raid data
 			DC_LoaTS_Helper.updateRaidData();
+			
+			// Make sure the ignore visited thing is working
+			// TODO: If we ever do more of these, make a framework for it, or something
+			DC_LoaTS_Helper.handleIgnoreVisitedRaids();
     	}
     	
     	// Everything is done

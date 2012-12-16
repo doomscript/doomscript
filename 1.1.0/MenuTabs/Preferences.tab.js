@@ -10,6 +10,7 @@
 				
 				rightClickVisitedKey: "RightClickVisited",
 				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
+				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				
 				initPane: function()
@@ -59,56 +60,7 @@
 								{
 									DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
 									
-									// Parser style for the hiding of these raids
-									var parser = new RaidFilterStyleParser("{state: visited}||{state: completed}||{state: ignored} ++none")
-									
-									// Find all the styles matching this filter
-									var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
-
-									if (this.checked === true) {
-										// Does the hide visited style already exist?
-										// - If yes, make sure it's enabled
-										// - If no, create it and make sure it's enabled
-										
-										if (typeof matchingStyles === "undefined")
-										{
-											matchingStyles = [];
-											DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
-											parser.injectStyles();
-											matchingStyles.push(parser);
-										}
-										else
-										{
-											var found = false;
-											for (var i = 0; i < matchingStyles.length; i++) {
-												if (parser.getKey() === matchingStyles[i].getKey()) {
-													found = true;
-													break;
-												}
-											}
-											if (!found) {
-												parser.injectStyles();
-												matchingStyles.push(parser);
-											}
-										}
-									}
-									else {
-										// Does the hide visited style already exist?
-										// - If yes, disable it
-										// - If no, do nothing
-										if (typeof matchingStyles !== "undefined") {
-											for (var i = 0; i < matchingStyles.length; i++) {
-												if (parser.getKey() === matchingStyles[i].getKey()) {
-													matchingStyles.splice(i, 1);
-													break;
-												}
-											}
-										}
-									}
-									
-									
-									
-									DC_LoaTS_Helper.updatePostedLinks();
+									DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
 								}
 							}
 					);
