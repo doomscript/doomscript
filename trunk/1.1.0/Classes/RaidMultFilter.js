@@ -32,10 +32,10 @@
 			// Based on this filter, does a given property match the filter
 			matches: function(params)
 			{				
-				var matched = true;
+				var matched = false;
 				
 				for (var i = 0; i < this.filters.length; i++) {
-					matched = matched && this.filters[i].matches(params);
+					matched = matched || this.filters[i].matches(params);
 				}
 				
 				return matched;
@@ -121,5 +121,7 @@
 
 			}
 		});
+
+		RaidMultiFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
 
 		

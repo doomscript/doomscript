@@ -50,8 +50,8 @@
 		// Pretty format health / damage numbers
 		DC_LoaTS_Helper.prettyFormatNumber = function(num)
 		{
-			var text = "Unknown";
-			if (typeof num == "number")
+			var text = "?";
+			if (typeof num === "number")
 			{
 				// Trillions
 				if (num >= 1000000000000)
@@ -78,18 +78,10 @@
 				{
 					text = num + "";
 				}
-				else
-				{
-					console.warn("Cannot pretty format number: " + num);
-				}
 			}
-			else if (typeof num == "string")
+			else if (typeof num === "string")
 			{
 				text = num;				
-			}
-			else
-			{
-				console.warn("Cannot pretty format text \"" + num + "\" as a number");
 			}
 			return text;
 		};
@@ -710,6 +702,64 @@
 			return didReload;
 		};
 		
+		DC_LoaTS_Helper.handleIgnoreVisitedRaids = function(ignore) {
+			
+			if (typeof ignore === "undefined") {
+				ignore = DC_LoaTS_Helper.getPref("IgnoreVisitedRaids", false);
+			}
+			
+			// Parser style for the hiding of these raids
+			var parser = new RaidFilterStyleParser("{state: visited}||{state: completed}||{state: ignored} ++none")
+			
+			// Find all the styles matching this filter
+			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
+
+			if (ignore === true) {
+				// Does the hide visited style already exist?
+				// - If yes, make sure it's enabled
+				// - If no, create it and make sure it's enabled
+				
+				if (typeof matchingStyles === "undefined")
+				{
+					matchingStyles = [];
+					DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()] = matchingStyles;
+					parser.injectStyles();
+					matchingStyles.push(parser);
+				}
+				else
+				{
+					var found = false;
+					for (var i = 0; i < matchingStyles.length; i++) {
+						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						parser.injectStyles();
+						matchingStyles.push(parser);
+					}
+				}
+			}
+			else {
+				// Does the hide visited style already exist?
+				// - If yes, disable it
+				// - If no, do nothing
+				if (typeof matchingStyles !== "undefined") {
+					for (var i = 0; i < matchingStyles.length; i++) {
+						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
+							matchingStyles.splice(i, 1);
+							break;
+						}
+					}
+				}
+			}
+			
+			
+			
+			DC_LoaTS_Helper.updatePostedLinks();
+		}
+		
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
@@ -745,18 +795,27 @@
 						{
 							// Restyle the message as appropriate
 							var styles = newRaidLink.getMatchedStyles();
-							if (typeof styles.messageStyle !== "undefined")
-							{
-								elem.parentNode.parentNode.className = styles.className;
-							}
-							else
-							{
-								elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "");
-							}
+							
+							// TODO: Eventually figure out how to style whispers without it being a PITA especially raidbot seenraids whispers
+							if ((elem.parentNode.parentNode.parentNode.className || "").indexOf("hisper") < 0) {
+								
+								// Remove existing doomscript styles. We don't want to double them up or anything weird
+								elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "").trim();
 
+								// If there are styles, apply them
+								if (styles && styles.className)
+								{
+									// Append to the existing styles
+									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
+								}
+							}
+							else {
+								console.log("Not going to alter class when parent class is " + elem.parentNode.parentNode.parentNode.className)
+							}
+							
+							// Remove the old link, and shove in the new, formatted, styled one
 							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
 							elem.remove();
-							
 						}
 						else if (!newRaidLink.isValid())
 						{
@@ -778,7 +837,7 @@
 					console.warn(e);
 				}
 				Timer.stop("updatePostedLinksTimeout");
-			}.bind(window, raidLink), 500);
+			}.bind(window, raidLink), 300);
 		};
 		
 		DC_LoaTS_Helper.ajax = function(params){
@@ -1108,7 +1167,7 @@
 						var WRData = DC_LoaTS_Helper.worldRaidInfo;
 						
 						if (!oldWRData && WRData) {
-							holodeck.activeDialogue().raidBotMessage("New " + (WRData.spawnType||"World Raid") + ": " + WRData.name);
+							message = "New " + (WRData.spawnType||"World Raid") + ": " + WRData.name;
 						}
 						
 						RaidToolbar.createWRButton();

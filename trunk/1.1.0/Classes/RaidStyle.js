@@ -10,7 +10,7 @@
 				var nativeCSS = "";
 				this.css = "";
 
-				console.log("Parsing styleText: \"" + styleText + "\"")
+//				console.log("Parsing styleText: \"" + styleText + "\"")
 				
 				// Extract from the inputted text the various natural language and native CSS bits
 				RaidStyle.parsePattern.lastIndex = 0;
@@ -33,7 +33,7 @@
 				naturalLanguage = naturalLanguage.trim().toLowerCase();
 				nativeCSS = nativeCSS.trim();
 				
-				console.log("styleText yielded naturalLanguage: \"" + naturalLanguage + "\" and nativeCSS: \"" + nativeCSS + "\"");
+//				console.log("styleText yielded naturalLanguage: \"" + naturalLanguage + "\" and nativeCSS: \"" + nativeCSS + "\"");
 				
 				// Try to parse the natural language bits
 				// First, get a copy of the parsable bits
@@ -46,15 +46,15 @@
 					var match = el.pattern.exec(naturalLanguage);
 					if (match != null && match[0] != "")
 					{
-						console.log(el.property + " captured \"" + match[el.capture] + "\" and will replace \"" + match[el.replace]) +"\"";
+//						console.log(el.property + " captured \"" + match[el.capture] + "\" and will replace \"" + match[el.replace]) +"\"";
 						this.css += el.property + ": " + match[el.capture] + "; ";
-						console.log("Natural language before: \"" + naturalLanguage + "\"");
+//						console.log("Natural language before: \"" + naturalLanguage + "\"");
 						naturalLanguage = naturalLanguage.replace(match[el.replace], "").trim();
-						console.log("Natural language after: \"" + naturalLanguage + "\"");
+//						console.log("Natural language after: \"" + naturalLanguage + "\"");
 					}
 					else
 					{
-						console.log(el.property + " did not match against \"" + naturalLanguage + "\"");
+//						console.log(el.property + " did not match against \"" + naturalLanguage + "\"");
 					}
 				}
 				

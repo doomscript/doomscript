@@ -280,6 +280,9 @@
 					}
 					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", false)) {
 						ignoredByPreference = true;
+
+						// Let the user know the command failed
+						holodeck.activeDialogue().raidBotMessage("Did not understand command: <code>" + str + "</code> " + DC_LoaTS_Helper.getCommandLink("/w RaidBot help", "Need Help?"));
 					}
 					
 					// Only pass the message along if it wasn't a /w RaidBot and it's not a command and we're not ignoring this message by preference
@@ -491,7 +494,7 @@
 				var command = DC_LoaTS_Helper.chatCommands[commandName];
 				if (typeof command.doNotEnumerateInHelp == "undefined" || command.doNotEnumerateInHelp === false)
 				{
-					if (typeof command.getParamText != "undefined")
+					if (typeof command.getParamText === "function")
 					{
 						helpText += "<code>/" + commandName + " " + command.getParamText() + "</code>\n";
 					}

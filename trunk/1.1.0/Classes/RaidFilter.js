@@ -309,10 +309,18 @@
 						switch(field.toLowerCase())
 						{
 							case "name":
-								// Dirty pi hacks. TODO: Do this better
-								var tmpName = (this.name.toLowerCase() === "pi")?"^pi_":this.name;
-								// If the user's text matches this raid name
-								matched = matched && new RegExp(tmpName, "i").test(value);
+								try {
+									// Dirty pi hacks. TODO: Do this better
+									var tmpName = (this.name.toLowerCase() === "pi")?"^pi_":this.name;
+
+									// If the user's text matches this raid name
+									matched = matched && new RegExp(tmpName, "i").test(value);
+								}
+								catch (ex){
+									holodeck.activeDialogue().raidBotMessage("Errors occurred while trying to match "  + tmpName + ". " + ex);
+									console.log(ex);
+									return false;
+								}
 								break;
 							case "difficulty":
 								// If the user's difficulty matches the raid
