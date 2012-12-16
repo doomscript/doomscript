@@ -8949,7 +8949,7 @@ DC_LoaTS_Helper.raids =
 			});
 		};
 	// World Raid Data, if there is any
-
+/*
 
 	DC_LoaTS_Helper.worldRaidInfo = {
 		name: "Raging Snowman",
@@ -8967,7 +8967,7 @@ DC_LoaTS_Helper.raids =
 		
 	};
 
-
+*/
 
 	// End World Raid Data
 	

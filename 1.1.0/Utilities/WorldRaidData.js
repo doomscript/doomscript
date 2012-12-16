@@ -1,5 +1,5 @@
 	// World Raid Data, if there is any
-
+/*
 
 	DC_LoaTS_Helper.worldRaidInfo = {
 		name: "Raging Snowman",
@@ -17,7 +17,7 @@
 		
 	};
 
-
+*/
 
 	// End World Raid Data
 	
