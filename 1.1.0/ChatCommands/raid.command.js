@@ -10,46 +10,47 @@
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {};
+					var ret = {success: true};
 					
-					if (typeof parser == "undefined")
+					// Run through each filter, they can be handled totally uniquely
+					for (var i = 0; i < parser.filters.length; i++)
 					{
-						console.error("WTF?");
-						return;
-					}
-					
-					// If this was a valid filter
-					if (parser.isValid())
-					{
-						// Find the matching raid types
-						var matchedTypes = DC_LoaTS_Helper.getRaidTypes(parser);
+						var filter = parser.filters[i];
 						
-						// If we matched some raid types
-						if (matchedTypes.length > 0)
+						// If this was a valid filter
+						if (filter.isValid())
 						{
-							for (var i = 0; i < matchedTypes.length; i++)
+							// Find the matching raid types
+							var matchedTypes = DC_LoaTS_Helper.getRaidTypes(filter);
+							
+							// If we matched some raid types
+							if (matchedTypes.length > 0)
 							{
-								// Grab this raid
-								var raid = matchedTypes[i];
+								// Iterate over all the matched raid types
+								for (var j = 0; j < matchedTypes.length; j++)
+								{
+									// Grab this raid
+									var raid = matchedTypes[j];
+									
+									// Have the raid bot tell them 
+									deck.activeDialogue().raidBotMessage(raid.getVerboseText(filter.difficulty));
+								}
 								
-								// Have the raid bot tell them 
-								deck.activeDialogue().raidBotMessage(raid.getVerboseText(parser.difficulty));
+								ret.success = ret.success && true;
+							}
+							// If we didn't match a single raid
+							else
+							{
+								ret.success = ret.success && true;
+								ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.name + "</code>";
 							}
 							
-							ret.success = true;
 						}
-						// If we didn't match a single raid
 						else
 						{
-							ret.success = true;
-							ret.statusMessage = "Could not locate any raids matching <code>" + parser.name + "</code>";
+							ret.success = false;
+							ret.statusMessage = (i > 0?"\n":"") + "Did not understand filter: <code>" + filter.filterText + "</code>";
 						}
-						
-					}
-					else
-					{
-						ret.success = false;
-						ret.statusMessage = "Did not understand command: <code>" + text + "</code>";
 					}
 					
 					return ret;

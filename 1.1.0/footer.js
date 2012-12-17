@@ -604,11 +604,7 @@
 			window._dc_loats_helper = new DC_LoaTS_Helper();
 			
 			// Update raid data
-			DC_LoaTS_Helper.updateRaidData();
-			
-			// Make sure the ignore visited thing is working
-			// TODO: If we ever do more of these, make a framework for it, or something
-			DC_LoaTS_Helper.handleIgnoreVisitedRaids();
+			DC_LoaTS_Helper.updateRaidData();			
     	}
     	
     	// Everything is done

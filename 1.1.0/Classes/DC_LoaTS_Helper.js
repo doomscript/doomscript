@@ -288,6 +288,11 @@
 					// Only pass the message along if it wasn't a /w RaidBot and it's not a command and we're not ignoring this message by preference
 					return !raidBotWhisper && chatCommandResult && !ignoredByPreference;
 				}; // End Replacement displayUnsanitizedMessage
+				
+				
+				// Make sure the ignore visited thing is working
+				// TODO: If we ever do more of these, make a framework for it, or something
+				DC_LoaTS_Helper.handleIgnoreVisitedRaids();
 		    } // End initialize
 	    });	
 	    
@@ -374,7 +379,7 @@
 	    		console.warn(ex);
 	    	}
 	    	
-	    	return ret || defaultValue;
+	    	return (typeof ret !== "undefined") ? ret : defaultValue;
 	    }
 	    
 	    // Store a preference value into storage

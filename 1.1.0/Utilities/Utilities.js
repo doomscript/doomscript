@@ -705,7 +705,7 @@
 		DC_LoaTS_Helper.handleIgnoreVisitedRaids = function(ignore) {
 			
 			if (typeof ignore === "undefined") {
-				ignore = DC_LoaTS_Helper.getPref("IgnoreVisitedRaids", false);
+				ignore = DC_LoaTS_Helper.getPref("HideVisitedRaids", false);
 			}
 			
 			// Parser style for the hiding of these raids
@@ -714,6 +714,9 @@
 			// Find all the styles matching this filter
 			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
 
+			console.log("matchingStyles[" + parser.raidFilter.toString() + "]", matchingStyles);
+			
+			console.log("Ignore: ", ignore);
 			if (ignore === true) {
 				// Does the hide visited style already exist?
 				// - If yes, make sure it's enabled
@@ -730,6 +733,7 @@
 				{
 					var found = false;
 					for (var i = 0; i < matchingStyles.length; i++) {
+						console.log("Comparing keys", parser.raidFilter.getKey(), matchingStyles[i].raidFilter.getKey());
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							found = true;
 							break;
