@@ -8,7 +8,6 @@
 			{
 				// Split the params at the + that divides the filter from the style
 				var parts = params.split("\+");
-				console.log(parts)
 				
 				// Parse the first part as a raid filter
 				if (parts.length >= 1)

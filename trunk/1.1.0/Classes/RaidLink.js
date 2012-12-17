@@ -142,10 +142,10 @@
 				}
 				
 				// Look up the raid type
-				var raid = DC_LoaTS_Helper.raids[this.raidTypeId];
+				var raid = DC_LoaTS_Helper.raids[(this.raidTypeId||"").toLowerCase()];
 				
 				// Return the raid type, or if we found nothing, a new empty raid type
-				return (typeof raid != "undefined")?raid:new RaidType(this.raidTypeId);
+				return (typeof raid !== "undefined")? raid : new RaidType(this.raidTypeId);
 			},
 			
 			getMatchedStyles: function()

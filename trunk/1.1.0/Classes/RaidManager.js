@@ -264,14 +264,14 @@
 					}
 					
 					// If we couldn't find the current state, set it to UNSEEN
-					if (typeof currentState == "undefined")
+					if (typeof currentState === "undefined")
 					{
 						currentState = RaidManager.STATE.UNSEEN;
 						containedInLocalDB = false;
 					}
 					
-					// If we weren't provided a state param, set it to UNSEEN
-					if (typeof state == "undefined")
+					// If we weren't provided a state param, set it to the current state
+					if (typeof state === "undefined")
 					{
 						state = currentState;
 					}
@@ -293,12 +293,6 @@
 							 &&
 								RaidManager.STATE.equals(state, RaidManager.STATE.UNSEEN)
 								&& 
-//								(	// DEPRECATED: Old state is stored with unseen text
-//									(typeof raidData.state.text != "undefined" && raidData.state.text ==  RaidManager.STATE.UNSEEN.text)
-//									||
-//									// Old state is stored with just id
-//									(typeof raidData.stateId != "undefined" && raidData.stateId == RaidManager.STATE.UNSEEN.id)
-//								)
 								RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)
 							 )
 					{
@@ -371,22 +365,19 @@
 				Timer.stop("store");
 			},
 			
-			// Lookup a given raid link
-			/*public static RaidLink*/
+			// Lookup RaidData for a given link
+			/*public static RaidData*/
 			fetch: function(raidLink)
 			{
 				Timer.start("fetch");
 				
 				// Declare the return var
-				var foundLink;
+				var raidData;
 				
-				if (raidLink.isValid() && typeof GM_getValue !== "undefined" && typeof GM_getValue !== "undefined")
+				if (raidLink.isValid())
 				{
-					// Load up the storage object
-//					var raidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
-
 					// Attempt to load the passed in raid link
-					var raidData = RaidManager.raidStorage[raidLink.getUniqueKey()];
+					raidData = RaidManager.raidStorage[raidLink.getUniqueKey()];
 										
 					// If the link is in storage
 					if (typeof raidData !== "undefined")
@@ -394,15 +385,12 @@
 						// Add in the functions that you expect to see on those objects
 						Object.extend(raidData.raidLink, RaidLink.prototype);
 					}
-					
-					// Set the correct raid data for return
-					foundLink = raidData;
 				}
 				
 				Timer.stop("fetch");
 				
 				// Return what we found or undefined
-				return foundLink;
+				return raidData;
 			},
 			
 			// Returns the raid storage

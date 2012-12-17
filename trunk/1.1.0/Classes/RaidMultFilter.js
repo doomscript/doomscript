@@ -114,7 +114,7 @@
 				var pretty = "";
 				
 				for (var i = 0; i < this.filters.length; i++) {
-					pretty += (i>0?"||":"") + this.filters[i].toPrettystring()
+					pretty += (i>0?"||":"") + this.filters[i].toPrettyString()
 				}
 				
 				return pretty;
