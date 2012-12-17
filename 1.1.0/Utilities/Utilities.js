@@ -618,7 +618,7 @@
 						DC_LoaTS_Helper.ajax({
 											  url: DC_LoaTS_Properties.joinRaidURL + "?" + collapsedOptions,
 											  method: "GET",
-											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(undefined, raidLink, currentState, callback)
+											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink, currentState, callback)
 						});
 					}
 					else	
@@ -630,7 +630,7 @@
 						$('gameiframe').contentWindow.location.replace(DC_LoaTS_Properties.kongLoaTSURL + "?" + Object.toQueryString(iframe_options));
 						
 						if (typeof callback === "function") {
-							callback.call(undefined, currentState, newState);
+							callback.call(this, currentState, newState);
 						}
 					}
 				}
@@ -654,10 +654,15 @@
 		};
 		
 		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, oldState, callback, response)
-		{			
+		{
+			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(response.responseText)[1].trim();
+			DCDebug("Ajax Raid Join Message: ", raidJoinMessage);
+			
+			
 			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
+				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 				if (typeof callback === "function") {
 					callback.call(this, oldState, RaidManager.STATE.VISITED);
 				}
@@ -678,6 +683,83 @@
 					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.COMPLETED);
 				}
 			}
+		};
+		
+		DC_LoaTS_Helper.loadAll = function(raidLinks) {
+			// Private variable to be closed over in the autoLoader
+			var autoLoadCounter = {
+					attempted: 0, 
+					loaded: 0, 
+					visited: 0, 
+					completed: 0, 
+					reported: false,
+					isValid: function() {return this.loaded + this.visited + this.completed == this.attempted;},
+					getReport: function() {this.reported = true; return "Loaded: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
+			};
+			var startTime = new Date()/1;
+			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 500);
+			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
+			var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
+
+			// Create function closure to be called repeatedly
+			var autoLoader = function __autoload()
+			{
+				// This shouldn't be called without links, but just in case
+				if (raidLinks.length > 0)
+				{
+					// Keep track of how many we've tried to load
+					autoLoadCounter.attempted++;
+					
+					// Load the next raid, capture the visitation marking
+					DC_LoaTS_Helper.loadRaid(raidLinks.pop(), iframe_options, lrib, 
+						function(oldState, newState){
+							if (RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED)) {
+								autoLoadCounter.completed++;
+							}
+							else if (RaidManager.STATE.equals(oldState, RaidManager.STATE.VISITED)) {
+								autoLoadCounter.visited++;
+							}
+							else {
+								autoLoadCounter.loaded++;
+							}
+							
+							if (raidLinks.length === 0 && autoLoadCounter.isValid() && !autoLoadCounter.reported) {
+								// Calculate how long it took to load them all
+								var endTime = new Date()/1;
+								var took = (endTime - startTime)/1000;
+								holodeck.activeDialogue().raidBotMessage("Loading Complete! " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
+							}
+						}
+					);
+					
+					// If there are any links left, we'll need to continue loading them
+					if (raidLinks.length > 0)
+					{
+						// Fire the loader again after a while
+						// Loading in Background
+						if (lrib) {
+							DC_LoaTS_Helper.autoLoader.timeout = setTimeout(__autoload, lribDelay);
+						}
+						// Loading in Foreground
+						else {
+							DC_LoaTS_Helper.autoLoader.timeout = setTimeout(__autoload, lrDelay);
+						}
+					}
+				}
+				else
+				{
+					// Calculate how long it took to load them all
+					var endTime = new Date()/1;
+					var took = (endTime - startTime)/1000;
+					holodeck.activeDialogue().raidBotMessage("Load ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
+				}
+			}
+			
+
+			// Kick off the auto loading
+			DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 500), raidLinks: raidLinks};
+			
 		};
 		
 		DC_LoaTS_Helper.reload = function()
@@ -714,9 +796,9 @@
 			// Find all the styles matching this filter
 			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
 
-			console.log("matchingStyles[" + parser.raidFilter.toString() + "]", matchingStyles);
+			//console.log("matchingStyles[" + parser.raidFilter.toString() + "]", matchingStyles);
 			
-			console.log("Ignore: ", ignore);
+			//console.log("Ignore: ", ignore);
 			if (ignore === true) {
 				// Does the hide visited style already exist?
 				// - If yes, make sure it's enabled
@@ -733,7 +815,7 @@
 				{
 					var found = false;
 					for (var i = 0; i < matchingStyles.length; i++) {
-						console.log("Comparing keys", parser.raidFilter.getKey(), matchingStyles[i].raidFilter.getKey());
+						//console.log("Comparing keys", parser.raidFilter.getKey(), matchingStyles[i].raidFilter.getKey());
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							found = true;
 							break;
@@ -758,8 +840,6 @@
 					}
 				}
 			}
-			
-			
 			
 			DC_LoaTS_Helper.updatePostedLinks();
 		}

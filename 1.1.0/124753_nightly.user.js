@@ -1875,7 +1875,6 @@ function main()
 			{
 				// Split the params at the + that divides the filter from the style
 				var parts = params.split("\+");
-				console.log(parts)
 				
 				// Parse the first part as a raid filter
 				if (parts.length >= 1)
@@ -2149,10 +2148,10 @@ function main()
 				}
 				
 				// Look up the raid type
-				var raid = DC_LoaTS_Helper.raids[this.raidTypeId];
+				var raid = DC_LoaTS_Helper.raids[(this.raidTypeId||"").toLowerCase()];
 				
 				// Return the raid type, or if we found nothing, a new empty raid type
-				return (typeof raid != "undefined")?raid:new RaidType(this.raidTypeId);
+				return (typeof raid !== "undefined")? raid : new RaidType(this.raidTypeId);
 			},
 			
 			getMatchedStyles: function()
@@ -2972,14 +2971,14 @@ function main()
 					}
 					
 					// If we couldn't find the current state, set it to UNSEEN
-					if (typeof currentState == "undefined")
+					if (typeof currentState === "undefined")
 					{
 						currentState = RaidManager.STATE.UNSEEN;
 						containedInLocalDB = false;
 					}
 					
-					// If we weren't provided a state param, set it to UNSEEN
-					if (typeof state == "undefined")
+					// If we weren't provided a state param, set it to the current state
+					if (typeof state === "undefined")
 					{
 						state = currentState;
 					}
@@ -3001,12 +3000,6 @@ function main()
 							 &&
 								RaidManager.STATE.equals(state, RaidManager.STATE.UNSEEN)
 								&& 
-//								(	// DEPRECATED: Old state is stored with unseen text
-//									(typeof raidData.state.text != "undefined" && raidData.state.text ==  RaidManager.STATE.UNSEEN.text)
-//									||
-//									// Old state is stored with just id
-//									(typeof raidData.stateId != "undefined" && raidData.stateId == RaidManager.STATE.UNSEEN.id)
-//								)
 								RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)
 							 )
 					{
@@ -3079,22 +3072,19 @@ function main()
 				Timer.stop("store");
 			},
 			
-			// Lookup a given raid link
-			/*public static RaidLink*/
+			// Lookup RaidData for a given link
+			/*public static RaidData*/
 			fetch: function(raidLink)
 			{
 				Timer.start("fetch");
 				
 				// Declare the return var
-				var foundLink;
+				var raidData;
 				
-				if (raidLink.isValid() && typeof GM_getValue !== "undefined" && typeof GM_getValue !== "undefined")
+				if (raidLink.isValid())
 				{
-					// Load up the storage object
-//					var raidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
-
 					// Attempt to load the passed in raid link
-					var raidData = RaidManager.raidStorage[raidLink.getUniqueKey()];
+					raidData = RaidManager.raidStorage[raidLink.getUniqueKey()];
 										
 					// If the link is in storage
 					if (typeof raidData !== "undefined")
@@ -3102,15 +3092,12 @@ function main()
 						// Add in the functions that you expect to see on those objects
 						Object.extend(raidData.raidLink, RaidLink.prototype);
 					}
-					
-					// Set the correct raid data for return
-					foundLink = raidData;
 				}
 				
 				Timer.stop("fetch");
 				
 				// Return what we found or undefined
-				return foundLink;
+				return raidData;
 			},
 			
 			// Returns the raid storage
@@ -4019,7 +4006,7 @@ function main()
 				var pretty = "";
 				
 				for (var i = 0; i < this.filters.length; i++) {
-					pretty += (i>0?"||":"") + this.filters[i].toPrettystring()
+					pretty += (i>0?"||":"") + this.filters[i].toPrettyString()
 				}
 				
 				return pretty;
@@ -5918,6 +5905,17 @@ function main()
 					// Declare ret object
 					var ret = {};
 					
+					var isCancelled = params === "cancel";
+					
+					// Cancel the previous timer, if there is one
+					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined" || isCancelled)
+					{
+						// Clear out the raidLinks array from the previous one.
+						// The timeout will detect that there are suddenly no more links
+						// and acknowledge the error state and quit.
+						DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+					}
+
 					this.commandStartTime = new Date()/1;
 						
 					ret.success = parser.isValid();
@@ -5930,7 +5928,7 @@ function main()
 							onload: this.receiveAjax.bind(this),
 							});
 							
-						ret.statusMessage = "Loading data from " + parser.getPasteLink();
+						ret.statusMessage = "Downloading data from " + parser.getPasteLink() + ". Please wait...";
 					}
 						
 					return ret;
@@ -5939,52 +5937,56 @@ function main()
 				receiveAjax: function(response)
 				{
 					DCDebug("Got back pastebin data", response);
-					if (response.status === 200)
+					if (response.status === 200) // Must be OK because even other 200 codes won't have our data
 					{
 						var text = response.responseText,
-							xx = 100,
 						    matchedRaidsList = [],
+						    notMatchedRaidsList = [],
+						    binData = {},
 						    match,
-						    regex = new RegExp(RaidLink.linkPattern.source, "gi"),
+						    regex = new RegExp(RaidLink.linkPattern.source, "gi"), // Prevent weird JS regex caching/lastIndex issues
 						    hasRaidFilter = typeof this.parser.raidFilter !== "undefined";
 						    
-						while ((match = regex.exec(text)) !== null && xx--)
+						while ((match = regex.exec(text)) !== null)
 						{
 							var raidLink = new RaidLink(match[0]);
 							if (raidLink.isValid())
 							{
+								var thisBin = binData[raidLink.getRaid().shortName];
+								if (!thisBin){
+									thisBin = {};
+									binData[raidLink.getRaid().shortName] = thisBin;
+								}
+								var thisBinRaids = thisBin[raidLink.difficulty];
+								if (!thisBinRaids){
+									thisBinRaids = [];
+									thisBin[raidLink.difficulty] = thisBinRaids;
+								}
+								thisBinRaids.push(raidLink);
+
+								
 								if (hasRaidFilter)
 								{
 									var raidData = RaidManager.fetch(raidLink);
-									var currentState = RaidManager.fetchState(raidLink);
-									var didMatch = false;
-									if (typeof raidData !== "undefined")
-									{
-										didMatch = this.parser.raidFilter.matches(
-										{
-											age: this.commandStartTime - raidData.firstSeen,
-											difficulty: raidLink.difficulty,
-											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
-											name: raidLink.getRaid().getSearchableName(),
-											state: currentState,
-											count: matchedRaidsList.length
-										});
-									}
-									else
-									{
-										didMatch = this.parser.raidFilter.matches(
-										{
-											difficulty: raidLink.difficulty,
-											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
-											name: raidLink.getRaid().getSearchableName(),
-											state: currentState,
-											count: matchedRaidsList.length
-										});
-									}
-										
-									if (didMatch)
+									var currentState = raidData ? RaidManager.STATE.valueOf(raidData.stateId) || RaidManager.STATE.UNSEEN;
+
+									
+									if (this.parser.raidFilter.matches(
+											{
+												age: (raidData && raidData.firstSeen)? this.commandStartTime - raidData.firstSeen : 0,
+												difficulty: raidLink.difficulty,
+												fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+												name: raidLink.getRaid().getSearchableName(),
+												state: currentState,
+												count: matchedRaidsList.length
+											}
+									))
 									{
 										matchedRaidsList.push(raidLink);
+									}
+									else 
+									{
+										notMatchedRaidsList.push(raidLink);
 									}
 								}
 								else 
@@ -5992,7 +5994,7 @@ function main()
 									matchedRaidsList.push(raidLink);
 								}
 							}
-						}
+						} // End while(regex)
 						
 						var str = "Found " + matchedRaidsList.length + " raids in " + this.parser.getPasteLink();
 						
@@ -6000,17 +6002,40 @@ function main()
 						{
 							str += " matching filter " + this.parser.raidFilter.toString();
 						}
-						var guid = DC_LoaTS_Helper.generateUUID();
-						DC_LoaTS_Helper.bulkRaids[guid] = {
-														   loadSource: this.parser.getPasteLink(), 
-														   raids: matchedRaidsList, 
-														   canceled: false
-														  };
 						
-						str += ". " + DC_LoaTS_Helper.getCommandLink("/raidbulkcallback " + guid, "Load these raids")  + ".";
-						console.log(str);
-
-						holodeck.processChatCommand("/raidbulkcallback " + guid);
+						var binUUID = DC_LoaTS_Helper.generateUUID();
+						var binBreakdown = "\n<a href='#' onclick='$(\"" + binUUID + "\").toggleClassName(\"hidden\"); return false;'>Toggle Bin Data</a>";
+						binBreakdown += "\n<span id='" + binUUID + "' class='hidden'>";
+						binBreakdown += "\nTotal Raids: " + (matchedRaidsList.length + notMatchedRaidsList.length);
+						for (var shortName in binData) {
+							for (var diff = 1; diff < 5; diff++) {
+								var raids = binData[shortName][diff];
+								if (raids && raids.length) {
+									binBreakdown += "\n" + RaidType.shortDifficulty[diff] + " " + shortName + " - " + raids.length;
+								}
+							}
+						}
+						
+						binBreakdown += "</span>";
+						
+						str += binBreakdown;
+						
+						// Store all the raids we're not going to visit
+						for (var i = 0; i < notMatchedRaidsList.length; i++) {
+							RaidManager.store(notMatchedRaidsList[i]);
+						}
+						
+						
+						str += "\nBin fatched and parsed in " + (new Date()/1 - this.commandStartTime) + " ms.";
+						
+						if (matchedRaidsList.length) {
+							str += "\n\nStarting to load " + matchedRaidsList.length + " raids. " + this.getCommandLink("/loadpastebin cancel", "Cancel?");
+							
+							DC_LoaTS_Helper.loadAll(matchedRaidsList);
+						}
+						
+						holodeck.activeDialogue().raidBotMessage(str);
+						
 					}
 					else if (response.status === 404)
 					{
@@ -7278,82 +7303,10 @@ RaidCommand
 						// If there were any matched links
 						if (raidLinks.length > 0)
 						{
-							// Private variable to be closed over in the autoLoader
-							var autoLoadCounter = {
-									attempted: 0, 
-									loaded: 0, 
-									visited: 0, 
-									completed: 0, 
-									reported: false,
-									isValid: function() {return this.loaded + this.visited + this.completed == this.attempted;},
-									getReport: function() {this.reported = true; return "Loaded: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
-							};
-							var startTime = new Date()/1;
-							var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
-							var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 500);
-							var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
-							var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
-
-							// Create function closure to be called repeatedly
-							var autoLoader = function __autoload()
-							{
-								// This shouldn't be called without links, but just in case
-								if (raidLinks.length > 0)
-								{
-									// Keep track of how many we've tried to load
-									autoLoadCounter.attempted++;
-									
-									// Load the next raid, capture the visitation marking
-									DC_LoaTS_Helper.loadRaid(raidLinks.pop(), iframe_options, lrib, 
-										function(oldState, newState){
-											if (RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED)) {
-												autoLoadCounter.completed++;
-											}
-											else if (RaidManager.STATE.equals(oldState, RaidManager.STATE.VISITED)) {
-												autoLoadCounter.visited++;
-											}
-											else {
-												autoLoadCounter.loaded++;
-											}
-											
-											if (raidLinks.length === 0 && autoLoadCounter.isValid() && !autoLoadCounter.reported) {
-												// Calculate how long it took to load them all
-												var endTime = new Date()/1;
-												var took = (endTime - startTime)/1000;
-												holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " complete! " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
-											}
-										}
-									);
-									
-									// If there are any links left, we'll need to continue loading them
-									if (raidLinks.length > 0)
-									{
-										// Fire the loader again after a while
-										// Loading in Background
-										if (lrib) {
-											DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, lribDelay);
-										}
-										// Loading in Foreground
-										else {
-											DC_LoaTS_Helper.autoLoaderTimeout = setTimeout(__autoload, lrDelay);
-										}
-									}
-								}
-								else
-								{
-									// Calculate how long it took to load them all
-									var endTime = new Date()/1;
-									var took = (endTime - startTime)/1000;
-									holodeck.activeDialogue().raidBotMessage("AutoLoad of " + raidFilter.toString() + " ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
-								}
-							}
-							
 							ret.success = true;
 							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
-
-							// Kick off the auto loading
-							DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 500), raidLinks: raidLinks};
 							
+							DC_LoaTS_Helper.loadAll(raidLinks);
 						}
 						else
 						{
@@ -8204,7 +8157,7 @@ DC_LoaTS_Helper.raids =
 						DC_LoaTS_Helper.ajax({
 											  url: DC_LoaTS_Properties.joinRaidURL + "?" + collapsedOptions,
 											  method: "GET",
-											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(undefined, raidLink, currentState, callback)
+											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink, currentState, callback)
 						});
 					}
 					else	
@@ -8216,7 +8169,7 @@ DC_LoaTS_Helper.raids =
 						$('gameiframe').contentWindow.location.replace(DC_LoaTS_Properties.kongLoaTSURL + "?" + Object.toQueryString(iframe_options));
 						
 						if (typeof callback === "function") {
-							callback.call(undefined, currentState, newState);
+							callback.call(this, currentState, newState);
 						}
 					}
 				}
@@ -8240,10 +8193,15 @@ DC_LoaTS_Helper.raids =
 		};
 		
 		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, oldState, callback, response)
-		{			
+		{
+			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(response.responseText)[1].trim();
+			DCDebug("Ajax Raid Join Message: ", raidJoinMessage);
+			
+			
 			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
+				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 				if (typeof callback === "function") {
 					callback.call(this, oldState, RaidManager.STATE.VISITED);
 				}
@@ -8264,6 +8222,83 @@ DC_LoaTS_Helper.raids =
 					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.COMPLETED);
 				}
 			}
+		};
+		
+		DC_LoaTS_Helper.loadAll = function(raidLinks) {
+			// Private variable to be closed over in the autoLoader
+			var autoLoadCounter = {
+					attempted: 0, 
+					loaded: 0, 
+					visited: 0, 
+					completed: 0, 
+					reported: false,
+					isValid: function() {return this.loaded + this.visited + this.completed == this.attempted;},
+					getReport: function() {this.reported = true; return "Loaded: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
+			};
+			var startTime = new Date()/1;
+			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 500);
+			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
+			var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
+
+			// Create function closure to be called repeatedly
+			var autoLoader = function __autoload()
+			{
+				// This shouldn't be called without links, but just in case
+				if (raidLinks.length > 0)
+				{
+					// Keep track of how many we've tried to load
+					autoLoadCounter.attempted++;
+					
+					// Load the next raid, capture the visitation marking
+					DC_LoaTS_Helper.loadRaid(raidLinks.pop(), iframe_options, lrib, 
+						function(oldState, newState){
+							if (RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED)) {
+								autoLoadCounter.completed++;
+							}
+							else if (RaidManager.STATE.equals(oldState, RaidManager.STATE.VISITED)) {
+								autoLoadCounter.visited++;
+							}
+							else {
+								autoLoadCounter.loaded++;
+							}
+							
+							if (raidLinks.length === 0 && autoLoadCounter.isValid() && !autoLoadCounter.reported) {
+								// Calculate how long it took to load them all
+								var endTime = new Date()/1;
+								var took = (endTime - startTime)/1000;
+								holodeck.activeDialogue().raidBotMessage("Loading Complete! " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
+							}
+						}
+					);
+					
+					// If there are any links left, we'll need to continue loading them
+					if (raidLinks.length > 0)
+					{
+						// Fire the loader again after a while
+						// Loading in Background
+						if (lrib) {
+							DC_LoaTS_Helper.autoLoader.timeout = setTimeout(__autoload, lribDelay);
+						}
+						// Loading in Foreground
+						else {
+							DC_LoaTS_Helper.autoLoader.timeout = setTimeout(__autoload, lrDelay);
+						}
+					}
+				}
+				else
+				{
+					// Calculate how long it took to load them all
+					var endTime = new Date()/1;
+					var took = (endTime - startTime)/1000;
+					holodeck.activeDialogue().raidBotMessage("Load ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
+				}
+			}
+			
+
+			// Kick off the auto loading
+			DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 500), raidLinks: raidLinks};
+			
 		};
 		
 		DC_LoaTS_Helper.reload = function()
@@ -8300,9 +8335,9 @@ DC_LoaTS_Helper.raids =
 			// Find all the styles matching this filter
 			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
 
-			console.log("matchingStyles[" + parser.raidFilter.toString() + "]", matchingStyles);
+			//console.log("matchingStyles[" + parser.raidFilter.toString() + "]", matchingStyles);
 			
-			console.log("Ignore: ", ignore);
+			//console.log("Ignore: ", ignore);
 			if (ignore === true) {
 				// Does the hide visited style already exist?
 				// - If yes, make sure it's enabled
@@ -8319,7 +8354,7 @@ DC_LoaTS_Helper.raids =
 				{
 					var found = false;
 					for (var i = 0; i < matchingStyles.length; i++) {
-						console.log("Comparing keys", parser.raidFilter.getKey(), matchingStyles[i].raidFilter.getKey());
+						//console.log("Comparing keys", parser.raidFilter.getKey(), matchingStyles[i].raidFilter.getKey());
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							found = true;
 							break;
@@ -8344,8 +8379,6 @@ DC_LoaTS_Helper.raids =
 					}
 				}
 			}
-			
-			
 			
 			DC_LoaTS_Helper.updatePostedLinks();
 		}
