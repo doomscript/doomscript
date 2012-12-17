@@ -59,8 +59,8 @@
 				}
 				
 				this.css += nativeCSS;
-				console.log("CSS: ");
-				console.log(this.css);
+//				console.log("CSS: ");
+//				console.log(this.css);
 			},
 			
 			toString: function()

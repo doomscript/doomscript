@@ -621,6 +621,11 @@ function main()
 					// Only pass the message along if it wasn't a /w RaidBot and it's not a command and we're not ignoring this message by preference
 					return !raidBotWhisper && chatCommandResult && !ignoredByPreference;
 				}; // End Replacement displayUnsanitizedMessage
+				
+				
+				// Make sure the ignore visited thing is working
+				// TODO: If we ever do more of these, make a framework for it, or something
+				DC_LoaTS_Helper.handleIgnoreVisitedRaids();
 		    } // End initialize
 	    });	
 	    
@@ -707,7 +712,7 @@ function main()
 	    		console.warn(ex);
 	    	}
 	    	
-	    	return ret || defaultValue;
+	    	return (typeof ret !== "undefined") ? ret : defaultValue;
 	    }
 	    
 	    // Store a preference value into storage
@@ -4085,8 +4090,8 @@ function main()
 				}
 				
 				this.css += nativeCSS;
-				console.log("CSS: ");
-				console.log(this.css);
+//				console.log("CSS: ");
+//				console.log(this.css);
 			},
 			
 			toString: function()
@@ -6244,46 +6249,47 @@ RaidCommand
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {};
+					var ret = {success: true};
 					
-					if (typeof parser == "undefined")
+					// Run through each filter, they can be handled totally uniquely
+					for (var i = 0; i < parser.filters.length; i++)
 					{
-						console.error("WTF?");
-						return;
-					}
-					
-					// If this was a valid filter
-					if (parser.isValid())
-					{
-						// Find the matching raid types
-						var matchedTypes = DC_LoaTS_Helper.getRaidTypes(parser);
+						var filter = parser.filters[i];
 						
-						// If we matched some raid types
-						if (matchedTypes.length > 0)
+						// If this was a valid filter
+						if (filter.isValid())
 						{
-							for (var i = 0; i < matchedTypes.length; i++)
+							// Find the matching raid types
+							var matchedTypes = DC_LoaTS_Helper.getRaidTypes(filter);
+							
+							// If we matched some raid types
+							if (matchedTypes.length > 0)
 							{
-								// Grab this raid
-								var raid = matchedTypes[i];
+								// Iterate over all the matched raid types
+								for (var j = 0; j < matchedTypes.length; j++)
+								{
+									// Grab this raid
+									var raid = matchedTypes[j];
+									
+									// Have the raid bot tell them 
+									deck.activeDialogue().raidBotMessage(raid.getVerboseText(filter.difficulty));
+								}
 								
-								// Have the raid bot tell them 
-								deck.activeDialogue().raidBotMessage(raid.getVerboseText(parser.difficulty));
+								ret.success = ret.success && true;
+							}
+							// If we didn't match a single raid
+							else
+							{
+								ret.success = ret.success && true;
+								ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.name + "</code>";
 							}
 							
-							ret.success = true;
 						}
-						// If we didn't match a single raid
 						else
 						{
-							ret.success = true;
-							ret.statusMessage = "Could not locate any raids matching <code>" + parser.name + "</code>";
+							ret.success = false;
+							ret.statusMessage = (i > 0?"\n":"") + "Did not understand filter: <code>" + filter.filterText + "</code>";
 						}
-						
-					}
-					else
-					{
-						ret.success = false;
-						ret.statusMessage = "Did not understand command: <code>" + text + "</code>";
 					}
 					
 					return ret;
@@ -8285,7 +8291,7 @@ DC_LoaTS_Helper.raids =
 		DC_LoaTS_Helper.handleIgnoreVisitedRaids = function(ignore) {
 			
 			if (typeof ignore === "undefined") {
-				ignore = DC_LoaTS_Helper.getPref("IgnoreVisitedRaids", false);
+				ignore = DC_LoaTS_Helper.getPref("HideVisitedRaids", false);
 			}
 			
 			// Parser style for the hiding of these raids
@@ -8294,6 +8300,9 @@ DC_LoaTS_Helper.raids =
 			// Find all the styles matching this filter
 			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
 
+			console.log("matchingStyles[" + parser.raidFilter.toString() + "]", matchingStyles);
+			
+			console.log("Ignore: ", ignore);
 			if (ignore === true) {
 				// Does the hide visited style already exist?
 				// - If yes, make sure it's enabled
@@ -8310,6 +8319,7 @@ DC_LoaTS_Helper.raids =
 				{
 					var found = false;
 					for (var i = 0; i < matchingStyles.length; i++) {
+						console.log("Comparing keys", parser.raidFilter.getKey(), matchingStyles[i].raidFilter.getKey());
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							found = true;
 							break;
@@ -9578,11 +9588,7 @@ DC_LoaTS_Helper.raids =
 			window._dc_loats_helper = new DC_LoaTS_Helper();
 			
 			// Update raid data
-			DC_LoaTS_Helper.updateRaidData();
-			
-			// Make sure the ignore visited thing is working
-			// TODO: If we ever do more of these, make a framework for it, or something
-			DC_LoaTS_Helper.handleIgnoreVisitedRaids();
+			DC_LoaTS_Helper.updateRaidData();			
     	}
     	
     	// Everything is done
