@@ -72,14 +72,14 @@
 							// Do not call the above handler function
 							doNotCallHandler: true,
 							// Actually let the browser load the link
-							followLink: true,
+							followLink: true
 						},
 						
 						// This option is just text. It doesn't do anything
 						otherOption: {
 							text: "Not clickable",
 							// Sets this option to do nothing
-							executable: false,
+							executable: false
 						},
 						
 						// This command actually runs the template command

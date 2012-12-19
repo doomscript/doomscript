@@ -27,22 +27,40 @@
 				/*public static STATE*/ 
 				valueOf: function(stateParam)
 				{
+					// Set up the cache for ids, if it's not already set up
+					if (!RaidManager.STATE.cacheById) {
+						RaidManager.STATE.cacheById = {};
+						for (var stateKey in this)
+						{
+							var item = this[stateKey];
+							// Ignore functions. Check for the state.id or state.text to equal the passed in value
+							if (item && item !== "function")
+							{
+								RaidManager.STATE.cacheById[item.id] = item;
+							}
+						}
+					}
+					
 					// State we found
 					var state;
 					
 					// If the parameter was a string
-					if (typeof stateParam == "string")
+					if (typeof stateParam === "string")
 					{
 						// lowercase it just in case
 						stateParam = stateParam.toLowerCase();
+					}
+					// Otherwise return from the id cache
+					else
+					{
+						return RaidManager.STATE.cacheById[stateParam];
 					}
 					
 					// Iterate over all valid states
 					for (var stateKey in this)
 					{
 						// Ignore functions. Check for the state.id or state.text to equal the passed in value
-						if (typeof this[stateKey] != "function"
-							&& typeof this[stateKey] != "undefined" 
+						if (this[stateKey] && typeof this[stateKey] !== "function"
 							&& (this[stateKey].id == stateParam || this[stateKey].text == stateParam)
 						   )
 						{
@@ -50,10 +68,9 @@
 							state = this[stateKey];
 							break;
 						}
-						else if (typeof this[stateKey] == "undefined")
+						else if (typeof this[stateKey] === "undefined")
 						{
-							console.warn("Invalid State:");
-							console.warn(stateKey);
+							console.warn("Invalid State:", stateKey);
 						}
 					}
 					
@@ -230,7 +247,7 @@
 			// Store a raid link and the state of the link
 			// RaidManager.raidStorage is a write-through cache, and the storage is volatile
 			// So we have to look up the storage every time we store. This keeps us in sync with
-			// other windows of the same browser running the game simulataneously
+			// other windows of the same browser running the game simultaneously
 			/*public static void*/
 			store: function(raidLink, state)
 			{
@@ -363,6 +380,146 @@
 				}
 				
 				Timer.stop("store");
+			},
+			
+			// Store a list of raid links and the state of the links
+			// RaidManager.raidStorage is a write-through cache, and the storage is volatile
+			// So we have to look up the storage every time we store. This keeps us in sync with
+			// other windows of the same browser running the game simultaneously
+			/*public static void*/
+			storeBulk: function(raidLinks, state)
+			{
+				Timer.start("store bulk");
+
+				Timer.start("store > loading hardRaidStorage");
+				
+				// Load up the storage object
+				var hardRaidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
+				Timer.stop("store > loading hardRaidStorage");
+			
+				// Capture all the valid links we're actually going to store
+				var outboundLinks = [];
+				
+				for (var i = 0; i < raidLinks.length; i++) {
+					
+					var raidLink = raidLinks[i];
+					
+					// Valid link?
+					if (raidLink.isValid()) {
+						
+						// Remember the valid ones
+						outboundLinks.push(raidLink);
+					
+						// Attempt to load the passed in raid link
+						var raidData = hardRaidStorage[raidLink.getUniqueKey()];
+						
+						// Lookup the current state
+						var currentState;
+						var containedInLocalDB = true;
+						if (typeof raidData != "undefined")
+						{
+							// If there is a stateId, use that first
+							if (typeof raidData.stateId != "undefined")
+							{
+								currentState = RaidManager.STATE.valueOf(raidData.stateId);
+							}
+							// If there is an old-style state, use that second
+							else if (typeof raidData.state != "undefined")
+							{
+								currentState = RaidManager.STATE.valueOf(raidData.state.text);
+							}
+						}
+						
+						// If we couldn't find the current state, set it to UNSEEN
+						if (typeof currentState === "undefined")
+						{
+							currentState = RaidManager.STATE.UNSEEN;
+							containedInLocalDB = false;
+						}
+						
+						// If we weren't provided a state param, set it to the current state
+						if (typeof state === "undefined")
+						{
+							state = currentState;
+						}
+						
+						// Keep track of whether or not this link needs to be updated elsewhere
+						var shouldUpdateAllLinks = false;
+						
+						// If we've never seen this link before
+						if (!raidData)
+						{
+							// Create a new storage container for it, and wrap it
+							raidData = {raidLink: raidLink, stateId: state.id, firstSeen: new Date()/1}
+							
+							// Place this object into the storage
+							hardRaidStorage[raidLink.getUniqueKey()] = raidData;						
+						}
+						// Two unseens upgrade to seen if the link was already in the DB
+						else if (containedInLocalDB
+								 &&
+									RaidManager.STATE.equals(state, RaidManager.STATE.UNSEEN)
+									&& 
+									RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)
+								 )
+						{
+						        // Set the new state
+						        raidData.stateId = RaidManager.STATE.SEEN.id;
+						       
+						        // Changed state
+						        shouldUpdateAllLinks = true;
+						}
+						// If we have seen this link before, change the links state if necessary
+						else if (!RaidManager.STATE.equals(currentState, state))
+						{
+							// Set the new state
+							raidData.stateId = state.id;
+							
+							// Since we changed state, need to update all those links
+							shouldUpdateAllLinks = true;
+						}
+						else
+						{
+							// Just double check to make sure the state id has been set
+							// Helps convert old states to new ones
+							raidData.stateId = currentState.id;
+						}
+												
+						// Update the lastSeen time of the link
+						raidData.lastSeen = new Date()/1;
+					}
+				} // End for iterating over the links
+				
+				Timer.start("store > storing hardRaidStorage");
+				// Store the storage data back into the browser storage
+				GM_setValue(DC_LoaTS_Properties.storage.raidStorage, JSON.stringify(hardRaidStorage));
+				Timer.stop("store > storing hardRaidStorage");
+				
+				Timer.start("store > extending raid links");
+				//TODO Work around this (update: not really that big of a deal based on timer data)
+				// Must have the methods attached to the objects
+				for (var key in hardRaidStorage)
+				{
+					// If we're missing methods, add them
+					if (typeof hardRaidStorage[key].raidLink.getRaid !== "function")
+					{
+						Object.extend(hardRaidStorage[key].raidLink, RaidLink.prototype);		
+					}
+				}
+				Timer.stop("store > extending raid links");
+				
+				// Update the cache
+				RaidManager.raidStorage = hardRaidStorage;
+				
+				// If we found a reason to update some links
+				if (shouldUpdateAllLinks)
+				{
+					// Update the posted links
+					DC_LoaTS_Helper.updatePostedLinks();
+				}
+				Timer.stop("store bulk");
+				
+				return outboundLinks;
 			},
 			
 			// Lookup RaidData for a given link

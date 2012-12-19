@@ -448,6 +448,10 @@
 				rulesText += "\tcolor:#B84EFE;\n";
 				rulesText += "}\n";
 				
+				rulesText += "\na.hidden {\n";
+				rulesText += "\tdisplay: none;\n";
+				rulesText += "}\n";
+				
 				
 				rulesText += "\n.DataDumpTab-Data {\n";
 				rulesText += "\twidth: 100%;\n";
@@ -539,7 +543,7 @@
 			{
 				holodeck.activeDialogue().displayUnsanitizedMessage("RaidBot",
 														 	message.replace(/\n/g, "<br />\n"),
-														 	{class: "whisper received_whisper"},
+														 	{"class": "whisper received_whisper"},
 															{non_user: true} 
 														   );
 			}

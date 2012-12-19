@@ -404,7 +404,7 @@ function main()
 						var raidLink = new RaidLink(msg);
 						
 						// Alliance Invite Link
-						var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)kv_fbuid=kong_([^<"']+)/i;
+						var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)?kv_fbuid=kong_([^<"']+)/i;
 						
 						var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance?</a>";
 						
@@ -851,46 +851,6 @@ function main()
 	DC_LoaTS_Helper.raidStyles = {};
 
 		/************************************/
-		/** PasteBinLinkParsingFilter Class */
-		/************************************/
-		
-		window.PasteBinLinkParsingFilter = Class.create({
-			initialize: function(params)
-			{
-				var paramsClean = params.trim().replace(/\s+/g, " ");
-				var indexOfSpace = paramsClean.indexOf(" ");
-				var pastebinURL = paramsClean.substring(0, indexOfSpace > 0 ? indexOfSpace : paramsClean.length);
-				if (PasteBinLinkParsingFilter.pastebinPattern.test(pastebinURL))
-				{
-					this.pastebinURL = pastebinURL;
-				}
-				if (indexOfSpace > 0)
-				{
-					this.raidFilter = new RaidMultiFilter(paramsClean.substring(indexOfSpace))
-				}
-			},
-			getPasteLink: function()
-			{
-				return "<a href=\"" + this.pastebinURL + "\" target=\"_blank\">" + this.pastebinURL + "</a>";
-			},
-			
-			isValid: function()
-			{
-				return typeof this.pastebinURL !== "undefined";
-			}
-		});
-		
-		// Parameter text for this parser
-		PasteBinLinkParsingFilter.paramText = "pastebinURL [raidFilter]";
-		
-		// Pattern to match pastebin links
-		PasteBinLinkParsingFilter.pastebinPattern = /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i;
-		
-		// Where to get raw pastebin data
-		PasteBinLinkParsingFilter.rawBase = "http://pastebin.com/raw.php?i=";
-
-		
-		/************************************/
 		/********* RaidButton Class *********/
 		/************************************/
 		
@@ -941,14 +901,11 @@ function main()
 				this.commandText = commandText;
 				this.processedText = this.commandText;
 				
-				DCDebug("processing text: " + this.processedText);
 				if (this.processedText.charAt(0) == '/')
 				{
 					this.processedText = this.processedText.substring(1);
 				}
-				
-				DCDebug("Checking " + this.processedText.toLowerCase() + " for " + this.getName() + " result: "  + this.processedText.toLowerCase().indexOf(this.getName()));
-				
+								
 				// If the command was explicitly provided, we need to strip it
 				if (this.processedText.toLowerCase().indexOf(this.getName()) == 0)
 				{
@@ -972,26 +929,18 @@ function main()
 				// Reassemble the normalized commandText				
 				this.commandText = "/" + this.getName() + " " + this.processedText;
 				
-//				DCDebug("command text: \"" + this.commandText + "\"");
-//				DCDebug("processed text: \"" + this.processedText + "\"");
-				
 				// Check for help
 				if (this.processedText.toLowerCase() == "help")
 				{
-//					DCDebug("This command is for help.");
 					this.isHelp = true;
 				}
 				// Not a help command
 				else
 				{
-//					DCDebug("Parsing Class:");
-//					DCDebug(this.parsingClass);
 					// With the params, get the parser
 					if (typeof this.parsingClass != "undefined")
 					{
 						this.parser = new this.parsingClass(this.processedText);
-//						DCDebug("Parser:");
-//						DCDebug(this.parser);
 					}
 				}
 			},
@@ -1701,7 +1650,7 @@ function main()
 							case "name":
 								try {
 									// Dirty pi hacks. TODO: Do this better
-									var tmpName = (this.name.toLowerCase() === "pi")?"^pi_":this.name;
+									var tmpName = (this.name && this.name.toLowerCase() === "pi")?"^pi_":this.name;
 
 									// If the user's text matches this raid name
 									matched = matched && new RegExp(tmpName, "i").test(value);
@@ -2734,22 +2683,40 @@ function main()
 				/*public static STATE*/ 
 				valueOf: function(stateParam)
 				{
+					// Set up the cache for ids, if it's not already set up
+					if (!RaidManager.STATE.cacheById) {
+						RaidManager.STATE.cacheById = {};
+						for (var stateKey in this)
+						{
+							var item = this[stateKey];
+							// Ignore functions. Check for the state.id or state.text to equal the passed in value
+							if (item && item !== "function")
+							{
+								RaidManager.STATE.cacheById[item.id] = item;
+							}
+						}
+					}
+					
 					// State we found
 					var state;
 					
 					// If the parameter was a string
-					if (typeof stateParam == "string")
+					if (typeof stateParam === "string")
 					{
 						// lowercase it just in case
 						stateParam = stateParam.toLowerCase();
+					}
+					// Otherwise return from the id cache
+					else
+					{
+						return RaidManager.STATE.cacheById[stateParam];
 					}
 					
 					// Iterate over all valid states
 					for (var stateKey in this)
 					{
 						// Ignore functions. Check for the state.id or state.text to equal the passed in value
-						if (typeof this[stateKey] != "function"
-							&& typeof this[stateKey] != "undefined" 
+						if (this[stateKey] && typeof this[stateKey] !== "function"
 							&& (this[stateKey].id == stateParam || this[stateKey].text == stateParam)
 						   )
 						{
@@ -2757,10 +2724,9 @@ function main()
 							state = this[stateKey];
 							break;
 						}
-						else if (typeof this[stateKey] == "undefined")
+						else if (typeof this[stateKey] === "undefined")
 						{
-							console.warn("Invalid State:");
-							console.warn(stateKey);
+							console.warn("Invalid State:", stateKey);
 						}
 					}
 					
@@ -2937,7 +2903,7 @@ function main()
 			// Store a raid link and the state of the link
 			// RaidManager.raidStorage is a write-through cache, and the storage is volatile
 			// So we have to look up the storage every time we store. This keeps us in sync with
-			// other windows of the same browser running the game simulataneously
+			// other windows of the same browser running the game simultaneously
 			/*public static void*/
 			store: function(raidLink, state)
 			{
@@ -3070,6 +3036,146 @@ function main()
 				}
 				
 				Timer.stop("store");
+			},
+			
+			// Store a list of raid links and the state of the links
+			// RaidManager.raidStorage is a write-through cache, and the storage is volatile
+			// So we have to look up the storage every time we store. This keeps us in sync with
+			// other windows of the same browser running the game simultaneously
+			/*public static void*/
+			storeBulk: function(raidLinks, state)
+			{
+				Timer.start("store bulk");
+
+				Timer.start("store > loading hardRaidStorage");
+				
+				// Load up the storage object
+				var hardRaidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
+				Timer.stop("store > loading hardRaidStorage");
+			
+				// Capture all the valid links we're actually going to store
+				var outboundLinks = [];
+				
+				for (var i = 0; i < raidLinks.length; i++) {
+					
+					var raidLink = raidLinks[i];
+					
+					// Valid link?
+					if (raidLink.isValid()) {
+						
+						// Remember the valid ones
+						outboundLinks.push(raidLink);
+					
+						// Attempt to load the passed in raid link
+						var raidData = hardRaidStorage[raidLink.getUniqueKey()];
+						
+						// Lookup the current state
+						var currentState;
+						var containedInLocalDB = true;
+						if (typeof raidData != "undefined")
+						{
+							// If there is a stateId, use that first
+							if (typeof raidData.stateId != "undefined")
+							{
+								currentState = RaidManager.STATE.valueOf(raidData.stateId);
+							}
+							// If there is an old-style state, use that second
+							else if (typeof raidData.state != "undefined")
+							{
+								currentState = RaidManager.STATE.valueOf(raidData.state.text);
+							}
+						}
+						
+						// If we couldn't find the current state, set it to UNSEEN
+						if (typeof currentState === "undefined")
+						{
+							currentState = RaidManager.STATE.UNSEEN;
+							containedInLocalDB = false;
+						}
+						
+						// If we weren't provided a state param, set it to the current state
+						if (typeof state === "undefined")
+						{
+							state = currentState;
+						}
+						
+						// Keep track of whether or not this link needs to be updated elsewhere
+						var shouldUpdateAllLinks = false;
+						
+						// If we've never seen this link before
+						if (!raidData)
+						{
+							// Create a new storage container for it, and wrap it
+							raidData = {raidLink: raidLink, stateId: state.id, firstSeen: new Date()/1}
+							
+							// Place this object into the storage
+							hardRaidStorage[raidLink.getUniqueKey()] = raidData;						
+						}
+						// Two unseens upgrade to seen if the link was already in the DB
+						else if (containedInLocalDB
+								 &&
+									RaidManager.STATE.equals(state, RaidManager.STATE.UNSEEN)
+									&& 
+									RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)
+								 )
+						{
+						        // Set the new state
+						        raidData.stateId = RaidManager.STATE.SEEN.id;
+						       
+						        // Changed state
+						        shouldUpdateAllLinks = true;
+						}
+						// If we have seen this link before, change the links state if necessary
+						else if (!RaidManager.STATE.equals(currentState, state))
+						{
+							// Set the new state
+							raidData.stateId = state.id;
+							
+							// Since we changed state, need to update all those links
+							shouldUpdateAllLinks = true;
+						}
+						else
+						{
+							// Just double check to make sure the state id has been set
+							// Helps convert old states to new ones
+							raidData.stateId = currentState.id;
+						}
+												
+						// Update the lastSeen time of the link
+						raidData.lastSeen = new Date()/1;
+					}
+				} // End for iterating over the links
+				
+				Timer.start("store > storing hardRaidStorage");
+				// Store the storage data back into the browser storage
+				GM_setValue(DC_LoaTS_Properties.storage.raidStorage, JSON.stringify(hardRaidStorage));
+				Timer.stop("store > storing hardRaidStorage");
+				
+				Timer.start("store > extending raid links");
+				//TODO Work around this (update: not really that big of a deal based on timer data)
+				// Must have the methods attached to the objects
+				for (var key in hardRaidStorage)
+				{
+					// If we're missing methods, add them
+					if (typeof hardRaidStorage[key].raidLink.getRaid !== "function")
+					{
+						Object.extend(hardRaidStorage[key].raidLink, RaidLink.prototype);		
+					}
+				}
+				Timer.stop("store > extending raid links");
+				
+				// Update the cache
+				RaidManager.raidStorage = hardRaidStorage;
+				
+				// If we found a reason to update some links
+				if (shouldUpdateAllLinks)
+				{
+					// Update the posted links
+					DC_LoaTS_Helper.updatePostedLinks();
+				}
+				Timer.stop("store bulk");
+				
+				return outboundLinks;
 			},
 			
 			// Lookup RaidData for a given link
@@ -4878,6 +4984,87 @@ function main()
 		};
 
 		/************************************/
+		/** UrlParsingFilter Class */
+		/************************************/
+		
+		window.UrlParsingFilter = Class.create({
+			initialize: function(params)
+			{
+				// Capture input params
+				this.params = params;
+				
+				// Default to not forced and not cancelled
+				this.force = false;
+				this.cancel = false;
+				
+				// Type is other unless we match something specific
+				this.type = "other";
+				
+				// Break apart the params to find out what this filter is supposed to represent
+				var paramsParts = params.trim().replace(/\s+/g, " ").split(" ");
+				
+				// If we're supposed to force this filter
+				if (paramsParts[0] === "force" || paramsParts[0] === "!") {
+					this.force = true;
+					this.url = paramsParts[1];
+					if (paramsParts[2]) {
+						this.raidFilter = new RaidMultiFilter(paramsParts.slice(2).join(" "));
+					}
+				}
+				// If we're supposed to cancel this filter
+				else if (params.parts[0] === "cancel") {
+					this.cancel = true;
+				}
+				// Neither forced nor cancelled, just a URL and maybe a RaidFilter
+				else {
+					this.url = params.parts[0];
+					if (paramsParts[1]) {
+						this.raidFilter = new RaidMultiFilter(paramsParts.slice(1).join(" "));
+					}
+				}
+				
+				// Does this match the url of any service we already know about? Assume not
+				this.known = false;
+				
+				var match;
+				// Try the various urls that this parser knows about
+				// Even if we're forcing it, we still need to run this to resolve the regexMatch
+				for (var type in UrlParsingFilter.urlPatterns) {
+					if ((match = UrlParsingFilter.urlPatterns[type].exec(this.url)) !== null) {
+						this.known = true;
+						this.type = type;
+						this.regexMatch = match;
+						break;
+					}
+				}
+			},
+			getUrlLink: function()
+			{
+				return "<a href=\"" + this.getWorkingUrl() + "\" target=\"_blank\">" + this.getWorkingUrl() + "</a>";
+			},
+			
+			getWorkingUrl: function ()
+			{
+				return this.convertedUrl || this.url;
+			},
+			
+			// It's valid if it provides a url or is a cancel
+			isValid: function()
+			{
+				return this.getWorkingUrl() || this.cancel;
+			}
+		});
+		
+		// Parameter text for this parser
+		UrlParsingFilter.paramText = "url [raidFilter]";
+		
+		// Pattern to match different link types
+		UrlParsingFilter.urlPatterns = {
+				"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
+				"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
+			};		
+		
+		/************************************/
 		/********** Formatting Tab **********/
 		/************************************/
 		
@@ -5725,6 +5912,56 @@ function main()
 			}
 		);
 		
+		
+		// Fetch raids command
+		RaidCommand.create( 
+			{
+				commandName: "fetchraids",
+				aliases: ["fetch", "fr"],
+				parsingClass: UrlParsingFilter,
+				
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: parser.known || parser.force};
+						
+					if (ret.success) {
+						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
+					}
+					else {
+						if (!parser.known) {
+							ret.statusMessage = parser.url + " is not from a known raid host. Are you sure you wish to fetch from there? " + DC_LoaTS_Helper.getCommandLink("/fetchraids force " + params);
+						}
+						else {
+							ret.statusMessage = "Could not find a url in <code>" + text + "</code>";
+						}
+					}
+					return ret;
+				},
+							
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Load raids from: " + this.parser.getWorkingUrl()
+						}
+					};
+					
+					return commandOptions;
+				},
+				
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/fetchraids url</code>\n";
+					helpText += "where <code>url</code> is the url of a raid host of some kind\n";
+					helpText += "\n";
+					helpText += "Loads all raids from the url, or whichever ones match the filter\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
 		RaidCommand.create( 
 			{
 				commandName: "linkstate",
@@ -5802,7 +6039,7 @@ function main()
 						initialText: {
 							text: "Mark this " + linkState.niceText + " " + this.parser.getName(),
 							executable: false
-						},
+						}
 					};
 					
 					for (var stateType in RaidManager.STATE)
@@ -5812,10 +6049,6 @@ function main()
 							commandOptions["mark_" + stateType.toLowerCase()] = this.createStateOption(RaidManager.STATE[stateType]);
 						}
 					}
-					
-					DCDebug("Command Options: ");
-					DCDebug(commandOptions);
-
 					
 					return commandOptions;
 				},
@@ -5894,171 +6127,96 @@ function main()
 		);
 		
 		
-		DC_LoaTS_Helper.bulkRaids = {};
+		// Load CConoly command
 		RaidCommand.create( 
 			{
-				commandName: "loadpastebin",
-				aliases: ["loadpaste", "loadbin", "lpb", "loadraidbin", "lrb"],
-				parsingClass: PasteBinLinkParsingFilter,
+				commandName: "loadcconoly",
+				aliases: ["loadcc", "lcc", "cconoly", "cc", "loadcconolyraids", "loadccraids"],
+				// No predefined parsing
+				// parsingClass: none,
+				
+				cconolyUrl: "http://cconoly.com/lots/raidlinks.php",
+				
 				handler: function(deck, parser, params, text, context)
 				{
+					if (params === "cancel") {
+						parser = new UrlParsingFilter("cancel");
+					}
+					else {
+						parser = new UrlParsingFilter(this.cconolyUrl + " " + sparams);
+					}
+					
 					// Declare ret object
-					var ret = {};
-					
-					var isCancelled = params === "cancel";
-					
-					// Cancel the previous timer, if there is one
-					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined" || isCancelled)
-					{
-						// Clear out the raidLinks array from the previous one.
-						// The timeout will detect that there are suddenly no more links
-						// and acknowledge the error state and quit.
-						DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
-					}
-
-					this.commandStartTime = new Date()/1;
+					var ret = {success: parser.type === "cconoly"};
 						
-					ret.success = parser.isValid();
-					
-					if (ret.success)
-					{
-						var match = PasteBinLinkParsingFilter.pastebinPattern.exec(parser.pastebinURL);
-						DC_LoaTS_Helper.ajax({
-							url: PasteBinLinkParsingFilter.rawBase + match[1],
-							onload: this.receiveAjax.bind(this),
-							});
-							
-						ret.statusMessage = "Downloading data from " + parser.getPasteLink() + ". Please wait...";
+					if (ret.success) {
+						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
-						
+					else {
+						ret.statusMessage = "Error processing command <code>" + text + "</code>";
+					}
 					return ret;
 				},
 							
-				receiveAjax: function(response)
-				{
-					DCDebug("Got back pastebin data", response);
-					if (response.status === 200) // Must be OK because even other 200 codes won't have our data
-					{
-						var text = response.responseText,
-						    matchedRaidsList = [],
-						    notMatchedRaidsList = [],
-						    binData = {},
-						    match,
-						    regex = new RegExp(RaidLink.linkPattern.source, "gi"), // Prevent weird JS regex caching/lastIndex issues
-						    hasRaidFilter = typeof this.parser.raidFilter !== "undefined";
-						    
-						while ((match = regex.exec(text)) !== null)
-						{
-							var raidLink = new RaidLink(match[0]);
-							if (raidLink.isValid())
-							{
-								var thisBin = binData[raidLink.getRaid().shortName];
-								if (!thisBin){
-									thisBin = {};
-									binData[raidLink.getRaid().shortName] = thisBin;
-								}
-								var thisBinRaids = thisBin[raidLink.difficulty];
-								if (!thisBinRaids){
-									thisBinRaids = [];
-									thisBin[raidLink.difficulty] = thisBinRaids;
-								}
-								thisBinRaids.push(raidLink);
-
-								
-								if (hasRaidFilter)
-								{
-									var raidData = RaidManager.fetch(raidLink);
-									var currentState = raidData ? RaidManager.STATE.valueOf(raidData.stateId) || RaidManager.STATE.UNSEEN;
-
-									
-									if (this.parser.raidFilter.matches(
-											{
-												age: (raidData && raidData.firstSeen)? this.commandStartTime - raidData.firstSeen : 0,
-												difficulty: raidLink.difficulty,
-												fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
-												name: raidLink.getRaid().getSearchableName(),
-												state: currentState,
-												count: matchedRaidsList.length
-											}
-									))
-									{
-										matchedRaidsList.push(raidLink);
-									}
-									else 
-									{
-										notMatchedRaidsList.push(raidLink);
-									}
-								}
-								else 
-								{
-									matchedRaidsList.push(raidLink);
-								}
-							}
-						} // End while(regex)
-						
-						var str = "Found " + matchedRaidsList.length + " raids in " + this.parser.getPasteLink();
-						
-						if (hasRaidFilter)
-						{
-							str += " matching filter " + this.parser.raidFilter.toString();
-						}
-						
-						var binUUID = DC_LoaTS_Helper.generateUUID();
-						var binBreakdown = "\n<a href='#' onclick='$(\"" + binUUID + "\").toggleClassName(\"hidden\"); return false;'>Toggle Bin Data</a>";
-						binBreakdown += "\n<span id='" + binUUID + "' class='hidden'>";
-						binBreakdown += "\nTotal Raids: " + (matchedRaidsList.length + notMatchedRaidsList.length);
-						for (var shortName in binData) {
-							for (var diff = 1; diff < 5; diff++) {
-								var raids = binData[shortName][diff];
-								if (raids && raids.length) {
-									binBreakdown += "\n" + RaidType.shortDifficulty[diff] + " " + shortName + " - " + raids.length;
-								}
-							}
-						}
-						
-						binBreakdown += "</span>";
-						
-						str += binBreakdown;
-						
-						// Store all the raids we're not going to visit
-						for (var i = 0; i < notMatchedRaidsList.length; i++) {
-							RaidManager.store(notMatchedRaidsList[i]);
-						}
-						
-						
-						str += "\nBin fatched and parsed in " + (new Date()/1 - this.commandStartTime) + " ms.";
-						
-						if (matchedRaidsList.length) {
-							str += "\n\nStarting to load " + matchedRaidsList.length + " raids. " + this.getCommandLink("/loadpastebin cancel", "Cancel?");
-							
-							DC_LoaTS_Helper.loadAll(matchedRaidsList);
-						}
-						
-						holodeck.activeDialogue().raidBotMessage(str);
-						
-					}
-					else if (response.status === 404)
-					{
-						holodeck.activeDialogue().raidBotMessage("Pastebin could not locate a valid paste at " + this.parser.getPasteLink());
-					}
-					else if (response.status >= 500 && response.status < 600)
-					{
-						holodeck.activeDialogue().raidBotMessage("Pastebin is having server trouble trying to load " + this.parser.getPasteLink() 
-						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
-					}
-					else 
-					{
-						holodeck.activeDialogue().raidBotMessage("Trouble loading " + this.parser.getPasteLink() 
-						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
-					}
-				},			
-
 				getOptions: function()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Load bin raids from: " + this.parser.getPastebinURL()
-						},
+							text: "Load cconoly raids"
+						}
+					};
+					
+					return commandOptions;
+				},
+				
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/loadcconoly</code>\n";
+					helpText += "\n";
+					helpText += "Loads raids from CConoly, or whichever ones match the filter\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		
+			// Load Pastebin command
+		RaidCommand.create( 
+			{
+				commandName: "loadpastebin",
+				aliases: ["loadpaste", "loadbin", "lpb", "loadraidbin", "lrb"],
+				parsingClass: UrlParsingFilter,
+				
+				pastebinRawBase: "http://pastebin.com/raw.php?i=",
+				
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: parser.type === "pastebin"};
+						
+					if (ret.success) {
+						// Make sure to convert to the better url
+						parser.convertedURL = this.pastebinRawBase + parser.regexMatch[1];
+						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
+					}
+					else {
+						if (parser.getWorkingUrl()) {
+							ret.statusMessage = parser.url + " does not appear to be a pastebin link. Try " + DC_LoaTS_Helper.getCommandLink("/fetchraids " + params);
+						}
+						else {
+							ret.statusMessage = "Could not find a pastebin link in <code>" + text + "</code>";
+						}
+					}
+					return ret;
+				},
+							
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Load bin raids from: " + this.parser.getWorkingUrl()
+						}
 					};
 					
 					return commandOptions;
@@ -6097,7 +6255,7 @@ function main()
 					var commandOptions = {					
 						initialText: {
 							text: "Load raid: " + this.parser.getDifficultyText() + " " + this.parser.getName()
-						},
+						}
 					};
 					
 					return commandOptions;
@@ -6148,8 +6306,8 @@ function main()
 				{					
 					var commandOptions = {					
 						initialText: {
-							text: "Mark all " + this.parser.filterText + " as " + this.parser.stateText,
-						},
+							text: "Mark all " + this.parser.filterText + " as " + this.parser.stateText
+						}
 					};
 					
 
@@ -6265,7 +6423,7 @@ RaidCommand
 		RaidCommand.create( 
 			{
 				commandName: "raid",
-				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis"],
+				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis", "rai", "fs", "os"],
 				parsingClass: RaidMultiFilter,
 				
 				// Doesn't use all the filter params
@@ -6324,7 +6482,7 @@ RaidCommand
 					var commandOptions = {					
 						initialText: {
 							text: "Raid Info for: " + this.parser.name,
-							executable: false,
+							executable: false
 						},
 						all: {
 							text: "All",
@@ -6332,7 +6490,7 @@ RaidCommand
 							{
 								DCDebug("Info All " + this.parser.name);
 								delete this.parser.difficulty;
-							},
+							}
 						},
 						
 						normal: {
@@ -6341,7 +6499,7 @@ RaidCommand
 							{
 								DCDebug("Info Normal " + this.parser.name);
 								this.parser.difficulty = 1;
-							},
+							}
 						},
 						
 						hard: {
@@ -6350,7 +6508,7 @@ RaidCommand
 							{
 								DCDebug("Info Hard " + this.parser.name);
 								this.parser.difficulty = 2;
-							},
+							}
 						},
 						
 						legendary: {
@@ -6359,7 +6517,7 @@ RaidCommand
 							{
 								DCDebug("Info Legendary " + this.parser.name);
 								this.parser.difficulty = 3;
-							},
+							}
 						},
 						
 						nightmare: {
@@ -6848,7 +7006,7 @@ RaidCommand
 					var commandOptions = {
 						
 						initialText: {
-							text: "Seen raids: " + ((typeof this.parser.name != "undefined")?this.parser.name : "Unknown"),
+							text: "Seen raids: " + ((typeof this.parser.name != "undefined")?this.parser.name : "Unknown")
 						},
 						
 						any: {
@@ -6857,7 +7015,7 @@ RaidCommand
 							{
 								DCDebug("Seen Any " + this.parser.name);
 								delete this.parser.difficulty;
-							},
+							}
 						},
 						
 						normal: {
@@ -6866,7 +7024,7 @@ RaidCommand
 							{
 								DCDebug("Seen Normal " + this.parser.name);
 								this.parser.difficulty = 1;
-							},
+							}
 						},
 						
 						hard: {
@@ -6875,7 +7033,7 @@ RaidCommand
 							{
 								DCDebug("Seen Hard " + this.parser.name);
 								this.parser.difficulty = 2;
-							},
+							}
 						},
 						
 						legendary: {
@@ -6884,7 +7042,7 @@ RaidCommand
 							{
 								DCDebug("Seen Legendary " + this.parser.name);
 								this.parser.difficulty = 3;
-							},
+							}
 						},
 						
 						nightmare: {
@@ -7018,14 +7176,14 @@ RaidCommand
 							// Do not call the above handler function
 							doNotCallHandler: true,
 							// Actually let the browser load the link
-							followLink: true,
+							followLink: true
 						},
 						
 						// This option is just text. It doesn't do anything
 						otherOption: {
 							text: "Not clickable",
 							// Sets this option to do nothing
-							executable: false,
+							executable: false
 						},
 						
 						// This command actually runs the template command
@@ -7088,7 +7246,7 @@ RaidCommand
 				{
 					var commandOptions = {
 						config: {
-							refreshEvery: 1000,
+							refreshEvery: 1000
 						},
 						initialText: {
 							text: "Local Time: " + this.getLocalDateText() + "<br>Server Time: " + this.getServerDateText()
@@ -7333,8 +7491,8 @@ RaidCommand
 					//TODO: Better options here
 					var commandOptions = {					
 						initialText: {
-							text: "Load all raids matching the filter",
-						},
+							text: "Load all raids matching the filter"
+						}
 					};
 					
 					return commandOptions;
@@ -7375,8 +7533,8 @@ RaidCommand
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Print the timer report",
-						},
+							text: "Print the timer report"
+						}
 					};
 					
 					return commandOptions;
@@ -8032,7 +8190,7 @@ DC_LoaTS_Helper.raids =
 							api_paste_code: data,
 							api_paste_private: this.privacy.UNLISTED, 
 							api_paste_name: title,
-							api_paste_expire_date: this.duration.MONTH,
+							api_paste_expire_date: this.duration.MONTH
 					};
 
 
@@ -8224,7 +8382,168 @@ DC_LoaTS_Helper.raids =
 			}
 		};
 		
+		DC_LoaTS_Helper.fetchAndLoadRaids = function(urlParsingFilter) {
+			
+			if (typeof urlParsingFilter === "string") {
+				urlParsingFilter = new UrlParsingFilter(urlParsingFilter);
+			}
+						
+			// Cancel the previous timer, if there is one
+			if (typeof DC_LoaTS_Helper.autoLoader !== "undefined" || urlParsingFilter.cancel)
+			{
+				// Clear out the raidLinks array from the previous one.
+				// The timeout will detect that there are suddenly no more links
+				// and acknowledge the error state and quit.
+				DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+			}
+			var commandStartTime = new Date()/1;
+			
+			if (holodeck.activeDialogue()) {
+				holodeck.activeDialogue().raidBotMessage("Fetching raids from " + urlParsingFilter.getUrlLink() + ". Please wait...");
+			}
+			
+			// Run the download
+			DC_LoaTS_Helper.ajax({
+				url: urlParsingFilter.getWorkingUrl(),
+				onload: function(response) {
+					
+					DCDebug("Got back external raid data", response);
+					if (response.status === 200) // Must be OK because even other 200 codes won't have our data
+					{
+						var text = response.responseText,
+						    matchedRaidsList = [],
+						    notMatchedRaidsList = [],
+						    binData = {},
+						    match,
+						    regex = new RegExp(RaidLink.linkPattern.source, "gi"), // Prevent weird JS regex caching/lastIndex issues
+						    hasRaidFilter = typeof urlParsingFilter.raidFilter !== "undefined",
+						    raidFilter = urlParsingFilter.raidFilter;
+						
+						// Safety catchall to prevent infinite matching
+						var xx = 10000;
+						
+						Timer.start("Parsing External Raids");
+						while ((match = regex.exec(text)) && xx--)
+						{
+							var raidLink = new RaidLink(match[0]);
+							DCDebug("Found Link: " + raidLink);
+							if (raidLink.isValid())
+							{
+								var thisBin = binData[raidLink.getRaid().shortName];
+								if (!thisBin){
+									thisBin = {};
+									binData[raidLink.getRaid().shortName] = thisBin;
+								}
+								var thisBinRaids = thisBin[raidLink.difficulty];
+								if (!thisBinRaids){
+									thisBinRaids = [];
+									thisBin[raidLink.difficulty] = thisBinRaids;
+								}
+								thisBinRaids.push(raidLink);
+
+								
+								if (hasRaidFilter)
+								{
+									var matchCriteria = {
+										difficulty: raidLink.difficulty,
+										fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+										name: raidLink.getRaid().getSearchableName(),
+										count: matchedRaidsList.length
+									};
+
+									// Don't calculate age and state if we don't need them
+									if (raidFilter.state || raidFilter.age) {
+										var raidData = RaidManager.fetch(raidLink);
+										
+										if (raidFilter.age) {
+											var age = (raidData && raidData.firstSeen)? commandStartTime - raidData.firstSeen : 0;
+											matchCriteria.age = age;
+										}
+										if (raidFilter.state) {
+											var currentState = raidData ? RaidManager.STATE.valueOf(raidData.stateId) : RaidManager.STATE.UNSEEN;
+											matchCriteria.state = currentState;
+										}
+									}
+									
+									if (raidFilter.matches(matchCriteria))
+									{
+										matchedRaidsList.push(raidLink);
+									}
+									else 
+									{
+										notMatchedRaidsList.push(raidLink);
+									}
+								}
+								else 
+								{
+									matchedRaidsList.push(raidLink);
+								}
+							}
+						} // End while(regex)
+						Timer.stop("Parsing External Raids");
+
+						var str = "Fetched " + matchedRaidsList.length + " valid raids from " + urlParsingFilter.getUrlLink();
+						
+						if (hasRaidFilter)
+						{
+							str += " matching filter " + raidFilter.toString();
+						}
+						
+						var binUUID = DC_LoaTS_Helper.generateUUID();
+						var binBreakdown = "\n<a href='#' onclick='$(\"" + binUUID + "\").toggleClassName(\"hidden\"); return false;'>Toggle Results Data</a>";
+						binBreakdown += "\n<span id='" + binUUID + "' class='hidden'>";
+						binBreakdown += "\nTotal Raids: " + (matchedRaidsList.length + notMatchedRaidsList.length);
+						for (var shortName in binData) {
+							for (var diff = 1; diff < 5; diff++) {
+								var raids = binData[shortName][diff];
+								if (raids && raids.length) {
+									binBreakdown += "\n" + RaidType.shortDifficulty[diff] + " " + shortName + " - " + raids.length;
+								}
+							}
+						}
+						
+						binBreakdown += "</span>";
+						
+						str += binBreakdown;
+						
+						// Store all the raids we're not going to visit
+						RaidManager.storeBulk(notMatchedRaidsList);
+						
+						
+						str += "\nRaids fetched, parsed, and stored in " + (new Date()/1 - commandStartTime) + " ms.";
+						
+						if (matchedRaidsList.length) {
+							str += "\n\nStarting to load " + matchedRaidsList.length + " raids. " + DC_LoaTS_Helper.getCommandLink("/fetchraids cancel", "Cancel?");
+							
+							DC_LoaTS_Helper.loadAll(matchedRaidsList);
+						}
+						
+						holodeck.activeDialogue().raidBotMessage(str);
+						
+					}
+					else if (response.status === 404)
+					{
+						holodeck.activeDialogue().raidBotMessage("Pastebin could not locate a valid paste at " + urlParsingFilter.getUrlLink());
+					}
+					else if (response.status >= 500 && response.status < 600)
+					{
+						holodeck.activeDialogue().raidBotMessage("Pastebin is having server trouble trying to load " + urlParsingFilter.getUrlLink() 
+						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+					}
+					else 
+					{
+						holodeck.activeDialogue().raidBotMessage("Trouble loading " + urlParsingFilter.getUrlLink() 
+						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+					}
+				} // End onload function
+			});
+
+		}
+		
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
+			console.log("Load all", arguments);
+			return;
+			
 			// Private variable to be closed over in the autoLoader
 			var autoLoadCounter = {
 					attempted: 0, 
@@ -8330,12 +8649,10 @@ DC_LoaTS_Helper.raids =
 			}
 			
 			// Parser style for the hiding of these raids
-			var parser = new RaidFilterStyleParser("{state: visited}||{state: completed}||{state: ignored} ++none")
+			var parser = new RaidFilterStyleParser("{state: visited}||{state: completed}||{state: ignored} ++none");
 			
 			// Find all the styles matching this filter
 			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
-
-			//console.log("matchingStyles[" + parser.raidFilter.toString() + "]", matchingStyles);
 			
 			//console.log("Ignore: ", ignore);
 			if (ignore === true) {
@@ -8354,7 +8671,6 @@ DC_LoaTS_Helper.raids =
 				{
 					var found = false;
 					for (var i = 0; i < matchingStyles.length; i++) {
-						//console.log("Comparing keys", parser.raidFilter.getKey(), matchingStyles[i].raidFilter.getKey());
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							found = true;
 							break;
@@ -9465,6 +9781,10 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tcolor:#B84EFE;\n";
 				rulesText += "}\n";
 				
+				rulesText += "\na.hidden {\n";
+				rulesText += "\tdisplay: none;\n";
+				rulesText += "}\n";
+				
 				
 				rulesText += "\n.DataDumpTab-Data {\n";
 				rulesText += "\twidth: 100%;\n";
@@ -9556,7 +9876,7 @@ DC_LoaTS_Helper.raids =
 			{
 				holodeck.activeDialogue().displayUnsanitizedMessage("RaidBot",
 														 	message.replace(/\n/g, "<br />\n"),
-														 	{class: "whisper received_whisper"},
+														 	{"class": "whisper received_whisper"},
 															{non_user: true} 
 														   );
 			}

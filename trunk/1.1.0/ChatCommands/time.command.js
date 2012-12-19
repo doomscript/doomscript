@@ -18,7 +18,7 @@
 				{
 					var commandOptions = {
 						config: {
-							refreshEvery: 1000,
+							refreshEvery: 1000
 						},
 						initialText: {
 							text: "Local Time: " + this.getLocalDateText() + "<br>Server Time: " + this.getServerDateText()

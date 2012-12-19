@@ -22,14 +22,11 @@
 				this.commandText = commandText;
 				this.processedText = this.commandText;
 				
-				DCDebug("processing text: " + this.processedText);
 				if (this.processedText.charAt(0) == '/')
 				{
 					this.processedText = this.processedText.substring(1);
 				}
-				
-				DCDebug("Checking " + this.processedText.toLowerCase() + " for " + this.getName() + " result: "  + this.processedText.toLowerCase().indexOf(this.getName()));
-				
+								
 				// If the command was explicitly provided, we need to strip it
 				if (this.processedText.toLowerCase().indexOf(this.getName()) == 0)
 				{
@@ -53,26 +50,18 @@
 				// Reassemble the normalized commandText				
 				this.commandText = "/" + this.getName() + " " + this.processedText;
 				
-//				DCDebug("command text: \"" + this.commandText + "\"");
-//				DCDebug("processed text: \"" + this.processedText + "\"");
-				
 				// Check for help
 				if (this.processedText.toLowerCase() == "help")
 				{
-//					DCDebug("This command is for help.");
 					this.isHelp = true;
 				}
 				// Not a help command
 				else
 				{
-//					DCDebug("Parsing Class:");
-//					DCDebug(this.parsingClass);
 					// With the params, get the parser
 					if (typeof this.parsingClass != "undefined")
 					{
 						this.parser = new this.parsingClass(this.processedText);
-//						DCDebug("Parser:");
-//						DCDebug(this.parser);
 					}
 				}
 			},

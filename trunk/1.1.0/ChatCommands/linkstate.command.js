@@ -75,7 +75,7 @@
 						initialText: {
 							text: "Mark this " + linkState.niceText + " " + this.parser.getName(),
 							executable: false
-						},
+						}
 					};
 					
 					for (var stateType in RaidManager.STATE)
@@ -85,10 +85,6 @@
 							commandOptions["mark_" + stateType.toLowerCase()] = this.createStateOption(RaidManager.STATE[stateType]);
 						}
 					}
-					
-					DCDebug("Command Options: ");
-					DCDebug(commandOptions);
-
 					
 					return commandOptions;
 				},
