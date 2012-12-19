@@ -71,7 +71,7 @@
 						var raidLink = new RaidLink(msg);
 						
 						// Alliance Invite Link
-						var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)kv_fbuid=kong_([^<"']+)/i;
+						var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)?kv_fbuid=kong_([^<"']+)/i;
 						
 						var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance?</a>";
 						

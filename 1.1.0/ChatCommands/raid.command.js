@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "raid",
-				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis"],
+				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis", "rai", "fs", "os"],
 				parsingClass: RaidMultiFilter,
 				
 				// Doesn't use all the filter params
@@ -60,7 +60,7 @@
 					var commandOptions = {					
 						initialText: {
 							text: "Raid Info for: " + this.parser.name,
-							executable: false,
+							executable: false
 						},
 						all: {
 							text: "All",
@@ -68,7 +68,7 @@
 							{
 								DCDebug("Info All " + this.parser.name);
 								delete this.parser.difficulty;
-							},
+							}
 						},
 						
 						normal: {
@@ -77,7 +77,7 @@
 							{
 								DCDebug("Info Normal " + this.parser.name);
 								this.parser.difficulty = 1;
-							},
+							}
 						},
 						
 						hard: {
@@ -86,7 +86,7 @@
 							{
 								DCDebug("Info Hard " + this.parser.name);
 								this.parser.difficulty = 2;
-							},
+							}
 						},
 						
 						legendary: {
@@ -95,7 +95,7 @@
 							{
 								DCDebug("Info Legendary " + this.parser.name);
 								this.parser.difficulty = 3;
-							},
+							}
 						},
 						
 						nightmare: {

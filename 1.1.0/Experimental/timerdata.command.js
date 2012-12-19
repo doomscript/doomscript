@@ -18,8 +18,8 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Print the timer report",
-						},
+							text: "Print the timer report"
+						}
 					};
 					
 					return commandOptions;

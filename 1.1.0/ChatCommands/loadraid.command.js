@@ -18,7 +18,7 @@
 					var commandOptions = {					
 						initialText: {
 							text: "Load raid: " + this.parser.getDifficultyText() + " " + this.parser.getName()
-						},
+						}
 					};
 					
 					return commandOptions;

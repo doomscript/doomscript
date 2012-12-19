@@ -34,8 +34,8 @@
 				{					
 					var commandOptions = {					
 						initialText: {
-							text: "Mark all " + this.parser.filterText + " as " + this.parser.stateText,
-						},
+							text: "Mark all " + this.parser.filterText + " as " + this.parser.stateText
+						}
 					};
 					
 

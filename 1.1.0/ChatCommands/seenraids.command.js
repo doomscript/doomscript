@@ -82,7 +82,7 @@
 					var commandOptions = {
 						
 						initialText: {
-							text: "Seen raids: " + ((typeof this.parser.name != "undefined")?this.parser.name : "Unknown"),
+							text: "Seen raids: " + ((typeof this.parser.name != "undefined")?this.parser.name : "Unknown")
 						},
 						
 						any: {
@@ -91,7 +91,7 @@
 							{
 								DCDebug("Seen Any " + this.parser.name);
 								delete this.parser.difficulty;
-							},
+							}
 						},
 						
 						normal: {
@@ -100,7 +100,7 @@
 							{
 								DCDebug("Seen Normal " + this.parser.name);
 								this.parser.difficulty = 1;
-							},
+							}
 						},
 						
 						hard: {
@@ -109,7 +109,7 @@
 							{
 								DCDebug("Seen Hard " + this.parser.name);
 								this.parser.difficulty = 2;
-							},
+							}
 						},
 						
 						legendary: {
@@ -118,7 +118,7 @@
 							{
 								DCDebug("Seen Legendary " + this.parser.name);
 								this.parser.difficulty = 3;
-							},
+							}
 						},
 						
 						nightmare: {

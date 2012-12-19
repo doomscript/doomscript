@@ -61,8 +61,8 @@
 					//TODO: Better options here
 					var commandOptions = {					
 						initialText: {
-							text: "Load all raids matching the filter",
-						},
+							text: "Load all raids matching the filter"
+						}
 					};
 					
 					return commandOptions;

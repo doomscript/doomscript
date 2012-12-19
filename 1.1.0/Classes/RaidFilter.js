@@ -311,7 +311,7 @@
 							case "name":
 								try {
 									// Dirty pi hacks. TODO: Do this better
-									var tmpName = (this.name.toLowerCase() === "pi")?"^pi_":this.name;
+									var tmpName = (this.name && this.name.toLowerCase() === "pi")?"^pi_":this.name;
 
 									// If the user's text matches this raid name
 									matched = matched && new RegExp(tmpName, "i").test(value);
