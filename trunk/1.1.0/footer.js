@@ -448,7 +448,7 @@
 				rulesText += "\tcolor:#B84EFE;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\na.hidden {\n";
+				rulesText += "\n.hidden {\n";
 				rulesText += "\tdisplay: none;\n";
 				rulesText += "}\n";
 				

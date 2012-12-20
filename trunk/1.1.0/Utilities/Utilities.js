@@ -1396,6 +1396,19 @@
 							holodeck.activeDialogue().raidBotMessage(message);
 						}
 					}
+					
+					if (window.raidTools && window.raidTools.spammer && window.raidTools.spammer.raids) {
+						var raidsObj = window.raidTools.spammer.raids;
+						if (!raidsObj.lots) {
+							raidsObj.lots = {};
+						}
+						
+						for (var raidId in DC_LoaTS_Helper.raids) {
+							if (!raidsObj.lots[raidId]){
+								raidsObj.lots[raidId] = DC_LoaTS_Helper.raids[raidId].shortName;
+							}
+						}
+					}
 				}
 			});
 

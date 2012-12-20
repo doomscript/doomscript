@@ -27,12 +27,12 @@
 					}
 				}
 				// If we're supposed to cancel this filter
-				else if (params.parts[0] === "cancel") {
+				else if (paramsParts[0] === "cancel") {
 					this.cancel = true;
 				}
 				// Neither forced nor cancelled, just a URL and maybe a RaidFilter
 				else {
-					this.url = params.parts[0];
+					this.url = paramsParts[0];
 					if (paramsParts[1]) {
 						this.raidFilter = new RaidMultiFilter(paramsParts.slice(1).join(" "));
 					}

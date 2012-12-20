@@ -5012,12 +5012,12 @@ function main()
 					}
 				}
 				// If we're supposed to cancel this filter
-				else if (params.parts[0] === "cancel") {
+				else if (paramsParts[0] === "cancel") {
 					this.cancel = true;
 				}
 				// Neither forced nor cancelled, just a URL and maybe a RaidFilter
 				else {
-					this.url = params.parts[0];
+					this.url = paramsParts[0];
 					if (paramsParts[1]) {
 						this.raidFilter = new RaidMultiFilter(paramsParts.slice(1).join(" "));
 					}
@@ -5923,14 +5923,14 @@ function main()
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {success: parser.known || parser.force};
+					var ret = {success: parser.known || parser.force || parser.cancel};
 						
 					if (ret.success) {
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {
 						if (!parser.known) {
-							ret.statusMessage = parser.url + " is not from a known raid host. Are you sure you wish to fetch from there? " + DC_LoaTS_Helper.getCommandLink("/fetchraids force " + params);
+							ret.statusMessage = parser.getWorkingUrl() + " is not from a known raid host. Are you sure you wish to fetch from there? " + DC_LoaTS_Helper.getCommandLink("/fetchraids force " + params);
 						}
 						else {
 							ret.statusMessage = "Could not find a url in <code>" + text + "</code>";
@@ -6143,7 +6143,7 @@ function main()
 						parser = new UrlParsingFilter("cancel");
 					}
 					else {
-						parser = new UrlParsingFilter(this.cconolyUrl + " " + sparams);
+						parser = new UrlParsingFilter(this.cconolyUrl + " " + params);
 					}
 					
 					// Declare ret object
@@ -9097,6 +9097,19 @@ DC_LoaTS_Helper.raids =
 							holodeck.activeDialogue().raidBotMessage(message);
 						}
 					}
+					
+					if (window.raidTools && window.raidTools.spammer && window.raidTools.spammer.raids) {
+						var raidsObj = window.raidTools.spammer.raids;
+						if (!raidsObj.lots) {
+							raidsObj.lots = {};
+						}
+						
+						for (var raidId in DC_LoaTS_Helper.raids) {
+							if (!raidsObj.lots[raidId]){
+								raidsObj.lots[raidId] = DC_LoaTS_Helper.raids[raidId].shortName;
+							}
+						}
+					}
 				}
 			});
 
@@ -9321,7 +9334,7 @@ DC_LoaTS_Helper.raids =
 		spawnType: "World Raid",
 		
 		startDate: "12/19/2012",
-		timerEnds: "2012-12-21T18:15:09Z",
+		timerEnds: "2012-12-21T23:00:07Z",
 		
 		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=5872044&kv_difficulty=1&kv_raid_boss=christmas_montage&kv_hash=5XzvkGP6E8",
 		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10905-New-World-Raid-Christmas-Campaign!",
@@ -9786,7 +9799,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tcolor:#B84EFE;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\na.hidden {\n";
+				rulesText += "\n.hidden {\n";
 				rulesText += "\tdisplay: none;\n";
 				rulesText += "}\n";
 				
