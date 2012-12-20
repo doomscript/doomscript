@@ -7587,7 +7587,8 @@ DC_LoaTS_Helper.raids =
     bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50, "S",   [75000000, 97500000, 120000000, 150000000]),
     gut_phager:         new RaidType("gut_phager",         "Z11", "Gut-Phager", "Gut-Phager", "Phager",               72,  50, "S",   80000000),
     bashan:             new RaidType("bashan",              "ZA", "Bashan", "Bashan", "Bashan",                       72,  50, "S",   85000000),
-    cyborg_shark:       new RaidType("cyborg_shark",        "ZA2", "Cyborg Shark", "C. Shark", "Shark",                72,  50, "S",   90000000),
+    cyborg_shark:       new RaidType("cyborg_shark",        "ZA2", "Cyborg Shark", "C. Shark", "Shark",               72,  50, "S",   90000000),
+    hulking_mutant:     new RaidType("hulking_mutant",      "Z15", "Hulking Mutant", "Mutant", "Mutant",              72,  50, "S",   90000000),
     
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -7602,6 +7603,7 @@ DC_LoaTS_Helper.raids =
     shuborunth: 		new RaidType("shuborunth",         "Z13","Wublunralxanachi", "Blob", "Blob",                  72, 100, "S",  200000000),
     birthday_cake_of_doom: new RaidType("birthday_cake_of_doom", "ZA","Birthday Cake of Doom", "Cake", "Cake",        72, 100, "S",  250000000),
     anthropist_xenocide_warship:new RaidType("anthropist_xenocide_warship","ZA2","Anthropist Xenocide Warship","Xenocide","Xeno",72,100,"S",300000000),
+    tentacled_turkey:   new RaidType("tentacled_turkey",   "Z15","Tentacled Turkey","Turkey","Turkey",                72, 100, "S",  350000000),
 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
@@ -7690,7 +7692,9 @@ DC_LoaTS_Helper.raids =
 
     kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken",                       72,  90000, "SEH", "Infinite", "N/A",  50000000000),
     
-    raging_snowman:     new RaidType("raging_snowman",      "WR", "Raging Snowman", "Snowman", "Snowman",             24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    raging_snowman:     new RaidType("raging_snowman",      "WR", "Raging Snowman", "Snowman", "Snowman",             24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+
+    christmas_montage:     new RaidType("christmas_montage","WR", "Christmas Campaign", "Christmas", "Xmas WR",             48,  90000, "SEH", "Infinite", "N/A",   5000000000)
     
 };
 
@@ -9307,26 +9311,27 @@ DC_LoaTS_Helper.raids =
 				return typeof args[number] != 'undefined'?args[number]:match;
 			});
 		};
+
 	// World Raid Data, if there is any
-/*
+
 
 	DC_LoaTS_Helper.worldRaidInfo = {
-		name: "Raging Snowman",
+		name: "Christmas Campaign",
 		
-		spawnType: "Rare Spawn",
+		spawnType: "World Raid",
 		
-		startDate: "12/14/2012",
-		timerEnds: "2012-12-15T18:15:09Z",
+		startDate: "12/19/2012",
+		timerEnds: "2012-12-21T18:15:09Z",
 		
-		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=5759546&kv_difficulty=1&kv_raid_boss=raging_snowman&kv_hash=vklLQtnhn7",
-		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10842-Raging-Snowman-12-14-12",
-		infoUrlTitle: "'Rare Spawn 12/14/12 - Raging Snowman!' Official Announcement",
+		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=5872044&kv_difficulty=1&kv_raid_boss=christmas_montage&kv_hash=5XzvkGP6E8",
+		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10905-New-World-Raid-Christmas-Campaign!",
+		infoUrlTitle: "'New World Raid: Christmas Campaign!' Official Announcement",
 		
-		lootTableImageUrl: "http://i.imgur.com/57n52.jpg?1"
+		lootTableImageUrl: "http://i.imgur.com/A1kXq.jpg"
 		
 	};
 
-*/
+
 
 	// End World Raid Data
 	
