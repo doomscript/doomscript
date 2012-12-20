@@ -15,7 +15,7 @@
 						parser = new UrlParsingFilter("cancel");
 					}
 					else {
-						parser = new UrlParsingFilter(this.cconolyUrl + " " + sparams);
+						parser = new UrlParsingFilter(this.cconolyUrl + " " + params);
 					}
 					
 					// Declare ret object

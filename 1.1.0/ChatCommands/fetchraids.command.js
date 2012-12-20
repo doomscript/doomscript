@@ -9,14 +9,14 @@
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {success: parser.known || parser.force};
+					var ret = {success: parser.known || parser.force || parser.cancel};
 						
 					if (ret.success) {
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {
 						if (!parser.known) {
-							ret.statusMessage = parser.url + " is not from a known raid host. Are you sure you wish to fetch from there? " + DC_LoaTS_Helper.getCommandLink("/fetchraids force " + params);
+							ret.statusMessage = parser.getWorkingUrl() + " is not from a known raid host. Are you sure you wish to fetch from there? " + DC_LoaTS_Helper.getCommandLink("/fetchraids force " + params);
 						}
 						else {
 							ret.statusMessage = "Could not find a url in <code>" + text + "</code>";
