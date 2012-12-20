@@ -263,11 +263,16 @@ Added new Alliance Raid: Crazed Santa
 2012.12.14 - 1.1.17
 Added two new Alliance Raids: SANTA's Workshop and Rabid Reindeer
 Updated Snowman rare spawn info, due to new snowman
+Added two new Zone 15 Raids: Tentacled Turkey and Hulking Mutant
+Added new WR: Christmas Campaign
 Added snull preference to snull the snulls in the snull
 Added ignore visited raids preference
 Added ignore invalid commands preference
 Added additional filtering capability to string multiple filters together using ||, like colo|tele 1 || rage|void 4 would give normal tele, normal colossa and colonel, nightmare ragebeasts, nightmare void
 Fixed bug loading WR data during update
+Reworked how pastebin and autoload work by making them use the same code
+With help from Sycdan, added /loadcconoly
+Added some help to keep the spammer up to date with known raid data
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -8398,8 +8403,15 @@ DC_LoaTS_Helper.raids =
 				// Clear out the raidLinks array from the previous one.
 				// The timeout will detect that there are suddenly no more links
 				// and acknowledge the error state and quit.
-				DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+				if (DC_LoaTS_Helper.autoLoader && DC_LoaTS_Helper.autoLoader.raidLinks) {
+					DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+				}
 			}
+			
+			if (urlParsingFilter.cancel) {
+				return;
+			}
+			
 			var commandStartTime = new Date()/1;
 			
 			if (holodeck.activeDialogue()) {
@@ -8545,9 +8557,6 @@ DC_LoaTS_Helper.raids =
 		}
 		
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
-			console.log("Load all", arguments);
-			return;
-			
 			// Private variable to be closed over in the autoLoader
 			var autoLoadCounter = {
 					attempted: 0, 
@@ -8751,9 +8760,6 @@ DC_LoaTS_Helper.raids =
 									// Append to the existing styles
 									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
 								}
-							}
-							else {
-								console.log("Not going to alter class when parent class is " + elem.parentNode.parentNode.parentNode.className)
 							}
 							
 							// Remove the old link, and shove in the new, formatted, styled one

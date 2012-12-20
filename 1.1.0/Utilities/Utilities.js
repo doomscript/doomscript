@@ -697,8 +697,15 @@
 				// Clear out the raidLinks array from the previous one.
 				// The timeout will detect that there are suddenly no more links
 				// and acknowledge the error state and quit.
-				DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+				if (DC_LoaTS_Helper.autoLoader && DC_LoaTS_Helper.autoLoader.raidLinks) {
+					DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+				}
 			}
+			
+			if (urlParsingFilter.cancel) {
+				return;
+			}
+			
 			var commandStartTime = new Date()/1;
 			
 			if (holodeck.activeDialogue()) {
@@ -844,9 +851,6 @@
 		}
 		
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
-			console.log("Load all", arguments);
-			return;
-			
 			// Private variable to be closed over in the autoLoader
 			var autoLoadCounter = {
 					attempted: 0, 
@@ -1050,9 +1054,6 @@
 									// Append to the existing styles
 									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
 								}
-							}
-							else {
-								console.log("Not going to alter class when parent class is " + elem.parentNode.parentNode.parentNode.className)
 							}
 							
 							// Remove the old link, and shove in the new, formatted, styled one
