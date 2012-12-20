@@ -141,7 +141,9 @@ DC_LoaTS_Helper.raids =
 
     kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken",                       72,  90000, "SEH", "Infinite", "N/A",  50000000000),
     
-    raging_snowman:     new RaidType("raging_snowman",      "WR", "Raging Snowman", "Snowman", "Snowman",             24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    raging_snowman:     new RaidType("raging_snowman",      "WR", "Raging Snowman", "Snowman", "Snowman",             24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+
+    christmas_montage:     new RaidType("christmas_montage","WR", "Christmas Campaign", "Christmas", "Xmas WR",             48,  90000, "SEH", "Infinite", "N/A",   5000000000)
     
 };
 
