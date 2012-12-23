@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.17
+// @version        1.1.18
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -273,6 +273,10 @@ Fixed bug loading WR data during update
 Reworked how pastebin and autoload work by making them use the same code
 With help from Sycdan, added /loadcconoly
 Added some help to keep the spammer up to date with known raid data
+
+201?.??.?? - 1.1.18
+Fixed issue with /clearraids all not working
+TODO: Added marked dead functionality for CConoly
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -281,7 +285,7 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.17",
+    	version: "1.1.18",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
