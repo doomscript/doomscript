@@ -26,14 +26,13 @@
 			spawnType: "Rare Spawn",
 			
 			startDate: "01/14/2013",
-			timerEnds: "2013-01-16T00:00:00Z",
-			
-			raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_boss=space_pox_mary&kv_difficulty=1&kv_raid_id=6425893&kv_hash=JGn78Os8l2",
+			timerEnds: "2013-01-15T23:55:41Z",
+
+			raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=6425893&kv_difficulty=1&kv_raid_boss=space_pox_mary&kv_hash=JGn78Os8l2",
 			infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?11242-Space-Pox-Mary-is-Here!",
-			infoUrlTitle: "Space Pox Mary is Here!",
-			
+			infoUrlTitle: "Space Pox Mary is Here!' Official Announcement",
+
 			lootTableImageUrl: "http://i.imgur.com/TMgZx.jpg"
-			
 		};
 
 
