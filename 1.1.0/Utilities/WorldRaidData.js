@@ -28,7 +28,7 @@
 			startDate: "01/14/2013",
 			timerEnds: "2013-01-16T00:00:00Z",
 			
-			raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=5872044&kv_difficulty=1&kv_raid_boss=christmas_montage&kv_hash=5XzvkGP6E8",
+			raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_boss=space_pox_mary&kv_difficulty=1&kv_raid_id=6425893&kv_hash=JGn78Os8l2",
 			infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?11242-Space-Pox-Mary-is-Here!",
 			infoUrlTitle: "Space Pox Mary is Here!",
 			
