@@ -20,13 +20,14 @@
 	};
 */
 
+	// DC_LoaTS_Helper.worldRaidInfo.timerEnds="2013-01-18T23:20:18Z"
 	DC_LoaTS_Helper.worldRaidInfo = {
 			name: "Space Pox Mary",
 			
 			spawnType: "Rare Spawn",
 			
 			startDate: "01/17/2013",
-			timerEnds: "2013-01-18T23:55:41Z",
+			timerEnds: "2013-01-18T23:20:18Z",
 
 			raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=6482771&kv_difficulty=1&kv_raid_boss=space_pox_mary&kv_hash=eU5NgJRuPq",
 			infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?11294-Last-Chance-Space-Pox-Mary",
