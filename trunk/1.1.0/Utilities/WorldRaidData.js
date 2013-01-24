@@ -11,7 +11,7 @@
 		startDate: "01/25/2013",
 		timerEnds: "2013-01-28T22:15:00Z",
 		
-		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=6482771&kv_difficulty=1&kv_hash=eU5NgJRuPq&kv_raid_boss=Will_Be_Summoned_Around_10PM_GMT",
+		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=6482771&kv_difficulty=1&kv_hash=eU5NgJRuPq&kv_raid_boss=Will_Be_Summoned_25-Jan_Around_10PM_GMT",
 		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?11432-Fight-the-flu-fight-Space-Pox!",
 		infoUrlTitle: "'Fight the flu, fight Space Pox!' Official Announcement",
 		lootTableImageUrl: "http://i.imgur.com/BD3yH.jpg"
