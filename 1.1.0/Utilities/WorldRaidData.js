@@ -1,7 +1,7 @@
 
 	// World Raid Data, if there is any
 	
-	// DC_LoaTS_Helper.worldRaidInfo.timerEnds = "2013-01-23T23:00:00Z" // 6PM EST / 11PM GMT
+	// DC_LoaTS_Helper.worldRaidInfo.timerEnds = "2013-01-28T22:20:19Z" // 6PM EST / 11PM GMT
 
 	// Ensure raid_boss=wr_space_pox in raidUrl
 	DC_LoaTS_Helper.worldRaidInfo = {
@@ -10,7 +10,7 @@
 		spawnType: "World Raid",
 		
 		startDate: "01/25/2013",
-		timerEnds: "2013-01-28T22:15:00Z",
+		timerEnds: "2013-01-28T22:20:19Z",
 		
 		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=6648986&kv_difficulty=1&kv_raid_boss=wr_space_pox&kv_hash=0P9ft37ffs",
 		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?11432-Fight-the-flu-fight-Space-Pox!",
