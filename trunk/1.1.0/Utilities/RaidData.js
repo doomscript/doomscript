@@ -139,7 +139,7 @@ DC_LoaTS_Helper.raids =
 
     cerebral_destroyer: new RaidType("cerebral_destroyer",  "WR", "Cerebral Destroyer", "Cerebral", "CD WR",          72,90000,"SEH", "Infinite", "N/A",  10000000000),
     
-    wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",  10000000000),
+    wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",  5000000000),
 
     kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken WR",                    72,  90000, "SEH", "Infinite", "N/A",  50000000000),
     
