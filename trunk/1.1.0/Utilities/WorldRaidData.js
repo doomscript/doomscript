@@ -6,7 +6,7 @@
 	DC_LoaTS_Helper.worldRaidInfo = {
 		name: "Cerebral CEO",
 		
-		spawnType: "Raid Spawn",
+		spawnType: "Rare Spawn",
 		
 		startDate: "02/07/2013",
 		timerEnds: "2013-02-08T22:40:49Z",
