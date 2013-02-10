@@ -274,9 +274,17 @@ Reworked how pastebin and autoload work by making them use the same code
 With help from Sycdan, added /loadcconoly
 Added some help to keep the spammer up to date with known raid data
 
-201?.??.?? - 1.1.18
+2013.02.10 - 1.1.18
 Fixed issue with /clearraids all not working
-TODO: Added marked dead functionality for CConoly
+Improved help text of a few commands
+Corrected and updated /farmvalue a bit
+Added marked dead functionality for CConoly
+Added os to filters [Sycdan]
+Fixed WR Space Pox Icon
+Kind of made the broken close icon for the menu suck less, though not totally fixed
+Added Zone 16 raids: Screaming Barracuda and Symphony of Two Worlds
+Added two Rare Spawns: Cerebral CEO and Space Pox Mary
+WR Info page's forum link should now open in a new window/tab
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -1368,6 +1376,7 @@ function main()
 					this.count;
 					this.page;
 					this.fs;
+					this.os;
 					this.valid = true;
 	
 					// Capture original filterText
@@ -1497,6 +1506,7 @@ function main()
 								
 								this.page = parseInt(paramValue);
 								break;
+							case "os":
 							case "fs":
 								var match = RaidFilter.numberExpressionPattern.exec(paramValue);
 								
@@ -1550,7 +1560,7 @@ function main()
 									holodeck.activeDialogue().raidBotMessage("Did not understand " + filterType + " expression " + traceStatement);
 									this.valid = false;
 								}
-								this.fs = condition + num;
+								this[filterType] = condition + num;
 								break;
 							case "state":
 								var tmpStateText = paramValue;
@@ -1685,9 +1695,10 @@ function main()
 								// Check against the age condition
 								matched = matched && eval(value + this.age);
 								break;
+							case "os":
 							case "fs":
 								// Check against the fs condition
-								matched = matched && eval(value + this.fs);
+								matched = matched && eval(value + this[field]);
 								break;
 							case "count":
 								// Check against the count condition
@@ -1715,7 +1726,8 @@ function main()
 						((typeof this.age 			!= "undefined")?"a=" + this.age + ";":"") +
 						((typeof this.count 		!= "undefined")?"c=" + this.count + ";":"") +
 						((typeof this.page 			!= "undefined")?"p=" + this.page + ";":"") +
-						((typeof this.fs 			!= "undefined")?"f=" + this.fs + ";":"");
+						((typeof this.fs 			!= "undefined")?"f=" + this.fs + ";":"") + 
+						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"");
 			},
 			
 			// If it has a name and optionally a difficulty and nothing else, it's simple
@@ -1727,7 +1739,8 @@ function main()
 					  typeof this.age			== "undefined" &&
 					  typeof this.count			== "undefined" &&
 					  typeof this.page			== "undefined" &&
-					  typeof this.fs			== "undefined");
+					  typeof this.fs			== "undefined" &&
+					  typeof this.os			== "undefined");
 			},
 			
 			isEmpty: function()
@@ -1739,7 +1752,8 @@ function main()
 						(typeof this.age 			== "undefined") &&
 						(typeof this.count 			== "undefined") &&
 						(typeof this.page 			== "undefined") &&
-						(typeof this.fs 			== "undefined");
+						(typeof this.fs 			== "undefined") && 
+						(typeof this.os 			== "undefined");
 	
 			},
 			
@@ -1762,6 +1776,7 @@ function main()
 						 ((typeof this.inverseState 	!= "undefined" && this.inverseState == true)? "!":"")
 						 + this.state.text + "}"+ " ":"") +
 						 ((typeof this.fs 				!= "undefined")? "{fs: " + this.fs + "} ":"") + 
+						 ((typeof this.os 				!= "undefined")? "{os: " + this.os + "} ":"") + 
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
 						 ((typeof this.count 			!= "undefined")? "{count: " + this.count + "} ":"") +
 						 ((typeof this.page 			!= "undefined")? "{page: " + this.page + "} ":"")).trim();
@@ -1818,7 +1833,7 @@ function main()
 		});
 		
 		// Parameter text for this parser
-		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
+		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{os: osParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
 		
 		// Regex to parse number expressions
 		RaidFilter.numberExpressionPattern = /(<=?|>=?|==?|!=?)?\s*(\d+)\s*(\w\w?)?/;
@@ -2557,6 +2572,9 @@ function main()
 			{
 				switch(raidLink.raidTypeId)
 				{
+					case "wr_space_pox":
+						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/space_pox_1.jpg";
+						break;
 					case "dule_warmaster":
 						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/dule_1.jpg";
 						break;
@@ -3000,12 +3018,10 @@ function main()
 						raidData.stateId = currentState.id;
 					}
 					
-					// If there is an old style state, delete it
-					// Our goal is to minimize local storage footprint to just the essentials
-					if (typeof raidData.state != "undefined" )
-					{
-						// Preserve backwards compatibility at the cost of memory usage
-//						delete raidData.state;
+					// If we should report dead raids and this one is dead and it hasn't been reported yet
+					if (DC_LoaTS_Helper.getPref("ReportDeadRaids", true) && RaidManager.STATE.equals(state, RaidManager.STATE.COMPLETED) && !raidData.reported) {
+						raidData.reported = true;
+						DC_LoaTS_Helper.reportDead(raidLink);
 					}
 					
 					// Update the lastSeen time of the link
@@ -3056,18 +3072,20 @@ function main()
 			{
 				Timer.start("store bulk");
 
-				Timer.start("store > loading hardRaidStorage");
-				
 				// Load up the storage object
+				Timer.start("store > loading hardRaidStorage");
 				var hardRaidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
 				Timer.stop("store > loading hardRaidStorage");
-			
+				
+				// Declare a bunch of vars. Don't forget there's no such thing as block scope
+				var raidLink, raidData, currentState, newState, containedInLocalDB, shouldUpdateAllLinks;
+				
 				// Capture all the valid links we're actually going to store
 				var outboundLinks = [];
 				
 				for (var i = 0; i < raidLinks.length; i++) {
 					
-					var raidLink = raidLinks[i];
+					raidLink = raidLinks[i];
 					
 					// Valid link?
 					if (raidLink.isValid()) {
@@ -3076,46 +3094,43 @@ function main()
 						outboundLinks.push(raidLink);
 					
 						// Attempt to load the passed in raid link
-						var raidData = hardRaidStorage[raidLink.getUniqueKey()];
+						raidData = hardRaidStorage[raidLink.getUniqueKey()];
 						
 						// Lookup the current state
-						var currentState;
-						var containedInLocalDB = true;
-						if (typeof raidData != "undefined")
+					    containedInLocalDB = true;
+					    currentState = null;
+						if (raidData)
 						{
 							// If there is a stateId, use that first
-							if (typeof raidData.stateId != "undefined")
+							if (raidData.stateId)
 							{
 								currentState = RaidManager.STATE.valueOf(raidData.stateId);
 							}
 							// If there is an old-style state, use that second
-							else if (typeof raidData.state != "undefined")
+							else if (raidData.state)
 							{
 								currentState = RaidManager.STATE.valueOf(raidData.state.text);
 							}
 						}
 						
 						// If we couldn't find the current state, set it to UNSEEN
-						if (typeof currentState === "undefined")
+						if (!currentState)
 						{
 							currentState = RaidManager.STATE.UNSEEN;
 							containedInLocalDB = false;
 						}
 						
-						// If we weren't provided a state param, set it to the current state
-						if (typeof state === "undefined")
-						{
-							state = currentState;
-						}
+						// Set the new state. It's either going to be the new parameter state or the existing state
+						newState = state || currentState;
 						
 						// Keep track of whether or not this link needs to be updated elsewhere
-						var shouldUpdateAllLinks = false;
+						shouldUpdateAllLinks = false;
 						
 						// If we've never seen this link before
 						if (!raidData)
 						{
 							// Create a new storage container for it, and wrap it
-							raidData = {raidLink: raidLink, stateId: state.id, firstSeen: new Date()/1}
+							raidData = {raidLink: raidLink, stateId: newState.id, firstSeen: new Date()/1}
 							
 							// Place this object into the storage
 							hardRaidStorage[raidLink.getUniqueKey()] = raidData;						
@@ -3123,7 +3138,7 @@ function main()
 						// Two unseens upgrade to seen if the link was already in the DB
 						else if (containedInLocalDB
 								 &&
-									RaidManager.STATE.equals(state, RaidManager.STATE.UNSEEN)
+									RaidManager.STATE.equals(newState, RaidManager.STATE.UNSEEN)
 									&& 
 									RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)
 								 )
@@ -3135,10 +3150,10 @@ function main()
 						        shouldUpdateAllLinks = true;
 						}
 						// If we have seen this link before, change the links state if necessary
-						else if (!RaidManager.STATE.equals(currentState, state))
+						else if (!RaidManager.STATE.equals(currentState, newState))
 						{
 							// Set the new state
-							raidData.stateId = state.id;
+							raidData.stateId = newState.id;
 							
 							// Since we changed state, need to update all those links
 							shouldUpdateAllLinks = true;
@@ -3152,6 +3167,12 @@ function main()
 												
 						// Update the lastSeen time of the link
 						raidData.lastSeen = new Date()/1;
+						
+						// If we should report dead raids and this one is dead and it hasn't been reported yet
+						if (DC_LoaTS_Helper.getPref("ReportDeadRaids", true) && RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED) && !raidData.reported) {
+							raidData.reported = true;
+							DC_LoaTS_Helper.reportDead(raidLink);
+						}
 					}
 				} // End for iterating over the links
 				
@@ -3176,12 +3197,9 @@ function main()
 				// Update the cache
 				RaidManager.raidStorage = hardRaidStorage;
 				
-				// If we found a reason to update some links
-				if (shouldUpdateAllLinks)
-				{
-					// Update the posted links
-					DC_LoaTS_Helper.updatePostedLinks();
-				}
+				// Update the posted links. 
+				DC_LoaTS_Helper.updatePostedLinks();
+				
 				Timer.stop("store bulk");
 				
 				return outboundLinks;
@@ -3596,7 +3614,7 @@ function main()
 					// Set up the close button
 					this.titleBarClose = document.createElement("img");
 					this.titleBarClose.id = "DC_LoaTS_raidMenuClose";
-					this.titleBarClose.src = "http://i.imm.io/nNJy.png";					
+					this.titleBarClose.src = "https://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/base.png";					
 					this.titleBarClose.setAttribute("usemap", "#raidMenuCloseMap");
 					this.titleBarWrapper.appendChild(this.titleBarClose);
 					
@@ -3613,8 +3631,8 @@ function main()
 					titleBarCloseArea.coords = "12,6,50,42,50,6,46,1,42,0,19,-1";
 					titleBarCloseArea.href = "#";
 					titleBarCloseArea.setAttribute("onclick", "RaidMenu.toggle(); return false;");
-					titleBarCloseArea.setAttribute("onmouseover", "$('DC_LoaTS_raidMenuClose').src = 'http://i.imm.io/nStr.png';");
-					titleBarCloseArea.setAttribute("onmouseout", "$('DC_LoaTS_raidMenuClose').src = 'http://i.imm.io/nNJy.png';");
+					titleBarCloseArea.setAttribute("onmouseover", "$('DC_LoaTS_raidMenuClose').src = 'https://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hover.png';");
+					titleBarCloseArea.setAttribute("onmouseout", "$('DC_LoaTS_raidMenuClose').src = 'https://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/base.png';");
 					this.titleBarCloseMap.appendChild(titleBarCloseArea);
 
 					
@@ -4791,14 +4809,15 @@ function main()
 				return DC_LoaTS_Helper.prettyFormatNumber(fs);
 			},
 			
-			// Get pretty text for target damange
-			/*public String*/
-			getTargetDamageText: function(difficulty)
+			// Get or calculate optimal share for a given difficulty raid. 
+			// Can be int or String (usually, if applicable, "Unknown")
+			/*public int or String*/
+			getOptimalShare: function (difficulty)
 			{
 				var target = 0;
 				
 				// If non-standard target damage is set
-				if (typeof this.target != "undefined")
+				if (typeof this.target !== "undefined")
 				{
 					target = this.target[difficulty-1];
 				}
@@ -4808,7 +4827,14 @@ function main()
 					target = this.getFairShare(difficulty) * RaidType.targetDamageModifier[this.size];
 				}
 				
-				return DC_LoaTS_Helper.prettyFormatNumber(target);
+				return target;
+			},
+			
+			// Get pretty text for target damage (optimal share)
+			/*public String*/
+			getTargetDamageText: function(difficulty)
+			{
+				return DC_LoaTS_Helper.prettyFormatNumber(this.getOptimalShare(difficulty));
 			},
 			
 			// Returns the int of the health or specified String (usually, if applicable, it's "Unknown")
@@ -5046,6 +5072,18 @@ function main()
 						break;
 					}
 				}
+				
+				// Additional management based on types
+				switch(type) {
+					case "pastebin":
+						// Nothing 
+						break;
+					case "cconoly":
+						
+						break;
+					default:
+						break;
+				}
 			},
 			getUrlLink: function()
 			{
@@ -5071,7 +5109,7 @@ function main()
 		UrlParsingFilter.urlPatterns = {
 				"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
 				"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
-			};		
+			};
 		
 		/************************************/
 		/********** Formatting Tab **********/
@@ -5227,6 +5265,7 @@ function main()
 				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
 				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
+				reportDeadRaidsKey: "ReportDeadRaids",
 				
 				initPane: function()
 				{
@@ -5294,16 +5333,27 @@ function main()
 									{
 										onclick: function()
 										{
-											//TODO: Obviously, this should come from a key
 											DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundKey, this.checked);
 										}
 									}
 					);
-					
-					
-					// This is commented out until we decide if it can be used.
-					// Reminder: Uncomment this line to re-enable loading in the background
 					wrapper.appendChild(loadBackgroundOption.wrapper);
+
+					var reportDeadRaidsOption = me.createSimpleOptionHTML(
+							"PreferencesMenu-ReportDeadRaidsInput",
+							"boolean", 
+							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true), 
+							"Report Dead Raids to CConoly",
+							"When a raid is marked Complete, inform CConoly",
+							{
+								onclick: function()
+								{
+									DC_LoaTS_Helper.setPref(me.reportDeadRaidsKey, this.checked);
+								}
+							}
+					);
+					wrapper.appendChild(reportDeadRaidsOption.wrapper);
+
 
 					this.pane.appendChild(wrapper);
 				}
@@ -5546,6 +5596,13 @@ function main()
 					helpText += "\n";
 					helpText += "If there is an update to install and checks are on, when the page loads, a bar will appear";
 					helpText += " at the top of the screen offering the option to update.\n";
+					helpText += "\n";
+					if (GM_getValue(DC_LoaTS_Properties.storage.autoUpdate, false)) {
+						helpText += "Updates are currently ON. Turn them " + this.getCommandLink("OFF","OFF?") + "\n";
+					}
+					else {
+						helpText += "Updates are currently OFF. Turn them " + this.getCommandLink("ON","ON?") + "\n";
+					}
 					
 					return helpText;
 				}
@@ -5582,6 +5639,9 @@ function main()
 				{
 					var helpText = "<b>Raid Command:</b> <code>/clearchat</code>\n";
 					helpText += "Clears the text of the chat.\n";
+					helpText += "\n";
+					helpText += this.getCommandLink("","Clear chat now?") + "\n";
+
 					
 					return helpText;
 				}
@@ -5803,7 +5863,11 @@ function main()
 					helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
 					helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
 					helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
-					
+					helpText += "\n";
+					helpText += "Example:\n";
+					helpText += "Export all seen psychic colonels, including visited: \n";
+					helpText += this.getCommandLink("psy {state: !completed}") + "\n";
+
 					return helpText;
 				}
 			}
@@ -5842,6 +5906,8 @@ function main()
 					farmText += "<tr><td>Purple Lion</td><td>3.2</td><td>1.1</td></tr>";
 					farmText += "<tr><td>Cybersmash</td><td>3.1</td><td>1.0</td></tr>";
 					farmText += "<tr><td>Blood Alley Gang</td><td>2.8</td><td>0.9</td></tr>";
+					farmText += "<tr><td>Bashan</td><td>2.3</td><td>0.6</td></tr>";
+					farmText += "<tr><td>Missiles</td><td>2.3</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Tulk</td><td>2.2</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Scarlet Harlot</td><td>2.0</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Agony Ecstacy</td><td>1.8</td><td>0.7</td></tr>";
@@ -5852,21 +5918,40 @@ function main()
 					farmText += "<tr><td>Sun-Xi</td><td>1.5</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Lt. Targe</td><td>1.4</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Guldax Quibberath</td><td>1.4</td><td>0.5</td></tr>";
+					farmText += "<tr><td>Bachanghenfil</td><td>1.3</td><td>0.3</td></tr>";
 					farmText += "<tr><td>Warden Ramiro</td><td>1.3</td><td>0.5</td></tr>";
 					farmText += "<tr><td>Nemo</td><td>1.3</td><td>0.5</td></tr>";
+					farmText += "<tr><td>Gut-Phager</td><td>1.2</td><td>0.2</td></tr>";
 					farmText += "<tr><td>Vulture Gunship</td><td>1.2</td><td>0.5</td></tr>";
 					farmText += "<tr><td>Caligula</td><td>1.2</td><td>0.4</td></tr>";
-					farmText += "<tr><td>Dule's</td><td>0.3</td><td>0.1</td></tr>";
-					farmText += "<tr><td>Sigurd</td><td>3.2</td><td>1.6</td></tr>";
-					farmText += "<tr><td>Fleet Com.</td><td>2.8</td><td>1.4</td></tr>";
-					farmText += "<tr><td>Reaver</td><td>3.1</td><td>1.6</td></tr>";
-					farmText += "<tr><td>Councilor</td><td>1.6</td><td>0.8</td></tr>";
-					farmText += "<tr><td>Centurian Commander</td><td>0.0</td><td>0.0</td></tr>";
-					farmText += "<tr><td></td><td></td><td></td></tr>"
-					farmText += "<tr><th>Energy Raid</th><th>Norm Farm Val</th><th>NM Farm Val</th></tr>"
-					farmText += "<tr><td>Vince Vortex</td><td>1.7</td><td>0.3</td></tr>";
-					farmText += "<tr><td></td><td></td><td></td></tr>"
-					farmText += "<tr><th>Honor Raid</th><th>Norm Farm Val</th><th>NM Farm Val</th></tr>"
+					farmText += "<tr><td>Cyborg Shark</td><td>1.1</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Guan Yu</td><td>1.1</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Pi</td><td>1.1</td><td>0.4</td></tr>";
+					farmText += "<tr><td>Sigurd</td><td>1.1</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Bile Beat</td><td>1.0</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Fleet Com.</td><td>0.9</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Reaver</td><td>0.9</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Cult-Mistress</td><td>0.9</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Nick</td><td>0.9</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Cake</td><td>0.9</td><td>0.2</td></tr>";
+					farmText += "<tr><td>The Hat</td><td>0.8</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Xenocide</td><td>0.7</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Colossa</td><td>0.7</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Blob</td><td>0.5</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Councilor</td><td>0.5</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Boar</td><td>0.5</td><td>0.1</td></tr>";
+					farmText += "<tr><td>R. Hunter</td><td>0.4</td><td>0.2</td></tr>";
+					farmText += "<tr><td>G. Rahn</td><td>0.3</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Dule's Bot</td><td>0.3</td><td>0.1</td></tr>";
+					
+					farmText += "<tr><td></td><td></td><td></td></tr>";
+					
+					farmText += "<tr><th>Energy Raid</th><th>Norm Farm Val</th><th>NM Farm Val</th></tr>";
+					farmText += "<tr><td>Vince Vortex</td><td>1.7</td><td>0.4</td></tr>";
+					
+					farmText += "<tr><td></td><td></td><td></td></tr>";
+					
+					farmText += "<tr><th>Honor Raid</th><th>Norm Farm Val</th><th>NM Farm Val</th></tr>";
 					farmText += "<tr><td>Krakak Swarm</td><td>5.6</td><td>1.9</td></tr>";
 					farmText += "<tr><td>Infected Squad</td><td>4.4</td><td>1.3</td></tr>";
 					farmText += "<tr><td>Flying Saucers</td><td>4.0</td><td>1.6</td></tr>";
@@ -5877,7 +5962,8 @@ function main()
 					farmText += "<tr><td>Wyrm</td><td>2.0</td><td>0.7</td></tr>";
 					farmText += "<tr><td>Death Flora</td><td>1.9</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Crossbones Squadron</td><td>1.6</td><td>0.5</td></tr>";
-					farmText += "<tr><td>Shadows</td><td>1.4</td><td>0.5</td></tr>";
+					farmText += "<tr><td>Celebrator</td><td>1.6</td><td>0.5</td></tr>";
+					farmText += "<tr><td>Shadows</td><td>1.4</td><td>0.3</td></tr>";
 					farmText += "<tr><td>Mr. Justice</td><td>1.1</td><td>0.3</td></tr>";
 					farmText += "<tr><td>Rylattu Exterminators</td><td>1.1</td><td>0.4</td></tr>";
 					farmText += "<tr><td>Colonel Mustard</td><td>1.1</td><td>0.4</td></tr>";
@@ -5889,10 +5975,14 @@ function main()
 					farmText += "<tr><td>Qin Legion</td><td>0.8</td><td>0.3</td></tr>";
 					farmText += "<tr><td>Juggernaut</td><td>0.7</td><td>0.2</td></tr>";
 					farmText += "<tr><td>Squid</td><td>0.7</td><td>0.2</td></tr>";
-					farmText += "<tr><td>Death Squadron</td><td>0.7</td><td>0.2</td></tr>";
-					farmText += "<tr><td>Devourer</td><td>0.6</td><td>0.2</td></tr>";
-					farmText += "<tr><td>Colby</td><td>0.5</td><td>0.2</td></tr>";
-					farmText += "<tr><td>Legacy Bot</td><td>0.4</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Death Squadron</td><td>0.7</td><td>0.1</td></tr>";
+					farmText += "<tr><td>H. House</td><td>0.6</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Devourer</td><td>0.6</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Colby</td><td>0.5</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Legacy Bot</td><td>0.4</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Psi-Hound</td><td>0.2</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Wahsh</td><td>0.0</td><td>0.0</td></tr>";
+					
 					farmText += "</table>";
 					farmText += "<a href=\"" + DC_LoaTS_Properties.farmSpreadsheetURL + "\" target=\"_blank\">Source</a>\n";
 
@@ -6144,6 +6234,8 @@ function main()
 				// No predefined parsing
 				// parsingClass: none,
 				
+				paramText: "[filter]",
+				
 				cconolyUrl: "http://cconoly.com/lots/raidlinks.php",
 				
 				handler: function(deck, parser, params, text, context)
@@ -6171,7 +6263,7 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Load cconoly raids"
+							text: "Load CConoly raids"
 						}
 					};
 					
@@ -6180,9 +6272,9 @@ function main()
 				
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/loadcconoly</code>\n";
+					var helpText = "<b>Raid Command:</b> <code>/loadcconoly [filter]</code>\n";
 					helpText += "\n";
-					helpText += "Loads raids from CConoly, or whichever ones match the filter\n";
+					helpText += "Loads all raids from CConoly, or whichever ones match the filter\n";
 					
 					return helpText;
 				}
@@ -6206,7 +6298,7 @@ function main()
 						
 					if (ret.success) {
 						// Make sure to convert to the better url
-						parser.convertedURL = this.pastebinRawBase + parser.regexMatch[1];
+						parser.convertedUrl = this.pastebinRawBase + parser.regexMatch[1];
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {
@@ -6546,7 +6638,10 @@ RaidCommand
 					var helpText = "<b>Raid Command:</b> <code>/raid raidName difficulty</code>\n";
 					helpText += "where <code>raidName</code> is any partial or full raid name\n";
 					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
-					
+					helpText += "\n";
+					helpText += "<b>Example:</b>\n";
+					helpText += "Raid data for NM Tulk: " + this.getCommandLink("tulk 4") + "\n";
+
 					return helpText;
 				}
 			}
@@ -7598,6 +7693,7 @@ DC_LoaTS_Helper.raids =
     bashan:             new RaidType("bashan",              "ZA", "Bashan", "Bashan", "Bashan",                       72,  50, "S",   85000000),
     cyborg_shark:       new RaidType("cyborg_shark",        "ZA2", "Cyborg Shark", "C. Shark", "Shark",               72,  50, "S",   90000000),
     hulking_mutant:     new RaidType("hulking_mutant",      "Z15", "Hulking Mutant", "Mutant", "Mutant",              72,  50, "S",   90000000),
+    screaming_barracuda: new RaidType("screaming_barracuda","Z16", "Screaming Barracuda", "Barracuda", "Barracuda",   72,  50, "S",  110000000),
     
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -7613,6 +7709,7 @@ DC_LoaTS_Helper.raids =
     birthday_cake_of_doom: new RaidType("birthday_cake_of_doom", "ZA","Birthday Cake of Doom", "Cake", "Cake",        72, 100, "S",  250000000),
     anthropist_xenocide_warship:new RaidType("anthropist_xenocide_warship","ZA2","Anthropist Xenocide Warship","Xenocide","Xeno",72,100,"S",300000000),
     tentacled_turkey:   new RaidType("tentacled_turkey",   "Z15","Tentacled Turkey","Turkey","Turkey",                72, 100, "S",  350000000),
+    where_music_meets:  new RaidType("where_music_meets",  "Z16","Symphony of Two Worlds","Symphony","Symphony",      72, 100, "S",  400000000),
 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
@@ -7674,6 +7771,7 @@ DC_LoaTS_Helper.raids =
     wahsh:              new RaidType("wahsh",               "AX", "Wahsh Al-Sahraa", "Wahsh", "Wahsh",                84,  100, "H", [500000000, 1200000000, 3125000000, 7812500000]),
     haunted_house:      new RaidType("haunted_house",       "AX", "Haunted House", "H. House", "House",              168,  100, "H",  350000000),
     crazed_santa:       new RaidType("crazed_santa",        "AX", "Crazed Santa", "Santa", "Santa",                   84,  100, "H",  400000000),
+    kristy_love:        new RaidType("kristy_love",         "AX", "Kristy Love", "Kristy", "Love",                    84,  100, "H",  450000000),
     
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
@@ -7689,21 +7787,26 @@ DC_LoaTS_Helper.raids =
     
     // World Raids
     // Infestation Trilogy
-    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python",                  100,  90000, "SEH", "Infinite", "N/A",   1000000000),
-    inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony",             100,  90000, "SEH", "Infinite", "N/A",   1000000000),
-    inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair",                      100,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python WR",               100,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony WR",          100,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair WR",                   100,  90000, "SEH", "Infinite", "N/A",   1000000000),
     
-    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz",            72,  90000, "SEH", "Infinite", "N/A", 100000000000),
+    general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz WR",         72,  90000, "SEH", "Infinite", "N/A", 100000000000),
 
-    cerebral_destroyer: new RaidType("cerebral_destroyer",  "WR", "Cerebral Destroyer", "Cerebral", "Cerebral Destroyer",72,90000,"SEH", "Infinite", "N/A",  10000000000),
+    cerebral_destroyer: new RaidType("cerebral_destroyer",  "WR", "Cerebral Destroyer", "Cerebral", "CD WR",          72,  90000,"SEH", "Infinite", "N/A",   10000000000),
     
-    wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",  10000000000),
+    wr_space_pox:       new RaidType("wr_space_pox",        "WR", "Intergalactic Space Pox", "WR Pox", "WR Pox",      72,  90000, "SEH", "Infinite", "N/A",   5000000000),
 
-    kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken",                       72,  90000, "SEH", "Infinite", "N/A",  50000000000),
+    kraken:             new RaidType("kraken",              "WR", "Kraken", "Kraken", "Kraken WR",                    72,  90000, "SEH", "Infinite", "N/A",  50000000000),
     
-    raging_snowman:     new RaidType("raging_snowman",      "WR", "Raging Snowman", "Snowman", "Snowman",             24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+    christmas_montage:  new RaidType("christmas_montage",   "WR", "Christmas Campaign", "Christmas", "Xmas WR",       48,  90000, "SEH", "Infinite", "N/A",   5000000000),
 
-    christmas_montage:     new RaidType("christmas_montage","WR", "Christmas Campaign", "Christmas", "Xmas WR",             48,  90000, "SEH", "Infinite", "N/A",   5000000000)
+    // Rare Spawns
+    raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+
+    space_pox_mary:     new RaidType("space_pox_mary",      "RS", "Space Pox Mary", "Mary", "Mary RS",                24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+    	
+   	cerebral_ceo:     	new RaidType("cerebral_ceo",     	"RS", "Cerebral CEO", "CEO", "CEO RS",                    24,  90000, "SEH", "Infinite", "N/A",   2000000000)
     
 };
 
@@ -8427,7 +8530,7 @@ DC_LoaTS_Helper.raids =
 				url: urlParsingFilter.getWorkingUrl(),
 				onload: function(response) {
 					
-					DCDebug("Got back external raid data", response);
+					//DCDebug("Got back external raid data", response);
 					if (response.status === 200) // Must be OK because even other 200 codes won't have our data
 					{
 						var text = response.responseText,
@@ -8446,9 +8549,10 @@ DC_LoaTS_Helper.raids =
 						while ((match = regex.exec(text)) && xx--)
 						{
 							var raidLink = new RaidLink(match[0]);
-							DCDebug("Found Link: " + raidLink);
+							//DCDebug("Found Link: " + raidLink);
 							if (raidLink.isValid())
 							{
+								// Record all raids by boss and difficulty, so we can report them to the user
 								var thisBin = binData[raidLink.getRaid().shortName];
 								if (!thisBin){
 									thisBin = {};
@@ -8460,13 +8564,14 @@ DC_LoaTS_Helper.raids =
 									thisBin[raidLink.difficulty] = thisBinRaids;
 								}
 								thisBinRaids.push(raidLink);
-
 								
 								if (hasRaidFilter)
 								{
+									// Create the criteria for the raidlink matching the filter
 									var matchCriteria = {
 										difficulty: raidLink.difficulty,
 										fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+										os: raidLink.getRaid().getOptimalShare(raidLink.difficulty),
 										name: raidLink.getRaid().getSearchableName(),
 										count: matchedRaidsList.length
 									};
@@ -8485,6 +8590,7 @@ DC_LoaTS_Helper.raids =
 										}
 									}
 									
+									// Check if the raid link actually matches the criteria
 									if (raidFilter.matches(matchCriteria))
 									{
 										matchedRaidsList.push(raidLink);
@@ -8543,22 +8649,30 @@ DC_LoaTS_Helper.raids =
 					}
 					else if (response.status === 404)
 					{
-						holodeck.activeDialogue().raidBotMessage("Pastebin could not locate a valid paste at " + urlParsingFilter.getUrlLink());
+						holodeck.activeDialogue().raidBotMessage("Could not locate a valid raid list at " + urlParsingFilter.getUrlLink());
 					}
 					else if (response.status >= 500 && response.status < 600)
 					{
-						holodeck.activeDialogue().raidBotMessage("Pastebin is having server trouble trying to load " + urlParsingFilter.getUrlLink() 
-						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+						holodeck.activeDialogue().raidBotMessage("Trouble trying to load " + urlParsingFilter.getUrlLink() 
+						+ ".\n" + "Service gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
 					else 
 					{
 						holodeck.activeDialogue().raidBotMessage("Trouble loading " + urlParsingFilter.getUrlLink() 
-						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+						+ ".\n" + "Service gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
 				} // End onload function
 			});
-
-		}
+		};
+		
+		DC_LoaTS_Helper.reportDead = function(raidLink) {
+			DC_LoaTS_Helper.ajax({
+				url: "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=tpircsmood",
+				onload: function(response) {
+					console.log("Report Dead Response: ", response);
+				}
+			});
+		};
 		
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			// Private variable to be closed over in the autoLoader
@@ -8573,7 +8687,7 @@ DC_LoaTS_Helper.raids =
 			};
 			var startTime = new Date()/1;
 			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
-			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 500);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 205);
 			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
 			var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
 
@@ -9242,6 +9356,7 @@ DC_LoaTS_Helper.raids =
 							if (wr.infoUrl) {
 								var infoLink = document.createElement("a");
 								infoLink.href = wr.infoUrl;
+								infoLink.target = "_BLANK";
 								infoLink.appendChild(document.createTextNode(wr.infoUrlTitle||wr.infoUrl));
 								infoDiv.appendChild(infoLink);
 							}
@@ -9336,29 +9451,42 @@ DC_LoaTS_Helper.raids =
 		};
 
 	// World Raid Data, if there is any
-
-
+    // We can leave stuff commented out in here, but don't let it get too big. This gets downloaded with /urd
+	
+	// DC_LoaTS_Helper.worldRaidInfo.timerEnds = "2013-01-28T22:20:19Z" // 6PM EST / 11PM GMT
+/*
 	DC_LoaTS_Helper.worldRaidInfo = {
-		name: "Christmas Campaign",
+		name: "Cerebral CEO",
+		
+		spawnType: "Rare Spawn",
+		
+		startDate: "02/07/2013",
+		timerEnds: "2013-02-08T22:40:49Z",
+		
+		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_boss=cerebral_ceo&kv_difficulty=1&kv_raid_id=6894478&kv_hash=gkT87rGS1L",
+		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?11606-Corporate-Takedown-Fight-the-Cerebral-CEO!",
+		infoUrlTitle: "'Corporate Takedown - Fight the Cerebral CEO! ' Official Announcement",
+		lootTableImageUrl: "http://i.imgur.com/7TzuHjl.jpg"
+	};
+*/
+	/*
+	DC_LoaTS_Helper.worldRaidInfo = {
+		name: "Cerebral Destroyer",
 		
 		spawnType: "World Raid",
 		
-		startDate: "12/19/2012",
-		timerEnds: "2012-12-21T23:00:07Z",
+		startDate: "01/25/2013",
+		timerEnds: "2013-01-28T22:20:19Z",
 		
-		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=5872044&kv_difficulty=1&kv_raid_boss=christmas_montage&kv_hash=5XzvkGP6E8",
-		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10905-New-World-Raid-Christmas-Campaign!",
-		infoUrlTitle: "'New World Raid: Christmas Campaign!' Official Announcement",
-		
-		lootTableImageUrl: "http://i.imgur.com/A1kXq.jpg"
-		
+		raidUrl: "http://www.kongregate.com/games/5thPlanetGames/legacy-of-a-thousand-suns?kv_action_type=raidhelp&kv_raid_id=6648986&kv_difficulty=1&kv_raid_boss=wr_space_pox&kv_hash=0P9ft37ffs",
+		infoUrl: "http://www.legacyofathousandsuns.com/forum/showthread.php?10224-Delirium-of-the-Cerebral-Destroyer",
+		infoUrlTitle: "'Delirium of the Cerebral Destroyer' Official Announcement",
+		lootTableImageUrl: "http://i.imgur.com/XlWhw.jpg"
 	};
-
+	*/
 
 
 	// End World Raid Data
-	
-	
 		}// End declareClasses function
 	
 	// Define some CSS Styles

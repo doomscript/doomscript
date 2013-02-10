@@ -20,6 +20,7 @@
 					this.count;
 					this.page;
 					this.fs;
+					this.os;
 					this.valid = true;
 	
 					// Capture original filterText
@@ -149,6 +150,7 @@
 								
 								this.page = parseInt(paramValue);
 								break;
+							case "os":
 							case "fs":
 								var match = RaidFilter.numberExpressionPattern.exec(paramValue);
 								
@@ -202,7 +204,7 @@
 									holodeck.activeDialogue().raidBotMessage("Did not understand " + filterType + " expression " + traceStatement);
 									this.valid = false;
 								}
-								this.fs = condition + num;
+								this[filterType] = condition + num;
 								break;
 							case "state":
 								var tmpStateText = paramValue;
@@ -337,9 +339,10 @@
 								// Check against the age condition
 								matched = matched && eval(value + this.age);
 								break;
+							case "os":
 							case "fs":
 								// Check against the fs condition
-								matched = matched && eval(value + this.fs);
+								matched = matched && eval(value + this[field]);
 								break;
 							case "count":
 								// Check against the count condition
@@ -367,7 +370,8 @@
 						((typeof this.age 			!= "undefined")?"a=" + this.age + ";":"") +
 						((typeof this.count 		!= "undefined")?"c=" + this.count + ";":"") +
 						((typeof this.page 			!= "undefined")?"p=" + this.page + ";":"") +
-						((typeof this.fs 			!= "undefined")?"f=" + this.fs + ";":"");
+						((typeof this.fs 			!= "undefined")?"f=" + this.fs + ";":"") + 
+						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"");
 			},
 			
 			// If it has a name and optionally a difficulty and nothing else, it's simple
@@ -379,7 +383,8 @@
 					  typeof this.age			== "undefined" &&
 					  typeof this.count			== "undefined" &&
 					  typeof this.page			== "undefined" &&
-					  typeof this.fs			== "undefined");
+					  typeof this.fs			== "undefined" &&
+					  typeof this.os			== "undefined");
 			},
 			
 			isEmpty: function()
@@ -391,7 +396,8 @@
 						(typeof this.age 			== "undefined") &&
 						(typeof this.count 			== "undefined") &&
 						(typeof this.page 			== "undefined") &&
-						(typeof this.fs 			== "undefined");
+						(typeof this.fs 			== "undefined") && 
+						(typeof this.os 			== "undefined");
 	
 			},
 			
@@ -414,6 +420,7 @@
 						 ((typeof this.inverseState 	!= "undefined" && this.inverseState == true)? "!":"")
 						 + this.state.text + "}"+ " ":"") +
 						 ((typeof this.fs 				!= "undefined")? "{fs: " + this.fs + "} ":"") + 
+						 ((typeof this.os 				!= "undefined")? "{os: " + this.os + "} ":"") + 
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
 						 ((typeof this.count 			!= "undefined")? "{count: " + this.count + "} ":"") +
 						 ((typeof this.page 			!= "undefined")? "{page: " + this.page + "} ":"")).trim();
@@ -470,7 +477,7 @@
 		});
 		
 		// Parameter text for this parser
-		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
+		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{os: osParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
 		
 		// Regex to parse number expressions
 		RaidFilter.numberExpressionPattern = /(<=?|>=?|==?|!=?)?\s*(\d+)\s*(\w\w?)?/;

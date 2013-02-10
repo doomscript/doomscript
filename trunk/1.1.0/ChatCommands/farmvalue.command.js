@@ -31,6 +31,8 @@
 					farmText += "<tr><td>Purple Lion</td><td>3.2</td><td>1.1</td></tr>";
 					farmText += "<tr><td>Cybersmash</td><td>3.1</td><td>1.0</td></tr>";
 					farmText += "<tr><td>Blood Alley Gang</td><td>2.8</td><td>0.9</td></tr>";
+					farmText += "<tr><td>Bashan</td><td>2.3</td><td>0.6</td></tr>";
+					farmText += "<tr><td>Missiles</td><td>2.3</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Tulk</td><td>2.2</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Scarlet Harlot</td><td>2.0</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Agony Ecstacy</td><td>1.8</td><td>0.7</td></tr>";
@@ -41,21 +43,40 @@
 					farmText += "<tr><td>Sun-Xi</td><td>1.5</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Lt. Targe</td><td>1.4</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Guldax Quibberath</td><td>1.4</td><td>0.5</td></tr>";
+					farmText += "<tr><td>Bachanghenfil</td><td>1.3</td><td>0.3</td></tr>";
 					farmText += "<tr><td>Warden Ramiro</td><td>1.3</td><td>0.5</td></tr>";
 					farmText += "<tr><td>Nemo</td><td>1.3</td><td>0.5</td></tr>";
+					farmText += "<tr><td>Gut-Phager</td><td>1.2</td><td>0.2</td></tr>";
 					farmText += "<tr><td>Vulture Gunship</td><td>1.2</td><td>0.5</td></tr>";
 					farmText += "<tr><td>Caligula</td><td>1.2</td><td>0.4</td></tr>";
-					farmText += "<tr><td>Dule's</td><td>0.3</td><td>0.1</td></tr>";
-					farmText += "<tr><td>Sigurd</td><td>3.2</td><td>1.6</td></tr>";
-					farmText += "<tr><td>Fleet Com.</td><td>2.8</td><td>1.4</td></tr>";
-					farmText += "<tr><td>Reaver</td><td>3.1</td><td>1.6</td></tr>";
-					farmText += "<tr><td>Councilor</td><td>1.6</td><td>0.8</td></tr>";
-					farmText += "<tr><td>Centurian Commander</td><td>0.0</td><td>0.0</td></tr>";
-					farmText += "<tr><td></td><td></td><td></td></tr>"
-					farmText += "<tr><th>Energy Raid</th><th>Norm Farm Val</th><th>NM Farm Val</th></tr>"
-					farmText += "<tr><td>Vince Vortex</td><td>1.7</td><td>0.3</td></tr>";
-					farmText += "<tr><td></td><td></td><td></td></tr>"
-					farmText += "<tr><th>Honor Raid</th><th>Norm Farm Val</th><th>NM Farm Val</th></tr>"
+					farmText += "<tr><td>Cyborg Shark</td><td>1.1</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Guan Yu</td><td>1.1</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Pi</td><td>1.1</td><td>0.4</td></tr>";
+					farmText += "<tr><td>Sigurd</td><td>1.1</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Bile Beat</td><td>1.0</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Fleet Com.</td><td>0.9</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Reaver</td><td>0.9</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Cult-Mistress</td><td>0.9</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Nick</td><td>0.9</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Cake</td><td>0.9</td><td>0.2</td></tr>";
+					farmText += "<tr><td>The Hat</td><td>0.8</td><td>0.3</td></tr>";
+					farmText += "<tr><td>Xenocide</td><td>0.7</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Colossa</td><td>0.7</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Blob</td><td>0.5</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Councilor</td><td>0.5</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Boar</td><td>0.5</td><td>0.1</td></tr>";
+					farmText += "<tr><td>R. Hunter</td><td>0.4</td><td>0.2</td></tr>";
+					farmText += "<tr><td>G. Rahn</td><td>0.3</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Dule's Bot</td><td>0.3</td><td>0.1</td></tr>";
+					
+					farmText += "<tr><td></td><td></td><td></td></tr>";
+					
+					farmText += "<tr><th>Energy Raid</th><th>Norm Farm Val</th><th>NM Farm Val</th></tr>";
+					farmText += "<tr><td>Vince Vortex</td><td>1.7</td><td>0.4</td></tr>";
+					
+					farmText += "<tr><td></td><td></td><td></td></tr>";
+					
+					farmText += "<tr><th>Honor Raid</th><th>Norm Farm Val</th><th>NM Farm Val</th></tr>";
 					farmText += "<tr><td>Krakak Swarm</td><td>5.6</td><td>1.9</td></tr>";
 					farmText += "<tr><td>Infected Squad</td><td>4.4</td><td>1.3</td></tr>";
 					farmText += "<tr><td>Flying Saucers</td><td>4.0</td><td>1.6</td></tr>";
@@ -66,7 +87,8 @@
 					farmText += "<tr><td>Wyrm</td><td>2.0</td><td>0.7</td></tr>";
 					farmText += "<tr><td>Death Flora</td><td>1.9</td><td>0.6</td></tr>";
 					farmText += "<tr><td>Crossbones Squadron</td><td>1.6</td><td>0.5</td></tr>";
-					farmText += "<tr><td>Shadows</td><td>1.4</td><td>0.5</td></tr>";
+					farmText += "<tr><td>Celebrator</td><td>1.6</td><td>0.5</td></tr>";
+					farmText += "<tr><td>Shadows</td><td>1.4</td><td>0.3</td></tr>";
 					farmText += "<tr><td>Mr. Justice</td><td>1.1</td><td>0.3</td></tr>";
 					farmText += "<tr><td>Rylattu Exterminators</td><td>1.1</td><td>0.4</td></tr>";
 					farmText += "<tr><td>Colonel Mustard</td><td>1.1</td><td>0.4</td></tr>";
@@ -78,10 +100,14 @@
 					farmText += "<tr><td>Qin Legion</td><td>0.8</td><td>0.3</td></tr>";
 					farmText += "<tr><td>Juggernaut</td><td>0.7</td><td>0.2</td></tr>";
 					farmText += "<tr><td>Squid</td><td>0.7</td><td>0.2</td></tr>";
-					farmText += "<tr><td>Death Squadron</td><td>0.7</td><td>0.2</td></tr>";
-					farmText += "<tr><td>Devourer</td><td>0.6</td><td>0.2</td></tr>";
-					farmText += "<tr><td>Colby</td><td>0.5</td><td>0.2</td></tr>";
-					farmText += "<tr><td>Legacy Bot</td><td>0.4</td><td>0.2</td></tr>";
+					farmText += "<tr><td>Death Squadron</td><td>0.7</td><td>0.1</td></tr>";
+					farmText += "<tr><td>H. House</td><td>0.6</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Devourer</td><td>0.6</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Colby</td><td>0.5</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Legacy Bot</td><td>0.4</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Psi-Hound</td><td>0.2</td><td>0.1</td></tr>";
+					farmText += "<tr><td>Wahsh</td><td>0.0</td><td>0.0</td></tr>";
+					
 					farmText += "</table>";
 					farmText += "<a href=\"" + DC_LoaTS_Properties.farmSpreadsheetURL + "\" target=\"_blank\">Source</a>\n";
 

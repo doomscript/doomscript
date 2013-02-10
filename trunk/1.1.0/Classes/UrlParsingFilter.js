@@ -52,6 +52,18 @@
 						break;
 					}
 				}
+				
+				// Additional management based on types
+				switch(type) {
+					case "pastebin":
+						// Nothing 
+						break;
+					case "cconoly":
+						
+						break;
+					default:
+						break;
+				}
 			},
 			getUrlLink: function()
 			{
@@ -77,5 +89,5 @@
 		UrlParsingFilter.urlPatterns = {
 				"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
 				"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
-			};		
+			};
 		

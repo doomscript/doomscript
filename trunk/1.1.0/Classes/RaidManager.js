@@ -335,12 +335,10 @@
 						raidData.stateId = currentState.id;
 					}
 					
-					// If there is an old style state, delete it
-					// Our goal is to minimize local storage footprint to just the essentials
-					if (typeof raidData.state != "undefined" )
-					{
-						// Preserve backwards compatibility at the cost of memory usage
-//						delete raidData.state;
+					// If we should report dead raids and this one is dead and it hasn't been reported yet
+					if (DC_LoaTS_Helper.getPref("ReportDeadRaids", true) && RaidManager.STATE.equals(state, RaidManager.STATE.COMPLETED) && !raidData.reported) {
+						raidData.reported = true;
+						DC_LoaTS_Helper.reportDead(raidLink);
 					}
 					
 					// Update the lastSeen time of the link
@@ -391,18 +389,20 @@
 			{
 				Timer.start("store bulk");
 
-				Timer.start("store > loading hardRaidStorage");
-				
 				// Load up the storage object
+				Timer.start("store > loading hardRaidStorage");
 				var hardRaidStorage = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidStorage));
 				Timer.stop("store > loading hardRaidStorage");
-			
+				
+				// Declare a bunch of vars. Don't forget there's no such thing as block scope
+				var raidLink, raidData, currentState, newState, containedInLocalDB, shouldUpdateAllLinks;
+				
 				// Capture all the valid links we're actually going to store
 				var outboundLinks = [];
 				
 				for (var i = 0; i < raidLinks.length; i++) {
 					
-					var raidLink = raidLinks[i];
+					raidLink = raidLinks[i];
 					
 					// Valid link?
 					if (raidLink.isValid()) {
@@ -411,46 +411,43 @@
 						outboundLinks.push(raidLink);
 					
 						// Attempt to load the passed in raid link
-						var raidData = hardRaidStorage[raidLink.getUniqueKey()];
+						raidData = hardRaidStorage[raidLink.getUniqueKey()];
 						
 						// Lookup the current state
-						var currentState;
-						var containedInLocalDB = true;
-						if (typeof raidData != "undefined")
+					    containedInLocalDB = true;
+					    currentState = null;
+						if (raidData)
 						{
 							// If there is a stateId, use that first
-							if (typeof raidData.stateId != "undefined")
+							if (raidData.stateId)
 							{
 								currentState = RaidManager.STATE.valueOf(raidData.stateId);
 							}
 							// If there is an old-style state, use that second
-							else if (typeof raidData.state != "undefined")
+							else if (raidData.state)
 							{
 								currentState = RaidManager.STATE.valueOf(raidData.state.text);
 							}
 						}
 						
 						// If we couldn't find the current state, set it to UNSEEN
-						if (typeof currentState === "undefined")
+						if (!currentState)
 						{
 							currentState = RaidManager.STATE.UNSEEN;
 							containedInLocalDB = false;
 						}
 						
-						// If we weren't provided a state param, set it to the current state
-						if (typeof state === "undefined")
-						{
-							state = currentState;
-						}
+						// Set the new state. It's either going to be the new parameter state or the existing state
+						newState = state || currentState;
 						
 						// Keep track of whether or not this link needs to be updated elsewhere
-						var shouldUpdateAllLinks = false;
+						shouldUpdateAllLinks = false;
 						
 						// If we've never seen this link before
 						if (!raidData)
 						{
 							// Create a new storage container for it, and wrap it
-							raidData = {raidLink: raidLink, stateId: state.id, firstSeen: new Date()/1}
+							raidData = {raidLink: raidLink, stateId: newState.id, firstSeen: new Date()/1}
 							
 							// Place this object into the storage
 							hardRaidStorage[raidLink.getUniqueKey()] = raidData;						
@@ -458,7 +455,7 @@
 						// Two unseens upgrade to seen if the link was already in the DB
 						else if (containedInLocalDB
 								 &&
-									RaidManager.STATE.equals(state, RaidManager.STATE.UNSEEN)
+									RaidManager.STATE.equals(newState, RaidManager.STATE.UNSEEN)
 									&& 
 									RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)
 								 )
@@ -470,10 +467,10 @@
 						        shouldUpdateAllLinks = true;
 						}
 						// If we have seen this link before, change the links state if necessary
-						else if (!RaidManager.STATE.equals(currentState, state))
+						else if (!RaidManager.STATE.equals(currentState, newState))
 						{
 							// Set the new state
-							raidData.stateId = state.id;
+							raidData.stateId = newState.id;
 							
 							// Since we changed state, need to update all those links
 							shouldUpdateAllLinks = true;
@@ -487,6 +484,12 @@
 												
 						// Update the lastSeen time of the link
 						raidData.lastSeen = new Date()/1;
+						
+						// If we should report dead raids and this one is dead and it hasn't been reported yet
+						if (DC_LoaTS_Helper.getPref("ReportDeadRaids", true) && RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED) && !raidData.reported) {
+							raidData.reported = true;
+							DC_LoaTS_Helper.reportDead(raidLink);
+						}
 					}
 				} // End for iterating over the links
 				
@@ -511,12 +514,9 @@
 				// Update the cache
 				RaidManager.raidStorage = hardRaidStorage;
 				
-				// If we found a reason to update some links
-				if (shouldUpdateAllLinks)
-				{
-					// Update the posted links
-					DC_LoaTS_Helper.updatePostedLinks();
-				}
+				// Update the posted links. 
+				DC_LoaTS_Helper.updatePostedLinks();
+				
 				Timer.stop("store bulk");
 				
 				return outboundLinks;

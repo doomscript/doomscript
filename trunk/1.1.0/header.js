@@ -274,9 +274,17 @@ Reworked how pastebin and autoload work by making them use the same code
 With help from Sycdan, added /loadcconoly
 Added some help to keep the spammer up to date with known raid data
 
-201?.??.?? - 1.1.18
+2013.02.10 - 1.1.18
 Fixed issue with /clearraids all not working
-TODO: Added marked dead functionality for CConoly
+Improved help text of a few commands
+Corrected and updated /farmvalue a bit
+Added marked dead functionality for CConoly
+Added os to filters [Sycdan]
+Fixed WR Space Pox Icon
+Kind of made the broken close icon for the menu suck less, though not totally fixed
+Added Zone 16 raids: Screaming Barracuda and Symphony of Two Worlds
+Added two Rare Spawns: Cerebral CEO and Space Pox Mary
+WR Info page's forum link should now open in a new window/tab
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.

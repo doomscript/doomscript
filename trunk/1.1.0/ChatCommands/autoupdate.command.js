@@ -70,6 +70,13 @@
 					helpText += "\n";
 					helpText += "If there is an update to install and checks are on, when the page loads, a bar will appear";
 					helpText += " at the top of the screen offering the option to update.\n";
+					helpText += "\n";
+					if (GM_getValue(DC_LoaTS_Properties.storage.autoUpdate, false)) {
+						helpText += "Updates are currently ON. Turn them " + this.getCommandLink("OFF","OFF?") + "\n";
+					}
+					else {
+						helpText += "Updates are currently OFF. Turn them " + this.getCommandLink("ON","ON?") + "\n";
+					}
 					
 					return helpText;
 				}

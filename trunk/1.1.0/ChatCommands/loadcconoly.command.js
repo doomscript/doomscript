@@ -7,6 +7,8 @@
 				// No predefined parsing
 				// parsingClass: none,
 				
+				paramText: "[filter]",
+				
 				cconolyUrl: "http://cconoly.com/lots/raidlinks.php",
 				
 				handler: function(deck, parser, params, text, context)
@@ -34,7 +36,7 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Load cconoly raids"
+							text: "Load CConoly raids"
 						}
 					};
 					
@@ -43,9 +45,9 @@
 				
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/loadcconoly</code>\n";
+					var helpText = "<b>Raid Command:</b> <code>/loadcconoly [filter]</code>\n";
 					helpText += "\n";
-					helpText += "Loads raids from CConoly, or whichever ones match the filter\n";
+					helpText += "Loads all raids from CConoly, or whichever ones match the filter\n";
 					
 					return helpText;
 				}
