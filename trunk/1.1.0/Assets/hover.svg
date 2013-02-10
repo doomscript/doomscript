@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns:author="http://www.sothink.com"
+width="37px" height="43px"
+xml:space="preserve">
+<g id="1" transform="matrix(1, 0, 0, 1, 1.4, 2)">
+<linearGradient
+id="LinearGradID_2" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.0121765, -0.0121765, 0.0266266, 0.0266266, 24.35, 13.4)" spreadMethod ="pad" x1="-819.2" y1="0" x2="819.2" y2="0" >
+<stop  offset="0" style="stop-color:#CC003A;stop-opacity:0.298039" />
+<stop  offset="1" style="stop-color:#CC003A;stop-opacity:0.498039" />
+</linearGradient>
+<path style="fill:url(#LinearGradID_2) " d="M25.1,-1Q34.05 -1.05 34.05 8.05L34.05 38.05L0 3.8L4.75 -0.95L25.1 -1" />
+<path style="fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:3;stroke:#CC003A;stroke-opacity:1" d="M4.75,-0.95L0 3.8L34.05 38.05L34.05 8.05Q34.05 -1.05 25.1 -1L4.75 -0.95z" />
+<linearGradient
+id="LinearGradID_3" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0, 0.00323486, -0.0210419, -1.52588e-005, 17.15, 2.95)" spreadMethod ="pad" x1="-819.2" y1="0" x2="819.2" y2="0" >
+<stop  offset="0" style="stop-color:#A3FEFD;stop-opacity:0" />
+<stop  offset="0.12549" style="stop-color:#A3FEFD;stop-opacity:0.262745" />
+<stop  offset="1" style="stop-color:#A3FEFD;stop-opacity:0" />
+</linearGradient>
+<path style="fill:url(#LinearGradID_3) " d="M34.05,9.45L5.65 9.45L0 3.8L4.75 -0.95L25.1 -1Q34.05 -1.05 34.05 8.05L34.05 9.45" />
+<linearGradient
+id="LinearGradID_4" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0, 0.00646973, -0.00759888, 0, 16.3, 3.5)" spreadMethod ="pad" x1="-819.2" y1="0" x2="819.2" y2="0" >
+<stop  offset="0" style="stop-color:#FFFFFF;stop-opacity:0.498039" />
+<stop  offset="1" style="stop-color:#A3FEFD;stop-opacity:0" />
+</linearGradient>
+<path style="fill:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke:url(#LinearGradID_4) " d="M34.05,8.05Q34.05 -1.05 25.1 -1L4.75 -0.95L0 3.8" />
+</g>
+</svg>
