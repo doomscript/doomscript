@@ -15,7 +15,7 @@
 						
 					if (ret.success) {
 						// Make sure to convert to the better url
-						parser.convertedURL = this.pastebinRawBase + parser.regexMatch[1];
+						parser.convertedUrl = this.pastebinRawBase + parser.regexMatch[1];
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {

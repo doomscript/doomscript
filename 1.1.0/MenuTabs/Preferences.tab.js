@@ -12,6 +12,7 @@
 				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
 				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
+				reportDeadRaidsKey: "ReportDeadRaids",
 				
 				initPane: function()
 				{
@@ -79,16 +80,27 @@
 									{
 										onclick: function()
 										{
-											//TODO: Obviously, this should come from a key
 											DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundKey, this.checked);
 										}
 									}
 					);
-					
-					
-					// This is commented out until we decide if it can be used.
-					// Reminder: Uncomment this line to re-enable loading in the background
 					wrapper.appendChild(loadBackgroundOption.wrapper);
+
+					var reportDeadRaidsOption = me.createSimpleOptionHTML(
+							"PreferencesMenu-ReportDeadRaidsInput",
+							"boolean", 
+							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true), 
+							"Report Dead Raids to CConoly",
+							"When a raid is marked Complete, inform CConoly",
+							{
+								onclick: function()
+								{
+									DC_LoaTS_Helper.setPref(me.reportDeadRaidsKey, this.checked);
+								}
+							}
+					);
+					wrapper.appendChild(reportDeadRaidsOption.wrapper);
+
 
 					this.pane.appendChild(wrapper);
 				}

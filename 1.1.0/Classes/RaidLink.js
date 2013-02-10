@@ -593,6 +593,9 @@
 			{
 				switch(raidLink.raidTypeId)
 				{
+					case "wr_space_pox":
+						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/space_pox_1.jpg";
+						break;
 					case "dule_warmaster":
 						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/dule_1.jpg";
 						break;

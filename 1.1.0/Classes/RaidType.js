@@ -102,14 +102,15 @@
 				return DC_LoaTS_Helper.prettyFormatNumber(fs);
 			},
 			
-			// Get pretty text for target damange
-			/*public String*/
-			getTargetDamageText: function(difficulty)
+			// Get or calculate optimal share for a given difficulty raid. 
+			// Can be int or String (usually, if applicable, "Unknown")
+			/*public int or String*/
+			getOptimalShare: function (difficulty)
 			{
 				var target = 0;
 				
 				// If non-standard target damage is set
-				if (typeof this.target != "undefined")
+				if (typeof this.target !== "undefined")
 				{
 					target = this.target[difficulty-1];
 				}
@@ -119,7 +120,14 @@
 					target = this.getFairShare(difficulty) * RaidType.targetDamageModifier[this.size];
 				}
 				
-				return DC_LoaTS_Helper.prettyFormatNumber(target);
+				return target;
+			},
+			
+			// Get pretty text for target damage (optimal share)
+			/*public String*/
+			getTargetDamageText: function(difficulty)
+			{
+				return DC_LoaTS_Helper.prettyFormatNumber(this.getOptimalShare(difficulty));
 			},
 			
 			// Returns the int of the health or specified String (usually, if applicable, it's "Unknown")

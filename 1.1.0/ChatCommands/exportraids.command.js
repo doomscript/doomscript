@@ -89,7 +89,11 @@
 					helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
 					helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
 					helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
-					
+					helpText += "\n";
+					helpText += "Example:\n";
+					helpText += "Export all seen psychic colonels, including visited: \n";
+					helpText += this.getCommandLink("psy {state: !completed}") + "\n";
+
 					return helpText;
 				}
 			}

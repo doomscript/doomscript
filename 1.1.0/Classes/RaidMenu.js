@@ -51,7 +51,7 @@
 					// Set up the close button
 					this.titleBarClose = document.createElement("img");
 					this.titleBarClose.id = "DC_LoaTS_raidMenuClose";
-					this.titleBarClose.src = "http://i.imm.io/nNJy.png";					
+					this.titleBarClose.src = "https://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/base.png";					
 					this.titleBarClose.setAttribute("usemap", "#raidMenuCloseMap");
 					this.titleBarWrapper.appendChild(this.titleBarClose);
 					
@@ -68,8 +68,8 @@
 					titleBarCloseArea.coords = "12,6,50,42,50,6,46,1,42,0,19,-1";
 					titleBarCloseArea.href = "#";
 					titleBarCloseArea.setAttribute("onclick", "RaidMenu.toggle(); return false;");
-					titleBarCloseArea.setAttribute("onmouseover", "$('DC_LoaTS_raidMenuClose').src = 'http://i.imm.io/nStr.png';");
-					titleBarCloseArea.setAttribute("onmouseout", "$('DC_LoaTS_raidMenuClose').src = 'http://i.imm.io/nNJy.png';");
+					titleBarCloseArea.setAttribute("onmouseover", "$('DC_LoaTS_raidMenuClose').src = 'https://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hover.png';");
+					titleBarCloseArea.setAttribute("onmouseout", "$('DC_LoaTS_raidMenuClose').src = 'https://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/base.png';");
 					this.titleBarCloseMap.appendChild(titleBarCloseArea);
 
 					

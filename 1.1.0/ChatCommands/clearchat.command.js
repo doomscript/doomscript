@@ -28,6 +28,9 @@
 				{
 					var helpText = "<b>Raid Command:</b> <code>/clearchat</code>\n";
 					helpText += "Clears the text of the chat.\n";
+					helpText += "\n";
+					helpText += this.getCommandLink("","Clear chat now?") + "\n";
+
 					
 					return helpText;
 				}

@@ -115,7 +115,10 @@
 					var helpText = "<b>Raid Command:</b> <code>/raid raidName difficulty</code>\n";
 					helpText += "where <code>raidName</code> is any partial or full raid name\n";
 					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
-					
+					helpText += "\n";
+					helpText += "<b>Example:</b>\n";
+					helpText += "Raid data for NM Tulk: " + this.getCommandLink("tulk 4") + "\n";
+
 					return helpText;
 				}
 			}

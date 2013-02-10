@@ -717,7 +717,7 @@
 				url: urlParsingFilter.getWorkingUrl(),
 				onload: function(response) {
 					
-					DCDebug("Got back external raid data", response);
+					//DCDebug("Got back external raid data", response);
 					if (response.status === 200) // Must be OK because even other 200 codes won't have our data
 					{
 						var text = response.responseText,
@@ -736,9 +736,10 @@
 						while ((match = regex.exec(text)) && xx--)
 						{
 							var raidLink = new RaidLink(match[0]);
-							DCDebug("Found Link: " + raidLink);
+							//DCDebug("Found Link: " + raidLink);
 							if (raidLink.isValid())
 							{
+								// Record all raids by boss and difficulty, so we can report them to the user
 								var thisBin = binData[raidLink.getRaid().shortName];
 								if (!thisBin){
 									thisBin = {};
@@ -750,13 +751,14 @@
 									thisBin[raidLink.difficulty] = thisBinRaids;
 								}
 								thisBinRaids.push(raidLink);
-
 								
 								if (hasRaidFilter)
 								{
+									// Create the criteria for the raidlink matching the filter
 									var matchCriteria = {
 										difficulty: raidLink.difficulty,
 										fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+										os: raidLink.getRaid().getOptimalShare(raidLink.difficulty),
 										name: raidLink.getRaid().getSearchableName(),
 										count: matchedRaidsList.length
 									};
@@ -775,6 +777,7 @@
 										}
 									}
 									
+									// Check if the raid link actually matches the criteria
 									if (raidFilter.matches(matchCriteria))
 									{
 										matchedRaidsList.push(raidLink);
@@ -833,22 +836,30 @@
 					}
 					else if (response.status === 404)
 					{
-						holodeck.activeDialogue().raidBotMessage("Pastebin could not locate a valid paste at " + urlParsingFilter.getUrlLink());
+						holodeck.activeDialogue().raidBotMessage("Could not locate a valid raid list at " + urlParsingFilter.getUrlLink());
 					}
 					else if (response.status >= 500 && response.status < 600)
 					{
-						holodeck.activeDialogue().raidBotMessage("Pastebin is having server trouble trying to load " + urlParsingFilter.getUrlLink() 
-						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+						holodeck.activeDialogue().raidBotMessage("Trouble trying to load " + urlParsingFilter.getUrlLink() 
+						+ ".\n" + "Service gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
 					else 
 					{
 						holodeck.activeDialogue().raidBotMessage("Trouble loading " + urlParsingFilter.getUrlLink() 
-						+ ".\n" + "Pastebin gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+						+ ".\n" + "Service gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
 				} // End onload function
 			});
-
-		}
+		};
+		
+		DC_LoaTS_Helper.reportDead = function(raidLink) {
+			DC_LoaTS_Helper.ajax({
+				url: "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=tpircsmood",
+				onload: function(response) {
+					console.log("Report Dead Response: ", response);
+				}
+			});
+		};
 		
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			// Private variable to be closed over in the autoLoader
@@ -863,7 +874,7 @@
 			};
 			var startTime = new Date()/1;
 			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
-			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 500);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 205);
 			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
 			var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
 
@@ -1532,6 +1543,7 @@
 							if (wr.infoUrl) {
 								var infoLink = document.createElement("a");
 								infoLink.href = wr.infoUrl;
+								infoLink.target = "_BLANK";
 								infoLink.appendChild(document.createTextNode(wr.infoUrlTitle||wr.infoUrl));
 								infoDiv.appendChild(infoLink);
 							}
