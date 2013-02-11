@@ -403,6 +403,7 @@
 				for (var i = 0; i < raidLinks.length; i++) {
 					
 					raidLink = raidLinks[i];
+					state = undefined;
 					
 					// Valid link?
 					if (raidLink.isValid()) {
@@ -696,7 +697,8 @@
 										{
 											age: commandStartTime - raidData.firstSeen,
 											difficulty: raidLink.difficulty,
-											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+											fs: raidLink.getRaid().getFairShare(raidLink.difficulty),
+											os: raidLink.getRaid().getOptimalShare(raidLink.difficulty),
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
 											count: raidCount
