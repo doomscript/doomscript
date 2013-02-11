@@ -8,8 +8,10 @@
 				// parsingClass: none,
 				
 				paramText: "[filter]",
-				
-				cconolyUrl: "http://cconoly.com/lots/raidlinks.php",
+					
+				timePrefKey: "LastQueryTime_Cconoly",
+
+				cconolyUrl: "http://cconoly.com/lots/raidlinks.php?doomscript=tpircsmood",
 				
 				handler: function(deck, parser, params, text, context)
 				{
@@ -17,19 +19,27 @@
 						parser = new UrlParsingFilter("cancel");
 					}
 					else {
-						parser = new UrlParsingFilter(this.cconolyUrl + " " + params);
+						parser = new UrlParsingFilter(this.cconolyUrl + "&hrs=" + this.hoursSinceLastCall() + " " + params);
 					}
 					
 					// Declare ret object
 					var ret = {success: parser.type === "cconoly"};
 						
 					if (ret.success) {
+						DC_LoaTS_Helper.setPref(this.timePrefKey, new Date()/1);
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {
 						ret.statusMessage = "Error processing command <code>" + text + "</code>";
 					}
 					return ret;
+				},
+					
+				hoursSinceLastCall: function()
+				{
+					elapsedMs = new Date()/1 - DC_LoaTS_Helper.getPref(this.timePrefKey, 0);
+					elapsedHrs = elapsedMs / 1000 / 60 / 60;
+					return Math.ceil(elapsedHrs * 1000)/1000; // Round to 3 decimals
 				},
 							
 				getOptions: function()
