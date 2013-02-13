@@ -283,6 +283,7 @@ Added os to filters [Sycdan]
 Fixed WR Space Pox Icon
 Kind of made the broken close icon for the menu suck less, though not totally fixed
 Added Zone 16 raids: Screaming Barracuda and Symphony of Two Worlds
+Added Zone 17 raids: Al-Husam
 Added two Rare Spawns: Cerebral CEO and Space Pox Mary
 WR Info page's forum link should now open in a new window/tab
 */
@@ -314,7 +315,7 @@ function main()
     	PlayNowFixURL: "http://userscripts.org/142619",
     	farmSpreadsheetURL: "https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4",
     	
-    	debugMode: true,
+    	debugMode: false,
     	
     	// GreaseMonkey Storage Keys
     	storage: {
@@ -7734,9 +7735,10 @@ DC_LoaTS_Helper.raids =
     commander_veck:     new RaidType("commander_veck",      "Z8", "Centurian Storm Commander", "Storm", "Storm",     168, 250, "S",  900000000),
     reaver:             new RaidType("reaver",              "Z9", "Galactic Reaver", "Reaver", "Reaver",              72, 250, "S", 1000000000),
     the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [1100000000, 1475000000, 1850000000, 2200000000]),
-    g_rahn:             new RaidType("g_rahn",             "Z12", "G. Rahn", "G. Rahn", "G. Rahn",                    72, 250, "S", 1200000000),
-    guan_yu:            new RaidType("guan_yu",             "ZA", "Guan Yu", "Guan", "Guan",                          72, 250, "S", 1300000000),
-    bile_beast:         new RaidType("bile_beast",         "ZA2", "Bile Beast", "Bile", "Bile",                       72, 250, "S", 1400000000),
+    g_rahn:             new RaidType("g_rahn",             "Z12", "G. Rahn", "G. Rahn", "G. Rahn",                    72, 250, "S", [1200000000, 1560000000, 1920000000, 2400000000]),
+    guan_yu:            new RaidType("guan_yu",             "ZA", "Guan Yu", "Guan", "Guan",                          72, 250, "S", [1300000000, 1690000000, 2080000000, 2600000000]),
+    bile_beast:         new RaidType("bile_beast",         "ZA2", "Bile Beast", "Bile", "Bile",                       72, 250, "S", [1400000000, 1820000000, 2240000000, 2800000000]),
+    al_husam:           new RaidType("al_husam",           "Z17", "Al-Husam", "Al-Husam", "Al-Husam",                 72, 250, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
     
     
     // Colossal Raids
