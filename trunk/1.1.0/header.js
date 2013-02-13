@@ -283,6 +283,7 @@ Added os to filters [Sycdan]
 Fixed WR Space Pox Icon
 Kind of made the broken close icon for the menu suck less, though not totally fixed
 Added Zone 16 raids: Screaming Barracuda and Symphony of Two Worlds
+Added Zone 17 raids: Al-Husam
 Added two Rare Spawns: Cerebral CEO and Space Pox Mary
 WR Info page's forum link should now open in a new window/tab
 */
