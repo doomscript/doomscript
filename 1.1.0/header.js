@@ -286,6 +286,7 @@ Added Zone 16 raids: Screaming Barracuda and Symphony of Two Worlds
 Added Zone 17 raids: Al-Husam
 Added two Rare Spawns: Cerebral CEO and Space Pox Mary
 WR Info page's forum link should now open in a new window/tab
+Corrected hard health numbers on a bunch of raids from Z10 on
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
