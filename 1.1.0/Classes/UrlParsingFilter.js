@@ -54,12 +54,13 @@
 				}
 				
 				// Additional management based on types
-				switch(type) {
+				switch(type)
+				{
 					case "pastebin":
 						// Nothing 
 						break;
 					case "cconoly":
-						
+						// Nothing
 						break;
 					default:
 						break;
@@ -67,7 +68,23 @@
 			},
 			getUrlLink: function()
 			{
-				return "<a href=\"" + this.getWorkingUrl() + "\" target=\"_blank\">" + this.getWorkingUrl() + "</a>";
+				return "<a href=\"" + this.getWorkingUrl() + "\" target=\"_blank\">" + this.getLinkName() + "</a>";
+			},
+				
+			getLinkName: function()
+			{
+				switch(this.type)
+				{
+					case "pastebin":
+						return "Pastebin";
+						break;
+					case "cconoly":
+						return "CConoly"
+						break;
+					default:
+						this.getWorkingUrl();
+						break;
+				}
 			},
 			
 			getWorkingUrl: function ()

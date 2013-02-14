@@ -708,7 +708,8 @@
 			
 			var commandStartTime = new Date()/1;
 			
-			if (holodeck.activeDialogue()) {
+			if (holodeck.activeDialogue())
+			{
 				holodeck.activeDialogue().raidBotMessage("Fetching raids from " + urlParsingFilter.getUrlLink() + ". Please wait...");
 			}
 			
@@ -721,9 +722,9 @@
 					if (response.status === 200) // Must be OK because even other 200 codes won't have our data
 					{
 						var text = response.responseText,
-						    matchedRaidsList = [],
-						    notMatchedRaidsList = [],
+							fetchedRaids = [],
 						    binData = {},
+						    str = "",
 						    match,
 						    regex = new RegExp(RaidLink.linkPattern.source, "gi"), // Prevent weird JS regex caching/lastIndex issues
 						    hasRaidFilter = typeof urlParsingFilter.raidFilter !== "undefined",
@@ -751,61 +752,20 @@
 									thisBin[raidLink.difficulty] = thisBinRaids;
 								}
 								thisBinRaids.push(raidLink);
-								
-								if (hasRaidFilter)
-								{
-									// Create the criteria for the raidlink matching the filter
-									var matchCriteria = {
-										difficulty: raidLink.difficulty,
-										fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
-										os: raidLink.getRaid().getOptimalShare(raidLink.difficulty),
-										name: raidLink.getRaid().getSearchableName(),
-										count: matchedRaidsList.length
-									};
-
-									// Don't calculate age and state if we don't need them
-									if (raidFilter.state || raidFilter.age) {
-										var raidData = RaidManager.fetch(raidLink);
-										
-										if (raidFilter.age) {
-											var age = (raidData && raidData.firstSeen)? commandStartTime - raidData.firstSeen : 0;
-											matchCriteria.age = age;
-										}
-										if (raidFilter.state) {
-											var currentState = raidData ? RaidManager.STATE.valueOf(raidData.stateId) : RaidManager.STATE.UNSEEN;
-											matchCriteria.state = currentState;
-										}
-									}
-									
-									// Check if the raid link actually matches the criteria
-									if (raidFilter.matches(matchCriteria))
-									{
-										matchedRaidsList.push(raidLink);
-									}
-									else 
-									{
-										notMatchedRaidsList.push(raidLink);
-									}
-								}
-								else 
-								{
-									matchedRaidsList.push(raidLink);
-								}
+								fetchedRaids.push(raidLink);
 							}
 						} // End while(regex)
+						
+						// Store all the raids we grabbed
+						RaidManager.storeBulk(fetchedRaids);
 						Timer.stop("Parsing External Raids");
 
-						var str = "Fetched " + matchedRaidsList.length + " valid raids from " + urlParsingFilter.getUrlLink();
-						
-						if (hasRaidFilter)
-						{
-							str += " matching filter " + raidFilter.toString();
-						}
-						
+						// Report the fetched raids
+						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + " ms.";
 						var binUUID = DC_LoaTS_Helper.generateUUID();
 						var binBreakdown = "\n<a href='#' onclick='$(\"" + binUUID + "\").toggleClassName(\"hidden\"); return false;'>Toggle Results Data</a>";
 						binBreakdown += "\n<span id='" + binUUID + "' class='hidden'>";
-						binBreakdown += "\nTotal Raids: " + (matchedRaidsList.length + notMatchedRaidsList.length);
+						binBreakdown += "\nTotal Raids: " + fetchedRaids.length;
 						for (var shortName in binData) {
 							for (var diff = 1; diff < 5; diff++) {
 								var raids = binData[shortName][diff];
@@ -814,24 +774,15 @@
 								}
 							}
 						}
-						
 						binBreakdown += "</span>";
-						
 						str += binBreakdown;
-						
-						// Store all the raids we're not going to visit
-						RaidManager.storeBulk(notMatchedRaidsList);
-						
-						
-						str += "\nRaids fetched, parsed, and stored in " + (new Date()/1 - commandStartTime) + " ms.";
-						
-						if (matchedRaidsList.length) {
-							str += "\n\nStarting to load " + matchedRaidsList.length + " raids. " + DC_LoaTS_Helper.getCommandLink("/fetchraids cancel", "Cancel?");
-							
-							DC_LoaTS_Helper.loadAll(matchedRaidsList);
+						if (holodeck.activeDialogue())
+						{
+							holodeck.activeDialogue().raidBotMessage(str);
 						}
 						
-						holodeck.activeDialogue().raidBotMessage(str);
+						// Load all known raids that match the given filter
+						holodeck.processChatCommand("/loadall" + (hasRaidFilter ? " " + raidFilter.toString() : ""));
 						
 					}
 					else if (response.status === 404)
@@ -841,12 +792,12 @@
 					else if (response.status >= 500 && response.status < 600)
 					{
 						holodeck.activeDialogue().raidBotMessage("Trouble trying to load " + urlParsingFilter.getUrlLink() 
-						+ ".\n" + "Service gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+						+ ".\n" + "Server gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
 					else 
 					{
 						holodeck.activeDialogue().raidBotMessage("Trouble loading " + urlParsingFilter.getUrlLink() 
-						+ ".\n" + "Service gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
+						+ ".\n" + "Server gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
 				} // End onload function
 			});
