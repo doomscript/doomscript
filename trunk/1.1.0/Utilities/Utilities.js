@@ -762,20 +762,23 @@
 
 						// Report the fetched raids
 						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + " ms.";
-						var binUUID = DC_LoaTS_Helper.generateUUID();
-						var binBreakdown = "\n<a href='#' onclick='$(\"" + binUUID + "\").toggleClassName(\"hidden\"); return false;'>Toggle Results Data</a>";
-						binBreakdown += "\n<span id='" + binUUID + "' class='hidden'>";
-						binBreakdown += "\nTotal Raids: " + fetchedRaids.length;
-						for (var shortName in binData) {
-							for (var diff = 1; diff < 5; diff++) {
-								var raids = binData[shortName][diff];
-								if (raids && raids.length) {
-									binBreakdown += "\n" + RaidType.shortDifficulty[diff] + " " + shortName + " - " + raids.length;
+						if (fetchedRaids.length > 0)
+						{
+							var binUUID = DC_LoaTS_Helper.generateUUID();
+							var binBreakdown = "\n<a href='#' onclick='$(\"" + binUUID + "\").toggleClassName(\"hidden\"); return false;'>Toggle Results Data</a>";
+							binBreakdown += "\n<span id='" + binUUID + "' class='hidden'>";
+							binBreakdown += "\nTotal Raids: " + fetchedRaids.length;
+							for (var shortName in binData) {
+								for (var diff = 1; diff < 5; diff++) {
+									var raids = binData[shortName][diff];
+									if (raids && raids.length) {
+										binBreakdown += "\n" + RaidType.shortDifficulty[diff] + " " + shortName + " - " + raids.length;
+									}
 								}
 							}
+							binBreakdown += "</span>";
+							str += binBreakdown;
 						}
-						binBreakdown += "</span>";
-						str += binBreakdown;
 						if (holodeck.activeDialogue())
 						{
 							holodeck.activeDialogue().raidBotMessage(str);
