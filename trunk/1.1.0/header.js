@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.18
+// @version        1.1.19
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -287,6 +287,9 @@ Added Zone 17 raids: Al-Husam
 Added two Rare Spawns: Cerebral CEO and Space Pox Mary
 WR Info page's forum link should now open in a new window/tab
 Corrected hard health numbers on a bunch of raids from Z10 on
+
+2013.02.14 - 1.1.19
+Altered /lcc <filter> so it runs /loadall <filter> after fetching raids, rather than just filterting the list of newly-fetched raids [sycdan]
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
