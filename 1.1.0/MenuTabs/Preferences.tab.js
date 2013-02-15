@@ -13,6 +13,7 @@
 				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				reportDeadRaidsKey: "ReportDeadRaids",
+				useQueryTimeDeltaKey: "UseQueryTimeDelta",
 				
 				initPane: function()
 				{
@@ -101,6 +102,20 @@
 					);
 					wrapper.appendChild(reportDeadRaidsOption.wrapper);
 
+					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
+							"PreferencesMenu-UseQueryTimeDeltaInput",
+							"boolean", 
+							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true), 
+							"Only fetch new raids from CConoly",
+							"If enabled, when you use /lcc, it will only collect raids since the last time you used it (saves some cycles on the cconoly server, so it's a nice thing to do)",
+							{
+								onclick: function()
+								{
+									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
+								}
+							}
+					);
+					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}

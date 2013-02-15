@@ -761,7 +761,7 @@
 						Timer.stop("Parsing External Raids");
 
 						// Report the fetched raids
-						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + " ms.";
+						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + "ms.";
 						if (fetchedRaids.length > 0)
 						{
 							var binUUID = DC_LoaTS_Helper.generateUUID();
