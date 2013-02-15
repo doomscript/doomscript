@@ -8,8 +8,6 @@
 				// parsingClass: none,
 				
 				paramText: "[filter]",
-					
-				timePrefKey: "LastQueryTime_Cconoly",
 
 				cconolyUrl: "http://cconoly.com/lots/raidlinks.php?doomscript=tpircsmood",
 				
@@ -19,14 +17,14 @@
 						parser = new UrlParsingFilter("cancel");
 					}
 					else {
-						parser = new UrlParsingFilter(this.cconolyUrl + "&hrs=" + this.hoursSinceLastCall() + " " + params);
+						parser = new UrlParsingFilter(this.cconolyUrl + "&hrs=" + this.hoursSinceLastQuery() + " " + params);
 					}
 					
 					// Declare ret object
 					var ret = {success: parser.type === "cconoly"};
 						
 					if (ret.success) {
-						DC_LoaTS_Helper.setPref(this.timePrefKey, new Date()/1);
+						GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, new Date()/1);
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {
@@ -35,11 +33,11 @@
 					return ret;
 				},
 					
-				hoursSinceLastCall: function()
+				hoursSinceLastQuery: function()
 				{
 					if (DC_LoaTS_Helper.getPref("UseQueryTimeDelta", true))
 					{
-						elapsedMs = new Date()/1 - DC_LoaTS_Helper.getPref(this.timePrefKey, 0);
+						elapsedMs = new Date()/1 - GM_getValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
 						elapsedHrs = elapsedMs / 1000 / 60 / 60;
 						return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals
 					}

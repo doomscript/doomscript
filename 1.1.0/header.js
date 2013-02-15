@@ -313,7 +313,6 @@ function main()
     	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong",
     	
     	// Other URLS
-    	SRLTSXURL: "http://userscripts.org/128721",
     	RaidToolsURL: "http://userscripts.org/132671",
     	QuickFriendURL: "http://userscripts.org/125666",
     	PlayNowFixURL: "http://userscripts.org/142619",
@@ -345,7 +344,10 @@ function main()
 	    	behaviorPrefs: "DC_LoaTS_behaviorPreferences",
 	    	
 	    	// Quarantine addendum
-	    	quarantine: "_quarantine"
+	    	quarantine: "_quarantine",
+	    		
+	    	// Timestamp of last query to cconoly
+	    	cconolyLastQueryTime: "DC_LoaTS_cconolyLastQueryTime"
     	}
 	};
 

@@ -313,7 +313,6 @@ function main()
     	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong",
     	
     	// Other URLS
-    	SRLTSXURL: "http://userscripts.org/128721",
     	RaidToolsURL: "http://userscripts.org/132671",
     	QuickFriendURL: "http://userscripts.org/125666",
     	PlayNowFixURL: "http://userscripts.org/142619",
@@ -345,7 +344,10 @@ function main()
 	    	behaviorPrefs: "DC_LoaTS_behaviorPreferences",
 	    	
 	    	// Quarantine addendum
-	    	quarantine: "_quarantine"
+	    	quarantine: "_quarantine",
+	    		
+	    	// Timestamp of last query to cconoly
+	    	cconolyLastQueryTime: "DC_LoaTS_cconolyLastQueryTime"
     	}
 	};
 
@@ -5747,7 +5749,14 @@ function main()
 							ret.statusMessage = "Did not understand command: <code>/" + this.getName() + " " + raidFilter.toString() + "</code>";
 							ret.success = false;
 						}
-					}						
+					}
+					
+					if (ret.success)
+					{
+						// Reset the query time delta so the raids can be re-fetched
+						GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
+					}
+									
 					return ret;
 				},
 				
@@ -6222,17 +6231,15 @@ function main()
 
 					
 					if (params.trim() === "post") {
-						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " OR ";
-						toolsText += "SRLTSX: " + DC_LoaTS_Properties.SRLTSXURL + " (only 1) and get any of: ";
-						toolsText += "RaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
-						toolsText += "QuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
-						toolsText += "Play Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
+						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " and any of: ";
+						toolsText += "\nRaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
+						toolsText += "\nQuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
+						toolsText += "\nPlay Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
 
 						holodeck._chat_window._active_room.sendRoomMessage(toolsText);
 					}
 					else {
 						var toolsText = "\ndoomscript: <a href=\"" + DC_LoaTS_Properties.scriptURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.scriptURL + "</a> \n";
-						toolsText += "SRLTSX: <a href=\"" + DC_LoaTS_Properties.SRLTSXURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.SRLTSXURL + "</a> \n";
 						toolsText += "RaidTools: <a href=\"" + DC_LoaTS_Properties.RaidToolsURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.RaidToolsURL + "</a> \n";
 						toolsText += "QuickFriend: <a href=\"" + DC_LoaTS_Properties.QuickFriendURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.QuickFriendURL + "</a> \n";
 						toolsText += "Play Now Fix: <a href=\"" + DC_LoaTS_Properties.PlayNowFixURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.PlayNowFixURL + "</a> \n";
@@ -6274,8 +6281,6 @@ function main()
 				// parsingClass: none,
 				
 				paramText: "[filter]",
-					
-				timePrefKey: "LastQueryTime_Cconoly",
 
 				cconolyUrl: "http://cconoly.com/lots/raidlinks.php?doomscript=tpircsmood",
 				
@@ -6285,14 +6290,14 @@ function main()
 						parser = new UrlParsingFilter("cancel");
 					}
 					else {
-						parser = new UrlParsingFilter(this.cconolyUrl + "&hrs=" + this.hoursSinceLastCall() + " " + params);
+						parser = new UrlParsingFilter(this.cconolyUrl + "&hrs=" + this.hoursSinceLastQuery() + " " + params);
 					}
 					
 					// Declare ret object
 					var ret = {success: parser.type === "cconoly"};
 						
 					if (ret.success) {
-						DC_LoaTS_Helper.setPref(this.timePrefKey, new Date()/1);
+						GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, new Date()/1);
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {
@@ -6301,11 +6306,11 @@ function main()
 					return ret;
 				},
 					
-				hoursSinceLastCall: function()
+				hoursSinceLastQuery: function()
 				{
 					if (DC_LoaTS_Helper.getPref("UseQueryTimeDelta", true))
 					{
-						elapsedMs = new Date()/1 - DC_LoaTS_Helper.getPref(this.timePrefKey, 0);
+						elapsedMs = new Date()/1 - GM_getValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
 						elapsedHrs = elapsedMs / 1000 / 60 / 60;
 						return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals
 					}
