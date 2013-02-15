@@ -5290,6 +5290,7 @@ function main()
 				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				reportDeadRaidsKey: "ReportDeadRaids",
+				useQueryTimeDeltaKey: "UseQueryTimeDelta",
 				
 				initPane: function()
 				{
@@ -5378,6 +5379,20 @@ function main()
 					);
 					wrapper.appendChild(reportDeadRaidsOption.wrapper);
 
+					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
+							"PreferencesMenu-UseQueryTimeDeltaInput",
+							"boolean", 
+							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true), 
+							"Only fetch new raids from CConoly",
+							"If enabled, when you use /lcc, it will only collect raids since the last time you used it (saves some cycles on the cconoly server, so it's a nice thing to do)",
+							{
+								onclick: function()
+								{
+									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
+								}
+							}
+					);
+					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}
@@ -6288,9 +6303,16 @@ function main()
 					
 				hoursSinceLastCall: function()
 				{
-					elapsedMs = new Date()/1 - DC_LoaTS_Helper.getPref(this.timePrefKey, 0);
-					elapsedHrs = elapsedMs / 1000 / 60 / 60;
-					return Math.ceil(elapsedHrs * 1000)/1000; // Round to 3 decimals
+					if (DC_LoaTS_Helper.getPref("UseQueryTimeDelta", true))
+					{
+						elapsedMs = new Date()/1 - DC_LoaTS_Helper.getPref(this.timePrefKey, 0);
+						elapsedHrs = elapsedMs / 1000 / 60 / 60;
+						return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals
+					}
+					else
+					{
+						return 168;
+					}
 				},
 							
 				getOptions: function()
@@ -8609,7 +8631,7 @@ DC_LoaTS_Helper.raids =
 						Timer.stop("Parsing External Raids");
 
 						// Report the fetched raids
-						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + " ms.";
+						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + "ms.";
 						if (fetchedRaids.length > 0)
 						{
 							var binUUID = DC_LoaTS_Helper.generateUUID();

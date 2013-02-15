@@ -37,9 +37,16 @@
 					
 				hoursSinceLastCall: function()
 				{
-					elapsedMs = new Date()/1 - DC_LoaTS_Helper.getPref(this.timePrefKey, 0);
-					elapsedHrs = elapsedMs / 1000 / 60 / 60;
-					return Math.ceil(elapsedHrs * 1000)/1000; // Round to 3 decimals
+					if (DC_LoaTS_Helper.getPref("UseQueryTimeDelta", true))
+					{
+						elapsedMs = new Date()/1 - DC_LoaTS_Helper.getPref(this.timePrefKey, 0);
+						elapsedHrs = elapsedMs / 1000 / 60 / 60;
+						return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals
+					}
+					else
+					{
+						return 168;
+					}
 				},
 							
 				getOptions: function()
