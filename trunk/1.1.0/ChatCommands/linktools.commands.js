@@ -11,17 +11,15 @@
 
 					
 					if (params.trim() === "post") {
-						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " OR ";
-						toolsText += "SRLTSX: " + DC_LoaTS_Properties.SRLTSXURL + " (only 1) and get any of: ";
-						toolsText += "RaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
-						toolsText += "QuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
-						toolsText += "Play Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
+						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " and any of: ";
+						toolsText += "\nRaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
+						toolsText += "\nQuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
+						toolsText += "\nPlay Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
 
 						holodeck._chat_window._active_room.sendRoomMessage(toolsText);
 					}
 					else {
 						var toolsText = "\ndoomscript: <a href=\"" + DC_LoaTS_Properties.scriptURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.scriptURL + "</a> \n";
-						toolsText += "SRLTSX: <a href=\"" + DC_LoaTS_Properties.SRLTSXURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.SRLTSXURL + "</a> \n";
 						toolsText += "RaidTools: <a href=\"" + DC_LoaTS_Properties.RaidToolsURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.RaidToolsURL + "</a> \n";
 						toolsText += "QuickFriend: <a href=\"" + DC_LoaTS_Properties.QuickFriendURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.QuickFriendURL + "</a> \n";
 						toolsText += "Play Now Fix: <a href=\"" + DC_LoaTS_Properties.PlayNowFixURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.PlayNowFixURL + "</a> \n";

@@ -58,7 +58,14 @@
 							ret.statusMessage = "Did not understand command: <code>/" + this.getName() + " " + raidFilter.toString() + "</code>";
 							ret.success = false;
 						}
-					}						
+					}
+					
+					if (ret.success)
+					{
+						// Reset the query time delta so the raids can be re-fetched
+						GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
+					}
+									
 					return ret;
 				},
 				
