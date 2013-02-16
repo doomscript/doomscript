@@ -298,7 +298,9 @@ function main()
 	// Properties for this script
 	window.DC_LoaTS_Properties = {
 		// Script info
-    	version: "1.1.18",
+		
+		// [sycdan] I hate this; would rather use GM_info.script.version when the version is called for
+    	version: "1.1.19",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
