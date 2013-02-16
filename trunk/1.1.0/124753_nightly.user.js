@@ -3939,10 +3939,8 @@ function main()
 			
 			createSimpleOptionHTML: function(id, type, value, description, hoverText, additionalAttributes)
 			{
-				switch(type)
+				if (type == "boolean" || type == "text") // Not sure if other types would need different wrappers...
 				{
-					case "boolean":
-					{
 						var outerWrapper = document.createElement("div");
 						outerWrapper.id = id + "Wrapper";
 						outerWrapper.className = "DC_LoaTS_raidMenuOptionWrapper clearfix";
@@ -3950,7 +3948,12 @@ function main()
 						var innerWrapper = document.createElement("div");
 						innerWrapper.className = "DC_LoaTS_raidMenuInnerWrapper"
 						outerWrapper.appendChild(innerWrapper);
-						
+				}
+				
+				switch(type)
+				{
+					case "boolean":
+					{
 						var option = document.createElement("input");
 						option.type = "checkbox";
 						option.id = id;
@@ -3960,6 +3963,28 @@ function main()
 						{
 							option.checked = true;
 						}
+						
+						for (var attribute in additionalAttributes)
+						{
+							option[attribute] = additionalAttributes[attribute];
+						}
+						
+						innerWrapper.appendChild(option);
+						
+						var desc = document.createElement("div");
+						desc.className = "DC_LoaTS_raidMenuDescription";
+						desc.innerHTML = description;
+						outerWrapper.appendChild(desc);
+						
+						return {wrapper: outerWrapper, option: option};
+					}
+					case "text":
+					{						
+						var option = document.createElement("input");
+						option.type = "text";
+						option.id = id;
+						option.title = hoverText;
+						option.value = value;
 						
 						for (var attribute in additionalAttributes)
 						{
@@ -5293,6 +5318,7 @@ function main()
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				reportDeadRaidsKey: "ReportDeadRaids",
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
+				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
 				
 				initPane: function()
 				{
@@ -5347,16 +5373,14 @@ function main()
 					);
 					wrapper.appendChild(hideVisitedOption.wrapper);
 
-			
-
 					var loadBackgroundOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
 									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey), 
-									//"Raids should load in background rather than in the game area.", 
-									//"If checked, raids won't load in game area.", 
-									"Snull Snulls in the Snull",
-									"Snull Snull Snull Snull Snull",
+									"Raids should load in background rather than in the game area.", 
+									"If checked, raids won't load in game area.", 
+									//"Snull Snulls in the Snull",
+									//"Snull Snull Snull Snull Snull",
 									{
 										onclick: function()
 										{
@@ -5365,6 +5389,32 @@ function main()
 									}
 					);
 					wrapper.appendChild(loadBackgroundOption.wrapper);
+					
+					var loadRaidsInBackgroundDelayOption = me.createSimpleOptionHTML(
+							"PreferencesMenu-LoadRaidsInBackgroundDelayInput",
+							"text", 
+							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 200), 
+							"Delay (millisecons) between loading each raid in the background.",
+							"Default = 200; No delay = 0; Half a second = 500.",
+							{
+								size: 4,
+								maxlength: 4,
+								onchange: function()
+								{
+									var v = this.value;
+									
+									if (/^\d+$/.test(v))
+									{
+										DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundDelayKey, v);
+									}
+									else
+									{
+										holodeck.activeDialogue().raidBotMessage("Load Raids In Background Delay: Please enter only numbers.");
+									}
+								}
+							}
+					);
+					wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
 
 					var reportDeadRaidsOption = me.createSimpleOptionHTML(
 							"PreferencesMenu-ReportDeadRaidsInput",
@@ -8703,7 +8753,7 @@ DC_LoaTS_Helper.raids =
 			};
 			var startTime = new Date()/1;
 			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
-			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 205);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 200);
 			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
 			var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
 

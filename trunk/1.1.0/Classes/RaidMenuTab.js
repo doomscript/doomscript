@@ -81,10 +81,8 @@
 			
 			createSimpleOptionHTML: function(id, type, value, description, hoverText, additionalAttributes)
 			{
-				switch(type)
+				if (type == "boolean" || type == "text") // Not sure if other types would need different wrappers...
 				{
-					case "boolean":
-					{
 						var outerWrapper = document.createElement("div");
 						outerWrapper.id = id + "Wrapper";
 						outerWrapper.className = "DC_LoaTS_raidMenuOptionWrapper clearfix";
@@ -92,7 +90,12 @@
 						var innerWrapper = document.createElement("div");
 						innerWrapper.className = "DC_LoaTS_raidMenuInnerWrapper"
 						outerWrapper.appendChild(innerWrapper);
-						
+				}
+				
+				switch(type)
+				{
+					case "boolean":
+					{
 						var option = document.createElement("input");
 						option.type = "checkbox";
 						option.id = id;
@@ -102,6 +105,28 @@
 						{
 							option.checked = true;
 						}
+						
+						for (var attribute in additionalAttributes)
+						{
+							option[attribute] = additionalAttributes[attribute];
+						}
+						
+						innerWrapper.appendChild(option);
+						
+						var desc = document.createElement("div");
+						desc.className = "DC_LoaTS_raidMenuDescription";
+						desc.innerHTML = description;
+						outerWrapper.appendChild(desc);
+						
+						return {wrapper: outerWrapper, option: option};
+					}
+					case "text":
+					{						
+						var option = document.createElement("input");
+						option.type = "text";
+						option.id = id;
+						option.title = hoverText;
+						option.value = value;
 						
 						for (var attribute in additionalAttributes)
 						{

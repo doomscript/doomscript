@@ -828,7 +828,7 @@
 			};
 			var startTime = new Date()/1;
 			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
-			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 205);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 200);
 			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
 			var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
 

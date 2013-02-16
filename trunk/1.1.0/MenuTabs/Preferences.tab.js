@@ -14,6 +14,7 @@
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				reportDeadRaidsKey: "ReportDeadRaids",
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
+				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
 				
 				initPane: function()
 				{
@@ -68,16 +69,14 @@
 					);
 					wrapper.appendChild(hideVisitedOption.wrapper);
 
-			
-
 					var loadBackgroundOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
 									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey), 
-									//"Raids should load in background rather than in the game area.", 
-									//"If checked, raids won't load in game area.", 
-									"Snull Snulls in the Snull",
-									"Snull Snull Snull Snull Snull",
+									"Raids should load in background rather than in the game area.", 
+									"If checked, raids won't load in game area.", 
+									//"Snull Snulls in the Snull",
+									//"Snull Snull Snull Snull Snull",
 									{
 										onclick: function()
 										{
@@ -86,6 +85,32 @@
 									}
 					);
 					wrapper.appendChild(loadBackgroundOption.wrapper);
+					
+					var loadRaidsInBackgroundDelayOption = me.createSimpleOptionHTML(
+							"PreferencesMenu-LoadRaidsInBackgroundDelayInput",
+							"text", 
+							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 200), 
+							"Delay (millisecons) between loading each raid in the background.",
+							"Default = 200; No delay = 0; Half a second = 500.",
+							{
+								size: 4,
+								maxlength: 4,
+								onchange: function()
+								{
+									var v = this.value;
+									
+									if (/^\d+$/.test(v))
+									{
+										DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundDelayKey, v);
+									}
+									else
+									{
+										holodeck.activeDialogue().raidBotMessage("Load Raids In Background Delay: Please enter only numbers.");
+									}
+								}
+							}
+					);
+					wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
 
 					var reportDeadRaidsOption = me.createSimpleOptionHTML(
 							"PreferencesMenu-ReportDeadRaidsInput",
