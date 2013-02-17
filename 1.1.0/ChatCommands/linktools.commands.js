@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "linktools",
-				aliases: [],
+				aliases: ["advertise", "blatantselfpromotion", "getdoomscript"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)

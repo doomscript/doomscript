@@ -32,10 +32,24 @@
 				}
 			},
 			
+			addRun: function(timerName, runTime) {
+				var timer = Timer[timerName];
+
+				if (typeof timer === "undefined")
+				{
+					timer = {name: timerName, start: 0, totalTime: 0, longestTime: 0, numTimes: 0};
+					window.Timer[timerName] = timer;
+				}
+
+				timer.totalTime += runTime || 0;
+				if (timer.longestTime < runTime) {timer.longestTime = runTime;}
+				timer.numTimes++;
+			},
+			
 			getTimer: function(timerName)
 			{
 				var timer = Timer[timerName];
-				if (typeof timer == "undefined")
+				if (typeof timer === "undefined")
 				{
 					console.log("Can't get a timer (" + timerName + ") that wasn't started");
 				}
@@ -56,7 +70,7 @@
 				for (var timerName in window.Timer)
 				{
 					var timer = window.Timer.getTimer(timerName);
-					if (typeof timer != "function" && typeof timer != "undefined")
+					if (typeof timer !== "function" && typeof timer !== "undefined")
 					{
 						report += timerName + " > Average: " + timer.getAverage().toFixed(5) + "ms - Total: " + timer.totalTime + "ms - # " + timer.numTimes + "\n\n";
 					}

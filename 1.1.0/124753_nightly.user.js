@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.19
+// @version        1.1.20
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -292,6 +292,14 @@ Corrected hard health numbers on a bunch of raids from Z10 on
 Altered /lcc <filter> so it runs /loadall <filter> after fetching raids, rather than just filterting the list of newly-fetched raids [sycdan]
 Added preference for delay between loading raids [sycdan]
 Hid doomscript tabs that were previously labeled under construction.
+
+2013.??.?? - 1.1.20
+Minor code cleanup
+Added more timing data to find slow downs
+Added aliases to /linktools: /advertise, /blatantselfpromotion, /getdoomscript
+Added aliases to /reload: /reloaf, /reloa, /eload
+Moved loadall to normal chat commands. It's a main feature now, not just an experimental hack. It will now appear in the right order in the help list
+Added /refreshlinks command to cause the links to redraw themselves. This is mainly for when a link refuses to mark visited
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -302,7 +310,7 @@ function main()
 		// Script info
 		
 		// [sycdan] I hate this; would rather use GM_info.script.version when the version is called for
-    	version: "1.1.19",
+    	version: "1.1.20",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -322,6 +330,8 @@ function main()
     	PlayNowFixURL: "http://userscripts.org/142619",
     	farmSpreadsheetURL: "https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4",
     	
+    	// Do not check code in with this set to true. 
+    	// Preferably, turn it on from the browser command line with DC_LoaTS_Properties.debugMode = true;
     	debugMode: false,
     	
     	// GreaseMonkey Storage Keys
@@ -3232,7 +3242,7 @@ function main()
 					raidData = RaidManager.raidStorage[raidLink.getUniqueKey()];
 										
 					// If the link is in storage
-					if (typeof raidData !== "undefined")
+					if (raidData && typeof raidData.raidLink.getRaid !== "function")
 					{
 						// Add in the functions that you expect to see on those objects
 						Object.extend(raidData.raidLink, RaidLink.prototype);
@@ -3287,14 +3297,14 @@ function main()
 				var raidData = RaidManager.fetch(raidLink);
 				
 				// If the raid link has been seen before
-				if (typeof raidData != "undefined")
+				if (typeof raidData !== "undefined")
 				{
-					if (typeof raidData.stateId != "undefined")
+					if (typeof raidData.stateId !== "undefined")
 					{
 						// Return its state
 						return RaidManager.STATE.valueOf(raidData.stateId);
 					}
-					else if (typeof raidData.state != "undefined")
+					else if (typeof raidData.state !== "undefined")
 					{
 						// Return its state
 						return RaidManager.STATE.valueOf(raidData.state.text);
@@ -5017,10 +5027,24 @@ function main()
 				}
 			},
 			
+			addRun: function(timerName, runTime) {
+				var timer = Timer[timerName];
+
+				if (typeof timer === "undefined")
+				{
+					timer = {name: timerName, start: 0, totalTime: 0, longestTime: 0, numTimes: 0};
+					window.Timer[timerName] = timer;
+				}
+
+				timer.totalTime += runTime || 0;
+				if (timer.longestTime < runTime) {timer.longestTime = runTime;}
+				timer.numTimes++;
+			},
+			
 			getTimer: function(timerName)
 			{
 				var timer = Timer[timerName];
-				if (typeof timer == "undefined")
+				if (typeof timer === "undefined")
 				{
 					console.log("Can't get a timer (" + timerName + ") that wasn't started");
 				}
@@ -5041,7 +5065,7 @@ function main()
 				for (var timerName in window.Timer)
 				{
 					var timer = window.Timer.getTimer(timerName);
-					if (typeof timer != "function" && typeof timer != "undefined")
+					if (typeof timer !== "function" && typeof timer !== "undefined")
 					{
 						report += timerName + " > Average: " + timer.getAverage().toFixed(5) + "ms - Total: " + timer.totalTime + "ms - # " + timer.numTimes + "\n\n";
 					}
@@ -6273,7 +6297,7 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "linktools",
-				aliases: [],
+				aliases: ["advertise", "blatantselfpromotion", "getdoomscript"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)
@@ -6317,6 +6341,91 @@ function main()
 					helpText += "Displays a list of scripts that you might find useful.\n";
 					helpText += "<code>" + this.getCommandLink("") + "</code> will post the links just to you.\n";
 					helpText += "<code>" + this.getCommandLink("post") + "</code> will post the links to chat.";
+					
+					return helpText;
+				}
+			}
+		);
+		
+//TODO: Remove Autoload alias. AutoLoad should be for incoming new raids, not loading existing ones
+		RaidCommand.create(
+			{
+				commandName: "loadall",
+				aliases: ["autoload"],
+				parsingClass: RaidMultiFilter,
+
+				handler: function(deck, raidFilter, params, text, context)
+				{
+					// Declare ret object
+					var ret = {};
+					
+					var isCancelled = params === "cancel";
+										
+					// Cancel the previous timer, if there is one
+					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined" || isCancelled)
+					{
+						// Clear out the raidLinks array from the previous one.
+						// The timeout will detect that there are suddenly no more links
+						// and acknowledge the error state and quit.
+						DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
+					}
+					
+					
+					// This only works with a valid filter
+					if (!isCancelled && raidFilter && raidFilter.isValid())
+					{
+						// Fetch all the links
+						var raidLinks = RaidManager.fetchByFilter(raidFilter);
+						
+						// If there were any matched links
+						if (raidLinks.length > 0)
+						{
+							ret.success = true;
+							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
+							
+							DC_LoaTS_Helper.loadAll(raidLinks);
+						}
+						else
+						{
+							ret.statusMessage = "AutoLoad could not find any raids matching " + raidFilter.toString() + " to load.";							
+						}
+						
+						ret.success = true;
+					}
+					else if (!isCancelled)
+					{
+						ret.success = false;
+						ret.statusMessage = "Could not execute autoload due to invalid raid filter: '" + raidFilter.toString() + "'.";
+					}
+					else 
+					{
+						ret.success = true;
+						ret.statusMessage = "AutoLoad cancelled.";
+					}
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					//TODO: Better options here
+					var commandOptions = {					
+						initialText: {
+							text: "Load all raids matching the filter"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/loadall raidFilter</code>\n";
+					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
+					helpText += "\n";
+					helpText += "\nLoads all seen raids that match the given filter";
+					helpText += "\n";
+					helpText += "\nFor example, " + this.getCommandLink("colonel 4") + " would load all nightmare colonels not previously visited";
+					helpText += "\n";
+					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
 					
 					return helpText;
 				}
@@ -7105,15 +7214,51 @@ RaidCommand
 		
 		RaidCommand.create( 
 			{
+				commandName: "refreshlinks",
+				aliases: [],
+				// No parsing needed
+				/*parsingClass: ,*/
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+					
+					DC_LoaTS_Helper.updatePostedLinks();
+					
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Refresh the links in chat"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/refreshlinks</code>\n";
+					helpText += "Will refresh all the links and their states in chat.\n";
+					helpText += "This can help if raids aren't looking marked like they should be.\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
 				commandName: "reload",
-				aliases: ["refresh"],
+				aliases: ["refresh", "reloaf", "reloa", "eload"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
 					var ret = {};
-					
+
 					// true if we did reload, false otherwise
 					ret.success = DC_LoaTS_Helper.reload();
 					
@@ -7641,91 +7786,6 @@ RaidCommand
 				{
 					searchInput = searchInput || "";
 					return this.urlPattern.format(escape(searchInput.replace(" ", "+")));
-				}
-			}
-		);
-		
-//TODO: Rename to loadAll command. AutoLoad should be for incoming new raids, not loading existing ones
-		RaidCommand.create(
-			{
-				commandName: "loadall",
-				aliases: ["autoload"],
-				parsingClass: RaidMultiFilter,
-
-				handler: function(deck, raidFilter, params, text, context)
-				{
-					// Declare ret object
-					var ret = {};
-					
-					var isCancelled = params === "cancel";
-										
-					// Cancel the previous timer, if there is one
-					if (typeof DC_LoaTS_Helper.autoLoader !== "undefined" || isCancelled)
-					{
-						// Clear out the raidLinks array from the previous one.
-						// The timeout will detect that there are suddenly no more links
-						// and acknowledge the error state and quit.
-						DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
-					}
-					
-					
-					// This only works with a valid filter
-					if (!isCancelled && raidFilter && raidFilter.isValid())
-					{
-						// Fetch all the links
-						var raidLinks = RaidManager.fetchByFilter(raidFilter);
-						
-						// If there were any matched links
-						if (raidLinks.length > 0)
-						{
-							ret.success = true;
-							ret.statusMessage = "AutoLoad starting for " + raidFilter.toString() + ". Loading " + raidLinks.length + " raids. " + this.getCommandLink("cancel", "Cancel");
-							
-							DC_LoaTS_Helper.loadAll(raidLinks);
-						}
-						else
-						{
-							ret.statusMessage = "AutoLoad could not find any raids matching " + raidFilter.toString() + " to load.";							
-						}
-						
-						ret.success = true;
-					}
-					else if (!isCancelled)
-					{
-						ret.success = false;
-						ret.statusMessage = "Could not execute autoload due to invalid raid filter: '" + raidFilter.toString() + "'.";
-					}
-					else 
-					{
-						ret.success = true;
-						ret.statusMessage = "AutoLoad cancelled.";
-					}
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					//TODO: Better options here
-					var commandOptions = {					
-						initialText: {
-							text: "Load all raids matching the filter"
-						}
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/loadall raidFilter</code>\n";
-					helpText += "where <code>raidFilter</code> is a valid raid filter\n";
-					helpText += "\n";
-					helpText += "\nLoads all seen raids that match the given filter";
-					helpText += "\n";
-					helpText += "\nFor example, " + this.getCommandLink("colonel 4") + " would load all nightmare colonels not previously visited";
-					helpText += "\n";
-					helpText += "<b>This feature is implemented for experimental/academic purposes only and should not be distributed!</b>\n";
-					
-					return helpText;
 				}
 			}
 		);
@@ -8496,6 +8556,8 @@ DC_LoaTS_Helper.raids =
 		// callback should be a function that takes two parameters, oldState and newState
 		DC_LoaTS_Helper.loadRaid = function(raidParam, iframe_options, loadRaidsInBackground, callback)
 		{
+			var start = new Date()/1;
+			
 			// Gather the info we need to load a raid, either from params or utility methods
 			iframe_options = iframe_options || DC_LoaTS_Helper.getIFrameOptions();
 			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
@@ -8517,14 +8579,6 @@ DC_LoaTS_Helper.raids =
 				// If the link is valid
 				if (typeof raidLink !== "undefined" && raidLink.isValid())
 				{
-					// Mark link as visited
-					var currentState = RaidManager.fetchState(raidLink);
-					var newState = currentState;
-					if (RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN) || RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)) {
-						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
-						newState = RaidManager.STATE.VISITED;
-					}
-					
 					// Set necessary iframe options
 					iframe_options['kv_action_type'] = 'raidhelp';
 					iframe_options['kv_difficulty'] = raidLink.difficulty;
@@ -8545,7 +8599,7 @@ DC_LoaTS_Helper.raids =
 						DC_LoaTS_Helper.ajax({
 											  url: DC_LoaTS_Properties.joinRaidURL + "?" + collapsedOptions,
 											  method: "GET",
-											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink, currentState, callback)
+											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink, callback, start)
 						});
 					}
 					else	
@@ -8556,9 +8610,20 @@ DC_LoaTS_Helper.raids =
 						// Set location of new game window
 						$('gameiframe').contentWindow.location.replace(DC_LoaTS_Properties.kongLoaTSURL + "?" + Object.toQueryString(iframe_options));
 						
+						// Mark link as visited
+						var currentState = RaidManager.fetchState(raidLink);
+						var newState = currentState;
+						if (RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN) || RaidManager.STATE.equals(currentState, RaidManager.STATE.SEEN)) {
+							RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+							newState = RaidManager.STATE.VISITED;
+						}
+
 						if (typeof callback === "function") {
 							callback.call(this, currentState, newState);
 						}
+
+						var time = new Date()/1 - start;
+						Timer.addRun("Load Raid - Foreground", time);
 					}
 				}
 				else
@@ -8566,7 +8631,7 @@ DC_LoaTS_Helper.raids =
 					// Notify the user that we don't know what that state is
 					holodeck.activeDialogue().raidBotMessage("Could not parse <code>" + raidParam + "</code> as a raid link url.");
 				}
-				
+
 				// Don't follow the HTML link because we succeeded here
 				return false;
 			}
@@ -8580,8 +8645,9 @@ DC_LoaTS_Helper.raids =
 			return true;
 		};
 		
-		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, oldState, callback, response)
+		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, callback, start, response)
 		{
+			
 			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(response.responseText)[1].trim();
 			DCDebug("Ajax Raid Join Message: ", raidJoinMessage);
 			
@@ -8591,7 +8657,7 @@ DC_LoaTS_Helper.raids =
 				// Joined
 				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 				if (typeof callback === "function") {
-					callback.call(this, oldState, RaidManager.STATE.VISITED);
+					callback.call(this, RaidManager.fetchState(raidLink), RaidManager.STATE.VISITED);
 				}
 			}
 			else if (response.responseText.indexOf("You are already a member of this raid!") >= 0)
@@ -8604,12 +8670,17 @@ DC_LoaTS_Helper.raids =
 			}
 			else
 			{
+				// Raid is either dead, invalid, or alliance. Whatever, just kill it
 				RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
-				DC_LoaTS_Helper.updatePostedLinks(raidLink);
 				if (typeof callback === "function") {
 					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.COMPLETED);
 				}
 			}
+
+			DC_LoaTS_Helper.updatePostedLinks(raidLink);
+
+			var time = new Date()/1 - start;
+			Timer.addRun("Load Raid - Background", time);
 		};
 		
 		DC_LoaTS_Helper.fetchAndLoadRaids = function(urlParsingFilter) {
@@ -8633,6 +8704,7 @@ DC_LoaTS_Helper.raids =
 				return;
 			}
 			
+			// Ignore the tiny amount of time it takes to check for cancellation/ending
 			var commandStartTime = new Date()/1;
 			
 			if (holodeck.activeDialogue())
@@ -8658,6 +8730,7 @@ DC_LoaTS_Helper.raids =
 						    raidFilter = urlParsingFilter.raidFilter;
 						
 						// Safety catchall to prevent infinite matching
+						// This also means the maximum number of raids that can be loaded like this is 10,000 which seems reasonable
 						var xx = 10000;
 						
 						Timer.start("Parsing External Raids");
@@ -8732,16 +8805,21 @@ DC_LoaTS_Helper.raids =
 				} // End onload function
 			});
 		};
-		
+
 		DC_LoaTS_Helper.reportDead = function(raidLink) {
-			DC_LoaTS_Helper.ajax({
-				url: "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=tpircsmood",
-				onload: function(response) {
-					console.log("Report Dead Response: ", response);
-				}
-			});
+			setTimeout(function() {
+				var start = new Date()/1;
+				DC_LoaTS_Helper.ajax({
+					url: "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=tpircsmood",
+					onload: function(response) {
+						var time = new Date()/1 - start;
+						Timer.addRun("CConoly markDead", time);
+						DCDebug("Report Dead took " + time + " ms. Response: ", response);
+					}
+				});
+			}, 10);
 		};
-		
+
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			// Private variable to be closed over in the autoLoader
 			var autoLoadCounter = {
