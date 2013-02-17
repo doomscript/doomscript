@@ -538,7 +538,7 @@
 					raidData = RaidManager.raidStorage[raidLink.getUniqueKey()];
 										
 					// If the link is in storage
-					if (typeof raidData !== "undefined")
+					if (raidData && typeof raidData.raidLink.getRaid !== "function")
 					{
 						// Add in the functions that you expect to see on those objects
 						Object.extend(raidData.raidLink, RaidLink.prototype);
@@ -593,14 +593,14 @@
 				var raidData = RaidManager.fetch(raidLink);
 				
 				// If the raid link has been seen before
-				if (typeof raidData != "undefined")
+				if (typeof raidData !== "undefined")
 				{
-					if (typeof raidData.stateId != "undefined")
+					if (typeof raidData.stateId !== "undefined")
 					{
 						// Return its state
 						return RaidManager.STATE.valueOf(raidData.stateId);
 					}
-					else if (typeof raidData.state != "undefined")
+					else if (typeof raidData.state !== "undefined")
 					{
 						// Return its state
 						return RaidManager.STATE.valueOf(raidData.state.text);

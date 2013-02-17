@@ -1,14 +1,14 @@
 		RaidCommand.create( 
 			{
 				commandName: "reload",
-				aliases: ["refresh"],
+				aliases: ["refresh", "reloaf", "reloa", "eload"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
 					var ret = {};
-					
+
 					// true if we did reload, false otherwise
 					ret.success = DC_LoaTS_Helper.reload();
 					

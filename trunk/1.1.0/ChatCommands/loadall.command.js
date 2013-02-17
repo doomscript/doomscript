@@ -1,4 +1,4 @@
-//TODO: Rename to loadAll command. AutoLoad should be for incoming new raids, not loading existing ones
+//TODO: Remove Autoload alias. AutoLoad should be for incoming new raids, not loading existing ones
 		RaidCommand.create(
 			{
 				commandName: "loadall",

@@ -569,6 +569,8 @@
 		// callback should be a function that takes two parameters, oldState and newState
 		DC_LoaTS_Helper.loadRaid = function(raidParam, iframe_options, loadRaidsInBackground, callback)
 		{
+			var start = new Date()/1;
+			
 			// Gather the info we need to load a raid, either from params or utility methods
 			iframe_options = iframe_options || DC_LoaTS_Helper.getIFrameOptions();
 			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
@@ -590,14 +592,6 @@
 				// If the link is valid
 				if (typeof raidLink !== "undefined" && raidLink.isValid())
 				{
-					// Mark link as visited
-					var currentState = RaidManager.fetchState(raidLink);
-					var newState = currentState;
-					if (RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN) || RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN)) {
-						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
-						newState = RaidManager.STATE.VISITED;
-					}
-					
 					// Set necessary iframe options
 					iframe_options['kv_action_type'] = 'raidhelp';
 					iframe_options['kv_difficulty'] = raidLink.difficulty;
@@ -618,7 +612,7 @@
 						DC_LoaTS_Helper.ajax({
 											  url: DC_LoaTS_Properties.joinRaidURL + "?" + collapsedOptions,
 											  method: "GET",
-											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink, currentState, callback)
+											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink, callback, start)
 						});
 					}
 					else	
@@ -629,9 +623,20 @@
 						// Set location of new game window
 						$('gameiframe').contentWindow.location.replace(DC_LoaTS_Properties.kongLoaTSURL + "?" + Object.toQueryString(iframe_options));
 						
+						// Mark link as visited
+						var currentState = RaidManager.fetchState(raidLink);
+						var newState = currentState;
+						if (RaidManager.STATE.equals(currentState, RaidManager.STATE.UNSEEN) || RaidManager.STATE.equals(currentState, RaidManager.STATE.SEEN)) {
+							RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+							newState = RaidManager.STATE.VISITED;
+						}
+
 						if (typeof callback === "function") {
 							callback.call(this, currentState, newState);
 						}
+
+						var time = new Date()/1 - start;
+						Timer.addRun("Load Raid - Foreground", time);
 					}
 				}
 				else
@@ -639,7 +644,7 @@
 					// Notify the user that we don't know what that state is
 					holodeck.activeDialogue().raidBotMessage("Could not parse <code>" + raidParam + "</code> as a raid link url.");
 				}
-				
+
 				// Don't follow the HTML link because we succeeded here
 				return false;
 			}
@@ -653,8 +658,9 @@
 			return true;
 		};
 		
-		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, oldState, callback, response)
+		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, callback, start, response)
 		{
+			
 			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(response.responseText)[1].trim();
 			DCDebug("Ajax Raid Join Message: ", raidJoinMessage);
 			
@@ -664,7 +670,7 @@
 				// Joined
 				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 				if (typeof callback === "function") {
-					callback.call(this, oldState, RaidManager.STATE.VISITED);
+					callback.call(this, RaidManager.fetchState(raidLink), RaidManager.STATE.VISITED);
 				}
 			}
 			else if (response.responseText.indexOf("You are already a member of this raid!") >= 0)
@@ -677,12 +683,17 @@
 			}
 			else
 			{
+				// Raid is either dead, invalid, or alliance. Whatever, just kill it
 				RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
-				DC_LoaTS_Helper.updatePostedLinks(raidLink);
 				if (typeof callback === "function") {
 					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.COMPLETED);
 				}
 			}
+
+			DC_LoaTS_Helper.updatePostedLinks(raidLink);
+
+			var time = new Date()/1 - start;
+			Timer.addRun("Load Raid - Background", time);
 		};
 		
 		DC_LoaTS_Helper.fetchAndLoadRaids = function(urlParsingFilter) {
@@ -706,6 +717,7 @@
 				return;
 			}
 			
+			// Ignore the tiny amount of time it takes to check for cancellation/ending
 			var commandStartTime = new Date()/1;
 			
 			if (holodeck.activeDialogue())
@@ -731,6 +743,7 @@
 						    raidFilter = urlParsingFilter.raidFilter;
 						
 						// Safety catchall to prevent infinite matching
+						// This also means the maximum number of raids that can be loaded like this is 10,000 which seems reasonable
 						var xx = 10000;
 						
 						Timer.start("Parsing External Raids");
@@ -805,16 +818,21 @@
 				} // End onload function
 			});
 		};
-		
+
 		DC_LoaTS_Helper.reportDead = function(raidLink) {
-			DC_LoaTS_Helper.ajax({
-				url: "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=tpircsmood",
-				onload: function(response) {
-					console.log("Report Dead Response: ", response);
-				}
-			});
+			setTimeout(function() {
+				var start = new Date()/1;
+				DC_LoaTS_Helper.ajax({
+					url: "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=tpircsmood",
+					onload: function(response) {
+						var time = new Date()/1 - start;
+						Timer.addRun("CConoly markDead", time);
+						DCDebug("Report Dead took " + time + " ms. Response: ", response);
+					}
+				});
+			}, 10);
 		};
-		
+
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			// Private variable to be closed over in the autoLoader
 			var autoLoadCounter = {
