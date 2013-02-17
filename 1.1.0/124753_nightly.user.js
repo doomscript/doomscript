@@ -290,6 +290,8 @@ Corrected hard health numbers on a bunch of raids from Z10 on
 
 2013.02.14 - 1.1.19
 Altered /lcc <filter> so it runs /loadall <filter> after fetching raids, rather than just filterting the list of newly-fetched raids [sycdan]
+Added preference for delay between loading raids [sycdan]
+Hid doomscript tabs that were previously labeled under construction.
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -5379,10 +5381,8 @@ function main()
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
 									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey), 
-									"Raids should load in background rather than in the game area.", 
-									"If checked, raids won't load in game area.", 
-									//"Snull Snulls in the Snull",
-									//"Snull Snull Snull Snull Snull",
+									"Load Raids in Background (Skips the Play Now screen when loading raids)", 
+									"If checked, raids won't load in the game area.", 
 									{
 										onclick: function()
 										{
@@ -5396,7 +5396,7 @@ function main()
 							"PreferencesMenu-LoadRaidsInBackgroundDelayInput",
 							"text", 
 							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 200), 
-							"Delay (millisecons) between loading each raid in the background.",
+							"ms. Time Between Loading Raids (Only applicable if Load Raids in Background is enabled)",
 							"Default = 200; No delay = 0; Half a second = 500.",
 							{
 								size: 4,
@@ -5423,7 +5423,7 @@ function main()
 							"boolean", 
 							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true), 
 							"Report Dead Raids to CConoly",
-							"When a raid is marked Complete, inform CConoly",
+							"When a raid is marked Complete (Dead or Timed Out), inform CConoly",
 							{
 								onclick: function()
 								{
@@ -5437,8 +5437,8 @@ function main()
 							"PreferencesMenu-UseQueryTimeDeltaInput",
 							"boolean", 
 							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true), 
-							"Only fetch new raids from CConoly",
-							"If enabled, when you use /lcc, it will only collect raids since the last time you used it (saves some cycles on the cconoly server, so it's a nice thing to do)",
+							"Ignore Duplicates When Using /loadcconoly",
+							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
 							{
 								onclick: function()
 								{
@@ -5556,66 +5556,66 @@ function main()
 		/************************************/
 		
 		// Class to manage a tab in the raid tab in the popup menu
-		RaidMenuTab.create(
-			{
-				tabName: "Styles",
-				tabHeader: "Raid Styles (Under construction)",
-				tabPosition: 20,
-				optionIndex: 0,
-				
-				initPane: function()
-				{
-					this.optionRowTemplate = document.createElement("div");
-					this.optionRowTemplate.className = "StylesTab-OptionRow clearfix";
-					
-					var raidNamesPicker = document.createElement("div");
-					raidNamesPicker.className = "StylesTab-RaidNamesPicker";
-					this.optionRowTemplate.appendChild(raidNamesPicker);
-					
-					var selectedRaidsInput = document.createElement("input");
-					raidNamesPicker.appendChild(selectedRaidsInput);
-					
-					var selectedRaidsOptionHolder = document.createElement("div");
-					raidNamesPicker.appendChild(selectedRaidsOptionHolder);
-					
-					for (var raidId in DC_LoaTS_Helper.raids)
-					{
-						var raid = DC_LoaTS_Helper.raids[raidId];
-						var label = document.createElement("label");
-						label["for"] = "StyleTab-RaidOption-" + raid.shortestName + "-" + this.optionIndex++;
-						label.appendChild(document.createTextNode(raid.colloqName));
-						
-						var checkbox = document.createElement("input");
-						checkbox.type = "checkbox";
-						checkbox.id = label["for"];
-						label.appendChild(checkbox);
-						
-						selectedRaidsOptionHolder.appendChild(label);
-						selectedRaidsOptionHolder.appendChild(document.createElement("br"));
-					}
-					
-					this.pane.appendChild(this.optionRowTemplate);
-				}
-				
-		});
+//		RaidMenuTab.create(
+//			{
+//				tabName: "Styles",
+//				tabHeader: "Raid Styles (Under construction)",
+//				tabPosition: 20,
+//				optionIndex: 0,
+//				
+//				initPane: function()
+//				{
+//					this.optionRowTemplate = document.createElement("div");
+//					this.optionRowTemplate.className = "StylesTab-OptionRow clearfix";
+//					
+//					var raidNamesPicker = document.createElement("div");
+//					raidNamesPicker.className = "StylesTab-RaidNamesPicker";
+//					this.optionRowTemplate.appendChild(raidNamesPicker);
+//					
+//					var selectedRaidsInput = document.createElement("input");
+//					raidNamesPicker.appendChild(selectedRaidsInput);
+//					
+//					var selectedRaidsOptionHolder = document.createElement("div");
+//					raidNamesPicker.appendChild(selectedRaidsOptionHolder);
+//					
+//					for (var raidId in DC_LoaTS_Helper.raids)
+//					{
+//						var raid = DC_LoaTS_Helper.raids[raidId];
+//						var label = document.createElement("label");
+//						label["for"] = "StyleTab-RaidOption-" + raid.shortestName + "-" + this.optionIndex++;
+//						label.appendChild(document.createTextNode(raid.colloqName));
+//						
+//						var checkbox = document.createElement("input");
+//						checkbox.type = "checkbox";
+//						checkbox.id = label["for"];
+//						label.appendChild(checkbox);
+//						
+//						selectedRaidsOptionHolder.appendChild(label);
+//						selectedRaidsOptionHolder.appendChild(document.createElement("br"));
+//					}
+//					
+//					this.pane.appendChild(this.optionRowTemplate);
+//				}
+//				
+//		});
 
 		/************************************/
 		/************ Utils Tab *************/
 		/************************************/
 		
 		// Class to manage a tab in the raid tab in the popup menu
-		RaidMenuTab.create(
-			{
-				tabName: "Utils",
-				tabHeader: "Utilities (Under Construction)",
-				tabPosition: 50,
-				
-				initPane: function()
-				{
-					//TODO: Fill out utilities tab
-				}
-							
-		});
+//		RaidMenuTab.create(
+//			{
+//				tabName: "Utils",
+//				tabHeader: "Utilities (Under Construction)",
+//				tabPosition: 50,
+//				
+//				initPane: function()
+//				{
+//					//TODO: Fill out utilities tab
+//				}
+//							
+//		});
 		
 		RaidCommand.create( 
 			{
@@ -9762,12 +9762,17 @@ DC_LoaTS_Helper.raids =
 				rulesText += "}\n";				
 				
 				
-				
+				rulesText += "\n#PreferencesMenu-LoadRaidsInBackgroundDelayInputWrapper input {\n";
+				rulesText += "\twidth: 30px;\n";
+				rulesText += "\twidth: 10px;\n";
+				rulesText += "\tborder-radius: 5px;\n";
+				rulesText += "\ttext-align: center;\n";
+				rulesText += "}\n";				
 				
 				
 				rulesText += "\n#DC_LoaTS_notifitcationBar {\n";
 				rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
-				rulesText += "\tpadding:  4px 10px; 0px\n";
+				rulesText += "\tpadding: 4px 10px; 0px\n";
 				rulesText += "\twidth: 100%;\n";
 				rulesText += "\tfont-size: 12pt;\n";
 				rulesText += "\tcolor: #915608;\n";

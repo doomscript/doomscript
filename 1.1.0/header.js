@@ -290,6 +290,8 @@ Corrected hard health numbers on a bunch of raids from Z10 on
 
 2013.02.14 - 1.1.19
 Altered /lcc <filter> so it runs /loadall <filter> after fetching raids, rather than just filterting the list of newly-fetched raids [sycdan]
+Added preference for delay between loading raids [sycdan]
+Hid doomscript tabs that were previously labeled under construction.
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
