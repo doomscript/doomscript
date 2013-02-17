@@ -207,7 +207,7 @@
 				
 				rulesText += "\n#PreferencesMenu-LoadRaidsInBackgroundDelayInputWrapper input {\n";
 				rulesText += "\twidth: 30px;\n";
-				rulesText += "\twidth: 10px;\n";
+				rulesText += "\theight: 10px;\n";
 				rulesText += "\tborder-radius: 5px;\n";
 				rulesText += "\ttext-align: center;\n";
 				rulesText += "}\n";				
