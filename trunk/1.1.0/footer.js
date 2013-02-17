@@ -205,12 +205,17 @@
 				rulesText += "}\n";				
 				
 				
-				
+				rulesText += "\n#PreferencesMenu-LoadRaidsInBackgroundDelayInputWrapper input {\n";
+				rulesText += "\twidth: 30px;\n";
+				rulesText += "\twidth: 10px;\n";
+				rulesText += "\tborder-radius: 5px;\n";
+				rulesText += "\ttext-align: center;\n";
+				rulesText += "}\n";				
 				
 				
 				rulesText += "\n#DC_LoaTS_notifitcationBar {\n";
 				rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
-				rulesText += "\tpadding:  4px 10px; 0px\n";
+				rulesText += "\tpadding: 4px 10px; 0px\n";
 				rulesText += "\twidth: 100%;\n";
 				rulesText += "\tfont-size: 12pt;\n";
 				rulesText += "\tcolor: #915608;\n";

@@ -73,10 +73,8 @@
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
 									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey), 
-									"Raids should load in background rather than in the game area.", 
-									"If checked, raids won't load in game area.", 
-									//"Snull Snulls in the Snull",
-									//"Snull Snull Snull Snull Snull",
+									"Load Raids in Background (Skips the Play Now screen when loading raids)", 
+									"If checked, raids won't load in the game area.", 
 									{
 										onclick: function()
 										{
@@ -90,7 +88,7 @@
 							"PreferencesMenu-LoadRaidsInBackgroundDelayInput",
 							"text", 
 							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 200), 
-							"Delay (millisecons) between loading each raid in the background.",
+							"ms. Time Between Loading Raids (Only applicable if Load Raids in Background is enabled)",
 							"Default = 200; No delay = 0; Half a second = 500.",
 							{
 								size: 4,
@@ -117,7 +115,7 @@
 							"boolean", 
 							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true), 
 							"Report Dead Raids to CConoly",
-							"When a raid is marked Complete, inform CConoly",
+							"When a raid is marked Complete (Dead or Timed Out), inform CConoly",
 							{
 								onclick: function()
 								{
@@ -131,8 +129,8 @@
 							"PreferencesMenu-UseQueryTimeDeltaInput",
 							"boolean", 
 							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true), 
-							"Only fetch new raids from CConoly",
-							"If enabled, when you use /lcc, it will only collect raids since the last time you used it (saves some cycles on the cconoly server, so it's a nice thing to do)",
+							"Ignore Duplicates When Using /loadcconoly",
+							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
 							{
 								onclick: function()
 								{
