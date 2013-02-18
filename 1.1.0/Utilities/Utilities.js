@@ -842,7 +842,7 @@
 					completed: 0, 
 					reported: false,
 					isValid: function() {return this.loaded + this.visited + this.completed == this.attempted;},
-					getReport: function() {this.reported = true; return "Loaded: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
+					getReport: function() {this.reported = true; return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
 			};
 			var startTime = new Date()/1;
 			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
