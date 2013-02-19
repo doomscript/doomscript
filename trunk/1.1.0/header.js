@@ -294,7 +294,7 @@ Added preference for delay between loading raids [sycdan]
 Hid doomscript tabs that were previously labeled under construction.
 
 2013.??.?? - 1.1.20
-Fix a bug in that was causing raids to be marked as completed when they were actually being re-joined
+Fixed a bug that was causing raids to be marked as completed when they were actually being re-joined
 Minor code cleanup
 Added more timing data to find slow downs
 Added aliases to /linktools: /advertise, /blatantselfpromotion, /getdoomscript
