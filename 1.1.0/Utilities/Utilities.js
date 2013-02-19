@@ -1025,9 +1025,179 @@
 			DC_LoaTS_Helper.updatePostedLinks();
 		}
 		
+		DC_LoaTS_Helper.listContainsRaid(list, raidLink) {
+			if (list && raidLink && raidLink.isValid()) {
+				var key = raidLink.getUniqueKey();
+				for (var i = 0; i < list.length; i++) {
+					if (list[i].getUniqueKey() === key) {
+						return true;
+					}
+				}
+			}
+			
+			return false;
+		}
+		
+		// Make sure the upl namespace exists
+		DC_LoaTS_Helper.upl = {now: {}, next: {}};
+		
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
+			/*
+			 
+			 
+			 
+			// If updating posted links is locked
+			if (DC_LoaTS_Helper.upl.lock) {
+				// No raidLink provided. Load everything
+				if (!raidLink) {
+					DC_LoaTS_Helper.upl.next.refreshAll = true;
+					delete DC_LoaTS_Helper.upl.next.list;
+				}
+				// If we're not loading all
+				else if (!DC_LoaTS_Helper.upl.next.refreshAll) {
+					// Make sure the list is ready
+					if (!DC_LoaTS_Helper.upl.next.list) {
+						DC_LoaTS_Helper.upl.next.list = {};
+					}
+					DC_LoaTS_Helper.upl.next.list[raidLink.getUniqueKey()] = raidLink;
+				}
+				
+				// If updating posted links became unlocked
+				if (DC_LoaTS_Helper.upl.lock) {
+					// Lock it
+					DC_LoaTS_Helper.upl.lock = true;
+					
+					// In theory, we now have the lock and other code can't get in here
+
+					// Copy over the important values
+					DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
+					DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
+					
+					// Clear out the nexts
+					DC_LoaTS_Helper.upl.next.refreshAll = false;
+					delete DC_LoaTS_Helper.upl.next.list;
+
+					// Run the private runner. Will do the unlock for us
+					_upl();
+				}
+				// If it's still locked, don't do anything
+			}
+			else {
+				// Lock it
+				DC_LoaTS_Helper.upl.lock = true;
+				
+				// In theory, we now have the lock and other code can't get in here
+
+				// Set the important values
+				DC_LoaTS_Helper.upl.now.refreshAll = !raidLink;
+				DC_LoaTS_Helper.upl.now.list = raidLink ? [raidLink] : undefined;
+
+				// Run the private runner. Will do the unlock for us
+				_upl();
+			}
+			
+			// Private function
+			function _upl() {
+				// At this time, we can assume that the locks prevent this code from every being run
+				// more than once at a time, and that the upl.now variables are set and won't change
+				
+				// Set a timeout to avoid sucking up all the cpu
+				setTimeout(function()
+				{
+					Timer.start("updatePostedLinksTimeout");
+					try 
+					{
+						// Look up all raid links in chat
+						var elems = $("play").getElementsByClassName("raidMessage");
+						
+						// Retrieve the message format
+						var messageFormat = DC_LoaTS_Helper.getMessageFormat();
+						
+						// Retrieve the link format
+						var linkFormat = DC_LoaTS_Helper.getLinkFormat();
+						
+						// Iterate over all link elements in the chat
+						for (var i = 0; i < elems.length; i++)
+						{
+							// Convert them to RaidLink objects
+							var elem = elems[i];
+							var newRaidLink = new RaidLink(elem.children[0].href);
+							
+							// If we're looking for a specific link, make sure to match it. Otherwise, do them all
+							if (newRaidLink.isValid() && (DC_LoaTS_helper.upl.now.refreshAll || DC_LoaTS_Helper.listContainsRaid(DC_LoaTS_Helper.upl.now.list, newRaidLink)))
+							{
+								// Restyle the message as appropriate
+								var styles = newRaidLink.getMatchedStyles();
+								
+								// TODO: Eventually figure out how to style whispers without it being a PITA especially raidbot seenraids whispers
+								if ((elem.parentNode.parentNode.parentNode.className || "").indexOf("hisper") < 0) {
+									
+									// Remove existing doomscript styles. We don't want to double them up or anything weird
+									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "").trim();
+
+									// If there are styles, apply them
+									if (styles && styles.className)
+									{
+										// Append to the existing styles
+										elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
+									}
+								}
+								
+								// Remove the old link, and shove in the new, formatted, styled one
+								elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
+								elem.remove();
+							}
+							else if (!newRaidLink.isValid())
+							{
+								console.warn("Element did not produce a valid raid link:");
+								console.warn(elem);
+							}
+							else if (newRaidLink.hash === raidLink.hash || raidLink.id === newRaidLink.id)
+							{
+								DCDebug("Similar links found while updating posted links, but not similar enough?");
+								DCDebug(raidLink);
+								DCDebug(newRaidLink);
+							}
+						}
+					}
+					catch (e)
+					{
+						console.warn(e);
+					}
+					
+					// If there's other stuff to run
+					if (DC_LoaTS_Helper.upl.next.refreshAll || DC_LoaTS_Helper.upl.next.list) {
+						setTimeout(function() {
+							// Copy over the important values
+							DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
+							DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
+							
+							// Clear out the nexts
+							DC_LoaTS_Helper.upl.next.refreshAll = false;
+							delete DC_LoaTS_Helper.upl.next.list;
+	
+							// Run the private runner. Will do the unlock for us
+							_upl();
+						// If we go to run this again, don't run it too soon
+						}, 1000);
+					}
+					else {
+						DC_LoaTS_Helper.upl.lock = false;
+					}
+					Timer.stop("updatePostedLinksTimeout");
+				}, 50);
+			}
+			
+			
+			
+			
+			*/
+			
+			
+			
+			
 			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout !== "undefined")
 			{
 				clearTimeout(DC_LoaTS_Helper.updatePostedLinksTimeout);
