@@ -9095,7 +9095,7 @@ DC_LoaTS_Helper.raids =
 			DC_LoaTS_Helper.updatePostedLinks();
 		}
 		
-		DC_LoaTS_Helper.listContainsRaid(list, raidLink) {
+		DC_LoaTS_Helper.listContainsRaid = function(list, raidLink) {
 			if (list && raidLink && raidLink.isValid()) {
 				var key = raidLink.getUniqueKey();
 				for (var i = 0; i < list.length; i++) {
