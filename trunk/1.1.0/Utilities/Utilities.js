@@ -660,33 +660,43 @@
 		
 		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, callback, start, response)
 		{
-			
-			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(response.responseText)[1].trim();
+			var responseText = response.responseText;
+			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(responseText)[1].trim();
 			DCDebug("Ajax Raid Join Message: ", raidJoinMessage);
 			
+			// Get the current state of the raid form the cache
+			var oldState = RaidManager.fetchState(raidLink)
 			
-			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
+			if (responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
 				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 				if (typeof callback === "function") {
-					callback.call(this, RaidManager.fetchState(raidLink), RaidManager.STATE.VISITED);
+					callback.call(this, oldState, RaidManager.STATE.VISITED);
 				}
 			}
-			else if (response.responseText.indexOf("You are already a member of this raid!") >= 0)
+			else if (responseText.indexOf("You are already a member of this raid!") >= 0 || responseText.indexOf("You have successfully re-joined the raid!") >= 0)
 			{
-				// Already visited
+				// Already visited / rejoined
 				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 				if (typeof callback === "function") {
 					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.VISITED);
 				}
 			}
-			else
+			else if (responseText.indexOf("This raid is already completed!") >= 0)
 			{
-				// Raid is either dead, invalid, or alliance. Whatever, just kill it
+				// Raid is dead
 				RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
 				if (typeof callback === "function") {
-					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.COMPLETED);
+					callback.call(this, oldState, RaidManager.STATE.COMPLETED);
+				}
+			}
+			else
+			{
+				// Invalid response (bad hash, wrong alliance, or otherwise broken link)
+				RaidManager.store(raidLink, RaidManager.STATE.IGNORED);
+				if (typeof callback === "function") {
+					callback.call(this, oldState, RaidManager.STATE.IGNORED);
 				}
 			}
 
@@ -772,6 +782,12 @@
 						// Store all the raids we grabbed
 						RaidManager.storeBulk(fetchedRaids);
 						Timer.stop("Parsing External Raids");
+						
+						// Update the last query time
+						if (urlParsingFilter.type == "cconoly")
+						{
+							GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, commandStartTime);
+						}
 
 						// Report the fetched raids
 						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + "ms.";
@@ -822,8 +838,10 @@
 		DC_LoaTS_Helper.reportDead = function(raidLink) {
 			setTimeout(function() {
 				var start = new Date()/1;
+				var reportUrl = "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=%VERSION%";
+				reportUrl = reportUrl.replace("%VERSION%", DC_LoaTS_Properties.version.toString().replace(/\./g, ""));
 				DC_LoaTS_Helper.ajax({
-					url: "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=tpircsmood",
+					url: reportUrl,
 					onload: function(response) {
 						var time = new Date()/1 - start;
 						Timer.addRun("CConoly markDead", time);
@@ -877,6 +895,9 @@
 								var endTime = new Date()/1;
 								var took = (endTime - startTime)/1000;
 								holodeck.activeDialogue().raidBotMessage("Loading Complete! " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
+								
+								// Update all the links, in case any were missed while loading
+								DC_LoaTS_Helper.updatePostedLinks();
 							}
 						}
 					);
@@ -1063,7 +1084,7 @@
 					console.warn(e);
 				}
 				Timer.stop("updatePostedLinksTimeout");
-			}.bind(window, raidLink), 300);
+			}.bind(window, raidLink), 100);
 		};
 		
 		DC_LoaTS_Helper.ajax = function(params){

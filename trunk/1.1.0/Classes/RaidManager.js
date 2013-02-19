@@ -229,6 +229,9 @@
 				{
 					// Replace the entire stored dataset with an empty object
 					GM_setValue(DC_LoaTS_Properties.storage.raidStorage, JSON.stringify({}));
+					
+					// Also clear the memcache
+					RaidManager.raidStorage = {};
 				}
 				else
 				{
@@ -241,6 +244,13 @@
 					// Store the storage data back into the browser storage
 					GM_setValue(DC_LoaTS_Properties.storage.raidStorage, JSON.stringify(RaidManager.raidStorage));
 				}
+				
+				// Reset the CConoly query time so all the raids can be loaded again
+				GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
+					
+				// Reset all the links to NEW
+				DC_LoaTS_Helper.updatePostedLinks();
+				
 				Timer.stop("clear");
 			},
 			

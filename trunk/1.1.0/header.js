@@ -294,12 +294,15 @@ Added preference for delay between loading raids [sycdan]
 Hid doomscript tabs that were previously labeled under construction.
 
 2013.??.?? - 1.1.20
+Fix a bug in that was causing raids to be marked as completed when they were actually being re-joined
 Minor code cleanup
 Added more timing data to find slow downs
 Added aliases to /linktools: /advertise, /blatantselfpromotion, /getdoomscript
 Added aliases to /reload: /reloaf, /reloa, /eload
 Moved loadall to normal chat commands. It's a main feature now, not just an experimental hack. It will now appear in the right order in the help list
 Added /refreshlinks command to cause the links to redraw themselves. This is mainly for when a link refuses to mark visited
+All links will now be refreshed after /loadall and /clearraids [sycdan]
+Fixed a bug in /clearraids all that was causing /seenraids to still show raids [sycdan]
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -309,7 +312,6 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-		// [sycdan] I hate this; would rather use GM_info.script.version when the version is called for
     	version: "1.1.20",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
