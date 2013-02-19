@@ -9,7 +9,7 @@
 				
 				paramText: "[filter]",
 
-				cconolyUrl: "http://cconoly.com/lots/raidlinks.php?doomscript=tpircsmood",
+				cconolyUrl: "http://cconoly.com/lots/raidlinks.php?doomscript=%VERSION%&hrs=%HOURS%",
 				
 				handler: function(deck, parser, params, text, context)
 				{
@@ -17,14 +17,16 @@
 						parser = new UrlParsingFilter("cancel");
 					}
 					else {
-						parser = new UrlParsingFilter(this.cconolyUrl + "&hrs=" + this.hoursSinceLastQuery() + " " + params);
+						var filterUrl = this.cconolyUrl + " " + params;
+						filterUrl = filterUrl.replace("%VERSION%", DC_LoaTS_Properties.version.toString().replace(/\./g, ""));
+						filterUrl = filterUrl.replace("%HOURS%", this.hoursSinceLastQuery());
+						parser = new UrlParsingFilter(filterUrl);
 					}
 					
 					// Declare ret object
 					var ret = {success: parser.type === "cconoly"};
 						
 					if (ret.success) {
-						GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, new Date()/1);
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {

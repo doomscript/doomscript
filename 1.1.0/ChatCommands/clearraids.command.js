@@ -33,7 +33,7 @@
 						var raidLinks = RaidManager.fetchByFilter(raidFilter);
 						
 						// If the RaidManager executed successfully
-						if (typeof raidLinks != "undefined")
+						if (typeof raidLinks !== "undefined")
 						{
 							// If we didn't match a single raid
 							if (raidLinks.length == 0)
@@ -59,13 +59,7 @@
 							ret.success = false;
 						}
 					}
-					
-					if (ret.success)
-					{
-						// Reset the query time delta so the raids can be re-fetched
-						GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
-					}
-									
+								
 					return ret;
 				},
 				
