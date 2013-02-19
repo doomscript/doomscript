@@ -52,20 +52,8 @@
 						break;
 					}
 				}
-				
-				// Additional management based on types
-				switch(type)
-				{
-					case "pastebin":
-						// Nothing 
-						break;
-					case "cconoly":
-						// Nothing
-						break;
-					default:
-						break;
-				}
 			},
+			
 			getUrlLink: function()
 			{
 				return "<a href=\"" + this.getWorkingUrl() + "\" target=\"_blank\">" + this.getLinkName() + "</a>";
@@ -104,7 +92,7 @@
 		
 		// Pattern to match different link types
 		UrlParsingFilter.urlPatterns = {
-				"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
-				"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
-			};
+			"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
+			"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
+		};
 		

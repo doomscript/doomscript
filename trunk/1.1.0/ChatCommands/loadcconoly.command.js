@@ -9,18 +9,13 @@
 				
 				paramText: "[filter]",
 
-				cconolyUrl: "http://cconoly.com/lots/raidlinks.php?doomscript=%VERSION%&hrs=%HOURS%",
-				
 				handler: function(deck, parser, params, text, context)
 				{
 					if (params === "cancel") {
 						parser = new UrlParsingFilter("cancel");
 					}
 					else {
-						var filterUrl = this.cconolyUrl + " " + params;
-						filterUrl = filterUrl.replace("%VERSION%", DC_LoaTS_Properties.version.toString().replace(/\./g, ""));
-						filterUrl = filterUrl.replace("%HOURS%", this.hoursSinceLastQuery());
-						parser = new UrlParsingFilter(filterUrl);
+						parser = new UrlParsingFilter(CConolyAPI.getRaidListUrl() + " " + params);
 					}
 					
 					// Declare ret object
@@ -35,19 +30,6 @@
 					return ret;
 				},
 					
-				hoursSinceLastQuery: function()
-				{
-					if (DC_LoaTS_Helper.getPref("UseQueryTimeDelta", true))
-					{
-						elapsedMs = new Date()/1 - GM_getValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
-						elapsedHrs = elapsedMs / 1000 / 60 / 60;
-						return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals
-					}
-					else
-					{
-						return 168;
-					}
-				},
 							
 				getOptions: function()
 				{
