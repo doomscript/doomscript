@@ -293,16 +293,19 @@ Altered /lcc <filter> so it runs /loadall <filter> after fetching raids, rather 
 Added preference for delay between loading raids [sycdan]
 Hid doomscript tabs that were previously labeled under construction.
 
-2013.??.?? - 1.1.20
+2013.02.19 - 1.1.20
 Fixed a bug that was causing raids to be marked as completed when they were actually being re-joined
 Minor code cleanup
 Added more timing data to find slow downs
 Added aliases to /linktools: /advertise, /blatantselfpromotion, /getdoomscript
 Added aliases to /reload: /reloaf, /reloa, /eload
-Moved loadall to normal chat commands. It's a main feature now, not just an experimental hack. It will now appear in the right order in the help list
+Moved /loadall to ChatCommands folder from Experimental. It's a main feature now, not just an experimental hack. 
+Consequently, /loadall will now appear in the correct alphabetical order in the help list
 Added /refreshlinks command to cause the links to redraw themselves. This is mainly for when a link refuses to mark visited
 All links will now be refreshed after /loadall and /clearraids [sycdan]
 Fixed a bug in /clearraids all that was causing /seenraids to still show raids [sycdan]
+Cleaned up some CConoly communication code [doomcat/sycdan]
+/clearraids ALL was not being accepted. It's now case-insensitive
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -334,7 +337,14 @@ function main()
     	
     	// Do not check code in with this set to true. 
     	// Preferably, turn it on from the browser command line with DC_LoaTS_Properties.debugMode = true;
-    	debugMode: false,
+    	// Or add debugMode=true to the game url in the browser
+    	debugMode: (function() {
+    		var value = /debugMode=(\w+)/.exec(document.location.href);
+    		if (value && value[1]) {
+    			return true;
+    		}
+    		return false;
+    	})(),
     	
     	// GreaseMonkey Storage Keys
     	storage: {

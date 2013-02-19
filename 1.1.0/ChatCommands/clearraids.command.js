@@ -9,7 +9,7 @@
 					ret = {};
 					
 					// If the user wants to clear all raids
-					if (params === "all")
+					if (params && params.toLowerCase() === "all")
 					{
 						// Clear all raids stored in memory
 						RaidManager.clear();
