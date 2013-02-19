@@ -516,7 +516,6 @@
 					});
 				}
 		};
-
 		
 		// Serialize a JS object for form submission
 		DC_LoaTS_Helper.uriSerialize = function(obj) {
@@ -735,6 +734,13 @@
 				holodeck.activeDialogue().raidBotMessage("Fetching raids from " + urlParsingFilter.getUrlLink() + ". Please wait...");
 			}
 			
+			// Update the last query time
+			if (urlParsingFilter.type == "cconoly")
+			{
+				// Make sure to set this before the query is run rathre than after
+				CConolyAPI.setLastQueryTime(commandStartTime);
+			}
+			
 			// Run the download
 			DC_LoaTS_Helper.ajax({
 				url: urlParsingFilter.getWorkingUrl(),
@@ -783,12 +789,6 @@
 						RaidManager.storeBulk(fetchedRaids);
 						Timer.stop("Parsing External Raids");
 						
-						// Update the last query time
-						if (urlParsingFilter.type == "cconoly")
-						{
-							GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, commandStartTime);
-						}
-
 						// Report the fetched raids
 						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + "ms.";
 						if (fetchedRaids.length > 0)
@@ -838,8 +838,8 @@
 		DC_LoaTS_Helper.reportDead = function(raidLink) {
 			setTimeout(function() {
 				var start = new Date()/1;
-				var reportUrl = "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=%VERSION%";
-				reportUrl = reportUrl.replace("%VERSION%", DC_LoaTS_Properties.version.toString().replace(/\./g, ""));
+				var reportUrl = CConolyAPI.getMarkDeadUrl(raidLink.id);
+				
 				DC_LoaTS_Helper.ajax({
 					url: reportUrl,
 					onload: function(response) {

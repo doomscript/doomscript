@@ -294,12 +294,15 @@ Added preference for delay between loading raids [sycdan]
 Hid doomscript tabs that were previously labeled under construction.
 
 2013.??.?? - 1.1.20
+Fix a bug in that was causing raids to be marked as completed when they were actually being re-joined
 Minor code cleanup
 Added more timing data to find slow downs
 Added aliases to /linktools: /advertise, /blatantselfpromotion, /getdoomscript
 Added aliases to /reload: /reloaf, /reloa, /eload
 Moved loadall to normal chat commands. It's a main feature now, not just an experimental hack. It will now appear in the right order in the help list
 Added /refreshlinks command to cause the links to redraw themselves. This is mainly for when a link refuses to mark visited
+All links will now be refreshed after /loadall and /clearraids [sycdan]
+Fixed a bug in /clearraids all that was causing /seenraids to still show raids [sycdan]
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -309,7 +312,6 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-		// [sycdan] I hate this; would rather use GM_info.script.version when the version is called for
     	version: "1.1.20",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
@@ -2933,6 +2935,9 @@ function main()
 				{
 					// Replace the entire stored dataset with an empty object
 					GM_setValue(DC_LoaTS_Properties.storage.raidStorage, JSON.stringify({}));
+					
+					// Also clear the memcache
+					RaidManager.raidStorage = {};
 				}
 				else
 				{
@@ -2945,6 +2950,13 @@ function main()
 					// Store the storage data back into the browser storage
 					GM_setValue(DC_LoaTS_Properties.storage.raidStorage, JSON.stringify(RaidManager.raidStorage));
 				}
+				
+				// Reset the CConoly query time so all the raids can be loaded again
+				GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
+					
+				// Reset all the links to NEW
+				DC_LoaTS_Helper.updatePostedLinks();
+				
 				Timer.stop("clear");
 			},
 			
@@ -5134,20 +5146,8 @@ function main()
 						break;
 					}
 				}
-				
-				// Additional management based on types
-				switch(type)
-				{
-					case "pastebin":
-						// Nothing 
-						break;
-					case "cconoly":
-						// Nothing
-						break;
-					default:
-						break;
-				}
 			},
+			
 			getUrlLink: function()
 			{
 				return "<a href=\"" + this.getWorkingUrl() + "\" target=\"_blank\">" + this.getLinkName() + "</a>";
@@ -5186,9 +5186,9 @@ function main()
 		
 		// Pattern to match different link types
 		UrlParsingFilter.urlPatterns = {
-				"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
-				"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
-			};
+			"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
+			"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
+		};
 		
 		/************************************/
 		/********** Formatting Tab **********/
@@ -5800,7 +5800,7 @@ function main()
 						var raidLinks = RaidManager.fetchByFilter(raidFilter);
 						
 						// If the RaidManager executed successfully
-						if (typeof raidLinks != "undefined")
+						if (typeof raidLinks !== "undefined")
 						{
 							// If we didn't match a single raid
 							if (raidLinks.length == 0)
@@ -5826,13 +5826,7 @@ function main()
 							ret.success = false;
 						}
 					}
-					
-					if (ret.success)
-					{
-						// Reset the query time delta so the raids can be re-fetched
-						GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
-					}
-									
+								
 					return ret;
 				},
 				
@@ -6443,22 +6437,19 @@ function main()
 				
 				paramText: "[filter]",
 
-				cconolyUrl: "http://cconoly.com/lots/raidlinks.php?doomscript=tpircsmood",
-				
 				handler: function(deck, parser, params, text, context)
 				{
 					if (params === "cancel") {
 						parser = new UrlParsingFilter("cancel");
 					}
 					else {
-						parser = new UrlParsingFilter(this.cconolyUrl + "&hrs=" + this.hoursSinceLastQuery() + " " + params);
+						parser = new UrlParsingFilter(CConolyAPI.getRaidListUrl() + " " + params);
 					}
 					
 					// Declare ret object
 					var ret = {success: parser.type === "cconoly"};
 						
 					if (ret.success) {
-						GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, new Date()/1);
 						DC_LoaTS_Helper.fetchAndLoadRaids(parser);
 					}
 					else {
@@ -6467,19 +6458,6 @@ function main()
 					return ret;
 				},
 					
-				hoursSinceLastQuery: function()
-				{
-					if (DC_LoaTS_Helper.getPref("UseQueryTimeDelta", true))
-					{
-						elapsedMs = new Date()/1 - GM_getValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
-						elapsedHrs = elapsedMs / 1000 / 60 / 60;
-						return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals
-					}
-					else
-					{
-						return 168;
-					}
-				},
 							
 				getOptions: function()
 				{
@@ -7826,6 +7804,52 @@ RaidCommand
 			}
 		);
 		
+		
+		// Manage data related to the CConoly API
+		DC_LoaTS_Helper.CConolyAPI = {
+				
+			lastQueryTimeKey: DC_LoaTS_Properties.storage.cconolyLastQueryTime,
+			useQueryTimeDeltaPrefKey: "UseQueryTimeDelta",
+			
+			baseUrl: "http://cconoly.com/lots/",
+			markDeadUrl: "markDead.php?kv_raid_id=%RAID_ID%&doomscript=%VERSION%",
+			raidListUrl: "raidlinks.php?hrs=%TIME%&doomscript=%VERSION%",
+			
+			setLastQueryTime: function(lastQueryTime) {
+				GM_setValue(this.lastQueryTimeKey, lastQueryTime);
+			},
+			
+			getMarkDeadUrl: function(raidID) {
+				var reportUrl = this.baseUrl + this.markDeadUrl;
+				reportUrl = reportUrl.replace("%RAID_ID%", raidID);
+				reportUrl = reportUrl.replace("%VERSION%", this.getVersionString());
+				return reportUrl;
+			},
+			
+			getRaidListUrl: function() {
+				var raidListUrl = this.baseUrl + this.markDeadUrl;
+				raidListUrl = raidListUrl.replace("%TIME%", this.getRaidListQueryHours());
+				raidListUrl = raidListUrl.replace("%VERSION%", this.getVersionString());
+				return raidListUrl;
+			},
+			
+			getVersionString: function() {
+				return DC_LoaTS_Properties.version.toString().replace(/\./g, "");
+			}
+			
+			getRaidListQueryHours: function()
+			{
+				return DC_LoaTS_Helper.getPref(this.useQueryTimeDeltaPrefKey, true) ? this.getHoursSinceLastQuery() : 168;
+			},
+			
+			getHoursSinceLastQuery: function() {
+				var elapsedMs = new Date()/1 - GM_getValue(this.lastQueryTimeKey, 0);
+				elapsedHrs = elapsedMs / 1000 / 60 / 60; // Convert ms to hours
+				return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals, take 168 or lower
+			}
+		
+		};
+		
 
 // List of all raid ids and names. Any raid without a real raid id will not show up nicely.
 DC_LoaTS_Helper.raids = 
@@ -8503,7 +8527,6 @@ DC_LoaTS_Helper.raids =
 					});
 				}
 		};
-
 		
 		// Serialize a JS object for form submission
 		DC_LoaTS_Helper.uriSerialize = function(obj) {
@@ -8647,33 +8670,43 @@ DC_LoaTS_Helper.raids =
 		
 		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, callback, start, response)
 		{
-			
-			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(response.responseText)[1].trim();
+			var responseText = response.responseText;
+			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(responseText)[1].trim();
 			DCDebug("Ajax Raid Join Message: ", raidJoinMessage);
 			
+			// Get the current state of the raid form the cache
+			var oldState = RaidManager.fetchState(raidLink)
 			
-			if (response.responseText.indexOf("You have successfully joined the raid!") >= 0)
+			if (responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
 				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 				if (typeof callback === "function") {
-					callback.call(this, RaidManager.fetchState(raidLink), RaidManager.STATE.VISITED);
+					callback.call(this, oldState, RaidManager.STATE.VISITED);
 				}
 			}
-			else if (response.responseText.indexOf("You are already a member of this raid!") >= 0)
+			else if (responseText.indexOf("You are already a member of this raid!") >= 0 || responseText.indexOf("You have successfully re-joined the raid!") >= 0)
 			{
-				// Already visited
+				// Already visited / rejoined
 				RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 				if (typeof callback === "function") {
 					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.VISITED);
 				}
 			}
-			else
+			else if (responseText.indexOf("This raid is already completed!") >= 0)
 			{
-				// Raid is either dead, invalid, or alliance. Whatever, just kill it
+				// Raid is dead
 				RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
 				if (typeof callback === "function") {
-					callback.call(this, RaidManager.STATE.VISITED, RaidManager.STATE.COMPLETED);
+					callback.call(this, oldState, RaidManager.STATE.COMPLETED);
+				}
+			}
+			else
+			{
+				// Invalid response (bad hash, wrong alliance, or otherwise broken link)
+				RaidManager.store(raidLink, RaidManager.STATE.IGNORED);
+				if (typeof callback === "function") {
+					callback.call(this, oldState, RaidManager.STATE.IGNORED);
 				}
 			}
 
@@ -8710,6 +8743,13 @@ DC_LoaTS_Helper.raids =
 			if (holodeck.activeDialogue())
 			{
 				holodeck.activeDialogue().raidBotMessage("Fetching raids from " + urlParsingFilter.getUrlLink() + ". Please wait...");
+			}
+			
+			// Update the last query time
+			if (urlParsingFilter.type == "cconoly")
+			{
+				// Make sure to set this before the query is run rathre than after
+				CConolyAPI.setLastQueryTime(commandStartTime);
 			}
 			
 			// Run the download
@@ -8759,7 +8799,7 @@ DC_LoaTS_Helper.raids =
 						// Store all the raids we grabbed
 						RaidManager.storeBulk(fetchedRaids);
 						Timer.stop("Parsing External Raids");
-
+						
 						// Report the fetched raids
 						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + "ms.";
 						if (fetchedRaids.length > 0)
@@ -8809,8 +8849,10 @@ DC_LoaTS_Helper.raids =
 		DC_LoaTS_Helper.reportDead = function(raidLink) {
 			setTimeout(function() {
 				var start = new Date()/1;
+				var reportUrl = CConolyAPI.getMarkDeadUrl(raidLink.id);
+				
 				DC_LoaTS_Helper.ajax({
-					url: "http://cconoly.com/lots/markDead.php?kv_raid_id=" + raidLink.id + "&doomscript=tpircsmood",
+					url: reportUrl,
 					onload: function(response) {
 						var time = new Date()/1 - start;
 						Timer.addRun("CConoly markDead", time);
@@ -8864,6 +8906,9 @@ DC_LoaTS_Helper.raids =
 								var endTime = new Date()/1;
 								var took = (endTime - startTime)/1000;
 								holodeck.activeDialogue().raidBotMessage("Loading Complete! " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
+								
+								// Update all the links, in case any were missed while loading
+								DC_LoaTS_Helper.updatePostedLinks();
 							}
 						}
 					);
@@ -9050,7 +9095,7 @@ DC_LoaTS_Helper.raids =
 					console.warn(e);
 				}
 				Timer.stop("updatePostedLinksTimeout");
-			}.bind(window, raidLink), 300);
+			}.bind(window, raidLink), 100);
 		};
 		
 		DC_LoaTS_Helper.ajax = function(params){
