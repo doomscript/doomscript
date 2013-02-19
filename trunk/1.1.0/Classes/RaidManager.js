@@ -246,7 +246,7 @@
 				}
 				
 				// Reset the CConoly query time so all the raids can be loaded again
-				CConolyAPI.setLastQueryTime(commandStartTime);
+				CConolyAPI.setLastQueryTime(0);
 				
 				// Reset all the links to NEW
 				DC_LoaTS_Helper.updatePostedLinks();
