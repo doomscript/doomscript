@@ -26,6 +26,7 @@
 					}
 					else {
 						ret.statusMessage = "Error processing command <code>" + text + "</code>";
+						DCDebug("Error with /lcc. Parser: ", parser);
 					}
 					return ret;
 				},
