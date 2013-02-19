@@ -46,7 +46,6 @@
 		    return false;
 		};
 
-		
 		// Pretty format health / damage numbers
 		DC_LoaTS_Helper.prettyFormatNumber = function(num)
 		{
@@ -661,7 +660,7 @@
 		{
 			var responseText = response.responseText;
 			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(responseText)[1].trim();
-			DCDebug("Ajax Raid Join Message: ", raidJoinMessage);
+			DCDebug("Ajax Raid Join: ", raidLink.raidTypeId + " (" + raidLink.id + ")", " Message: ", raidJoinMessage);
 			
 			// Get the current state of the raid form the cache
 			var oldState = RaidManager.fetchState(raidLink)
@@ -785,6 +784,8 @@
 							}
 						} // End while(regex)
 						
+						DCDebug("Bin Data from '" + urlParsingFilter.getWorkingUrl() + "': ", binData);
+						
 						// Store all the raids we grabbed
 						RaidManager.storeBulk(fetchedRaids);
 						Timer.stop("Parsing External Raids");
@@ -855,12 +856,14 @@
 			// Private variable to be closed over in the autoLoader
 			var autoLoadCounter = {
 					attempted: 0, 
+					invalid: 0,
 					loaded: 0, 
 					visited: 0, 
 					completed: 0, 
 					reported: false,
 					isValid: function() {return this.loaded + this.visited + this.completed == this.attempted;},
-					getReport: function() {this.reported = true; return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
+					getReport: function() {this.reported = true; return this._generateReportText()},
+					_generateReportText: function() {return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed + "\n<span class='abbr' title='Invalid Hash, Wrong Alliance, Broken Links, etc'>Invalid</span>: " + this.invalid;}
 			};
 			var startTime = new Date()/1;
 			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
@@ -880,7 +883,10 @@
 					// Load the next raid, capture the visitation marking
 					DC_LoaTS_Helper.loadRaid(raidLinks.pop(), iframe_options, lrib, 
 						function(oldState, newState){
-							if (RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED)) {
+							if (RaidManager.STATE.equals(newState, RaidManager.STATE.IGNORED)) {
+								autoLoadCounter.invalid++;
+							}
+							else if (RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED)) {
 								autoLoadCounter.completed++;
 							}
 							else if (RaidManager.STATE.equals(oldState, RaidManager.STATE.VISITED)) {
@@ -898,6 +904,9 @@
 								
 								// Update all the links, in case any were missed while loading
 								DC_LoaTS_Helper.updatePostedLinks();
+								
+								// Clean up
+								delete DC_LoaTS_Helper.autoLoader;
 							}
 						}
 					);
@@ -927,7 +936,13 @@
 			
 
 			// Kick off the auto loading
-			DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 500), raidLinks: raidLinks};
+			DC_LoaTS_Helper.autoLoader = {
+				timeout: setTimeout(autoLoader, 500), 
+				raidLinks: raidLinks, 
+				counter: autoLoadCounter,
+				startingLinkCount: raidLinks.length,
+				startTime: (new Date()/1) + 500
+			};
 			
 		};
 		

@@ -70,7 +70,7 @@
 						return "CConoly"
 						break;
 					default:
-						this.getWorkingUrl();
+						return this.getWorkingUrl();
 						break;
 				}
 			},

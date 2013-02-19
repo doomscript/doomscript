@@ -293,16 +293,19 @@ Altered /lcc <filter> so it runs /loadall <filter> after fetching raids, rather 
 Added preference for delay between loading raids [sycdan]
 Hid doomscript tabs that were previously labeled under construction.
 
-2013.??.?? - 1.1.20
+2013.02.19 - 1.1.20
 Fixed a bug that was causing raids to be marked as completed when they were actually being re-joined
 Minor code cleanup
 Added more timing data to find slow downs
 Added aliases to /linktools: /advertise, /blatantselfpromotion, /getdoomscript
 Added aliases to /reload: /reloaf, /reloa, /eload
-Moved loadall to normal chat commands. It's a main feature now, not just an experimental hack. It will now appear in the right order in the help list
+Moved /loadall to ChatCommands folder from Experimental. It's a main feature now, not just an experimental hack. 
+Consequently, /loadall will now appear in the correct alphabetical order in the help list
 Added /refreshlinks command to cause the links to redraw themselves. This is mainly for when a link refuses to mark visited
 All links will now be refreshed after /loadall and /clearraids [sycdan]
 Fixed a bug in /clearraids all that was causing /seenraids to still show raids [sycdan]
+Cleaned up some CConoly communication code [doomcat/sycdan]
+/clearraids ALL was not being accepted. It's now case-insensitive
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -334,7 +337,14 @@ function main()
     	
     	// Do not check code in with this set to true. 
     	// Preferably, turn it on from the browser command line with DC_LoaTS_Properties.debugMode = true;
-    	debugMode: false,
+    	// Or add debugMode=true to the game url in the browser
+    	debugMode: (function() {
+    		var value = /debugMode=(\w+)/.exec(document.location.href);
+    		if (value && value[1]) {
+    			return true;
+    		}
+    		return false;
+    	})(),
     	
     	// GreaseMonkey Storage Keys
     	storage: {
@@ -5164,7 +5174,7 @@ function main()
 						return "CConoly"
 						break;
 					default:
-						this.getWorkingUrl();
+						return this.getWorkingUrl();
 						break;
 				}
 			},
@@ -5776,7 +5786,7 @@ function main()
 					ret = {};
 					
 					// If the user wants to clear all raids
-					if (params === "all")
+					if (params && params.toLowerCase() === "all")
 					{
 						// Clear all raids stored in memory
 						RaidManager.clear();
@@ -7771,6 +7781,55 @@ RaidCommand
 		
 		RaidCommand.create( 
 			{
+				commandName: "checkload",
+				aliases: ["loadcheck", "check", "load"],
+				// No parsing needed
+				/*parsingClass: ,*/
+
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+					
+					var data = DC_LoaTS_Helper.autoLoader;
+						
+					if (data) {
+						var fractionComplete = data.raidLinks.length / data.startingLinkCount,
+						    percentComplete = Math.round(fractionComplete * 100);
+						    timeElapsed = new Date()/1 - data.startTime,
+						    timeRemaining = timeElapsed / fractionComplete;
+						ret.statusMessage = "Attempted " + data.raidLinks.length + " of " + data.startingLinkCount + " raids (" + percentComplete + "%) in " + timeElapsed + "ms.";
+						ret.statusMessage += "\nEstimated Time Remaining: " + timeRemaining + " ms."
+						ret.statusMessage += "\nCurrent Report: \n" + data.counter._generateReportText();
+					}
+					else {
+						ret.statusMessage = "No load being performed at this time.";
+					}
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Print the timer report"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
+					helpText += "Prints out timing and performance data about the script\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
 				commandName: "timerdata",
 				aliases: [],
 				// No parsing needed
@@ -7835,7 +7894,7 @@ RaidCommand
 			},
 			
 			getVersionString: function() {
-				return DC_LoaTS_Properties.version.toString().replace(/\./g, "");
+				return this.versionString || (this.versionString = DC_LoaTS_Properties.version.toString().replace(/\./g, ""));
 			},
 			
 			getRaidListQueryHours: function()
@@ -7848,7 +7907,6 @@ RaidCommand
 				elapsedHrs = elapsedMs / 1000 / 60 / 60; // Convert ms to hours
 				return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals, take 168 or lower
 			}
-		
 		};
 		
 
@@ -8058,7 +8116,6 @@ DC_LoaTS_Helper.raids =
 		    return false;
 		};
 
-		
 		// Pretty format health / damage numbers
 		DC_LoaTS_Helper.prettyFormatNumber = function(num)
 		{
@@ -8673,7 +8730,7 @@ DC_LoaTS_Helper.raids =
 		{
 			var responseText = response.responseText;
 			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(responseText)[1].trim();
-			DCDebug("Ajax Raid Join Message: ", raidJoinMessage);
+			DCDebug("Ajax Raid Join: ", raidLink.raidTypeId + " (" + raidLink.id + ")", " Message: ", raidJoinMessage);
 			
 			// Get the current state of the raid form the cache
 			var oldState = RaidManager.fetchState(raidLink)
@@ -8797,6 +8854,8 @@ DC_LoaTS_Helper.raids =
 							}
 						} // End while(regex)
 						
+						DCDebug("Bin Data from '" + urlParsingFilter.getWorkingUrl() + "': ", binData);
+						
 						// Store all the raids we grabbed
 						RaidManager.storeBulk(fetchedRaids);
 						Timer.stop("Parsing External Raids");
@@ -8867,12 +8926,14 @@ DC_LoaTS_Helper.raids =
 			// Private variable to be closed over in the autoLoader
 			var autoLoadCounter = {
 					attempted: 0, 
+					invalid: 0,
 					loaded: 0, 
 					visited: 0, 
 					completed: 0, 
 					reported: false,
 					isValid: function() {return this.loaded + this.visited + this.completed == this.attempted;},
-					getReport: function() {this.reported = true; return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed;}
+					getReport: function() {this.reported = true; return this._generateReportText()},
+					_generateReportText: function() {return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed + "\n<span class='abbr' title='Invalid Hash, Wrong Alliance, Broken Links, etc'>Invalid</span>: " + this.invalid;}
 			};
 			var startTime = new Date()/1;
 			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
@@ -8892,7 +8953,10 @@ DC_LoaTS_Helper.raids =
 					// Load the next raid, capture the visitation marking
 					DC_LoaTS_Helper.loadRaid(raidLinks.pop(), iframe_options, lrib, 
 						function(oldState, newState){
-							if (RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED)) {
+							if (RaidManager.STATE.equals(newState, RaidManager.STATE.IGNORED)) {
+								autoLoadCounter.invalid++;
+							}
+							else if (RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED)) {
 								autoLoadCounter.completed++;
 							}
 							else if (RaidManager.STATE.equals(oldState, RaidManager.STATE.VISITED)) {
@@ -8910,6 +8974,9 @@ DC_LoaTS_Helper.raids =
 								
 								// Update all the links, in case any were missed while loading
 								DC_LoaTS_Helper.updatePostedLinks();
+								
+								// Clean up
+								delete DC_LoaTS_Helper.autoLoader;
 							}
 						}
 					);
@@ -8939,7 +9006,13 @@ DC_LoaTS_Helper.raids =
 			
 
 			// Kick off the auto loading
-			DC_LoaTS_Helper.autoLoader = {timeout: setTimeout(autoLoader, 500), raidLinks: raidLinks};
+			DC_LoaTS_Helper.autoLoader = {
+				timeout: setTimeout(autoLoader, 500), 
+				raidLinks: raidLinks, 
+				counter: autoLoadCounter,
+				startingLinkCount: raidLinks.length,
+				startTime: (new Date()/1) + 500
+			};
 			
 		};
 		

@@ -28,7 +28,7 @@
 			},
 			
 			getVersionString: function() {
-				return DC_LoaTS_Properties.version.toString().replace(/\./g, "");
+				return this.versionString || (this.versionString = DC_LoaTS_Properties.version.toString().replace(/\./g, ""));
 			},
 			
 			getRaidListQueryHours: function()
@@ -41,6 +41,5 @@
 				elapsedHrs = elapsedMs / 1000 / 60 / 60; // Convert ms to hours
 				return Math.min(168, Math.ceil(elapsedHrs * 1000)/1000); // Round to 3 decimals, take 168 or lower
 			}
-		
 		};
 		
