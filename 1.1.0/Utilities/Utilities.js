@@ -737,7 +737,7 @@
 			// Update the last query time
 			if (urlParsingFilter.type == "cconoly")
 			{
-				// Make sure to set this before the query is run rathre than after
+				// Make sure to set this before the query is run rather than after
 				CConolyAPI.setLastQueryTime(commandStartTime);
 			}
 			

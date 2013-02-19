@@ -294,7 +294,7 @@ Added preference for delay between loading raids [sycdan]
 Hid doomscript tabs that were previously labeled under construction.
 
 2013.??.?? - 1.1.20
-Fix a bug in that was causing raids to be marked as completed when they were actually being re-joined
+Fixed a bug that was causing raids to be marked as completed when they were actually being re-joined
 Minor code cleanup
 Added more timing data to find slow downs
 Added aliases to /linktools: /advertise, /blatantselfpromotion, /getdoomscript
@@ -2952,8 +2952,8 @@ function main()
 				}
 				
 				// Reset the CConoly query time so all the raids can be loaded again
-				GM_setValue(DC_LoaTS_Properties.storage.cconolyLastQueryTime, 0);
-					
+				CConolyAPI.setLastQueryTime(commandStartTime);
+				
 				// Reset all the links to NEW
 				DC_LoaTS_Helper.updatePostedLinks();
 				
@@ -8749,7 +8749,7 @@ DC_LoaTS_Helper.raids =
 			// Update the last query time
 			if (urlParsingFilter.type == "cconoly")
 			{
-				// Make sure to set this before the query is run rathre than after
+				// Make sure to set this before the query is run rather than after
 				CConolyAPI.setLastQueryTime(commandStartTime);
 			}
 			
