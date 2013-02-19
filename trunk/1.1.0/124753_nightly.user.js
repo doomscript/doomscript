@@ -6454,6 +6454,7 @@ function main()
 					}
 					else {
 						ret.statusMessage = "Error processing command <code>" + text + "</code>";
+						DCDebug("Error with /lcc. Parser: ", parser);
 					}
 					return ret;
 				},
@@ -7806,7 +7807,7 @@ RaidCommand
 		
 		
 		// Manage data related to the CConoly API
-		DC_LoaTS_Helper.CConolyAPI = {
+		window.CConolyAPI = {
 				
 			lastQueryTimeKey: DC_LoaTS_Properties.storage.cconolyLastQueryTime,
 			useQueryTimeDeltaPrefKey: "UseQueryTimeDelta",
@@ -7827,7 +7828,7 @@ RaidCommand
 			},
 			
 			getRaidListUrl: function() {
-				var raidListUrl = this.baseUrl + this.markDeadUrl;
+				var raidListUrl = this.baseUrl + this.raidListUrl;
 				raidListUrl = raidListUrl.replace("%TIME%", this.getRaidListQueryHours());
 				raidListUrl = raidListUrl.replace("%VERSION%", this.getVersionString());
 				return raidListUrl;
@@ -7835,7 +7836,7 @@ RaidCommand
 			
 			getVersionString: function() {
 				return DC_LoaTS_Properties.version.toString().replace(/\./g, "");
-			}
+			},
 			
 			getRaidListQueryHours: function()
 			{

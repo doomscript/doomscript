@@ -1,6 +1,6 @@
 		
 		// Manage data related to the CConoly API
-		DC_LoaTS_Helper.CConolyAPI = {
+		window.CConolyAPI = {
 				
 			lastQueryTimeKey: DC_LoaTS_Properties.storage.cconolyLastQueryTime,
 			useQueryTimeDeltaPrefKey: "UseQueryTimeDelta",
@@ -21,7 +21,7 @@
 			},
 			
 			getRaidListUrl: function() {
-				var raidListUrl = this.baseUrl + this.markDeadUrl;
+				var raidListUrl = this.baseUrl + this.raidListUrl;
 				raidListUrl = raidListUrl.replace("%TIME%", this.getRaidListQueryHours());
 				raidListUrl = raidListUrl.replace("%VERSION%", this.getVersionString());
 				return raidListUrl;
@@ -29,7 +29,7 @@
 			
 			getVersionString: function() {
 				return DC_LoaTS_Properties.version.toString().replace(/\./g, "");
-			}
+			},
 			
 			getRaidListQueryHours: function()
 			{
