@@ -17,7 +17,7 @@
 						    percentComplete = Math.round(fractionComplete * 100);
 						    timeElapsed = new Date()/1 - data.startTime,
 						    timeRemaining = timeElapsed / fractionComplete;
-						ret.statusMessage = "Attempted " + data.raidLinks.length + " of " + data.startingLinkCount + " raids (" + percentComplete + "%) in " + timeElapsed + "ms.";
+						ret.statusMessage = "Attempted " + data.counter.attempted + " of " + data.startingLinkCount + " raids (" + percentComplete + "%) in " + timeElapsed + "ms.";
 						ret.statusMessage += "\nEstimated Time Remaining: " + timeRemaining + " ms."
 						ret.statusMessage += "\nCurrent Report: \n" + data.counter._generateReportText();
 					}

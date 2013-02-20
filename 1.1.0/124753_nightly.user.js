@@ -7798,7 +7798,7 @@ RaidCommand
 						    percentComplete = Math.round(fractionComplete * 100);
 						    timeElapsed = new Date()/1 - data.startTime,
 						    timeRemaining = timeElapsed / fractionComplete;
-						ret.statusMessage = "Attempted " + data.raidLinks.length + " of " + data.startingLinkCount + " raids (" + percentComplete + "%) in " + timeElapsed + "ms.";
+						ret.statusMessage = "Attempted " + data.counter.attempted + " of " + data.startingLinkCount + " raids (" + percentComplete + "%) in " + timeElapsed + "ms.";
 						ret.statusMessage += "\nEstimated Time Remaining: " + timeRemaining + " ms."
 						ret.statusMessage += "\nCurrent Report: \n" + data.counter._generateReportText();
 					}
@@ -8931,7 +8931,7 @@ DC_LoaTS_Helper.raids =
 					visited: 0, 
 					completed: 0, 
 					reported: false,
-					isValid: function() {return this.loaded + this.visited + this.completed == this.attempted;},
+					isValid: function() {return this.loaded + this.visited + this.completed + this.ignored == this.attempted;},
 					getReport: function() {this.reported = true; return this._generateReportText()},
 					_generateReportText: function() {return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed + "\n<span class='abbr' title='Invalid Hash, Wrong Alliance, Broken Links, etc'>Invalid</span>: " + this.invalid;}
 			};
