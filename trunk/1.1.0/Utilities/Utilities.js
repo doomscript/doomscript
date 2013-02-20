@@ -861,7 +861,7 @@
 					visited: 0, 
 					completed: 0, 
 					reported: false,
-					isValid: function() {return this.loaded + this.visited + this.completed + this.ignored == this.attempted;},
+					isValid: function() {return this.loaded + this.visited + this.completed + this.invalid == this.attempted;},
 					getReport: function() {this.reported = true; return this._generateReportText()},
 					_generateReportText: function() {return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed + "\n<span class='abbr' title='Invalid Hash, Wrong Alliance, Broken Links, etc'>Invalid</span>: " + this.invalid;}
 			};
