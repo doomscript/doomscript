@@ -1026,13 +1026,16 @@
 		}
 		
 		DC_LoaTS_Helper.listContainsRaid = function(list, raidLink) {
+			DCDebug("List contains raid: ", list, raidLink);
 			if (list && raidLink && raidLink.isValid()) {
-				var key = raidLink.getUniqueKey();
 				for (var i = 0; i < list.length; i++) {
-					if (list[i].getUniqueKey() === key) {
+					if (list[i].id === raidLink.id && list[i].hash === raidLink.hash) {
 						return true;
 					}
 				}
+			}
+			else {
+				DCDebug("No comparison to be done", list, raidLink);
 			}
 			
 			return false;
@@ -1045,11 +1048,9 @@
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
 			/*
-			 
-			 
-			 
 			// If updating posted links is locked
 			if (DC_LoaTS_Helper.upl.lock) {
+				DCDebug("UPL already locked trying to update: " + (raidLink ? raidLink.id : "ALL"));
 				// No raidLink provided. Load everything
 				if (!raidLink) {
 					DC_LoaTS_Helper.upl.next.refreshAll = true;
@@ -1059,16 +1060,18 @@
 				else if (!DC_LoaTS_Helper.upl.next.refreshAll) {
 					// Make sure the list is ready
 					if (!DC_LoaTS_Helper.upl.next.list) {
-						DC_LoaTS_Helper.upl.next.list = {};
+						DC_LoaTS_Helper.upl.next.list = [];
 					}
-					DC_LoaTS_Helper.upl.next.list[raidLink.getUniqueKey()] = raidLink;
+					DC_LoaTS_Helper.upl.next.list.push(raidLink);
 				}
 				
 				// If updating posted links became unlocked
 				if (DC_LoaTS_Helper.upl.lock) {
 					// Lock it
 					DC_LoaTS_Helper.upl.lock = true;
-					
+					DCDebug("UPL became unlocked during update: " + (raidLink ? raidLink.id : "ALL"));
+					DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
+
 					// In theory, we now have the lock and other code can't get in here
 
 					// Copy over the important values
@@ -1079,6 +1082,7 @@
 					DC_LoaTS_Helper.upl.next.refreshAll = false;
 					delete DC_LoaTS_Helper.upl.next.list;
 
+					DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
 					// Run the private runner. Will do the unlock for us
 					_upl();
 				}
@@ -1087,6 +1091,8 @@
 			else {
 				// Lock it
 				DC_LoaTS_Helper.upl.lock = true;
+				DCDebug("UPL already unlocked for: " + (raidLink ? raidLink.id : "ALL"));
+				DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
 				
 				// In theory, we now have the lock and other code can't get in here
 
@@ -1094,6 +1100,7 @@
 				DC_LoaTS_Helper.upl.now.refreshAll = !raidLink;
 				DC_LoaTS_Helper.upl.now.list = raidLink ? [raidLink] : undefined;
 
+				DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
 				// Run the private runner. Will do the unlock for us
 				_upl();
 			}
@@ -1107,6 +1114,7 @@
 				setTimeout(function()
 				{
 					Timer.start("updatePostedLinksTimeout");
+					DCDebug("Running UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
 					try 
 					{
 						// Look up all raid links in chat
@@ -1126,7 +1134,7 @@
 							var newRaidLink = new RaidLink(elem.children[0].href);
 							
 							// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-							if (newRaidLink.isValid() && (DC_LoaTS_helper.upl.now.refreshAll || DC_LoaTS_Helper.listContainsRaid(DC_LoaTS_Helper.upl.now.list, newRaidLink)))
+							if (newRaidLink.isValid() && (DC_LoaTS_Helper.upl.now.refreshAll || DC_LoaTS_Helper.listContainsRaid(DC_LoaTS_Helper.upl.now.list, newRaidLink)))
 							{
 								// Restyle the message as appropriate
 								var styles = newRaidLink.getMatchedStyles();
@@ -1169,6 +1177,7 @@
 					
 					// If there's other stuff to run
 					if (DC_LoaTS_Helper.upl.next.refreshAll || DC_LoaTS_Helper.upl.next.list) {
+						DCDebug("Additional links available. Scheduling UPL again for: ", DC_LoaTS_Helper.upl.next.list, " refreshAll: " + DC_LoaTS_Helper.upl.next.refreshAll);
 						setTimeout(function() {
 							// Copy over the important values
 							DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
@@ -1178,22 +1187,24 @@
 							DC_LoaTS_Helper.upl.next.refreshAll = false;
 							delete DC_LoaTS_Helper.upl.next.list;
 	
+							DCDebug("Calling UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
 							// Run the private runner. Will do the unlock for us
 							_upl();
 						// If we go to run this again, don't run it too soon
-						}, 1000);
+						}, 500);
 					}
 					else {
+						DCDebug("Unlocking UPL");
 						DC_LoaTS_Helper.upl.lock = false;
 					}
 					Timer.stop("updatePostedLinksTimeout");
-				}, 50);
+				}, 100);
 			}
 			
 			
 			
-			
 			*/
+			
 			
 			
 			
@@ -1254,7 +1265,7 @@
 							console.warn("Element did not produce a valid raid link:");
 							console.warn(elem);
 						}
-						else if (/*newRaidLink.getRaid().id == raidLink.getRaid().id ||*/ newRaidLink.hash == raidLink.hash || raidLink.id == newRaidLink.id)
+						else if (newRaidLink.hash == raidLink.hash || raidLink.id == newRaidLink.id)
 						{
 							DCDebug("Similar links found while updating posted links, but not similar enough?");
 							DCDebug(raidLink);
@@ -1270,6 +1281,7 @@
 				}
 				Timer.stop("updatePostedLinksTimeout");
 			}.bind(window, raidLink), 100);
+			
 		};
 		
 		DC_LoaTS_Helper.ajax = function(params){
