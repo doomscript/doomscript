@@ -293,7 +293,7 @@ Altered /lcc <filter> so it runs /loadall <filter> after fetching raids, rather 
 Added preference for delay between loading raids [sycdan]
 Hid doomscript tabs that were previously labeled under construction.
 
-2013.02.19 - 1.1.20
+2013.02.24 - 1.1.20
 Fixed a bug that was causing raids to be marked as completed when they were actually being re-joined
 Minor code cleanup
 Added more timing data to find slow downs
