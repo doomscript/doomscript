@@ -213,7 +213,7 @@
 				rulesText += "}\n";				
 				
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBar {\n";
+				rulesText += "\n#DC_LoaTS_notificationBar {\n";
 				rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding: 4px 10px; 0px\n";
 				rulesText += "\twidth: 100%;\n";
@@ -226,25 +226,25 @@
 				rulesText += "\tz-index: 99999999;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBarTitle {\n";
+				rulesText += "\n#DC_LoaTS_notificationBarTitle {\n";
 				rulesText += "\tfloat: left;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBarText {\n";
+				rulesText += "\n#DC_LoaTS_notificationBarText {\n";
 				rulesText += "\tfloat: left;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBarButtons {\n";
+				rulesText += "\n#DC_LoaTS_notificationBarButtons {\n";
 				rulesText += "\tfloat: right;\n";
 				rulesText += "\tpadding-top:1px;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBarButtons a.DC_LoaTS_updateLink {\n";
+				rulesText += "\n#DC_LoaTS_notificationBarButtons a.DC_LoaTS_updateLink {\n";
 				rulesText += "\tfont-size: inherit;\n";
 				rulesText += "\tmargin-right:10px;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\na.DC_LoaTS_notifitcationBarButton {\n";
+				rulesText += "\na.DC_LoaTS_notificationBarButton {\n";
 				rulesText += "\tbackground-color: #F9B83E;\n";
 				rulesText += "\tborder: 1px solid #915608;"
 				rulesText += "\tpadding: 2px 10px;\n";
@@ -257,7 +257,7 @@
 				rulesText += "\tborder-radius: 5px;\n";
 				rulesText += "}\n";
 								
-				rulesText += "\na.DC_LoaTS_notifitcationBarButton:hover {\n";
+				rulesText += "\na.DC_LoaTS_notificationBarButton:hover {\n";
 				rulesText += "\tcolor: #915608;\n"								
 				rulesText += "\tbackground: #FDE477;\n";
 				rulesText += "}\n";
@@ -265,7 +265,7 @@
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer {\n";
 				rulesText += "\tcolor: #FFFFFF;\n"								
 				rulesText += "\tlist-style: none;\n"								
-				rulesText += "\tbackground: #113552 url(http://old.jqueryui.com/themeroller/images/?new=113552&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\t-moz-border-radius: 5px;\n";
 				rulesText += "\t-webkit-border-radius: 5px;\n";
 				rulesText += "\tborder-radius: 5px;\n";
@@ -282,7 +282,7 @@
 				rulesText += "\na.DC_LoaTS_button {\n";
 				rulesText += "\twidth: 16px;\n";
 				rulesText += "\theight: 16px;\n";
-				rulesText += "\tbackground: url(http://old.jqueryui.com/themeroller/images/?new=e0fdff&w=256&h=240&f=png&fltr[]=rcd|256&fltr[]=mask|icons/icons.png);\n";
+				rulesText += "\tbackground: url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/icons.png);\n";
 				rulesText += "\tbackground-repeat: no-repeat;\n";
 				rulesText += "\tcursor: pointer;\n";
 				rulesText += "\tdisplay: block;\n";
@@ -338,7 +338,7 @@
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_omniboxCommandsWrapper {\n";
-				rulesText += "\tbackground: #113552 url(http://old.jqueryui.com/themeroller/images/?new=113552&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\tlist-style: none;\n";
 				rulesText += "\tz-index: 999;\n";
 				rulesText += "\tposition: absolute;\n";
