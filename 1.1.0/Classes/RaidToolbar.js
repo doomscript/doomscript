@@ -25,7 +25,7 @@
 					var ccc = $("chat_container_cell");
 					ccc.remove();
 					td.insert({after: ccc});
-					ccc.setAttribute("rowspan", 2);
+					ccc.setAttribute("rowspan", "2");
 					
 					$("maingame").style.height = parseInt($("maingame").style.height) + 20 + "px";
 					$("chat_container").style.height = parseInt($("chat_container").style.height) + 20 + "px";
