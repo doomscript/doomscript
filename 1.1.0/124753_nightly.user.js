@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.20
+// @version        1.1.21
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -306,6 +306,12 @@ All links will now be refreshed after /loadall and /clearraids [sycdan]
 Fixed a bug in /clearraids all that was causing /seenraids to still show raids [sycdan]
 Cleaned up some CConoly communication code [doomcat/sycdan]
 /clearraids ALL was not being accepted. It's now case-insensitive
+
+2013.03.?? - 1.1.21
+Fixed missing images on toolbar
+[TODO] Fix missing images on menu
+Added /rss command
+Moved /checkload out of experimental
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -315,7 +321,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.20",
+    	version: "1.1.21",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -4360,7 +4366,7 @@ function main()
 					var ccc = $("chat_container_cell");
 					ccc.remove();
 					td.insert({after: ccc});
-					ccc.setAttribute("rowspan", 2);
+					ccc.setAttribute("rowspan", "2");
 					
 					$("maingame").style.height = parseInt($("maingame").style.height) + 20 + "px";
 					$("chat_container").style.height = parseInt($("chat_container").style.height) + 20 + "px";
@@ -5736,6 +5742,55 @@ function main()
 			}
 		);
 	
+		RaidCommand.create( 
+			{
+				commandName: "checkload",
+				aliases: ["loadcheck", "check", "load"],
+				// No parsing needed
+				/*parsingClass: ,*/
+
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+					
+					var data = DC_LoaTS_Helper.autoLoader;
+						
+					if (data) {
+						var fractionComplete = data.raidLinks.length / data.startingLinkCount,
+						    percentComplete = Math.round(fractionComplete * 100);
+						    timeElapsed = new Date()/1 - data.startTime,
+						    timeRemaining = timeElapsed / fractionComplete;
+						ret.statusMessage = "Attempted " + data.counter.attempted + " of " + data.startingLinkCount + " raids (" + percentComplete + "%) in " + timeElapsed + "ms.";
+						ret.statusMessage += "\nEstimated Time Remaining: " + timeRemaining + " ms."
+						ret.statusMessage += "\nCurrent Report: \n" + data.counter._generateReportText();
+					}
+					else {
+						ret.statusMessage = "No load being performed at this time.";
+					}
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Print the timer report"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
+					helpText += "Prints out timing and performance data about the script\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
 		RaidCommand.create( 
 			{
 				commandName: "clearchat",
@@ -7781,38 +7836,71 @@ RaidCommand
 		
 		RaidCommand.create( 
 			{
-				commandName: "checkload",
-				aliases: ["loadcheck", "check", "load"],
+				commandName: "rss",
+				aliases: ["forums", "threads", "posts"],
 				// No parsing needed
 				/*parsingClass: ,*/
 
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {success: true};
-					
-					var data = DC_LoaTS_Helper.autoLoader;
-						
-					if (data) {
-						var fractionComplete = data.raidLinks.length / data.startingLinkCount,
-						    percentComplete = Math.round(fractionComplete * 100);
-						    timeElapsed = new Date()/1 - data.startTime,
-						    timeRemaining = timeElapsed / fractionComplete;
-						ret.statusMessage = "Attempted " + data.counter.attempted + " of " + data.startingLinkCount + " raids (" + percentComplete + "%) in " + timeElapsed + "ms.";
-						ret.statusMessage += "\nEstimated Time Remaining: " + timeRemaining + " ms."
-						ret.statusMessage += "\nCurrent Report: \n" + data.counter._generateReportText();
-					}
-					else {
-						ret.statusMessage = "No load being performed at this time.";
-					}
-						
+					var ret = {success: true, statusMessage: "Reading RSS feed..."};
+
+					DC_LoaTS_Helper.ajax({
+						url: "http://www.legacyofathousandsuns.com/forum/external.php?type=RSS2",
+						onload:function(response) {
+							var xmlDoc = (new DOMParser()).parseFromString(response.responseText, "text/xml"),
+							    items = xmlDoc.getElementsByTagName("item"),
+							    i, item, j, child, threads = [], thread, 
+							    str = "Recent posts (as of " + DC_LoaTS_Helper.getCurrentPrettyDate() + ")";
+							
+							for (i = 0; i < items.length; i++) {
+								item = items[i];
+                                threads.push({
+                                    title: getNodeValue(item, "title"),
+                                    url: getNodeValue(item, "link"),
+                                    date: getNodeValue(item, "pubDate"),
+                                    relativeDate: DC_LoaTS_Helper.timeDifference(new Date()/1, new Date(getNodeValue(item, "pubDate"))/1),
+                                    description: getNodeValue(item, "description"),
+                                    category: getNodeValue(item, "category"),
+                                    categoryUrl: getNodeValue(item, "category", "domain"),
+                                    creator: getNodeValue(item, "creator")
+                                });
+							}
+
+                            function getNodeValue(parent, tagName, attribute) {
+                                tags = parent.getElementsByTagNameNS("*", tagName);
+                                if (tags && tags[0]) {
+                                	if (attribute) {
+                                		return tags[0].attributes[attribute].nodeValue;
+                                	}
+                                	else {
+                                		return tags[0].childNodes[0].nodeValue;
+                                	}
+                                }
+                                
+                                return "<i>Unable to locate in RSS feed</i>";
+                            }
+
+                            for (i = 0; i < threads.length; i++) {
+                            	thread = threads[i];
+                            	str += "\n--------------------------------------------------\n"
+                                str += thread.relativeDate + " ";
+                            	str += "<a href='" + thread.categoryUrl + "' target='_blank'>" + thread.category + "</a>";
+                            	str += " &gt; <a href='" + thread.url + "' target='_blank'>" + thread.title + "</a>";
+                            }
+                            
+                            holodeck.activeDialogue().raidBotMessage(str);
+                            
+						} // end onload
+					});					
 					return ret;
 				},
 				getOptions: function()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Print the timer report"
+							text: "Lists recent threads from the forums"
 						}
 					};
 					
@@ -7820,8 +7908,8 @@ RaidCommand
 				},
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
-					helpText += "Prints out timing and performance data about the script\n";
+					var helpText = "<b>Raid Command:</b> <code>/threads</code>\n";
+					helpText += "Lists recent threads from the forums\n";
 					
 					return helpText;
 				}
@@ -9865,6 +9953,65 @@ DC_LoaTS_Helper.raids =
 			}
 		}
 		
+		DC_LoaTS_Helper.timeDifference = function(current, previous) {
+
+		    var msPerImmediate = 10 * 1000,
+		        msPerMinute = 60 * 1000,
+		        msPerHour = msPerMinute * 60,
+		        msPerDay = msPerHour * 24,
+		        msPerMonth = msPerDay * 30,
+		        msPerYear = msPerDay * 365,
+
+		        elapsed = current - previous,
+		        val, unit, text;
+
+		    if (elapsed < msPerImmediate) {
+		         text = "moments ago";
+		    }
+		    else if (elapsed < msPerMinute) {
+		         val = Math.round(elapsed/1000);
+		         unit = "second";
+		    }
+		    else if (elapsed < msPerHour) {
+		         val = Math.round(elapsed/msPerMinute);
+		         unit = "minute";
+		    }
+		    else if (elapsed < msPerDay ) {
+		    	val = Math.round(elapsed/msPerHour);
+		        unit = "hour";
+		    }
+		    else if (elapsed < msPerMonth) {
+		    	val = Math.round(elapsed/msPerDay);
+		        unit = "day";
+		    }
+		    else if (elapsed < msPerYear) {
+		    	val = Math.round(elapsed/msPerMonth);
+		        unit = "month";
+		    }
+		    else {
+		    	val = Math.round(elapsed/msPerYear);
+		        unit = "year";
+		    }
+		    
+		    return text || val + " " + unit + (val !== 1 ? 's':'') + " ago"
+		};
+		
+		DC_LoaTS_Helper.getCurrentPrettyDate = function() {
+			// Via: https://gist.github.com/akb/1187817
+			return (function () {
+			    return ['Jan.', 'Feb.', 'Mar.', 
+			            'Apr.', 'May', 'Jun.',
+			            'Jul.', 'Aug.', 'Sep.', 
+			            'Oct.', 'Nov.', 'Dec.'][this.getMonth()] + " " +
+			            (function (d) { 
+			                var s = d.toString(), l = s[s.length-1];
+			                return s+(['st','nd','rd'][l-1] || 'th');
+			            })(this.getDate()) + ", " +
+			            this.getFullYear() + " " +
+			            this.getHours() + ":" + ("0" + this.getMinutes()).slice(-2);
+			}).call(new Date())
+		};
+
 
 		DC_LoaTS_Helper.generateUUID = function()
 		{
@@ -10149,7 +10296,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "}\n";				
 				
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBar {\n";
+				rulesText += "\n#DC_LoaTS_notificationBar {\n";
 				rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding: 4px 10px; 0px\n";
 				rulesText += "\twidth: 100%;\n";
@@ -10162,25 +10309,25 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tz-index: 99999999;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBarTitle {\n";
+				rulesText += "\n#DC_LoaTS_notificationBarTitle {\n";
 				rulesText += "\tfloat: left;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBarText {\n";
+				rulesText += "\n#DC_LoaTS_notificationBarText {\n";
 				rulesText += "\tfloat: left;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBarButtons {\n";
+				rulesText += "\n#DC_LoaTS_notificationBarButtons {\n";
 				rulesText += "\tfloat: right;\n";
 				rulesText += "\tpadding-top:1px;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\n#DC_LoaTS_notifitcationBarButtons a.DC_LoaTS_updateLink {\n";
+				rulesText += "\n#DC_LoaTS_notificationBarButtons a.DC_LoaTS_updateLink {\n";
 				rulesText += "\tfont-size: inherit;\n";
 				rulesText += "\tmargin-right:10px;\n";
 				rulesText += "}\n";
 				
-				rulesText += "\na.DC_LoaTS_notifitcationBarButton {\n";
+				rulesText += "\na.DC_LoaTS_notificationBarButton {\n";
 				rulesText += "\tbackground-color: #F9B83E;\n";
 				rulesText += "\tborder: 1px solid #915608;"
 				rulesText += "\tpadding: 2px 10px;\n";
@@ -10193,7 +10340,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tborder-radius: 5px;\n";
 				rulesText += "}\n";
 								
-				rulesText += "\na.DC_LoaTS_notifitcationBarButton:hover {\n";
+				rulesText += "\na.DC_LoaTS_notificationBarButton:hover {\n";
 				rulesText += "\tcolor: #915608;\n"								
 				rulesText += "\tbackground: #FDE477;\n";
 				rulesText += "}\n";
@@ -10201,7 +10348,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer {\n";
 				rulesText += "\tcolor: #FFFFFF;\n"								
 				rulesText += "\tlist-style: none;\n"								
-				rulesText += "\tbackground: #113552 url(http://old.jqueryui.com/themeroller/images/?new=113552&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\t-moz-border-radius: 5px;\n";
 				rulesText += "\t-webkit-border-radius: 5px;\n";
 				rulesText += "\tborder-radius: 5px;\n";
@@ -10218,7 +10365,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\na.DC_LoaTS_button {\n";
 				rulesText += "\twidth: 16px;\n";
 				rulesText += "\theight: 16px;\n";
-				rulesText += "\tbackground: url(http://old.jqueryui.com/themeroller/images/?new=e0fdff&w=256&h=240&f=png&fltr[]=rcd|256&fltr[]=mask|icons/icons.png);\n";
+				rulesText += "\tbackground: url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/icons.png);\n";
 				rulesText += "\tbackground-repeat: no-repeat;\n";
 				rulesText += "\tcursor: pointer;\n";
 				rulesText += "\tdisplay: block;\n";
@@ -10274,7 +10421,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_omniboxCommandsWrapper {\n";
-				rulesText += "\tbackground: #113552 url(http://old.jqueryui.com/themeroller/images/?new=113552&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\tlist-style: none;\n";
 				rulesText += "\tz-index: 999;\n";
 				rulesText += "\tposition: absolute;\n";
