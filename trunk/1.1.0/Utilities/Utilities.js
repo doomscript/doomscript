@@ -1795,6 +1795,65 @@
 			}
 		}
 		
+		DC_LoaTS_Helper.timeDifference = function(current, previous) {
+
+		    var msPerImmediate = 10 * 1000,
+		        msPerMinute = 60 * 1000,
+		        msPerHour = msPerMinute * 60,
+		        msPerDay = msPerHour * 24,
+		        msPerMonth = msPerDay * 30,
+		        msPerYear = msPerDay * 365,
+
+		        elapsed = current - previous,
+		        val, unit, text;
+
+		    if (elapsed < msPerImmediate) {
+		         text = "moments ago";
+		    }
+		    else if (elapsed < msPerMinute) {
+		         val = Math.round(elapsed/1000);
+		         unit = "second";
+		    }
+		    else if (elapsed < msPerHour) {
+		         val = Math.round(elapsed/msPerMinute);
+		         unit = "minute";
+		    }
+		    else if (elapsed < msPerDay ) {
+		    	val = Math.round(elapsed/msPerHour);
+		        unit = "hour";
+		    }
+		    else if (elapsed < msPerMonth) {
+		    	val = Math.round(elapsed/msPerDay);
+		        unit = "day";
+		    }
+		    else if (elapsed < msPerYear) {
+		    	val = Math.round(elapsed/msPerMonth);
+		        unit = "month";
+		    }
+		    else {
+		    	val = Math.round(elapsed/msPerYear);
+		        unit = "year";
+		    }
+		    
+		    return text || val + " " + unit + (val !== 1 ? 's':'') + " ago"
+		};
+		
+		DC_LoaTS_Helper.getCurrentPrettyDate = function() {
+			// Via: https://gist.github.com/akb/1187817
+			return (function () {
+			    return ['Jan.', 'Feb.', 'Mar.', 
+			            'Apr.', 'May', 'Jun.',
+			            'Jul.', 'Aug.', 'Sep.', 
+			            'Oct.', 'Nov.', 'Dec.'][this.getMonth()] + " " +
+			            (function (d) { 
+			                var s = d.toString(), l = s[s.length-1];
+			                return s+(['st','nd','rd'][l-1] || 'th');
+			            })(this.getDate()) + ", " +
+			            this.getFullYear() + " " +
+			            this.getHours() + ":" + ("0" + this.getMinutes()).slice(-2);
+			}).call(new Date())
+		};
+
 
 		DC_LoaTS_Helper.generateUUID = function()
 		{

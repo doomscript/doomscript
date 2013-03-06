@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.20
+// @version        1.1.21
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -306,6 +306,12 @@ All links will now be refreshed after /loadall and /clearraids [sycdan]
 Fixed a bug in /clearraids all that was causing /seenraids to still show raids [sycdan]
 Cleaned up some CConoly communication code [doomcat/sycdan]
 /clearraids ALL was not being accepted. It's now case-insensitive
+
+2013.03.?? - 1.1.21
+Fixed missing images on toolbar
+[TODO] Fix missing images on menu
+Added /rss command
+Moved /checkload out of experimental
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -315,7 +321,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.20",
+    	version: "1.1.21",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
