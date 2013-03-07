@@ -118,6 +118,7 @@ DC_LoaTS_Helper.raids =
     haunted_house:      new RaidType("haunted_house",       "AX", "Haunted House", "H. House", "House",              168,  100, "H",  350000000),
     crazed_santa:       new RaidType("crazed_santa",        "AX", "Crazed Santa", "Santa", "Santa",                   84,  100, "H", [400000000, 520000000, 640000000, 800000000]),
     kristy_love:        new RaidType("kristy_love",         "AX", "Kristy Love", "Kristy", "Love",                    84,  100, "H", [450000000, 585000000, 720000000, 900000000]),
+    gedrocht:           new RaidType("gedrocht",            "AX", "Gedrocht", "Gedrocht", "Gedrocht",                 84,  100, "H", [500000000, 650000000, 800000000,1000000000]),
     
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
