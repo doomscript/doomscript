@@ -71,6 +71,7 @@ DC_LoaTS_Helper.raids =
     guan_yu:            new RaidType("guan_yu",             "ZA", "Guan Yu", "Guan", "Guan",                          72, 250, "S", [1300000000, 1690000000, 2080000000, 2600000000]),
     bile_beast:         new RaidType("bile_beast",         "ZA2", "Bile Beast", "Bile", "Bile",                       72, 250, "S", [1400000000, 1820000000, 2240000000, 2800000000]),
     al_husam:           new RaidType("al_husam",           "Z17", "Al-Husam", "Al-Husam", "Al-Husam",                 72, 250, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
+    noir:               new RaidType("noir",               "Z18", "Noir", "Noir", "Noir",                             72, 250, "S", [1600000000, 2080000000, 2560000000, 3200000000]),
     
     
     // Colossal Raids
