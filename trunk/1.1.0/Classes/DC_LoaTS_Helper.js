@@ -421,7 +421,7 @@
 				var raid = DC_LoaTS_Helper.raids[raidId];
 				
 				// If the user's text matches this raid name
-				if (raidFilter.matches({name: raid.getSearchableName()}))
+				if (raidFilter.matches({name: raid.getSearchableName(), zone: raid.zone}))
 				{
 					// Capture this raid to return
 					matchedTypes.push(raid);

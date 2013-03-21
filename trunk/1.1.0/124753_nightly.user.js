@@ -312,6 +312,9 @@ Fixed missing images on toolbar
 [TODO] Fix missing images on menu
 Added /rss command
 Moved /checkload out of experimental
+Added noir raid
+Added zone filter
+Invalid Raid Id fix [Solsund]
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -333,7 +336,7 @@ function main()
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
     	joinRaidURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
-    	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong",
+    	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
     	
     	// Other URLS
     	RaidToolsURL: "http://userscripts.org/132671",
@@ -810,7 +813,7 @@ function main()
 				var raid = DC_LoaTS_Helper.raids[raidId];
 				
 				// If the user's text matches this raid name
-				if (raidFilter.matches({name: raid.getSearchableName()}))
+				if (raidFilter.matches({name: raid.getSearchableName(), zone: raid.zone}))
 				{
 					// Capture this raid to return
 					matchedTypes.push(raid);
@@ -1416,6 +1419,7 @@ function main()
 					this.page;
 					this.fs;
 					this.os;
+					this.zone;
 					this.valid = true;
 	
 					// Capture original filterText
@@ -1624,6 +1628,18 @@ function main()
 									this.valid = false;
 								}
 								break;
+							case "zone":
+								
+								if (isNaN(paramValue)) {
+									this.zone = "" + paramValue;
+								}
+								else {
+									this.zone = "Z" + paramValue
+								}
+								
+								this.zone = this.zone.toUpperCase();
+								
+								break;
 							default:
 								console.warn("Did not understand filter param " + match[1] + ":" + match[2]);
 						}
@@ -1743,6 +1759,9 @@ function main()
 								// Check against the count condition
 								matched = matched && value < this.count;
 								break;
+							case "zone":
+								matched = matched && value === this.zone;
+								break;
 							default:
 								// Didn't find the field
 								console.warn("Couldn't match RaidFilter property to " + field);
@@ -1766,7 +1785,8 @@ function main()
 						((typeof this.count 		!= "undefined")?"c=" + this.count + ";":"") +
 						((typeof this.page 			!= "undefined")?"p=" + this.page + ";":"") +
 						((typeof this.fs 			!= "undefined")?"f=" + this.fs + ";":"") + 
-						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"");
+						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"") + 
+						((typeof this.zone 			!= "undefined")?"z=" + this.zone + ";":"");
 			},
 			
 			// If it has a name and optionally a difficulty and nothing else, it's simple
@@ -1779,7 +1799,8 @@ function main()
 					  typeof this.count			== "undefined" &&
 					  typeof this.page			== "undefined" &&
 					  typeof this.fs			== "undefined" &&
-					  typeof this.os			== "undefined");
+					  typeof this.os			== "undefined" &&
+					  typeof this.zone			== "undefined");
 			},
 			
 			isEmpty: function()
@@ -1792,7 +1813,8 @@ function main()
 						(typeof this.count 			== "undefined") &&
 						(typeof this.page 			== "undefined") &&
 						(typeof this.fs 			== "undefined") && 
-						(typeof this.os 			== "undefined");
+						(typeof this.os 			== "undefined") && 
+						(typeof this.zone 			== "undefined");
 	
 			},
 			
@@ -1816,6 +1838,7 @@ function main()
 						 + this.state.text + "}"+ " ":"") +
 						 ((typeof this.fs 				!= "undefined")? "{fs: " + this.fs + "} ":"") + 
 						 ((typeof this.os 				!= "undefined")? "{os: " + this.os + "} ":"") + 
+						 ((typeof this.zone				!= "undefined")? "{zone: " + this.zone + "} ":"") + 
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
 						 ((typeof this.count 			!= "undefined")? "{count: " + this.count + "} ":"") +
 						 ((typeof this.page 			!= "undefined")? "{page: " + this.page + "} ":"")).trim();
@@ -1872,7 +1895,7 @@ function main()
 		});
 		
 		// Parameter text for this parser
-		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{os: osParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
+		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{os: osParam}] [{zone: zoneParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
 		
 		// Regex to parse number expressions
 		RaidFilter.numberExpressionPattern = /(<=?|>=?|==?|!=?)?\s*(\d+)\s*(\w\w?)?/;
@@ -3433,7 +3456,8 @@ function main()
 											os: raidLink.getRaid().getOptimalShare(raidLink.difficulty),
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
-											count: raidCount
+											count: raidCount,
+											zone: raidLink.getRaid().zone
 										}
 										))
 									{
@@ -3565,7 +3589,8 @@ function main()
 									fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
 									name: raidLink.getRaid().getSearchableName(),
 									state: currentState,
-									count: raidCount
+									count: raidCount,
+									zone: raidLink.getRaid().zone
 								}
 								))
 							{
@@ -6831,7 +6856,7 @@ RaidCommand
 							else
 							{
 								ret.success = ret.success && true;
-								ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.name + "</code>";
+								ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.toString() + "</code>";
 							}
 							
 						}
