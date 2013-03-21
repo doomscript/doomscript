@@ -711,7 +711,8 @@
 											os: raidLink.getRaid().getOptimalShare(raidLink.difficulty),
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
-											count: raidCount
+											count: raidCount,
+											zone: raidLink.getRaid().zone
 										}
 										))
 									{
@@ -843,7 +844,8 @@
 									fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
 									name: raidLink.getRaid().getSearchableName(),
 									state: currentState,
-									count: raidCount
+									count: raidCount,
+									zone: raidLink.getRaid().zone
 								}
 								))
 							{

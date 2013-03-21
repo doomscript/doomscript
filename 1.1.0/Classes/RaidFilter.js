@@ -21,6 +21,7 @@
 					this.page;
 					this.fs;
 					this.os;
+					this.zone;
 					this.valid = true;
 	
 					// Capture original filterText
@@ -229,6 +230,18 @@
 									this.valid = false;
 								}
 								break;
+							case "zone":
+								
+								if (isNaN(paramValue)) {
+									this.zone = "" + paramValue;
+								}
+								else {
+									this.zone = "Z" + paramValue
+								}
+								
+								this.zone = this.zone.toUpperCase();
+								
+								break;
 							default:
 								console.warn("Did not understand filter param " + match[1] + ":" + match[2]);
 						}
@@ -348,6 +361,9 @@
 								// Check against the count condition
 								matched = matched && value < this.count;
 								break;
+							case "zone":
+								matched = matched && value === this.zone;
+								break;
 							default:
 								// Didn't find the field
 								console.warn("Couldn't match RaidFilter property to " + field);
@@ -371,7 +387,8 @@
 						((typeof this.count 		!= "undefined")?"c=" + this.count + ";":"") +
 						((typeof this.page 			!= "undefined")?"p=" + this.page + ";":"") +
 						((typeof this.fs 			!= "undefined")?"f=" + this.fs + ";":"") + 
-						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"");
+						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"") + 
+						((typeof this.zone 			!= "undefined")?"z=" + this.zone + ";":"");
 			},
 			
 			// If it has a name and optionally a difficulty and nothing else, it's simple
@@ -384,7 +401,8 @@
 					  typeof this.count			== "undefined" &&
 					  typeof this.page			== "undefined" &&
 					  typeof this.fs			== "undefined" &&
-					  typeof this.os			== "undefined");
+					  typeof this.os			== "undefined" &&
+					  typeof this.zone			== "undefined");
 			},
 			
 			isEmpty: function()
@@ -397,7 +415,8 @@
 						(typeof this.count 			== "undefined") &&
 						(typeof this.page 			== "undefined") &&
 						(typeof this.fs 			== "undefined") && 
-						(typeof this.os 			== "undefined");
+						(typeof this.os 			== "undefined") && 
+						(typeof this.zone 			== "undefined");
 	
 			},
 			
@@ -421,6 +440,7 @@
 						 + this.state.text + "}"+ " ":"") +
 						 ((typeof this.fs 				!= "undefined")? "{fs: " + this.fs + "} ":"") + 
 						 ((typeof this.os 				!= "undefined")? "{os: " + this.os + "} ":"") + 
+						 ((typeof this.zone				!= "undefined")? "{zone: " + this.zone + "} ":"") + 
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
 						 ((typeof this.count 			!= "undefined")? "{count: " + this.count + "} ":"") +
 						 ((typeof this.page 			!= "undefined")? "{page: " + this.page + "} ":"")).trim();
@@ -477,7 +497,7 @@
 		});
 		
 		// Parameter text for this parser
-		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{os: osParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
+		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{os: osParam}] [{zone: zoneParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
 		
 		// Regex to parse number expressions
 		RaidFilter.numberExpressionPattern = /(<=?|>=?|==?|!=?)?\s*(\d+)\s*(\w\w?)?/;

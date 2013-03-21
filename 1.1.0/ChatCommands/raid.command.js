@@ -42,7 +42,7 @@
 							else
 							{
 								ret.success = ret.success && true;
-								ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.name + "</code>";
+								ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.toString() + "</code>";
 							}
 							
 						}

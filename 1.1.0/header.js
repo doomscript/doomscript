@@ -307,11 +307,16 @@ Fixed a bug in /clearraids all that was causing /seenraids to still show raids [
 Cleaned up some CConoly communication code [doomcat/sycdan]
 /clearraids ALL was not being accepted. It's now case-insensitive
 
-2013.03.?? - 1.1.21
+2013.03.21 - 1.1.21
 Fixed missing images on toolbar
-[TODO] Fix missing images on menu
 Added /rss command
 Moved /checkload out of experimental
+Added noir raid
+Added zone filter
+Invalid Raid Id fix [Solsund]
+
+2013.??.?? - 1.1.22
+[TODO] Fix missing images on menu
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -333,7 +338,7 @@ function main()
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
     	joinRaidURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
-    	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong",
+    	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
     	
     	// Other URLS
     	RaidToolsURL: "http://userscripts.org/132671",
