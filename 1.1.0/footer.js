@@ -55,7 +55,8 @@
 
 
 				rulesText += "\n#DC_LoaTS_raidMenuTitleBar {\n";
-				rulesText += "\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
+				rulesText += "\tbackground: #347D87 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menutitlebarbg.png) 50% 50% repeat-x;\n";
+				//rulesText += "\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding:  2px 10px;\n";
 				rulesText += "\tborder-top-left-radius: 5px;\n";
 //				rulesText += "\tborder-top-right-radius: 5px;\n";
@@ -87,7 +88,8 @@
 				rulesText += "}\n";
 				
 				rulesText += "\n#DC_LoaTS_raidMenuBodyWrapper {\n";
-				rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #0E5969 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menubodywrapperbg.png) 50% 50% repeat;\n";
+				//rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
 				rulesText += "\tborder: 3px solid #93CDD0;\n";
 				rulesText += "\tborder-top-width: 0px;\n";
 				rulesText += "\tborder-bottom-left-radius: 5px;\n";
@@ -153,7 +155,8 @@
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_raidMenuPane {\n";
-				rulesText += "\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;\n";
+				//rulesText += "\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;\n";
+				rulesText += "\tbackground: #77C0C0 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menupanebg.png) 50% bottom repeat-x;\n";
 				rulesText += "\tfont-size: 1.2em;\n";
 				rulesText += "\tpadding: 5px 10px;\n";
 				rulesText += "\tmin-height: 200px;\n";
@@ -214,7 +217,8 @@
 				
 				
 				rulesText += "\n#DC_LoaTS_notificationBar {\n";
-				rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
+				rulesText += "\tbackground: #f8dc5a url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/notificationbg.png) 50% 50% repeat-x;\n";
+				//rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding: 4px 10px; 0px\n";
 				rulesText += "\twidth: 100%;\n";
 				rulesText += "\tfont-size: 12pt;\n";
