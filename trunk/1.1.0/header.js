@@ -317,6 +317,7 @@ Invalid Raid Id fix [Solsund]
 
 2013.??.?? - 1.1.22
 [TODO] Fix missing images on menu
+Fixed bug in zone filter not working for /raidstyle
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
