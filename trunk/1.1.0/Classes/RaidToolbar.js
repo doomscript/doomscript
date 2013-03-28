@@ -263,14 +263,12 @@
 					{
 						try
 						{
-							// A wiki command was used
-							var wasWiki = false;
-							
 							// Attempt to match the text to a known command
 							for (var commandName in DC_LoaTS_Helper.chatCommands)
 							{
 								// Going to add a wiki command no matter what
-								if (commandName.toLowerCase() == DC_LoaTS_Helper.chatCommands.wiki.commandName)
+								if (commandName.toLowerCase() == DC_LoaTS_Helper.chatCommands.wiki.commandName ||
+									commandName.toLowerCase() == DC_LoaTS_Helper.chatCommands.forum.commandName)
 								{
 									continue;
 								}
@@ -301,11 +299,8 @@
 								}
 							}
 							
-							if (!wasWiki)
-							{
-								// Doesn't match an existing command
-								matchedCommands.push(new DC_LoaTS_Helper.chatCommands.wiki("omnibox", text));
-							}
+							matchedCommands.push(new DC_LoaTS_Helper.chatCommands.wiki("omnibox", text));
+							matchedCommands.push(new DC_LoaTS_Helper.chatCommands.forum("omnibox", text));
 						}
 						catch(ex)
 						{
