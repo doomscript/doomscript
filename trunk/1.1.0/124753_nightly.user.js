@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.21
+// @version        1.1.22
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -315,9 +315,14 @@ Added noir raid
 Added zone filter
 Invalid Raid Id fix [Solsund]
 
-2013.??.?? - 1.1.22
-[TODO] Fix missing images on menu
+2013.04.04 - 1.1.22
 Fixed bug in zone filter not working for /raidstyle
+Added size filter
+Fixed bug with dynamic loading of Kong page (chat_window div)
+Fixed bug where /raidstyle and /markall were not respecting OS filters
+Added /forum command [anonimmm]
+
+[TODO] Fix missing images on menu
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -327,7 +332,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.21",
+    	version: "1.1.22",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -816,7 +821,7 @@ function main()
 				var raid = DC_LoaTS_Helper.raids[raidId];
 				
 				// If the user's text matches this raid name
-				if (raidFilter.matches({name: raid.getSearchableName(), zone: raid.zone}))
+				if (raidFilter.matches({name: raid.getSearchableName(), size: raid.size, zone: raid.zone}))
 				{
 					// Capture this raid to return
 					matchedTypes.push(raid);
@@ -1418,6 +1423,7 @@ function main()
 					this.state;
 					this.inverseState = false;
 					this.age;
+					this.size;
 					this.count;
 					this.page;
 					this.fs;
@@ -1554,6 +1560,7 @@ function main()
 								break;
 							case "os":
 							case "fs":
+							case "size":
 								var match = RaidFilter.numberExpressionPattern.exec(paramValue);
 								
 								if (match != null)
@@ -1755,6 +1762,7 @@ function main()
 								break;
 							case "os":
 							case "fs":
+							case "size":
 								// Check against the fs condition
 								matched = matched && eval(value + this[field]);
 								break;
@@ -1787,7 +1795,8 @@ function main()
 						((typeof this.age 			!= "undefined")?"a=" + this.age + ";":"") +
 						((typeof this.count 		!= "undefined")?"c=" + this.count + ";":"") +
 						((typeof this.page 			!= "undefined")?"p=" + this.page + ";":"") +
-						((typeof this.fs 			!= "undefined")?"f=" + this.fs + ";":"") + 
+                        ((typeof this.size          != "undefined")?"e=" + this.size + ";":"") + 
+                        ((typeof this.fs            != "undefined")?"f=" + this.fs + ";":"") + 
 						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"") + 
 						((typeof this.zone 			!= "undefined")?"z=" + this.zone + ";":"");
 			},
@@ -1801,7 +1810,8 @@ function main()
 					  typeof this.age			== "undefined" &&
 					  typeof this.count			== "undefined" &&
 					  typeof this.page			== "undefined" &&
-					  typeof this.fs			== "undefined" &&
+                      typeof this.size          == "undefined" &&
+                      typeof this.fs            == "undefined" &&
 					  typeof this.os			== "undefined" &&
 					  typeof this.zone			== "undefined");
 			},
@@ -1815,7 +1825,8 @@ function main()
 						(typeof this.age 			== "undefined") &&
 						(typeof this.count 			== "undefined") &&
 						(typeof this.page 			== "undefined") &&
-						(typeof this.fs 			== "undefined") && 
+                        (typeof this.size           == "undefined") && 
+                        (typeof this.fs             == "undefined") && 
 						(typeof this.os 			== "undefined") && 
 						(typeof this.zone 			== "undefined");
 	
@@ -1839,7 +1850,8 @@ function main()
 						 
 						 ((typeof this.inverseState 	!= "undefined" && this.inverseState == true)? "!":"")
 						 + this.state.text + "}"+ " ":"") +
-						 ((typeof this.fs 				!= "undefined")? "{fs: " + this.fs + "} ":"") + 
+                         ((typeof this.size             != "undefined")? "{size: " + this.size + "} ":"") + 
+                         ((typeof this.fs               != "undefined")? "{fs: " + this.fs + "} ":"") + 
 						 ((typeof this.os 				!= "undefined")? "{os: " + this.os + "} ":"") + 
 						 ((typeof this.zone				!= "undefined")? "{zone: " + this.zone + "} ":"") + 
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
@@ -1898,7 +1910,7 @@ function main()
 		});
 		
 		// Parameter text for this parser
-		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{fs: fsParam}] [{os: osParam}] [{zone: zoneParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
+		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{size: sizeParam}] [{fs: fsParam}] [{os: osParam}] [{zone: zoneParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
 		
 		// Regex to parse number expressions
 		RaidFilter.numberExpressionPattern = /(<=?|>=?|==?|!=?)?\s*(\d+)\s*(\w\w?)?/;
@@ -2220,8 +2232,10 @@ function main()
 											age: (new Date()/1) - raidData.firstSeen,
 											difficulty: this.difficulty,
 											fs:  this.getRaid().getFairShare(this.difficulty),
+											os: this.getRaid().getOptimalShare(this.difficulty),
 											name: this.getRaid().getSearchableName(),
 											state: RaidManager.fetchState(this),
+											size: this.getRaid().size,
 											zone: this.getRaid().zone
 										})
 							)
@@ -3461,6 +3475,7 @@ function main()
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
 											count: raidCount,
+											size: raidLink.getRaid().size,
 											zone: raidLink.getRaid().zone
 										}
 										))
@@ -3590,10 +3605,12 @@ function main()
 								{
 									age: commandStartTime - raidData.firstSeen,
 									difficulty: raidLink.difficulty,
-									fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+                                    fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+                                    os:  raidLink.getRaid().getOptimalShare(raidLink.difficulty),
 									name: raidLink.getRaid().getSearchableName(),
 									state: currentState,
 									count: raidCount,
+									size: raidLink.getRaid().size,
 									zone: raidLink.getRaid().zone
 								}
 								))
@@ -6274,6 +6291,7 @@ function main()
 				urlPattern: "http://www.legacyofathousandsuns.com/forum/search.php?do=process&sortby=rank&query=%searchString%",
 				// No parsing
 				/*parsingClass: ,*/
+				aliases: ["forums"],
 				
 				handler: function(deck, parser, params, text, context)
 				{
@@ -6607,9 +6625,45 @@ function main()
 				
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/loadcconoly [filter]</code>\n";
+                    var helpText = "<b>Raid Command:</b> <code>/loadcconoly raidName difficulty {state: stateName} {age: timeFormat} {size: sizeFormat} {fs: fsFormat} {os: osFormat} {zone: zoneNumber} {count: numberResults} {page: resultsPage}</code>\n";
 					helpText += "\n";
-					helpText += "Loads all raids from CConoly, or whichever ones match the filter\n";
+                    helpText += "Looks up raids from CConoly. "
+                    helpText += "where <code>raidName</code> <i>(optional)</i> is any partial or full raid name\n";
+                    helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
+                    helpText += "where <code>stateName</code> <i>(optional)</i> is either seen or visited\n";
+                    helpText += "where <code>timeFormat</code> <i>(optional)</i> is like <code>&lt;24h</code>, <code>&lt;30m</code>, or <code>&gt;1d</code>\n";
+                    helpText += "where <code>sizeFormat</code> <i>(optional)</i> is like <code>&lt;100</code> or <code>250</code>\n";
+                    helpText += "where <code>osFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+                    helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+                    helpText += "where <code>zoneNumber</code> <i>(optional)</i> is like <code>1</code>, <code>Z14</code>, <code>ZA</code>, <code>WR</code>\n";
+                    helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
+                    helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
+                    helpText += "\n";
+                    helpText += "<b>Examples:</b>\n";
+                    helpText += "\n";
+                    helpText += "<i>Find all raids you've seen, but not visited<i>\n";
+                    helpText += "<code>" + this.getCommandLink("{state:seen}") + "</code>\n";
+                    helpText += "\n";
+                    helpText += "<i>Find all raids you've seen, but not visited that you saw posted in the last 5 hours<i>\n";
+                    helpText += "<code>" + this.getCommandLink("{state:seen} {age: <5h}") + "</code>\n";
+                    helpText += "\n";
+                    helpText += "<i>Find all raids you've seen, but not visited that you saw posted in the last 5 hours that have FS &lt; 1M<i>\n";
+                    helpText += "<code>" + this.getCommandLink("{state:seen} {age: <5h} {fs:<1M}") + "</code>\n";
+                    helpText += "\n";
+                    helpText += "<i>Find all normal telemachus raids that you've not visited before\n";
+                    helpText += "<code>" + this.getCommandLink("tele 1 {state:!visited}") + " </code>\n";
+                    helpText += "\n";
+                    helpText += "<i>Find the first 10 void killer raids you've seen\n";
+                    helpText += "<code>" + this.getCommandLink("killer {count: 10}") + "</code>\n";
+                    helpText += "\n";
+                    helpText += "<i>Find the second 10 void killer raids you've seen\n";
+                    helpText += "<code>" + this.getCommandLink("killer {count: 10} {page: 2}") + "</code>\n";
+                    helpText += "\n";
+                    helpText += "<i>Find all void nightmare vorden raids you've seen\n";
+                    helpText += "<code>" + this.getCommandLink("vorden 4") + "</code>\n";
+                    helpText += "\n";
+                    helpText += "<i>Looking for <a href=\"http://www.zoywiki.com/index.php/LotS/experiment/multicoloredcloorian\" title=\"Cloorian Material needed to craft some Legendary pants\">Cloorian Material<a/>\n";
+                    helpText += "<code>" + this.getCommandLink("vor|gan|nat 4 {age: <24h} {state: !visited}") + "</code>\n";
 					
 					return helpText;
 				}
@@ -7536,13 +7590,16 @@ RaidCommand
 				
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/seenraids raidName difficulty {state: stateName} {age: timeFormat} {fs: fsFormat} {count: numberResults} {page: resultsPage}</code>\n";
+					var helpText = "<b>Raid Command:</b> <code>/seenraids raidName difficulty {state: stateName} {age: timeFormat} {size: sizeFormat} {fs: fsFormat} {os: osFormat} {zone: zoneNumber} {count: numberResults} {page: resultsPage}</code>\n";
 					helpText += "Looks up raids that you've seen before in chat"
 					helpText += "where <code>raidName</code> <i>(optional)</i> is any partial or full raid name\n";
 					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
 					helpText += "where <code>stateName</code> <i>(optional)</i> is either seen or visited\n";
 					helpText += "where <code>timeFormat</code> <i>(optional)</i> is like <code>&lt;24h</code>, <code>&lt;30m</code>, or <code>&gt;1d</code>\n";
-					helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+                    helpText += "where <code>sizeFormat</code> <i>(optional)</i> is like <code>&lt;100</code> or <code>250</code>\n";
+                    helpText += "where <code>osFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+                    helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+                    helpText += "where <code>zoneNumber</code> <i>(optional)</i> is like <code>1</code>, <code>Z14</code>, <code>ZA</code>, <code>WR</code>\n";
 					helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
 					helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
 					helpText += "\n";
@@ -9567,7 +9624,7 @@ DC_LoaTS_Helper.raids =
 		
 		// Check for updates
 		DC_LoaTS_Helper.checkForUpdates = function()
-		{
+		{		    
 			var elems = $("chat_window").getElementsByClassName("DC_LoaTS_updateNotRun");
 			
 			for (var i = 0; i < elems.length; i++)
@@ -9577,6 +9634,7 @@ DC_LoaTS_Helper.raids =
 				elem.removeClassName("DC_LoaTS_updateNotRun");
 				elem.removeClassName("DC_LoaTS_checkingForUpdate");
 			}
+		    
 			
 			new Ajax.Request(DC_LoaTS_Properties.updateURL,
 				{
@@ -10742,7 +10800,7 @@ DC_LoaTS_Helper.raids =
     	{
 	        
 	        // Do we actually have everything we need to start?
-	        if (typeof holodeck == "undefined" || typeof ChatDialogue == "undefined" || typeof Class == "undefined")
+	        if (typeof holodeck === "undefined" || typeof ChatDialogue === "undefined" || typeof Class === "undefined" || !$("chat_window"))
 	        {
 	        	// Something is not loaded yet. Bail on this and try again later
 //	            console.log("DC LoaTS Link Helper not ready. Fail " + window._dc_loats_helper_fails + "/10");

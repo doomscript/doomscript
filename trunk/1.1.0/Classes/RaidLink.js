@@ -176,8 +176,10 @@
 											age: (new Date()/1) - raidData.firstSeen,
 											difficulty: this.difficulty,
 											fs:  this.getRaid().getFairShare(this.difficulty),
+											os: this.getRaid().getOptimalShare(this.difficulty),
 											name: this.getRaid().getSearchableName(),
 											state: RaidManager.fetchState(this),
+											size: this.getRaid().size,
 											zone: this.getRaid().zone
 										})
 							)

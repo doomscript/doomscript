@@ -4,6 +4,7 @@
 				urlPattern: "http://www.legacyofathousandsuns.com/forum/search.php?do=process&sortby=rank&query=%searchString%",
 				// No parsing
 				/*parsingClass: ,*/
+				aliases: ["forums"],
 				
 				handler: function(deck, parser, params, text, context)
 				{

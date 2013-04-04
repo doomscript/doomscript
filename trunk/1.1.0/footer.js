@@ -588,7 +588,7 @@
     	{
 	        
 	        // Do we actually have everything we need to start?
-	        if (typeof holodeck == "undefined" || typeof ChatDialogue == "undefined" || typeof Class == "undefined")
+	        if (typeof holodeck === "undefined" || typeof ChatDialogue === "undefined" || typeof Class === "undefined" || !$("chat_window"))
 	        {
 	        	// Something is not loaded yet. Bail on this and try again later
 //	            console.log("DC LoaTS Link Helper not ready. Fail " + window._dc_loats_helper_fails + "/10");
