@@ -137,13 +137,16 @@
 				
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/seenraids raidName difficulty {state: stateName} {age: timeFormat} {fs: fsFormat} {count: numberResults} {page: resultsPage}</code>\n";
+					var helpText = "<b>Raid Command:</b> <code>/seenraids raidName difficulty {state: stateName} {age: timeFormat} {size: sizeFormat} {fs: fsFormat} {os: osFormat} {zone: zoneNumber} {count: numberResults} {page: resultsPage}</code>\n";
 					helpText += "Looks up raids that you've seen before in chat"
 					helpText += "where <code>raidName</code> <i>(optional)</i> is any partial or full raid name\n";
 					helpText += "where <code>difficulty</code> <i>(optional)</i> is a number 1 - 4 where 1 is normal, 4 is nightmare\n";
 					helpText += "where <code>stateName</code> <i>(optional)</i> is either seen or visited\n";
 					helpText += "where <code>timeFormat</code> <i>(optional)</i> is like <code>&lt;24h</code>, <code>&lt;30m</code>, or <code>&gt;1d</code>\n";
-					helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+                    helpText += "where <code>sizeFormat</code> <i>(optional)</i> is like <code>&lt;100</code> or <code>250</code>\n";
+                    helpText += "where <code>osFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+                    helpText += "where <code>fsFormat</code> <i>(optional)</i> is like <code>&lt;1m</code> or <code>&gt;500k</code>\n";
+                    helpText += "where <code>zoneNumber</code> <i>(optional)</i> is like <code>1</code>, <code>Z14</code>, <code>ZA</code>, <code>WR</code>\n";
 					helpText += "where <code>numberResults</code> <i>(optional)</i> is the number of results to display\n";
 					helpText += "where <code>resultsPage</code> <i>(optional)</i> is if you've set count, then which page to show. If page is omitted, it will show the first page of results.\n";
 					helpText += "\n";

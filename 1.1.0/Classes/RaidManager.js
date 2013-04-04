@@ -712,6 +712,7 @@
 											name: raidLink.getRaid().getSearchableName(),
 											state: currentState,
 											count: raidCount,
+											size: raidLink.getRaid().size,
 											zone: raidLink.getRaid().zone
 										}
 										))
@@ -841,10 +842,12 @@
 								{
 									age: commandStartTime - raidData.firstSeen,
 									difficulty: raidLink.difficulty,
-									fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+                                    fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+                                    os:  raidLink.getRaid().getOptimalShare(raidLink.difficulty),
 									name: raidLink.getRaid().getSearchableName(),
 									state: currentState,
 									count: raidCount,
+									size: raidLink.getRaid().size,
 									zone: raidLink.getRaid().zone
 								}
 								))

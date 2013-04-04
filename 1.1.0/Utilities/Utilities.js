@@ -1338,7 +1338,7 @@
 		
 		// Check for updates
 		DC_LoaTS_Helper.checkForUpdates = function()
-		{
+		{		    
 			var elems = $("chat_window").getElementsByClassName("DC_LoaTS_updateNotRun");
 			
 			for (var i = 0; i < elems.length; i++)
@@ -1348,6 +1348,7 @@
 				elem.removeClassName("DC_LoaTS_updateNotRun");
 				elem.removeClassName("DC_LoaTS_checkingForUpdate");
 			}
+		    
 			
 			new Ajax.Request(DC_LoaTS_Properties.updateURL,
 				{

@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.21
+// @version        1.1.22
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -315,9 +315,14 @@ Added noir raid
 Added zone filter
 Invalid Raid Id fix [Solsund]
 
-2013.??.?? - 1.1.22
-[TODO] Fix missing images on menu
+2013.04.04 - 1.1.22
 Fixed bug in zone filter not working for /raidstyle
+Added size filter
+Fixed bug with dynamic loading of Kong page (chat_window div)
+Fixed bug where /raidstyle and /markall were not respecting OS filters
+Added /forum command [anonimmm]
+
+[TODO] Fix missing images on menu
 */
 
 // Wrapper function for the whole thing. This gets extracted into the HTML of the page.
@@ -327,7 +332,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.21",
+    	version: "1.1.22",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
