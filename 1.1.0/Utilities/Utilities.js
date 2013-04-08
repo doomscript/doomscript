@@ -1322,16 +1322,23 @@
                     params[event.data.callbackName](event.data.responseObj);
                 }
             });
+            // Convert params to simple object
+            var paramSimple = {};
             for (var param in params)
             {
-                if (params.hasOwnProperty(param) && typeof params[param] === "function" && param.toLowerCase().indexOf("on") === 0)
-                {
-                    params["__callback_" + param] = "function";
+                if (params.hasOwnProperty(param)) {
+                    if (typeof params[param] === "function")
+                    {
+                        paramSimple["__callback_" + param] = "function";
+                    }
+                    else {
+                        paramSimple[param] = params[param];
+                    }
                 }
             }
             var origin = window.location.protocol + "//" + window.location.host;
             var evt = document.createEvent("MessageEvent");
-            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, Object.create(params), origin, 1, window, null);
+            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, paramSimple, origin, 1, window, null);
             document.dispatchEvent(evt);
         };
 		

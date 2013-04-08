@@ -497,6 +497,7 @@
 	{
 		if (typeof GM_setValue === 'undefined')
 		{
+		    // These are probably obsolete now
 			if(window.opera)
 			{
 				if(window.localStorage)
@@ -540,6 +541,10 @@
 					localStorage.removeItem(k);
 				}
 			}
+		}
+		
+		if (typeof GM_xmlhttpRequest !== "function") {
+		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts.org/scripts/show/105153");
 		}
 	}
 	
