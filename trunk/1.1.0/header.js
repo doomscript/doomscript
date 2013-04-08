@@ -322,6 +322,9 @@ Fixed bug with dynamic loading of Kong page (chat_window div)
 Fixed bug where /raidstyle and /markall were not respecting OS filters
 Added /forum command [anonimmm]
 
+2013.??.?? - 1.1.23
+Fixd critical issues where script is totally broken in Opera. Users need http://userscripts.org/scripts/show/105153 and 
+
 [TODO] Fix missing images on menu
 */
 

@@ -322,6 +322,9 @@ Fixed bug with dynamic loading of Kong page (chat_window div)
 Fixed bug where /raidstyle and /markall were not respecting OS filters
 Added /forum command [anonimmm]
 
+2013.??.?? - 1.1.23
+Fixd critical issues where script is totally broken in Opera. Users need http://userscripts.org/scripts/show/105153 and 
+
 [TODO] Fix missing images on menu
 */
 
@@ -9608,16 +9611,23 @@ DC_LoaTS_Helper.raids =
                     params[event.data.callbackName](event.data.responseObj);
                 }
             });
+            // Convert params to simple object
+            var paramSimple = {};
             for (var param in params)
             {
-                if (params.hasOwnProperty(param) && typeof params[param] === "function" && param.toLowerCase().indexOf("on") === 0)
-                {
-                    params["__callback_" + param] = "function";
+                if (params.hasOwnProperty(param)) {
+                    if (typeof params[param] === "function")
+                    {
+                        paramSimple["__callback_" + param] = "function";
+                    }
+                    else {
+                        paramSimple[param] = params[param];
+                    }
                 }
             }
             var origin = window.location.protocol + "//" + window.location.host;
             var evt = document.createEvent("MessageEvent");
-            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, Object.create(params), origin, 1, window, null);
+            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, paramSimple, origin, 1, window, null);
             document.dispatchEvent(evt);
         };
 		
@@ -10709,6 +10719,7 @@ DC_LoaTS_Helper.raids =
 	{
 		if (typeof GM_setValue === 'undefined')
 		{
+		    // These are probably obsolete now
 			if(window.opera)
 			{
 				if(window.localStorage)
@@ -10752,6 +10763,10 @@ DC_LoaTS_Helper.raids =
 					localStorage.removeItem(k);
 				}
 			}
+		}
+		
+		if (typeof GM_xmlhttpRequest !== "function") {
+		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts.org/scripts/show/105153");
 		}
 	}
 	
