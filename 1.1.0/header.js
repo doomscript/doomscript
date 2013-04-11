@@ -323,7 +323,8 @@ Fixed bug where /raidstyle and /markall were not respecting OS filters
 Added /forum command [anonimmm]
 
 2013.??.?? - 1.1.23
-Fixd critical issues where script is totally broken in Opera. Users need http://userscripts.org/scripts/show/105153 and 
+Fixd critical issues where script is totally broken in Opera. [TODO] Post new Opera instructions 
+Added Penelope Wellerd RS
 
 [TODO] Fix missing images on menu
 */

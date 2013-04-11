@@ -323,7 +323,8 @@ Fixed bug where /raidstyle and /markall were not respecting OS filters
 Added /forum command [anonimmm]
 
 2013.??.?? - 1.1.23
-Fixd critical issues where script is totally broken in Opera. Users need http://userscripts.org/scripts/show/105153 and 
+Fixd critical issues where script is totally broken in Opera. [TODO] Post new Opera instructions 
+Added Penelope Wellerd RS
 
 [TODO] Fix missing images on menu
 */
@@ -8282,7 +8283,9 @@ DC_LoaTS_Helper.raids =
 
     space_pox_mary:     new RaidType("space_pox_mary",      "RS", "Space Pox Mary", "Mary", "Mary RS",                24,  90000, "SEH", "Infinite", "N/A",   2000000000),
     	
-   	cerebral_ceo:     	new RaidType("cerebral_ceo",     	"RS", "Cerebral CEO", "CEO", "CEO RS",                    24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    cerebral_ceo:       new RaidType("cerebral_ceo",        "RS", "Cerebral CEO", "CEO", "CEO RS",                    24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+    
+    penelope_wellerd:   new RaidType("penelope_wellerd",    "RS", "Penelope Wellerd", "Wellerd", "Wellerd RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000)
     
 };
 
