@@ -129,6 +129,7 @@ DC_LoaTS_Helper.raids =
     genesis:            new RaidType("genesis",             "A5", "Genesis", "Genesis", "Genesis",                   165,  250, "H", 1000000000),
     celebration_enhancer_1: new RaidType("celebration_enhancer_1","AX","Celebration Enhancer J-54","Celebrator","Celeb",84,250, "H",  600000000),
     quiskan_psi_hound: new RaidType("quiskan_psi_hound",    "A7","Quiskan Psi-Hound","Psi-Hound","Hound",            168,  250, "H", [1000000000, 1500000000, 2500000000, 10000000000]),
+    ms_myriad_and_steelstike: new RaidType("ms_myriad_and_steelstike","AX","Ms. Myriad and Steelstrike","M & S","M & S",168,250,"H", [1500000000, 2000000000, 3000000000, 12500000000]),
 
     // Galaxy Dome Raids
     vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000),
@@ -149,6 +150,8 @@ DC_LoaTS_Helper.raids =
     
     christmas_montage:  new RaidType("christmas_montage",   "WR", "Christmas Campaign", "Christmas", "Xmas WR",       48,  90000, "SEH", "Infinite", "N/A",   5000000000),
 
+    schism:             new RaidType("schism",              "WR", "Schism", "Schism", "Schism WR",                   120,  90000, "SEH", "Infinite", "N/A",  50000000000),
+
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
@@ -157,6 +160,7 @@ DC_LoaTS_Helper.raids =
     cerebral_ceo:       new RaidType("cerebral_ceo",        "RS", "Cerebral CEO", "CEO", "CEO RS",                    24,  90000, "SEH", "Infinite", "N/A",   2000000000),
     
     penelope_wellerd:   new RaidType("penelope_wellerd",    "RS", "Penelope Wellerd", "Wellerd", "Wellerd RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    
     
 };
 

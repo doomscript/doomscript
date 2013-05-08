@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.22
+// @version        1.1.23
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -325,6 +325,7 @@ Added /forum command [anonimmm]
 2013.??.?? - 1.1.23
 Fixd critical issues where script is totally broken in Opera. [TODO] Post new Opera instructions 
 Added Penelope Wellerd RS
+Added M & S alliance raid
 
 [TODO] Fix missing images on menu
 */
@@ -336,7 +337,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.22",
+    	version: "1.1.23",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
