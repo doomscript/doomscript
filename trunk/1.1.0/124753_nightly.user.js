@@ -8152,6 +8152,7 @@ DC_LoaTS_Helper.raids =
     quiskerian_temple:  new RaidType("quiskerian_temple",   "L1", "Quiskerian Temple", "Temple", "Temple",            10,  25, "S", [200000000, 1000000000, 2000000000, 3000000000]),
     missile_strike:     new RaidType("missile_strike",      "ZA", "Missile Strike", "Missiles", "Missile",            72,  10, "S",  [22000000, 28600000, 35200000, 44000000]),
     pi:                 new RaidType("pi",                 "ZA2", "Pi", "Pi", "Pi",                                   72,  10, "S",  [24000000, 31200000, 38400000, 48000000]),
+    master_hao:         new RaidType("master_hao",         "Z19", "Master Hao", "Hao", "Hao",                         36,  10, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
     
     // Medium Raids
     "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
@@ -8169,6 +8170,7 @@ DC_LoaTS_Helper.raids =
     cyborg_shark:       new RaidType("cyborg_shark",        "ZA2", "Cyborg Shark", "C. Shark", "Shark",               72,  50, "S",   90000000),
     hulking_mutant:     new RaidType("hulking_mutant",      "Z15", "Hulking Mutant", "Mutant", "Mutant",              72,  50, "S",   90000000),
     screaming_barracuda: new RaidType("screaming_barracuda","Z16", "Screaming Barracuda", "Barracuda", "Barracuda",   72,  50, "S",  110000000),
+    vunlac:             new RaidType("vunlac",              "Z19", "Vunlac", "Vunlac", "Vunlac",                      36,  50, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
     
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -8185,6 +8187,7 @@ DC_LoaTS_Helper.raids =
     anthropist_xenocide_warship:new RaidType("anthropist_xenocide_warship","ZA2","Anthropist Xenocide Warship","Xenocide","Xeno",72,100,"S",[300000000, 390000000, 480000000, 600000000]),
     tentacled_turkey:   new RaidType("tentacled_turkey",   "Z15","Tentacled Turkey","Turkey","Turkey",                72, 100, "S",  [350000000, 455000000, 560000000, 700000000]),
     where_music_meets:  new RaidType("where_music_meets",  "Z16","Symphony of Two Worlds","Symphony","Symphony",      72, 100, "S",  [400000000, 520000000, 640000000, 800000000]),
+    reichsmarschall_dule:new RaidType("reichsmarschall_dule","Z19","Reichsmarschall Dule", "R. Dule", "R. Dule",      36, 100, "S", [2000000000, 2600000000, 3200000000, 4000000000]),
 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
@@ -8202,7 +8205,7 @@ DC_LoaTS_Helper.raids =
     bile_beast:         new RaidType("bile_beast",         "ZA2", "Bile Beast", "Bile", "Bile",                       72, 250, "S", [1400000000, 1820000000, 2240000000, 2800000000]),
     al_husam:           new RaidType("al_husam",           "Z17", "Al-Husam", "Al-Husam", "Al-Husam",                 72, 250, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
     noir:               new RaidType("noir",               "Z18", "Noir", "Noir", "Noir",                             72, 250, "S", [1600000000, 2080000000, 2560000000, 3200000000]),
-    
+    sky_commander_bethany:new RaidType("sky_commander_bethany", "Z19", "Sky Commander Bethany", "Bethany", "Bethany", 36, 250, "S", [2500000000, 3250000000, 4000000000, 5000000000]),
     
     // Colossal Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
@@ -8214,6 +8217,7 @@ DC_LoaTS_Helper.raids =
     nosferatu_nick:     new RaidType("nosferatu_nick",     "Z14", "Nosferatu Nick", "Nick", "Nick",                   24, 500, "S", 3500000000),
     niflung_boar:       new RaidType("niflung_boar",        "ZA", "Niflung Boar", "Boar", "Boar",                     30, 500, "S", 4000000000),
     vlarg_relic_hunter: new RaidType("vlarg_relic_hunter", "ZA2", "Vlarg Relic Hunter", "R. Hunter", "Vlarg",         30, 500, "S", 4500000000),
+    noir2:              new RaidType("noir2",              "Z19", "Noir (II)", "Noir (II)", "Noir (II)",              30, 500, "S", 5000000000),
     
     
     // Aliance Raids
