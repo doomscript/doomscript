@@ -322,11 +322,15 @@ Fixed bug with dynamic loading of Kong page (chat_window div)
 Fixed bug where /raidstyle and /markall were not respecting OS filters
 Added /forum command [anonimmm]
 
-2013.??.?? - 1.1.23
-Fixd critical issues where script is totally broken in Opera. [TODO] Post new Opera instructions 
+2013.05.26 - 1.1.23
+Fixd critical issues where script is totally broken in Opera. 
 Added Penelope Wellerd RS
 Added M & S alliance raid
+Added Zone 19 Raids: Bethany, Vunlac, R. Dule, Master Hao, and Noir (II)
+Tweaked chat icons
+Attempted critical Chrome 27 fix
 
+[TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
 */
 
@@ -343,8 +347,8 @@ function main()
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
     	scriptURL: "http://userscripts.org/124753",
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
-    	raidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/RaidData.js",
-    	worldRaidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/WorldRaidData.js",
+    	raidDataURL: "http://getKongE.org/old/RaidData.js",
+    	worldRaidDataURL: "http://getKongE.org/old/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	

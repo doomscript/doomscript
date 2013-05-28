@@ -24,12 +24,17 @@
 				rulesText += "\t-webkit-border-radius: 5px;\n";
 				rulesText += "}\n";
 								
-				rulesText += "\na.DC_LoaTS_updateLink:hover {\n";
-				rulesText += "\tcolor: #08F !important;\n"								
-				rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
-				rulesText += "}\n";
-				
-				
+                rulesText += "\na.DC_LoaTS_updateLink:hover {\n";
+                rulesText += "\tcolor: #08F !important;\n"                              
+                rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
+                rulesText += "}\n";
+                
+                
+                rulesText += "\nimg.raidIcon {\n";
+                rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
+                rulesText += "}\n";
+                
+                
 				// -- Raid Menu Styles -- \\
 				
 				rulesText += "\n#DC_LoaTS_raidMenu {\n";
@@ -646,7 +651,33 @@ function xhrGo(event)
 			params[funcName] = gmCallBack.bind(this, params.UUID, funcName);
 		}
 	}
-	setTimeout(function(){GM_xmlhttpRequest(params);},0);
+    if (typeof GM_xmlhttpRequest === "function") {
+	    setTimeout(function(){GM_xmlhttpRequest(params);},0);
+    }
+    else {
+        console.error("Browser is not configured to allow GM_xmlhttpRequest. This could be due to a Chrome v27 bug.");
+        var xmlhttp;
+        if (window.XMLHttpRequest)
+        {// code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        }
+        else
+        {// code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function()
+        {
+            if (xmlhttp.readyState === 4)
+            {
+                if (typeof params.onload === "function") {
+                    params.onload(xmlhttp);
+                }
+            }
+        }
+        xmlhttp.open(params.method,params.url,!params.synchronous);
+        xmlhttp.send();
+        
+    }
 };
 
 function gmCallBack(UUID, funcName, response)
