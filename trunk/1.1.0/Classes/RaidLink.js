@@ -527,7 +527,7 @@
 				if (typeof this.raidTypeId !== "undefined")
 				{
 					// Locate the offsite image
-					imageSRC = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/" + this.raidTypeId + "_1.jpg";
+					imageSRC = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/" + this.raidTypeId + "_1.jpg";
 				}
 				
 				return imageSRC;
@@ -571,13 +571,13 @@
 		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/.*?\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
 		
 		// Fallback image url if we can't get the provided one
-		RaidLink.defaultImageFormat = '<img style="raidIcon" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
+		RaidLink.defaultImageFormat = '<img class="raidIcon" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
 		
 		// Fallback image url if we can't get the nice one
 		RaidLink.defaultImageSRC = "http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op";
 		
 		// Fallback message format
-		RaidLink.defaultMessageFormat = "{image} {visited} Raid: [{size}-{stat}-{difficulty}-{fs}-{os}] {short-name}";
+		RaidLink.defaultMessageFormat = "{image} {visited-short} {diff} [{size}-{stat}-{fs}-{os}] {shorter-name} ({id})";
 		
 		// Old link format
 		RaidLink.defaultLinkFormat_v1 = "<a class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event, '{url}');\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
@@ -592,36 +592,33 @@
 			var raidLink = new RaidLink(this.parentNode.href);
 			
 			// First time failed, check for alternate fail names
-			if (this.src == "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
+			if (this.src === "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
 			{
 				switch(raidLink.raidTypeId)
 				{
 					case "wr_space_pox":
-						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/space_pox_1.jpg";
+						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/space_pox_1.jpg";
 						break;
 					case "dule_warmaster":
-						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/dule_1.jpg";
+						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/dule_1.jpg";
 						break;
 					case "hultex_quibberath":
-						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/hultex_1.jpg";
+						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/hultex_1.jpg";
 						break;
 					case "warden_ramiro":
-						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/ramiro_1.jpg";
+						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/ramiro_1.jpg";
 						break;
 					case "purple_lion":
-						this.src = RaidLink.defaultImageSRC;
-						break;
 					case "kang":
-						this.src = RaidLink.defaultImageSRC;
-						break;
 					case "tourniquet":
-						this.src = RaidLink.defaultImageSRC;
-						break;
 					case "flora":
-						this.src = RaidLink.defaultImageSRC;
-						break;
+					case "sky_commander_bethany":
+					case "vunlac":
+					case "reichsmarschall_dule":
+					case "master_hao":
+					case "noir2":
 					default:
-						this.src = RaidLink.defaultImageSRC;
+                        this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/" + raidLink.raidTypeId + "_small.jpg";
 				}
 			}
 			// Second time failed, switch to default

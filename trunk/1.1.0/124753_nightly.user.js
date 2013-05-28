@@ -323,10 +323,14 @@ Fixed bug where /raidstyle and /markall were not respecting OS filters
 Added /forum command [anonimmm]
 
 2013.??.?? - 1.1.23
-Fixd critical issues where script is totally broken in Opera. [TODO] Post new Opera instructions 
+Fixd critical issues where script is totally broken in Opera. 
 Added Penelope Wellerd RS
 Added M & S alliance raid
+Added Zone 19 Raids: Bethany, Vunlac, R. Dule, Master Hao, and Noir (II)
+Tweaked chat icons
+Attempted critical Chrome 27 fix
 
+[TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
 */
 
@@ -343,8 +347,8 @@ function main()
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
     	scriptURL: "http://userscripts.org/124753",
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
-    	raidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/RaidData.js",
-    	worldRaidDataURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Utilities/WorldRaidData.js",
+    	raidDataURL: "http://getKongE.org/old/RaidData.js",
+    	worldRaidDataURL: "http://getKongE.org/old/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
@@ -2588,7 +2592,7 @@ function main()
 				if (typeof this.raidTypeId !== "undefined")
 				{
 					// Locate the offsite image
-					imageSRC = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/" + this.raidTypeId + "_1.jpg";
+					imageSRC = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/" + this.raidTypeId + "_1.jpg";
 				}
 				
 				return imageSRC;
@@ -2632,13 +2636,13 @@ function main()
 		RaidLink.backupLinkReplacementPattern = /.?\[?"?http:\/\/.*?\?4217\-op","5thPlanetGames\/legacy\-of\-a\-thousand\-suns\?.*?(?:\u2026|\u8320|…|\.\.\.|\]|"|')*$/i;
 		
 		// Fallback image url if we can't get the provided one
-		RaidLink.defaultImageFormat = '<img style="raidIcon" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
+		RaidLink.defaultImageFormat = '<img class="raidIcon" src="{imageSRC}" onerror="RaidLink.fixBrokenImage.apply(this);" />';
 		
 		// Fallback image url if we can't get the nice one
 		RaidLink.defaultImageSRC = "http://cdn2.kongregate.com/game_icons/0033/2679/i.gif?4217-op";
 		
 		// Fallback message format
-		RaidLink.defaultMessageFormat = "{image} {visited} Raid: [{size}-{stat}-{difficulty}-{fs}-{os}] {short-name}";
+		RaidLink.defaultMessageFormat = "{image} {visited-short} {diff} [{size}-{stat}-{fs}-{os}] {shorter-name} ({id})";
 		
 		// Old link format
 		RaidLink.defaultLinkFormat_v1 = "<a class=\"raidLink raidDiff{difficulty}\" onclick=\"return DC_LoaTS_Helper.raidLinkClick(event, '{url}');\" href=\"{url}\" title=\"{text-no-image}\">{text}</a>";
@@ -2653,36 +2657,33 @@ function main()
 			var raidLink = new RaidLink(this.parentNode.href);
 			
 			// First time failed, check for alternate fail names
-			if (this.src == "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
+			if (this.src === "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
 			{
 				switch(raidLink.raidTypeId)
 				{
 					case "wr_space_pox":
-						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/space_pox_1.jpg";
+						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/space_pox_1.jpg";
 						break;
 					case "dule_warmaster":
-						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/dule_1.jpg";
+						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/dule_1.jpg";
 						break;
 					case "hultex_quibberath":
-						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/hultex_1.jpg";
+						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/hultex_1.jpg";
 						break;
 					case "warden_ramiro":
-						this.src = "http://dawnofthedragons.cdngc.net/lots_live/images/bosses/post/ramiro_1.jpg";
+						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/ramiro_1.jpg";
 						break;
 					case "purple_lion":
-						this.src = RaidLink.defaultImageSRC;
-						break;
 					case "kang":
-						this.src = RaidLink.defaultImageSRC;
-						break;
 					case "tourniquet":
-						this.src = RaidLink.defaultImageSRC;
-						break;
 					case "flora":
-						this.src = RaidLink.defaultImageSRC;
-						break;
+					case "sky_commander_bethany":
+					case "vunlac":
+					case "reichsmarschall_dule":
+					case "master_hao":
+					case "noir2":
 					default:
-						this.src = RaidLink.defaultImageSRC;
+                        this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/" + raidLink.raidTypeId + "_small.jpg";
 				}
 			}
 			// Second time failed, switch to default
@@ -10258,12 +10259,17 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\t-webkit-border-radius: 5px;\n";
 				rulesText += "}\n";
 								
-				rulesText += "\na.DC_LoaTS_updateLink:hover {\n";
-				rulesText += "\tcolor: #08F !important;\n"								
-				rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
-				rulesText += "}\n";
-				
-				
+                rulesText += "\na.DC_LoaTS_updateLink:hover {\n";
+                rulesText += "\tcolor: #08F !important;\n"                              
+                rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
+                rulesText += "}\n";
+                
+                
+                rulesText += "\nimg.raidIcon {\n";
+                rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
+                rulesText += "}\n";
+                
+                
 				// -- Raid Menu Styles -- \\
 				
 				rulesText += "\n#DC_LoaTS_raidMenu {\n";
@@ -10880,7 +10886,33 @@ function xhrGo(event)
 			params[funcName] = gmCallBack.bind(this, params.UUID, funcName);
 		}
 	}
-	setTimeout(function(){GM_xmlhttpRequest(params);},0);
+    if (typeof GM_xmlhttpRequest === "function") {
+	    setTimeout(function(){GM_xmlhttpRequest(params);},0);
+    }
+    else {
+        console.error("Browser is not configured to allow GM_xmlhttpRequest. This could be due to a Chrome v27 bug.");
+        var xmlhttp;
+        if (window.XMLHttpRequest)
+        {// code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        }
+        else
+        {// code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function()
+        {
+            if (xmlhttp.readyState === 4)
+            {
+                if (typeof params.onload === "function") {
+                    params.onload(xmlhttp);
+                }
+            }
+        }
+        xmlhttp.open(params.method,params.url,!params.synchronous);
+        xmlhttp.send();
+        
+    }
 };
 
 function gmCallBack(UUID, funcName, response)
