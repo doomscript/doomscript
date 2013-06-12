@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.23
+// @version        1.1.24
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -323,12 +323,15 @@ Fixed bug where /raidstyle and /markall were not respecting OS filters
 Added /forum command [anonimmm]
 
 2013.05.26 - 1.1.23
-Fixd critical issues where script is totally broken in Opera. 
+Fixed critical issues where script is totally broken in Opera. 
 Added Penelope Wellerd RS
 Added M & S alliance raid
 Added Zone 19 Raids: Bethany, Vunlac, R. Dule, Master Hao, and Noir (II)
 Tweaked chat icons
 Attempted critical Chrome 27 fix
+
+2013.??.?? - 1.1.24
+Added H8 RS
 
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
@@ -341,7 +344,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.23",
+    	version: "1.1.24",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

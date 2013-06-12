@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.23
+// @version        1.1.24
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -322,13 +322,16 @@ Fixed bug with dynamic loading of Kong page (chat_window div)
 Fixed bug where /raidstyle and /markall were not respecting OS filters
 Added /forum command [anonimmm]
 
-2013.??.?? - 1.1.23
-Fixd critical issues where script is totally broken in Opera. 
+2013.05.26 - 1.1.23
+Fixed critical issues where script is totally broken in Opera. 
 Added Penelope Wellerd RS
 Added M & S alliance raid
 Added Zone 19 Raids: Bethany, Vunlac, R. Dule, Master Hao, and Noir (II)
 Tweaked chat icons
 Attempted critical Chrome 27 fix
+
+2013.??.?? - 1.1.24
+Added H8 RS
 
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
@@ -341,7 +344,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.23",
+    	version: "1.1.24",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -8294,9 +8297,10 @@ DC_LoaTS_Helper.raids =
     	
     cerebral_ceo:       new RaidType("cerebral_ceo",        "RS", "Cerebral CEO", "CEO", "CEO RS",                    24,  90000, "SEH", "Infinite", "N/A",   2000000000),
     
-    penelope_wellerd:   new RaidType("penelope_wellerd",    "RS", "Penelope Wellerd", "Wellerd", "Wellerd RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    penelope_wellerd:   new RaidType("penelope_wellerd",    "RS", "Penelope Wellerd", "Wellerd", "Wellerd RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000),
     
-    
+    h8:                 new RaidType("h8",                  "RS", "H8", "H8", "H8 RS",                                24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+
 };
 
 
