@@ -163,9 +163,10 @@ DC_LoaTS_Helper.raids =
     	
     cerebral_ceo:       new RaidType("cerebral_ceo",        "RS", "Cerebral CEO", "CEO", "CEO RS",                    24,  90000, "SEH", "Infinite", "N/A",   2000000000),
     
-    penelope_wellerd:   new RaidType("penelope_wellerd",    "RS", "Penelope Wellerd", "Wellerd", "Wellerd RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    penelope_wellerd:   new RaidType("penelope_wellerd",    "RS", "Penelope Wellerd", "Wellerd", "Wellerd RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000),
     
-    
+    h8:                 new RaidType("h8",                  "RS", "H8", "H8", "H8 RS",                                24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+
 };
 
 
