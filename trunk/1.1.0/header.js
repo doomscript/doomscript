@@ -330,8 +330,9 @@ Added Zone 19 Raids: Bethany, Vunlac, R. Dule, Master Hao, and Noir (II)
 Tweaked chat icons
 Attempted critical Chrome 27 fix
 
-2013.??.?? - 1.1.24
+2013.06.18 - 1.1.24
 Added H8 RS
+Fixed Critical bug from Kong Change
 
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu

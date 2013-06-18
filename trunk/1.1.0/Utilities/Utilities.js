@@ -534,43 +534,76 @@
 		};
 		
 		
-		// Obtains the iframe_options from the game page
-		DC_LoaTS_Helper.getIFrameOptions = function() {
-			try
-			{
-				// Regex to locate the iframe properties as defined by Kong
-				var reg = new RegExp(/var iframe_options = ([^\x3B]+)/g);
-				
-				// If Kong has defined the properties we need to scrape from			
-				if (typeof activateGame !== "undefined")
-				{
-					// Attempt to find the properties we need
-					var match = reg.exec(activateGame); 
-					
-					// If we have the iframe options
-					if (match != null)
-					{							
-						// Parse and return the existing iframe options
-						return eval('('+match[1]+')');
-						
-					}
-				}
-			}
-			catch (ex) {
-				console.error("Failed to parse iframe_options.", ex);
-				return {};
-			}
-		};
+        // Obtains the iframe_options from the game page
+        DC_LoaTS_Helper.getIFrameOptions = function() {
+            try
+            {
+                // Regex to locate the iframe properties as defined by Kong
+                var reg = new RegExp(/var iframe_options = ([^\x3B]+)/g);
+                
+                // If Kong has defined the properties we need to scrape from            
+                if (typeof activateGame !== "undefined")
+                {
+                    // Attempt to find the properties we need
+                    var match = reg.exec(activateGame); 
+                    
+                    // If we have the iframe options
+                    if (match != null)
+                    {                           
+                        // Parse and return the existing iframe options
+                        return eval('('+match[1]+')');
+                        
+                    }
+                }
+            }
+            catch (ex) {
+                console.error("Failed to parse iframe_options.", ex);
+                return {};
+            }
+        };
+        
+        
+        // Obtains the GameIframe from the game page
+        DC_LoaTS_Helper.getGameIframe = function() {
+            try
+            {
+                // Regex to locate the iframe properties as defined by Kong
+                var reg = new RegExp(/(new GameIframe\(.*?\)).createGameIframeElement\(\);/g);
+                
+                // If Kong has defined the properties we need to scrape from            
+                if (typeof activateGame !== "undefined")
+                {
+                    // Attempt to find the properties we need
+                    var match = reg.exec(activateGame); 
+                    
+                    // If we have the iframe options
+                    if (match != null)
+                    {
+                        // Needed for the creation of GameIframe
+                        var urlOptions = '';
+                        
+                        // Parse and return the existing iframe options
+                        return eval(match[1]);
+                    }
+                }
+            }
+            catch (ex) {
+                console.error("Failed to parse GameIframe.", ex);
+                return {};
+            }
+        };
+        
+        
 		
 		// Load raid without refreshing page
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		// callback should be a function that takes two parameters, oldState and newState
-		DC_LoaTS_Helper.loadRaid = function(raidParam, iframe_options, loadRaidsInBackground, callback)
+		DC_LoaTS_Helper.loadRaid = function(raidParam, gameIframe, loadRaidsInBackground, callback)
 		{
 			var start = new Date()/1;
 			
 			// Gather the info we need to load a raid, either from params or utility methods
-			iframe_options = iframe_options || DC_LoaTS_Helper.getIFrameOptions();
+			gameIframe = gameIframe || DC_LoaTS_Helper.getGameIframe();
 			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
 			
 			try
@@ -590,13 +623,9 @@
 				// If the link is valid
 				if (typeof raidLink !== "undefined" && raidLink.isValid())
 				{
-					// Set necessary iframe options
-					iframe_options['kv_action_type'] = 'raidhelp';
-					iframe_options['kv_difficulty'] = raidLink.difficulty;
-					iframe_options['kv_hash'] = raidLink.hash;
-					iframe_options['kv_raid_boss'] = raidLink.raidTypeId;
-					iframe_options['kv_raid_id'] = raidLink.id;
-
+					// Set necessary gameIframe options
+				    gameIframe.urlOptions = raidLink;
+				    var iframe_options = gameIframe.iframeOptions();
 					
 					if (loadRaidsInBackground)
 					{
@@ -615,12 +644,8 @@
 					}
 					else	
 					{
-						// Destroy the old iframe and replace with blank one
-						$('gameiframe').replace(new Element('iframe', {"id":"gameiframe","name":"gameiframe","style":"border:none;position:relative;z-index:1;","scrolling":"auto","border":0,"frameborder":0,"width":760,"height":700,"class":"dont_hide"}));
-						
-						// Set location of new game window
-						$('gameiframe').contentWindow.location.replace(DC_LoaTS_Properties.kongLoaTSURL + "?" + Object.toQueryString(iframe_options));
-						
+					    $("gameiframe").contentWindow.location.replace(gameIframe.getGameIframeUrl());
+					    
 						// Mark link as visited
 						var currentState = RaidManager.fetchState(raidLink);
 						var newState = currentState;
@@ -869,7 +894,7 @@
 			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
 			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 200);
 			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
-			var iframe_options = DC_LoaTS_Helper.getIFrameOptions();
+			var gameIframe = DC_LoaTS_Helper.getGameIframe();
 
 			// Create function closure to be called repeatedly
 			var autoLoader = function __autoload()
@@ -881,7 +906,7 @@
 					autoLoadCounter.attempted++;
 					
 					// Load the next raid, capture the visitation marking
-					DC_LoaTS_Helper.loadRaid(raidLinks.pop(), iframe_options, lrib, 
+					DC_LoaTS_Helper.loadRaid(raidLinks.pop(), gameIframe, lrib, 
 						function(oldState, newState){
 							if (RaidManager.STATE.equals(newState, RaidManager.STATE.IGNORED)) {
 								autoLoadCounter.invalid++;
