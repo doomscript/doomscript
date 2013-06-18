@@ -557,6 +557,17 @@
 			{
 				// All a link needs to be valid is an id and a hash
 				return typeof this.id != "undefined" && typeof this.hash != "undefined" && this.id != "" && this.hash != "";
+			},
+			
+			// Necessary for reloading the iFrame
+			toQueryParams: function() {
+			    return {
+			        kv_action_type: "raidhelp", 
+			        kv_raid_boss: this.raidTypeId, 
+			        kv_difficulty: this.difficulty, 
+			        kv_raid_id: this.id, 
+			        kv_hash: this.hash
+			    };
 			}
 			
 		});
