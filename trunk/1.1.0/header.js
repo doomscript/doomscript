@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.24
+// @version        1.1.25
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -334,6 +334,12 @@ Attempted critical Chrome 27 fix
 Added H8 RS
 Fixed Critical bug from Kong Change
 
+2013.06.18 - 1.1.25
+Added Inventor RS & WR
+Added Sweet and Jalfreezi alliance raids
+Changed defaults
+
+
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
 */
@@ -345,7 +351,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.24",
+    	version: "1.1.25",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
