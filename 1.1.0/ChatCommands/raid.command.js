@@ -2,7 +2,7 @@
 			{
 				commandName: "raid",
 				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis", "rai", "fs", "os"],
-				parsingClass: RaidMultiFilter,
+				parsingClass: RaidFilter,
 				
 				// Doesn't use all the filter params
 				paramText: "[raidName] [raidDifficulty]",
@@ -10,53 +10,45 @@
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {success: true};
-					
-					// Run through each filter, they can be handled totally uniquely
-					for (var i = 0; i < parser.filters.length; i++)
+					var ret = {success: true},
+					    filter = parser;
+				
+					// If this was a valid filter
+					if (filter.isValid())
 					{
-						var filter = parser.filters[i];
+						// Find the matching raid types
+						var matchedTypes = DC_LoaTS_Helper.getRaidTypes(filter);
 						
-						// If this was a valid filter
-						if (filter.isValid())
+						// If we matched some raid types
+						if (matchedTypes.length > 0)
 						{
-							// Find the matching raid types
-							var matchedTypes = DC_LoaTS_Helper.getRaidTypes(filter);
-							
-							// If we matched some raid types
-							if (matchedTypes.length > 0)
+							// Iterate over all the matched raid types
+							for (var j = 0; j < matchedTypes.length; j++)
 							{
-								// Iterate over all the matched raid types
-								for (var j = 0; j < matchedTypes.length; j++)
-								{
-									// Grab this raid
-									var raid = matchedTypes[j];
-									
-									// Have the raid bot tell them 
-									deck.activeDialogue().raidBotMessage(raid.getVerboseText(filter.difficulty));
-								}
+								// Grab this raid
+								var raid = matchedTypes[j];
 								
-								ret.success = ret.success && true;
-							}
-							// If we didn't match a single raid
-							else
-							{
-								ret.success = ret.success && true;
-								ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.toString() + "</code>";
+								// Have the raid bot tell them 
+								deck.activeDialogue().raidBotMessage(raid.getVerboseText(filter.difficulty));
 							}
 							
+							ret.success = ret.success && true;
 						}
+						// If we didn't match a single raid
 						else
 						{
-							ret.success = false;
-							ret.statusMessage = (i > 0?"\n":"") + "Did not understand filter: <code>" + filter.filterText + "</code>";
+							ret.success = ret.success && true;
+							ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.toString() + "</code>";
 						}
+						
 					}
 					
 					return ret;
 				},
 				getOptions: function()
 				{
+				    console.log("Raid Info: ", this, this.parser);
+				    
 					var commandOptions = {					
 						initialText: {
 							text: "Raid Info for: " + this.parser.name,

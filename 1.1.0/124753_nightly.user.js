@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.24
+// @version        1.1.25
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -334,6 +334,12 @@ Attempted critical Chrome 27 fix
 Added H8 RS
 Fixed Critical bug from Kong Change
 
+2013.06.18 - 1.1.25
+Added Inventor RS & WR
+Added Sweet and Jalfreezi alliance raids
+Changed defaults
+
+
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
 */
@@ -345,7 +351,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.24",
+    	version: "1.1.25",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -5434,7 +5440,7 @@ function main()
 					var rightClickOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-RightClickVisitedInput",
 									"boolean", 
-									DC_LoaTS_Helper.getPref(me.rightClickVisitedKey), 
+									DC_LoaTS_Helper.getPref(me.rightClickVisitedKey, true), 
 									"Right-click should mark raids visited.", 
 									"If checked, right clicking a link will mark it visited", 
 									{
@@ -5449,7 +5455,7 @@ function main()
 					var ignoreInvalidOption = me.createSimpleOptionHTML(
 							"PreferencesMenu-IgnoreInvalidCommandsInput",
 							"boolean", 
-							DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey), 
+							DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey, true), 
 							"Ignore invalid commands.", 
 							"If checked, any command that is not a valid command will be ignored", 
 							{
@@ -5482,7 +5488,7 @@ function main()
 					var loadBackgroundOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
-									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey), 
+									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey, true), 
 									"Load Raids in Background (Skips the Play Now screen when loading raids)", 
 									"If checked, raids won't load in the game area.", 
 									{
@@ -5497,9 +5503,9 @@ function main()
 					var loadRaidsInBackgroundDelayOption = me.createSimpleOptionHTML(
 							"PreferencesMenu-LoadRaidsInBackgroundDelayInput",
 							"text", 
-							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 200), 
+							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 50), 
 							"ms. Time Between Loading Raids (Only applicable if Load Raids in Background is enabled)",
-							"Default = 200; No delay = 0; Half a second = 500.",
+							"Default = 50; No delay = 0; Half a second = 500.",
 							{
 								size: 4,
 								maxlength: 4,
@@ -6352,7 +6358,46 @@ function main()
 					return this.urlPattern.replace("%searchString%",searchInput);
 				}
 			}
-		);		RaidCommand.create( 
+		);        RaidCommand.create( 
+            {
+                commandName: "konginfo",
+                aliases: [],
+                doNotEnumerateInHelp: true, // Don't list this in the help
+               // No parsing needed
+                /*parsingClass: ,*/
+                handler: function(deck, parser, params, text, context)
+                {
+                    // Declare ret object
+                    var ret = {success: true};
+                    
+                    ret.statusMessage = "Kong ID: " + active_user.id() + "\n";
+                    ret.statusMessage = "Kong Hash: " + active_user.gameAuthToken();
+
+                    return ret;
+                },
+                
+                getOptions: function()
+                {
+                    var commandOptions = {
+                        initialText: {
+                            text: "Get important info about your Kong game."
+                        }
+                    };
+                    
+                    return commandOptions;
+                },
+                
+                buildHelpText: function()
+                {
+                    var helpText = "<b>Raid Command:</b> <code>/konginfo</code>\n";
+                    helpText += "Displays important Kong info.\n";
+                    
+                    return helpText;
+                }
+            }
+        );
+        
+		RaidCommand.create( 
 			{
 				commandName: "linkstate",
 				aliases: ["setcachestate", "setstate"],
@@ -6935,7 +6980,7 @@ RaidCommand
 			{
 				commandName: "raid",
 				aliases: ["raids", "radi", "radu", "raud", "radus", "rauds", "radis", "rai", "fs", "os"],
-				parsingClass: RaidMultiFilter,
+				parsingClass: RaidFilter,
 				
 				// Doesn't use all the filter params
 				paramText: "[raidName] [raidDifficulty]",
@@ -6943,53 +6988,45 @@ RaidCommand
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {success: true};
-					
-					// Run through each filter, they can be handled totally uniquely
-					for (var i = 0; i < parser.filters.length; i++)
+					var ret = {success: true},
+					    filter = parser;
+				
+					// If this was a valid filter
+					if (filter.isValid())
 					{
-						var filter = parser.filters[i];
+						// Find the matching raid types
+						var matchedTypes = DC_LoaTS_Helper.getRaidTypes(filter);
 						
-						// If this was a valid filter
-						if (filter.isValid())
+						// If we matched some raid types
+						if (matchedTypes.length > 0)
 						{
-							// Find the matching raid types
-							var matchedTypes = DC_LoaTS_Helper.getRaidTypes(filter);
-							
-							// If we matched some raid types
-							if (matchedTypes.length > 0)
+							// Iterate over all the matched raid types
+							for (var j = 0; j < matchedTypes.length; j++)
 							{
-								// Iterate over all the matched raid types
-								for (var j = 0; j < matchedTypes.length; j++)
-								{
-									// Grab this raid
-									var raid = matchedTypes[j];
-									
-									// Have the raid bot tell them 
-									deck.activeDialogue().raidBotMessage(raid.getVerboseText(filter.difficulty));
-								}
+								// Grab this raid
+								var raid = matchedTypes[j];
 								
-								ret.success = ret.success && true;
-							}
-							// If we didn't match a single raid
-							else
-							{
-								ret.success = ret.success && true;
-								ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.toString() + "</code>";
+								// Have the raid bot tell them 
+								deck.activeDialogue().raidBotMessage(raid.getVerboseText(filter.difficulty));
 							}
 							
+							ret.success = ret.success && true;
 						}
+						// If we didn't match a single raid
 						else
 						{
-							ret.success = false;
-							ret.statusMessage = (i > 0?"\n":"") + "Did not understand filter: <code>" + filter.filterText + "</code>";
+							ret.success = ret.success && true;
+							ret.statusMessage = (i > 0?"\n":"") + "Could not locate any raids matching <code>" + filter.toString() + "</code>";
 						}
+						
 					}
 					
 					return ret;
 				},
 				getOptions: function()
 				{
+				    console.log("Raid Info: ", this, this.parser);
+				    
 					var commandOptions = {					
 						initialText: {
 							text: "Raid Info for: " + this.parser.name,
@@ -7824,7 +7861,7 @@ RaidCommand
 				{
 					var localDate = new Date();
 					var serverDate =  new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60 * 1000);
-					return serverDate.toLocaleString().substring(0,25) + "GMT+0000 (UTC)";
+					return serverDate.toLocaleString().substring(0,25) + " GMT+0000 (UTC)";
 				}
 			}
 		);
@@ -8271,6 +8308,7 @@ DC_LoaTS_Helper.raids =
     kristy_love:        new RaidType("kristy_love",         "AX", "Kristy Love", "Kristy", "Love",                    84,  100, "H", [450000000, 585000000, 720000000, 900000000]),
     gedrocht:           new RaidType("gedrocht",            "AX", "Gedrocht", "Gedrocht", "Gedrocht",                 84,  100, "H", [500000000, 650000000, 800000000,1000000000]),
     nutcracker_sweet:   new RaidType("nutcracker_sweet",    "AX", "Nutcracker Sweet", "Sweet", "Sweet",               84,  100, "H", [750000000, 1000000000, 1500000000, 3000000000]),
+    crazy_jalfrezi:     new RaidType("crazy_jalfrezi",     "AX", "The Crazy Jalfrezi", "Jalfrezi", "Freezi",         84,  100, "H", [1000000000,1250000000,2000000000,4000000000]),
     
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
@@ -8303,6 +8341,8 @@ DC_LoaTS_Helper.raids =
 
     schism:             new RaidType("schism",              "WR", "Schism", "Schism", "Schism WR",                   120,  90000, "SEH", "Infinite", "N/A",  50000000000),
 
+    inventors_revenge:  new RaidType("inventors_revenge",   "WR", "Inventor's Revenge", "Revenge", "Revenge WR",      72,  90000, "SEH", "Infinite", "N/A",  75000000000),
+
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
@@ -8312,7 +8352,11 @@ DC_LoaTS_Helper.raids =
     
     penelope_wellerd:   new RaidType("penelope_wellerd",    "RS", "Penelope Wellerd", "Wellerd", "Wellerd RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000),
     
-    h8:                 new RaidType("h8",                  "RS", "H8", "H8", "H8 RS",                                24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    h8:                 new RaidType("h8",                  "RS", "H8", "H8", "H8 RS",                                24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+
+    inventors_scheme:   new RaidType("inventors_scheme",    "RS", "Inventor's Scheme", "Scheme", "Scheme RS",         24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+
+    predator_moon:      new RaidType("predator_moon",       "RS", "Predator Moon", "Predator", "Moon RS",             24,  90000, "SEH", "Infinite", "N/A",   2000000000)
 
 };
 
@@ -9972,7 +10016,10 @@ DC_LoaTS_Helper.raids =
 					var message;
 					if (response.status === 200) {
 						var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
-						eval(response.responseText);
+						try {
+						    eval(response.responseText);
+						}
+						catch (ex){}
 						var WRData = DC_LoaTS_Helper.worldRaidInfo;
 						
 						if (!oldWRData && WRData) {

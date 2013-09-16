@@ -1653,7 +1653,10 @@
 					var message;
 					if (response.status === 200) {
 						var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
-						eval(response.responseText);
+						try {
+						    eval(response.responseText);
+						}
+						catch (ex){}
 						var WRData = DC_LoaTS_Helper.worldRaidInfo;
 						
 						if (!oldWRData && WRData) {

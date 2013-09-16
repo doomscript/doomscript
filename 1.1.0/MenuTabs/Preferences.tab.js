@@ -24,7 +24,7 @@
 					var rightClickOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-RightClickVisitedInput",
 									"boolean", 
-									DC_LoaTS_Helper.getPref(me.rightClickVisitedKey), 
+									DC_LoaTS_Helper.getPref(me.rightClickVisitedKey, true), 
 									"Right-click should mark raids visited.", 
 									"If checked, right clicking a link will mark it visited", 
 									{
@@ -39,7 +39,7 @@
 					var ignoreInvalidOption = me.createSimpleOptionHTML(
 							"PreferencesMenu-IgnoreInvalidCommandsInput",
 							"boolean", 
-							DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey), 
+							DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey, true), 
 							"Ignore invalid commands.", 
 							"If checked, any command that is not a valid command will be ignored", 
 							{
@@ -72,7 +72,7 @@
 					var loadBackgroundOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
-									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey), 
+									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey, true), 
 									"Load Raids in Background (Skips the Play Now screen when loading raids)", 
 									"If checked, raids won't load in the game area.", 
 									{
@@ -87,9 +87,9 @@
 					var loadRaidsInBackgroundDelayOption = me.createSimpleOptionHTML(
 							"PreferencesMenu-LoadRaidsInBackgroundDelayInput",
 							"text", 
-							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 200), 
+							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 50), 
 							"ms. Time Between Loading Raids (Only applicable if Load Raids in Background is enabled)",
-							"Default = 200; No delay = 0; Half a second = 500.",
+							"Default = 50; No delay = 0; Half a second = 500.",
 							{
 								size: 4,
 								maxlength: 4,

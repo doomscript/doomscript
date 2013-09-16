@@ -125,6 +125,7 @@ DC_LoaTS_Helper.raids =
     kristy_love:        new RaidType("kristy_love",         "AX", "Kristy Love", "Kristy", "Love",                    84,  100, "H", [450000000, 585000000, 720000000, 900000000]),
     gedrocht:           new RaidType("gedrocht",            "AX", "Gedrocht", "Gedrocht", "Gedrocht",                 84,  100, "H", [500000000, 650000000, 800000000,1000000000]),
     nutcracker_sweet:   new RaidType("nutcracker_sweet",    "AX", "Nutcracker Sweet", "Sweet", "Sweet",               84,  100, "H", [750000000, 1000000000, 1500000000, 3000000000]),
+    crazy_jalfrezi:     new RaidType("crazy_jalfrezi",     "AX", "The Crazy Jalfrezi", "Jalfrezi", "Freezi",         84,  100, "H", [1000000000,1250000000,2000000000,4000000000]),
     
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
@@ -157,6 +158,8 @@ DC_LoaTS_Helper.raids =
 
     schism:             new RaidType("schism",              "WR", "Schism", "Schism", "Schism WR",                   120,  90000, "SEH", "Infinite", "N/A",  50000000000),
 
+    inventors_revenge:  new RaidType("inventors_revenge",   "WR", "Inventor's Revenge", "Revenge", "Revenge WR",      72,  90000, "SEH", "Infinite", "N/A",  75000000000),
+
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
@@ -166,7 +169,11 @@ DC_LoaTS_Helper.raids =
     
     penelope_wellerd:   new RaidType("penelope_wellerd",    "RS", "Penelope Wellerd", "Wellerd", "Wellerd RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000),
     
-    h8:                 new RaidType("h8",                  "RS", "H8", "H8", "H8 RS",                                24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    h8:                 new RaidType("h8",                  "RS", "H8", "H8", "H8 RS",                                24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+
+    inventors_scheme:   new RaidType("inventors_scheme",    "RS", "Inventor's Scheme", "Scheme", "Scheme RS",         24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+
+    predator_moon:      new RaidType("predator_moon",       "RS", "Predator Moon", "Predator", "Moon RS",             24,  90000, "SEH", "Infinite", "N/A",   2000000000)
 
 };
 
