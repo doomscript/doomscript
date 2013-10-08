@@ -27,19 +27,22 @@
 				/*public static STATE*/ 
 				valueOf: function(stateParam)
 				{
+                    var stateKey;
 					// Set up the cache for ids, if it's not already set up
 					if (!RaidManager.STATE.cacheById) {
-						RaidManager.STATE.cacheById = {};
-						for (var stateKey in this)
-						{
-							var item = this[stateKey];
-							// Ignore functions. Check for the state.id or state.text to equal the passed in value
-							if (item && item !== "function")
-							{
-								RaidManager.STATE.cacheById[item.id] = item;
-							}
-						}
-					}
+                        RaidManager.STATE.cacheById = {};
+                        for (stateKey in this)
+                        {
+                            if (this.hasOwnProperty(stateKey)) {
+                                var item = this[stateKey];
+                                // Ignore functions. Check for the state.id or state.text to equal the passed in value
+                                if (item && item !== "function")
+                                {
+                                    RaidManager.STATE.cacheById[item.id] = item;
+                                }
+                            }
+                        }
+                    }
 					
 					// State we found
 					var state;
@@ -57,21 +60,23 @@
 					}
 					
 					// Iterate over all valid states
-					for (var stateKey in this)
+					for (stateKey in this)
 					{
-						// Ignore functions. Check for the state.id or state.text to equal the passed in value
-						if (this[stateKey] && typeof this[stateKey] !== "function"
-							&& (this[stateKey].id == stateParam || this[stateKey].text == stateParam)
-						   )
-						{
-							// If we found a state that matches, capture it and break the loop
-							state = this[stateKey];
-							break;
-						}
-						else if (typeof this[stateKey] === "undefined")
-						{
-							console.warn("Invalid State:", stateKey);
-						}
+                        if (this.hasOwnProperty(stateKey)) {
+                            // Ignore functions. Check for the state.id or state.text to equal the passed in value
+                            if (this[stateKey] && typeof this[stateKey] !== "function"
+                                && (this[stateKey].id == stateParam || this[stateKey].text == stateParam)
+                                )
+                            {
+                                // If we found a state that matches, capture it and break the loop
+                                state = this[stateKey];
+                                break;
+                            }
+                            else if (typeof this[stateKey] === "undefined")
+                            {
+                                console.warn("Invalid State:", stateKey);
+                            }
+                        }
 					}
 					
 					// Return the state we found, or undefined if we didn't find one
@@ -134,7 +139,7 @@
 					}
 					
 					console.warn("rawRaidStorage was not able to be parsed. For debugging purposes, it will now been quarantined, and the normal raid link storage will be cleared.");
-					console.warn(ex)
+					console.warn(ex);
 					
 					// Quarantine the current raid storage
 					GM_setValue(DC_LoaTS_Properties.storage.raidStorage + DC_LoaTS_Properties.storage.quarantine, rawRaidStorage);
@@ -151,18 +156,20 @@
 				// Iterate over all stored data
 				for (var key in RaidManager.raidStorage)
 				{
-					// Grab this raidData item
-					var raidData = RaidManager.raidStorage[key];
-					
-					// The raidData item is actually RaidLink, but storage doesn't retain methods. Add back in the methods
-					Object.extend(raidData.raidLink, RaidLink.prototype);
-					
-					// Clear items that have been stored for more than their total raid length
-					if ((new Date()/1) - raidData.firstSeen > raidData.raidLink.getRaid().time * 60*60*1000)
-					{
-						delete RaidManager.raidStorage[key];
-						clearCount++;
-					}
+                    if (RaidManager.raidStorage.hasOwnProperty(key)) {
+                        // Grab this raidData item
+                        var raidData = RaidManager.raidStorage[key];
+
+                        // The raidData item is actually RaidLink, but storage doesn't retain methods. Add back in the methods
+                        Object.extend(raidData.raidLink, RaidLink.prototype);
+
+                        // Clear items that have been stored for more than their total raid length
+                        if ((new Date()/1) - raidData.firstSeen > raidData.raidLink.getRaid().time * 60*60*1000)
+                        {
+                            delete RaidManager.raidStorage[key];
+                            clearCount++;
+                        }
+                    }
 				}
 
 				// If anything was cleared, log it for posterity
@@ -196,21 +203,25 @@
 					// Iterate over every preference type
 					for (var key in RaidManager.raidPrefs)
 					{
-						var pref = RaidManager.raidPrefs[key];
-						
-						// Iterate over every variable to change in that preference.
-						for (var variable in pref)
-						{
-							try
-							{
-								eval(variable + "=" + pref[variable]);
-							}
-							catch (ex)
-							{
-								console.warn("Could not update `" + variable + "` to be \"" + pref[variable] + "\".")
-								console.warn(ex);
-							}
-						}
+                        if (RaidManager.raidPrefs.hasOwnProperty(key)) {
+                            var pref = RaidManager.raidPrefs[key];
+
+                            // Iterate over every variable to change in that preference.
+                            for (var variable in pref)
+                            {
+                                if (pref.hasOwnProperty(variable)) {
+                                    try
+                                    {
+                                        eval(variable + "=" + pref[variable]);
+                                    }
+                                    catch (ex)
+                                    {
+                                        console.warn("Could not update `" + variable + "` to be \"" + pref[variable] + "\".");
+                                        console.warn(ex);
+                                    }
+                                }
+                            }
+                        }
 					}
 				}
 				
@@ -344,13 +355,7 @@
 						// Helps convert old states to new ones
 						raidData.stateId = currentState.id;
 					}
-					
-					// If we should report dead raids and this one is dead and it hasn't been reported yet
-					if (DC_LoaTS_Helper.getPref("ReportDeadRaids", true) && RaidManager.STATE.equals(state, RaidManager.STATE.COMPLETED) && !raidData.reported) {
-						raidData.reported = true;
-						DC_LoaTS_Helper.reportDead(raidLink);
-					}
-					
+
 					// Update the lastSeen time of the link
 					raidData.lastSeen = new Date()/1;
 					
@@ -364,11 +369,13 @@
 					// Gotta have the methods attached to the objects
 					for (var key in hardRaidStorage)
 					{
-						// If we're missing methods, add them
-						if (typeof hardRaidStorage[key].raidLink.getRaid != "function")
-						{
-							Object.extend(hardRaidStorage[key].raidLink, RaidLink.prototype);		
-						}
+                        if (hardRaidStorage.hasOwnProperty(key)) {
+                            // If we're missing methods, add them
+                            if (typeof hardRaidStorage[key].raidLink.getRaid != "function")
+                            {
+                                Object.extend(hardRaidStorage[key].raidLink, RaidLink.prototype);
+                            }
+                        }
 					}
 					Timer.stop("store > extending raid links");
 					
@@ -495,12 +502,6 @@
 												
 						// Update the lastSeen time of the link
 						raidData.lastSeen = new Date()/1;
-						
-						// If we should report dead raids and this one is dead and it hasn't been reported yet
-						if (DC_LoaTS_Helper.getPref("ReportDeadRaids", true) && RaidManager.STATE.equals(newState, RaidManager.STATE.COMPLETED) && !raidData.reported) {
-							raidData.reported = true;
-							DC_LoaTS_Helper.reportDead(raidLink);
-						}
 					}
 				} // End for iterating over the links
 				
@@ -514,11 +515,13 @@
 				// Must have the methods attached to the objects
 				for (var key in hardRaidStorage)
 				{
-					// If we're missing methods, add them
-					if (typeof hardRaidStorage[key].raidLink.getRaid !== "function")
-					{
-						Object.extend(hardRaidStorage[key].raidLink, RaidLink.prototype);		
-					}
+                    if (hardRaidStorage.hasOwnProperty(key)) {
+                        // If we're missing methods, add them
+                        if (typeof hardRaidStorage[key].raidLink.getRaid !== "function")
+                        {
+                            Object.extend(hardRaidStorage[key].raidLink, RaidLink.prototype);
+                        }
+                    }
 				}
 				Timer.stop("store > extending raid links");
 				
@@ -574,21 +577,22 @@
 			fetchAll: function()
 			{
 				// Holder for raid links
-				var raidLinks = new Array();
+				var raidLinks = [];
 				
 				// For everything in storage
 				for (var key in RaidManager.raidStorage)
 				{
-					// Pull the raid data
-					var raidData = RaidManager.raidStorage[key];
-					
-					// It should exist, but just in case
-					if (typeof raidData != "undefined")
-					{
-						// Collect the links into the array
-						raidLinks.push(raidData.raidLink);
-					}
-					
+                    if (RaidManager.raidStorage.hasOwnProperty(key)) {
+                        // Pull the raid data
+                        var raidData = RaidManager.raidStorage[key];
+
+                        // It should exist, but just in case
+                        if (typeof raidData != "undefined")
+                        {
+                            // Collect the links into the array
+                            raidLinks.push(raidData.raidLink);
+                        }
+                    }
 				}
 				
 				// Return all the links
@@ -625,6 +629,7 @@
 			/*public static Array*/
 			fetchByFilter: function(filterParam)
 			{
+                var raidLinks;
 				Timer.start("fetchByFilter");
 				try 
 				{
@@ -645,14 +650,13 @@
 					else
 					{
 						console.warn("Could not fetch by filter " + filterParam + ". Parameter must be a String or RaidFilter");
-						return;
 					}
 					
 					// If the command makes a valid filter
-					if (raidFilter.isValid())
+					if (raidFilter && raidFilter.isValid())
 					{
 						// Collect all matching raid links
-						var raidLinks = new Array();
+						raidLinks = [];
 						
 						// If there was no name or difficulty
 						if (raidFilter.isEmpty())
@@ -678,95 +682,94 @@
 							// Iterate over all raids
 							for (var key in raidStorage)
 							{
-								// Get the raid data from storage
-								var raidData = raidStorage[key];
-								
-								// Get the current raidLink
-								var raidLink = raidData.raidLink;
-								
-								// Get the state of the link
-								var currentState;
-								if (typeof raidData.stateId != "undefined")
-								{
-									currentState = RaidManager.STATE.valueOf(raidData.stateId);
-								}
-								else if (typeof raidData.state != "undefined" && typeof raidData.state.text != "undefined")
-								{
-									currentState = RaidManager.STATE.valueOf(raidData.state.text);
-								}
-								
-								if (typeof currentState == "undefined")
-								{
-									console.warn("Could not locate a state for " + raidLink.getSimpleText() + ". This may cause unexpected matching behavior.");
-								}
-								
-								try
-								{
-									// If this link matches the filter
-									if (raidFilter.matches(
-										{
-											age: commandStartTime - raidData.firstSeen,
-											difficulty: raidLink.difficulty,
-											fs: raidLink.getRaid().getFairShare(raidLink.difficulty),
-											os: raidLink.getRaid().getOptimalShare(raidLink.difficulty),
-											name: raidLink.getRaid().getSearchableName(),
-											state: currentState,
-											count: raidCount,
-											size: raidLink.getRaid().size,
-											zone: raidLink.getRaid().zone
-										}
-										))
-									{
-										//TODO: Improved Sorting
-										// If we don't have a defined page, or we're on the right page, or we don't care about the count
-										if (typeof raidFilter.page == "undefined" || resultsPage == raidFilter.page || typeof raidFilter.count == "undefined")
-										{
-											// Put seen links at the end
-											if (RaidManager.STATE.equals(currentState, RaidManager.STATE.SEEN))
-											{
-												raidLinks.push(raidLink);
-											}
-											// Put visited and other links up top
-											else
-											{
-												raidLinks.unshift(raidLink);
-											}
-										}
-										
-										// Keep track of how many raids match the query so we can deal with pagination
-										raidCount++;
-										if (raidFilter.count != "undefined" && raidCount % raidFilter.count == 0) {resultsPage++;raidCount=0;}
-										
-										// Once we've collected enough links, bail
-										// If count is not set, we'll only break when we've iterated over all raids
-										if (raidLinks.length == raidFilter.count)
-										{
-											break;
-										}
-									}
-								}
-								catch(ex)
-								{
-									console.warn(ex);
-									console.warn("Failure while trying to match ");
-									console.warn(
-										{
-											age: commandStartTime - raidData.firstSeen,
-											difficulty: raidLink.difficulty,
-											fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
-											name: raidLink.getRaid().getSearchableName(),
-											state: currentState,
-											count: raidCount
-										}
-									);
-								}
+                                if (raidStorage.hasOwnProperty(key)) {
+                                    // Get the raid data from storage
+                                    var raidData = raidStorage[key];
+
+                                    // Get the current raidLink
+                                    var raidLink = raidData.raidLink;
+
+                                    // Get the state of the link
+                                    var currentState;
+                                    if (typeof raidData.stateId != "undefined")
+                                    {
+                                        currentState = RaidManager.STATE.valueOf(raidData.stateId);
+                                    }
+                                    else if (typeof raidData.state != "undefined" && typeof raidData.state.text != "undefined")
+                                    {
+                                        currentState = RaidManager.STATE.valueOf(raidData.state.text);
+                                    }
+
+                                    if (typeof currentState == "undefined")
+                                    {
+                                        console.warn("Could not locate a state for " + raidLink.getSimpleText() + ". This may cause unexpected matching behavior.");
+                                    }
+
+                                    try
+                                    {
+                                        // If this link matches the filter
+                                        if (raidFilter.matches(
+                                            {
+                                                age: commandStartTime - raidData.firstSeen,
+                                                difficulty: raidLink.difficulty,
+                                                fs: raidLink.getRaid().getFairShare(raidLink.difficulty),
+                                                os: raidLink.getRaid().getOptimalShare(raidLink.difficulty),
+                                                name: raidLink.getRaid().getSearchableName(),
+                                                state: currentState,
+                                                count: raidCount,
+                                                size: raidLink.getRaid().size,
+                                                zone: raidLink.getRaid().zone
+                                            }
+                                        ))
+                                        {
+                                            //TODO: Improved Sorting
+                                            // If we don't have a defined page, or we're on the right page, or we don't care about the count
+                                            if (typeof raidFilter.page == "undefined" || resultsPage == raidFilter.page || typeof raidFilter.count == "undefined")
+                                            {
+                                                // Put seen links at the end
+                                                if (RaidManager.STATE.equals(currentState, RaidManager.STATE.SEEN))
+                                                {
+                                                    raidLinks.push(raidLink);
+                                                }
+                                                // Put visited and other links up top
+                                                else
+                                                {
+                                                    raidLinks.unshift(raidLink);
+                                                }
+                                            }
+
+                                            // Keep track of how many raids match the query so we can deal with pagination
+                                            raidCount++;
+                                            if (raidFilter.count != "undefined" && raidCount % raidFilter.count == 0) {resultsPage++;raidCount=0;}
+
+                                            // Once we've collected enough links, bail
+                                            // If count is not set, we'll only break when we've iterated over all raids
+                                            if (raidLinks.length == raidFilter.count)
+                                            {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    catch(ex)
+                                    {
+                                        console.warn(ex);
+                                        console.warn("Failure while trying to match ");
+                                        console.warn(
+                                            {
+                                                age: commandStartTime - raidData.firstSeen,
+                                                difficulty: raidLink.difficulty,
+                                                fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+                                                name: raidLink.getRaid().getSearchableName(),
+                                                state: currentState,
+                                                count: raidCount
+                                            }
+                                        );
+                                    }
+                                }
 							}
 						}
 						
 						Timer.stop("fetchByFilter");
-	
-						// Return all found links
-						return raidLinks;
 					}
 				}
 				catch (ex)
@@ -776,7 +779,10 @@
 					console.warn(ex);
 				}
 				Timer.stop("fetchByFilter");
-			},
+
+                // Return all found links
+                return raidLinks;
+            },
 			
 			markByFilter: function(filter, state) {
 				Timer.start("markByFilter");
@@ -793,8 +799,7 @@
 				var raidCount = 0;
 				
 				// If the command makes a valid filter
-				if (filter.isValid())
-				{
+				if (filter.isValid()) {
 					// Get all raids
 					Timer.start("markByFilter > loading hardRaidStorage");
 					// Load up the storage object
@@ -803,85 +808,83 @@
 					
 					// Count of raids seen
 					var resultsPage = 1;
-					
-					// Start time of the run
-					var commandStartTime = (new Date() / 1);
-					
-					// Iterate over all raids
-					for (var key in raidStorage)
-					{
-						// Get the raid data from storage
-						var raidData = raidStorage[key];
-						
-						// Get the link from the data
-						var raidLink = raidData.raidLink;
-						
-						// Convert to RaidLink
-						Object.extend(raidLink, RaidLink.prototype);
-						
-						// Get the state of the link
-						var currentState;
-						if (typeof raidData.stateId != "undefined")
-						{
-							currentState = RaidManager.STATE.valueOf(raidData.stateId);
-						}
-						else if (typeof raidData.state != "undefined" && typeof raidData.state.text != "undefined")
-						{
-							currentState = RaidManager.STATE.valueOf(raidData.state.text);
-						}
-						
-						if (typeof currentState == "undefined")
-						{
-							console.warn("Could not locate a state for " + raidLink.getSimpleText() + ". This may cause unexpected matching behavior.");
-						}
-						
-						try
-						{
-							// If this link matches the filter
-							if (filter.matches(
-								{
-									age: commandStartTime - raidData.firstSeen,
-									difficulty: raidLink.difficulty,
-                                    fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
-                                    os:  raidLink.getRaid().getOptimalShare(raidLink.difficulty),
-									name: raidLink.getRaid().getSearchableName(),
-									state: currentState,
-									count: raidCount,
-									size: raidLink.getRaid().size,
-									zone: raidLink.getRaid().zone
-								}
-								))
-							{
-								raidData.stateId = state.id;
-								
-								// Keep track of how many raids match the query so we can deal with pagination
-								raidCount++;
-								if (filter.count != "undefined" && raidCount % filter.count == 0) {resultsPage++;raidCount=0;}
-								
-								// Once we've changed enough links, bail
-								// If count is not set, we'll only break when we've iterated over all raids
-								if (raidCount == filter.count)
-								{
-									break;
-								}
-							}
-						}
-						catch(ex)
-						{
-							console.warn(ex);
-							console.warn("Failure while trying to match ");
-							console.warn(
-								{
-									age: commandStartTime - raidData.firstSeen,
-									difficulty: raidLink.difficulty,
-									fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
-									name: raidLink.getRaid().getSearchableName(),
-									state: currentState,
-									count: raidCount
-								}
-							);
-						}
-					}
+
+                    // Start time of the run
+                    var commandStartTime = (new Date() / 1);
+
+                    // Iterate over all raids
+                    for (var key in raidStorage) {
+                        if (raidStorage.hasOwnProperty(key)) {
+
+                            // Get the raid data from storage
+                            var raidData = raidStorage[key];
+
+                            // Get the link from the data
+                            var raidLink = raidData.raidLink;
+
+                            // Convert to RaidLink
+                            Object.extend(raidLink, RaidLink.prototype);
+
+                            // Get the state of the link
+                            var currentState;
+                            if (typeof raidData.stateId !== "undefined") {
+                                currentState = RaidManager.STATE.valueOf(raidData.stateId);
+                            }
+                            else if (typeof raidData.state !== "undefined" && typeof raidData.state.text !== "undefined") {
+                                currentState = RaidManager.STATE.valueOf(raidData.state.text);
+                            }
+
+                            if (typeof currentState === "undefined") {
+                                console.warn("Could not locate a state for " + raidLink.getSimpleText() + ". This may cause unexpected matching behavior.");
+                            }
+
+                            try {
+                                // If this link matches the filter
+                                if (filter.matches(
+                                    {
+                                        age: commandStartTime - raidData.firstSeen,
+                                        difficulty: raidLink.difficulty,
+                                        fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+                                        os:  raidLink.getRaid().getOptimalShare(raidLink.difficulty),
+                                        name: raidLink.getRaid().getSearchableName(),
+                                        state: currentState,
+                                        count: raidCount,
+                                        size: raidLink.getRaid().size,
+                                        zone: raidLink.getRaid().zone
+                                    }
+                                ))
+                                {
+                                    raidData.stateId = state.id;
+
+                                    // Keep track of how many raids match the query so we can deal with pagination
+                                    raidCount++;
+                                    if (filter.count != "undefined" && raidCount % filter.count == 0) {resultsPage++;raidCount=0;}
+
+                                    // Once we've changed enough links, bail
+                                    // If count is not set, we'll only break when we've iterated over all raids
+                                    if (raidCount == filter.count)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            catch(ex)
+                            {
+                                console.warn(ex);
+                                console.warn("Failure while trying to match ");
+                                console.warn(
+                                    {
+                                        age: commandStartTime - raidData.firstSeen,
+                                        difficulty: raidLink.difficulty,
+                                        fs:  raidLink.getRaid().getFairShare(raidLink.difficulty),
+                                        name: raidLink.getRaid().getSearchableName(),
+                                        state: currentState,
+                                        count: raidCount
+                                    }
+                                );
+                            }
+                        }
+                    }
 					
 					Timer.start("markByFilter > storing hardRaidStorage");
 					// Store the storage data back into the browser storage
@@ -893,5 +896,5 @@
 				
 				return raidCount;
 			}
-		}
+		};
 
