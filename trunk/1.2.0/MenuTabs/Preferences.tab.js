@@ -12,7 +12,6 @@
 				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
 				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
-				reportDeadRaidsKey: "ReportDeadRaids",
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
 				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
 				
@@ -109,21 +108,6 @@
 							}
 					);
 					wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
-
-					var reportDeadRaidsOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-ReportDeadRaidsInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true), 
-							"Report Dead Raids to CConoly",
-							"When a raid is marked Complete (Dead or Timed Out), inform CConoly",
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.reportDeadRaidsKey, this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(reportDeadRaidsOption.wrapper);
 
 					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
 							"PreferencesMenu-UseQueryTimeDeltaInput",

@@ -2,8 +2,8 @@
         RaidCommand.create(
             {
                 commandName: "loadraidmonitor",
-                aliases: ["loadrm", "lrm", "raidmonitor", "rm", "loadraidmonitorraids", "loadrmraids"],
-                parsingClass: RaidFilter,
+                aliases: ["loadrm", "lrm", "raidmonitor", "rm", "loadrmraids", "lmr", "lrmalpha"],
+                parsingClass: RaidMultiFilter,
 
                 paramText: "[filter]",
 
@@ -11,7 +11,7 @@
                 {
                     var ret = {success: true};
                     DC_LoaTS_Helper.ajax({
-                        url: "http://getKongE.org/games/lots/raids?format=json&",
+                        url: RaidMonitorAPI.getRaidListUrl(),
                         onload: function(response) {
                             var message;
                             if (response.status === 200) {
@@ -30,7 +30,7 @@
                                             raids: []
                                         },
                                         alliance: {
-                                            header: "AAL Raids",
+                                            header: "Alliance Raids",
                                             key: "AllianceRaid",
                                             raids: []
                                         },
@@ -45,7 +45,7 @@
                                     for (i in raids) {
                                         if (!raids.hasOwnProperty(i)) continue;
                                         raid = raids[i];
-                                        raid.def = DC_LoaTS_Helper.raidDefs[raid.boss];
+                                        raid.def = DC_LoaTS_Helper.raids[raid.boss];
 
                                         if (!raid.def) {
                                             console.log("No def", i, raid);
@@ -62,7 +62,7 @@
                                         }
                                     }
 
-                                    var processBucket = function(bucket) {
+                                    var processBucket = function(bucket, markVisited) {
                                         var matchedRaids = [];
                                         for (i in bucket.raids) {
                                             if (!bucket.raids.hasOwnProperty(i)) continue;
@@ -78,7 +78,7 @@
                                                 var sdd = summonDateParts[0].split("-");
                                                 var sdt = summonDateParts[1].split(":");
 
-                                                var totalSecs = raid.def.duration*60*60;
+                                                var totalSecs = raid.def.time*60*60;
                                                 elapsedSecs = Math.ceil((now_utc - new Date(sdd[0], sdd[1]-1, sdd[2], sdt[0], sdt[1], sdt[2])) / 1000);
                                                 remainingSecs = totalSecs - elapsedSecs;
                                             }
@@ -97,6 +97,8 @@
                                             }
                                         }
 
+                                        holodeck.activeDialogue().raidBotMessage("Downloaded " + bucket.raids.length + " raids. Loading " + matchedRaids.length + " that matched <code>" + parser.toPrettyString() + "</code>...");
+
                                         var joinResults = {joined: 0, visited: 0, dead: 0, invalid: 0};
 
                                         function loadMatchedRaids() {
@@ -105,26 +107,31 @@
                                                 DC_LoaTS_Helper.ajax({
                                                     url: DC_LoaTS_Properties.joinRaidURL + "?kongregate_user_id=" + active_user.id() + "&kongregate_game_auth_token=" + active_user.gameAuthToken() + "&kv_raid_id=" + raid.raid_id + "&kv_hash=" + raid.hash,
                                                     onload: function(response) {
+                                                        var raidLink = new RaidLink(raid.raid_id, raid.hash, raid.difficulty, raid.boss);
                                                         var responseText = response.responseText;
                                                         if (responseText.indexOf("You have successfully joined the raid!") >= 0 || responseText.indexOf("You have successfully re-joined the raid!") >= 0)
                                                         {
                                                             // Joined
                                                             joinResults.joined++;
+                                                            RaidManager.store(raidLink, RaidManager.STATE.VISITED);
                                                         }
                                                         else if (responseText.indexOf("You are already a member of this raid!") >= 0)
                                                         {
                                                             // Already visited / rejoined
                                                             joinResults.visited++;
+                                                            RaidManager.store(raidLink, RaidManager.STATE.VISITED);
                                                         }
                                                         else if (responseText.indexOf("This raid is already completed!") >= 0)
                                                         {
                                                             // Raid is dead
                                                             joinResults.dead++;
+                                                            RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
                                                         }
                                                         else
                                                         {
                                                             // Invalid response (bad hash, wrong alliance, or otherwise broken link)
                                                             joinResults.invalid++;
+                                                            RaidManager.store(raidLink, RaidManager.STATE.IGNORED);
                                                         }
                                                         setTimeout(loadMatchedRaids, 10);
                                                     }
@@ -144,11 +151,17 @@
                                         loadMatchedRaids();
                                     };
 
-                                    processBucket(buckets.private);
-                                    processBucket(buckets.alliance);
 
-                                    // TODO: For now, don't worry about public raids
-                                    //processBucket(buckets.public);
+                                    if (buckets.private.raids.length) {
+                                        processBucket(buckets.private);
+                                    }
+
+                                    if (buckets.alliance.raids.length) {
+                                        processBucket(buckets.alliance);
+                                    }
+
+                                    // Always try to load public raids
+                                    processBucket(buckets.public, true);
                                 }
                             }
                             else if (response.status > 200 && response.status < 400) {
@@ -171,7 +184,7 @@
                 {
                     var commandOptions = {
                         initialText: {
-                            text: "Load RaidMonitor raids"
+                            text: "Load Raid Monitor raids"
                         }
                     };
 
@@ -180,9 +193,16 @@
 
                 buildHelpText: function()
                 {
-                    var helpText = "<b>Raid Command:</b> <code>/loadraidmonitor</code>\n";
+                    var helpText = "<b>Raid Command:</b> <code>/lrmalpha</code>\n";
+                    helpText += "TODO: Help text";
 
                     return helpText;
                 }
             }
         );
+
+        // Create a command factory for this command
+        var commandFactory = new RaidCommandFactory(DC_LoaTS_Helper.chatCommands.lrmalpha, "chat");
+
+        // Attach the command factory to the holodeck callback
+        holodeck.addChatCommand("lrmalpha", commandFactory.createAndExecuteCommand.bind(commandFactory));

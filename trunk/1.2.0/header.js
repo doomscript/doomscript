@@ -362,7 +362,9 @@ function main()
     	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
         raidDataURL: "http://getKongE.org/old/RaidData.js",
         raidHostURL: "http://getKongE.org/games/lots/raids",
+        cooldownsURL: "http://getKongE.org/games/lots/raids/cooldowns.php",
         donateURL: "http://getKongE.org/donate",
+
     	worldRaidDataURL: "http://getKongE.org/old/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",

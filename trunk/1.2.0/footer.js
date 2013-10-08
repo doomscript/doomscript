@@ -471,16 +471,148 @@
 				rulesText += "\twidth: 100%;\n";
 				rulesText += "\theight: 400px;\n";
 				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuCloseTabA {\n";
-				rulesText += "\tborder-radius: 100px;\n";
-				rulesText += "\twidth: 5px;\n";
-				rulesText += "\theight: 5px;\n";
-				rulesText += "\tcolor: #FFFFFF;\n";
-				rulesText += "\tbackground-color: #CCCCCC;\n";
-				rulesText += "}\n";
 
-				var head = document.getElementsByTagName('head')[0],
+
+        // Raid Monitor stylings
+        rulesText += "\n.RaidMonitor-Block {\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - size block
+        rulesText += "\n.RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tborder-top-right-radius: 25px;\n";
+        rulesText += "\tborder-bottom-right-radius: 25px;\n";
+        rulesText += "\twidth: 50px;\n";
+        rulesText += "\theight: 50px;\n";
+        rulesText += "\tcolor: transparent;\n";
+        rulesText += "\ttext-indent: 10px;\n";
+        rulesText += "\tborder: 1px solid #333333;\n";
+        rulesText += "\tbackground-repeat: no-repeat;\n";
+        rulesText += "\tbackground-position: bottom right;\n";
+        rulesText += "\t-moz-transition: width 1s ease-out, color 1s;\n";
+        rulesText += "\t-webkit-transition: width 1s, color 1s;\n";
+        rulesText += "\t-o-transition: width 1s, color 1s;\n";
+        rulesText += "}\n";
+
+
+
+        // Raid Monitor stylings - size block
+        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\twidth: 250px;\n";
+        rulesText += "\tcolor: #000000;\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - small
+        rulesText += "\n.RaidMonitor-SizeBlock-Small .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_small.png);\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - medium
+        rulesText += "\n.RaidMonitor-SizeBlock-Medium .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_medium.png);\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - large
+        rulesText += "\n.RaidMonitor-SizeBlock-Large .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_large.png);\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - epic
+        rulesText += "\n.RaidMonitor-SizeBlock-Epic .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_epic.png);\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - colossal
+        rulesText += "\n.RaidMonitor-SizeBlock-Colossal .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_colossal.png);\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - settings
+        rulesText += "\n.RaidMonitor-SizeBlock-Settings .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/gear.png);\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-SizeBlock p {\n";
+        rulesText += "\tmargin: 0;\n";
+        rulesText += "\tpadding: 0;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock {\n";
+        rulesText += "\tposition: relative;\n";
+        rulesText += "\tfloat: left;\n";
+        rulesText += "\tmargin-right: 2px;\n";
+        rulesText += "\twidth: 50px;\n";
+        rulesText += "\theight: 50px;\n";
+        rulesText += "\tborder-radius: 25px;\n";
+        rulesText += "\t-moz-transition: height 1s ease-out .5s;\n";
+        rulesText += "\t-webkit-transition: height 1s ease-out .5s;\n";
+        rulesText += "\t-o-transition: height 1s ease-out .5s;\n";
+        rulesText += "\tbackground-color: #333;\n";
+        rulesText += "\tz-index: 10;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tborder-radius: 25px;\n";
+        rulesText += "\tbottom: 0px;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+        rulesText += "\tborder: 1px solid #333;\n";
+        rulesText += "\tbackground-color: #fff;\n";
+        rulesText += "\tz-index: 10;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover {\n";
+        rulesText += "\theight: 100px;\n";
+        rulesText += "\tz-index: 20;\n";
+        rulesText += "\t-moz-transition: height 1s ease-out;\n";
+        rulesText += "\t-webkit-transition: height 1s ease-out;\n";
+        rulesText += "\t-o-transition: height 1s ease-out;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\twidth: 250px;\n";
+        rulesText += "\tz-index: 20;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-Contents {\n";
+        rulesText += "\twidth: 0px;\n";
+        rulesText += "\toverflow: hidden;\n";
+        rulesText += "\tpadding-left: 10px;\n";
+        rulesText += "\tpadding-top: 1px;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+        rulesText += "\n}";
+
+        rulesText += "\n.RaidMonitor-Contents label, .RaidMonitor-Contents p {\n";
+        rulesText += "\twhite-space: nowrap;\n";
+        rulesText += "\n}";
+
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-Contents {\n";
+        rulesText += "\twidth: 100%;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-Contents {\n";
+        rulesText += "\twidth: 100%;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+        rulesText += "}\n";
+
+
+
+
+
+
+        var head = document.getElementsByTagName('head')[0],
 				    style = document.createElement('style'),
 				    rules = document.createTextNode(rulesText);
 				
@@ -625,10 +757,14 @@
 	        
     		// Throw a reference to this onto the window I guess in case anyone else wants to use it?
 			window._dc_loats_helper = new DC_LoaTS_Helper();
-			
-			// Update raid data
-			DC_LoaTS_Helper.updateRaidData();			
-    	}
+
+            // Update raid data
+            DC_LoaTS_Helper.updateRaidData();
+
+            // Update cooldowns
+            DC_LoaTS_Helper.updateCooldowns();
+
+        }
     	
     	// Everything is done
         console.info("DC LoaTS Link Helper started!");

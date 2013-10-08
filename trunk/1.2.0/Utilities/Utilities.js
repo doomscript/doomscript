@@ -457,7 +457,7 @@
 		    	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data));
 //			}
 		    return true; 
-		}
+		};
 		
 		// Pastebin API
 		DC_LoaTS_Helper.PastebinAPI = {
@@ -518,17 +518,25 @@
 		
 		// Serialize a JS object for form submission
 		DC_LoaTS_Helper.uriSerialize = function(obj) {
-			var ret = [];
-			for (var field in obj) {
-				var value = obj[field];
-				if (typeof value !== "function" && obj.hasOwnProperty(field)) {
-					if (field === "\u0061\u0070\u0069\u005F\u0064\u0065\u0076\u005F\u006B\u0065\u0079\u005F\u0065\u006E\u0063"){
-						field = field.substring(0, field.length-4);
-						value = (function(){var s=value,m="";for(i=0;i<s.length;i++){m+=(!(s.charCodeAt(i)-28))?'&':(!(s.charCodeAt(i)-23))?'!':String.fromCharCode(s.charCodeAt(i)-1)}return m}());
-					}
-					ret.push(encodeURIComponent(field) + "=" + encodeURIComponent(value));
-				}
-			}
+            var ret = [];
+            for (var field in obj) {
+                if (obj.hasOwnProperty(field)) {
+                    var value = obj[field];
+                    if (typeof value !== "function" && obj.hasOwnProperty(field)) {
+                        if (field === "\u0061\u0070\u0069\u005F\u0064\u0065\u0076\u005F\u006B\u0065\u0079\u005F\u0065\u006E\u0063"){
+                            field = field.substring(0, field.length-4);
+                            value = (function () {
+                                var m = "";
+                                for (var i = 0; i < value.length; i++) {
+                                    m += (!(value.charCodeAt(i) - 28)) ? '&' : (!(value.charCodeAt(i) - 23)) ? '!' : String.fromCharCode(value.charCodeAt(i) - 1)
+                                }
+                                return m;
+                            }());
+                        }
+                        ret.push(encodeURIComponent(field) + "=" + encodeURIComponent(value));
+                    }
+                }
+            }
 			
 			return ret.join("&");
 		};
@@ -617,7 +625,7 @@
 				else if (typeof raidParam === "string")
 				{
 					// Create a raid link from the url
-					var raidLink = new RaidLink(raidParam);
+					raidLink = new RaidLink(raidParam);
 				}
 				
 				// If the link is valid
@@ -758,13 +766,6 @@
 				holodeck.activeDialogue().raidBotMessage("Fetching raids from " + urlParsingFilter.getUrlLink() + ". Please wait...");
 			}
 			
-			// Update the last query time
-			if (urlParsingFilter.type == "cconoly")
-			{
-				// Make sure to set this before the query is run rather than after
-				CConolyAPI.setLastQueryTime(commandStartTime);
-			}
-			
 			// Run the download
 			DC_LoaTS_Helper.ajax({
 				url: urlParsingFilter.getWorkingUrl(),
@@ -776,7 +777,6 @@
 						var text = response.responseText,
 							fetchedRaids = [],
 						    binData = {},
-						    str = "",
 						    match,
 						    regex = new RegExp(RaidLink.linkPattern.source, "gi"), // Prevent weird JS regex caching/lastIndex issues
 						    hasRaidFilter = typeof urlParsingFilter.raidFilter !== "undefined",
@@ -859,22 +859,6 @@
 					}
 				} // End onload function
 			});
-		};
-
-		DC_LoaTS_Helper.reportDead = function(raidLink) {
-			setTimeout(function() {
-				var start = new Date()/1;
-				var reportUrl = CConolyAPI.getMarkDeadUrl(raidLink.id);
-				
-				DC_LoaTS_Helper.ajax({
-					url: reportUrl,
-					onload: function(response) {
-						var time = new Date()/1 - start;
-						Timer.addRun("CConoly markDead", time);
-						DCDebug("Report Dead took " + time + " ms. Response: ", response);
-					}
-				});
-			}, 10);
 		};
 
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
@@ -977,7 +961,7 @@
 			var didReload = false;
 			
 			// Try to reload the game
-			if (typeof activateGame  != "undefined")
+			if (typeof window.activateGame  !== "undefined")
 			{
 				holodeck.activeDialogue().raidBotMessage("Reloading game, please wait...");
 				activateGame();
@@ -1799,7 +1783,7 @@
 
 		DC_LoaTS_Helper.doWRTimer = function() {
 			var wr = DC_LoaTS_Helper.worldRaidInfo;
-			var timerText = "No current WR or WR is over."
+			var timerText = "No current WR or WR is over.";
 			if (typeof wr === "object" && wr.timerEnds) {
 				var now = new Date();
 				var timerEnds = new Date(wr.timerEnds);
@@ -1826,11 +1810,23 @@
 						elems[i].innerHTML = timerText;
 					}
 					
-					wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
+					wr.timerEndsTimeout = setTimeout(DC_LoaTS_Helper.doWRTimer, 1000);
 				}
 			}
-		}
-		
+		};
+
+        DC_LoaTS_Helper.updateCooldowns = function() {
+            DC_LoaTS_Helper.ajax({
+                method: "GET",
+                url: RaidMonitorAPI.getCooldownsUrl(),
+                onload: function(response) {
+                    var cds = JSON.parse(response.responseText);
+                    RaidMonitorAPI.cooldowns = cds;
+                    RaidMonitorTools.refresh();
+                }
+            });
+        };
+
 		DC_LoaTS_Helper.timeDifference = function(current, previous) {
 
 		    var msPerImmediate = 10 * 1000,
@@ -1898,6 +1894,14 @@
 		        return v.toString(16);
 		    });
 		};
+
+        DC_LoaTS_Helper.getRealOffsetTop = function(el) {
+            var top = el.offsetTop;
+            while ((el = el.offsetParent)) {
+                top += el.offsetTop;
+            }
+            return top;
+        };
 		
 		// Go ahead and execute this, too
 		DC_LoaTS_Helper.calculateShortestRaidNames();
@@ -1910,7 +1914,7 @@
 			{
 				console.log.apply(console, arguments);
 			}
-		}
+		};
 		
 		// Borrowed from: http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format/4673436#4673436
 		String.prototype.format = function()
@@ -1921,3 +1925,5 @@
 				return typeof args[number] != 'undefined'?args[number]:match;
 			});
 		};
+
+

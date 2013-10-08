@@ -40,12 +40,16 @@
 					// Store this page as visited
 					RaidManager.store(currentPageLink, RaidManager.STATE.VISITED);
 				}
-				
-				// Show the raid toolbar
-				RaidToolbar.show();
-				
-				
-				// ChatDialogue is the Kongregate ChatDialogue class that is part of the Kongregate Holodeck
+
+                // Show the raid toolbar
+                RaidToolbar.show();
+
+                // Show the raid monitor
+                RaidMonitorTools.show();
+
+
+
+                // ChatDialogue is the Kongregate ChatDialogue class that is part of the Kongregate Holodeck
 				// See: http://www.kongregate.com/javascripts/holodeck/chat_dialogue.js for readable source
 				// We're going to take the normal function that displays a chat message and move it so that
 				// we can intercept chat messages and reformat them.
