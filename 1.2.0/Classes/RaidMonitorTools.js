@@ -94,10 +94,35 @@
     };
 
     RaidMonitorTools.refresh = function() {
-        var i, size, cooldown;
+        var i, size, cooldown, block, blockp;
         for (i = 0; i < raidMonitorTools.sizes.length; i++) {
             size = raidMonitorTools.sizes[i];
             cooldown = RaidMonitorAPI.cooldowns[size];
-            console.log("Refreshing cooldown: ", size, cooldown, raidMonitorTools.blocks[size]);
+            block = raidMonitorTools.blocks[size];
+            blockp = block.parentNode;
+            console.log("Refreshing cooldown: ", size, cooldown, block);
+            if (cooldown && cooldown.dead === 'Yes') {
+                var parts = cooldown.lastUpdateTime.split(" ");
+                var sdd = parts[0].split("-");
+                var sdt = parts[1].split(":");
+
+                cooldown.lastUpdate = new Date(sdd[0], sdd[1]-1, sdd[2], sdt[0], sdt[1], sdt[2]);
+                cooldown.endDate = new Date(cooldown.lastUpdate.getTime() + cooldown.cooldown + RaidMonitorAPI.wiggleRoom);
+                if (cooldown.endDate < new Date()) {
+                    if (blockp.className.indexOf("behind") < 0) {
+                        blockp.className += " behind";
+                    }
+                }
+                else {
+                    if (blockp.className.indexOf("behind") < 0) {
+                        blockp.className = block.className.replace("behind", "");
+                    }
+                }
+            }
+            else {
+                if (blockp.className.indexOf("behind") < 0) {
+                    blockp.className += " behind";
+                }
+            }
         }
     };
