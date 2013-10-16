@@ -9,6 +9,8 @@ window.RaidMonitorAPI = {
     raidListUrl: "raidPoller.php?age=%AGE%&id=%ID%&hash=%HASH%&agent=ds_%VERSION%",
     cooldownsUrl: "cooldowns.php?username=%USER%",
 
+    wiggleRoom: 2, // Number of hours to allow summons after cooldown expires
+
     setLastQueryTime: function(lastQueryTime) {
         GM_setValue(this.lastQueryTimeKey, lastQueryTime);
     },

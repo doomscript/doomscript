@@ -607,6 +607,10 @@
         rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
         rulesText += "}\n";
 
+        rulesText += "\n.RaidMonitor-Block .behind {\n";
+        rulesText += "\tbackground-color: #F00;\n";
+        rulesText += "}\n";
+
 
 
 

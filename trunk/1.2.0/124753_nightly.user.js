@@ -4279,11 +4279,36 @@ function main()
     };
 
     RaidMonitorTools.refresh = function() {
-        var i, size, cooldown;
+        var i, size, cooldown, block, blockp;
         for (i = 0; i < raidMonitorTools.sizes.length; i++) {
             size = raidMonitorTools.sizes[i];
             cooldown = RaidMonitorAPI.cooldowns[size];
-            console.log("Refreshing cooldown: ", size, cooldown, raidMonitorTools.blocks[size]);
+            block = raidMonitorTools.blocks[size];
+            blockp = block.parentNode;
+            console.log("Refreshing cooldown: ", size, cooldown, block);
+            if (cooldown && cooldown.dead === 'Yes') {
+                var parts = cooldown.lastUpdateTime.split(" ");
+                var sdd = parts[0].split("-");
+                var sdt = parts[1].split(":");
+
+                cooldown.lastUpdate = new Date(sdd[0], sdd[1]-1, sdd[2], sdt[0], sdt[1], sdt[2]);
+                cooldown.endDate = new Date(cooldown.lastUpdate.getTime() + cooldown.cooldown + RaidMonitorAPI.wiggleRoom);
+                if (cooldown.endDate < new Date()) {
+                    if (blockp.className.indexOf("behind") < 0) {
+                        blockp.className += " behind";
+                    }
+                }
+                else {
+                    if (blockp.className.indexOf("behind") < 0) {
+                        blockp.className = block.className.replace("behind", "");
+                    }
+                }
+            }
+            else {
+                if (blockp.className.indexOf("behind") < 0) {
+                    blockp.className += " behind";
+                }
+            }
         }
     };		/************************************/
 		/****** RaidMultiFilter Class *******/
@@ -8481,7 +8506,8 @@ DC_LoaTS_Helper.raids =
     nutcracker_sweet:   new RaidType("nutcracker_sweet",    "A11", "Nutcracker Sweet", "Sweet", "Sweet",              84,  100, "H", [ 750000000, 1000000000, 1500000000, 3000000000]),
     crazy_jalfrezi:     new RaidType("crazy_jalfrezi",      "A12", "The Crazy Jalfrezi", "Jalfrezi", "Freezi",        84,  100, "H", [1000000000, 1250000000, 2000000000, 4000000000]),
     patti:              new RaidType("patti",               "A13", "PATTI", "PATTI", "PATTI",                         84,  100, "H", [1000000000, 1250000000, 2000000000, 4000000000]),
-    
+    crimzo_the_killer_clown:new RaidType("crimzo_the_killer_clown","A2-1", "Crimzo the Killer Clown", "Crimzo", "Crimzo",84,100,"H", [1000000000, 1250000000, 2000000000, 4000000000]),
+
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
     ship_of_the_damned: new RaidType("ship_of_the_damned",  "A3", "Ship of the Damned", "Damned", "Damned",          168,  250, "H",  300000000),
@@ -8545,6 +8571,8 @@ window.RaidMonitorAPI = {
     baseUrl: "http://getKongE.org/games/lots/raids/",
     raidListUrl: "raidPoller.php?age=%AGE%&id=%ID%&hash=%HASH%&agent=ds_%VERSION%",
     cooldownsUrl: "cooldowns.php?username=%USER%",
+
+    wiggleRoom: 2, // Number of hours to allow summons after cooldown expires
 
     setLastQueryTime: function(lastQueryTime) {
         GM_setValue(this.lastQueryTimeKey, lastQueryTime);
@@ -11151,6 +11179,10 @@ window.RaidMonitorAPI = {
         rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-Block .behind {\n";
+        rulesText += "\tbackground-color: #F00;\n";
         rulesText += "}\n";
 
 
