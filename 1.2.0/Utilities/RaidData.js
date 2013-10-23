@@ -23,7 +23,8 @@ DC_LoaTS_Helper.raids =
     missile_strike:     new RaidType("missile_strike",      "ZA", "Missile Strike", "Missiles", "Missile",            72,  10, "S",  [22000000, 28600000, 35200000, 44000000]),
     pi:                 new RaidType("pi",                 "ZA2", "Pi", "Pi", "Pi",                                   72,  10, "S",  [24000000, 31200000, 38400000, 48000000]),
     master_hao:         new RaidType("master_hao",         "Z19", "Master Hao", "Hao", "Hao",                         36,  10, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
-    
+    trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               5,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000]),
+
     // Medium Raids
     "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
     carnus:             new RaidType("carnus",              "Z2", "Carnus 9000", "Carnus", "Carnus",                 120,  50, "S",   15000000),
@@ -34,8 +35,8 @@ DC_LoaTS_Helper.raids =
     warden_ramiro:      new RaidType("warden_ramiro",       "Z7", "Warden Ramiro", "Ramiro", "Ramiro",                72,  50, "S",   60000000),
     vulture_gunship:    new RaidType("vulture_gunship",     "Z8", "Vulture Gunship", "Vulture", "Vulture",            72,  50, "S",   65000000),
     xarpa:              new RaidType("xarpa",               "Z9", "Centurian Fleet Commander", "Fleet Com.", "Fleet Comm",72,50,"S",  70000000),
-    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50, "S",   [75000000, 97500000, 120000000, 150000000]),
-    gut_phager:         new RaidType("gut_phager",         "Z11", "Gut-Phager", "Gut-Phager", "Phager",               72,  50, "S",   [80000000, 104000000, 128000000, 160000000]),
+    bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50, "S",  [75000000, 97500000, 120000000, 150000000]),
+    gut_phager:         new RaidType("gut_phager",         "Z11", "Gut-Phager", "Gut-Phager", "Phager",               72,  50, "S",  [80000000, 104000000, 128000000, 160000000]),
     bashan:             new RaidType("bashan",              "ZA", "Bashan", "Bashan", "Bashan",                       72,  50, "S",   85000000),
     cyborg_shark:       new RaidType("cyborg_shark",        "ZA2", "Cyborg Shark", "C. Shark", "Shark",               72,  50, "S",   90000000),
     hulking_mutant:     new RaidType("hulking_mutant",      "Z15", "Hulking Mutant", "Mutant", "Mutant",              72,  50, "S",   90000000),
@@ -52,12 +53,12 @@ DC_LoaTS_Helper.raids =
     sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  100000000),
     sludge_serpent:     new RaidType("sludge_serpent",      "Z8", "Sludge Serpent", "Serpent", "Serpent",             72, 100, "S",  120000000),
     kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S", [180000000, 234000000, 288000000, 320000000]),
-    shuborunth: 		new RaidType("shuborunth",         "Z13","Wublunralxanachi", "Blob", "Blob",                  72, 100, "S",  [200000000, 260000000, 320000000, 400000000]),
-    birthday_cake_of_doom: new RaidType("birthday_cake_of_doom", "ZA","Birthday Cake of Doom", "Cake", "Cake",        72, 100, "S",  [250000000, 325000000, 400000000, 500000000]),
+    shuborunth: 		new RaidType("shuborunth",         "Z13","Wublunralxanachi", "Blob", "Blob",                  72, 100, "S", [200000000, 260000000, 320000000, 400000000]),
+    birthday_cake_of_doom: new RaidType("birthday_cake_of_doom", "ZA","Birthday Cake of Doom", "Cake", "Cake",        72, 100, "S", [250000000, 325000000, 400000000, 500000000]),
     anthropist_xenocide_warship:new RaidType("anthropist_xenocide_warship","ZA2","Anthropist Xenocide Warship","Xenocide","Xeno",72,100,"S",[300000000, 390000000, 480000000, 600000000]),
-    tentacled_turkey:   new RaidType("tentacled_turkey",   "Z15","Tentacled Turkey","Turkey","Turkey",                72, 100, "S",  [350000000, 455000000, 560000000, 700000000]),
-    where_music_meets:  new RaidType("where_music_meets",  "Z16","Symphony of Two Worlds","Symphony","Symphony",      72, 100, "S",  [400000000, 520000000, 640000000, 800000000]),
-    reichsmarschall_dule:new RaidType("reichsmarschall_dule","Z19","Reichsmarschall Dule", "R. Dule", "R. Dule",      36, 100, "S", [2000000000, 2600000000, 3200000000, 4000000000]),
+    tentacled_turkey:   new RaidType("tentacled_turkey",   "Z15","Tentacled Turkey","Turkey","Turkey",                72, 100, "S", [350000000, 455000000, 560000000, 700000000]),
+    where_music_meets:  new RaidType("where_music_meets",  "Z16","Symphony of Two Worlds","Symphony","Symphony",      72, 100, "S", [400000000, 520000000, 640000000, 800000000]),
+    reichsmarschall_dule:new RaidType("reichsmarschall_dule","Z19","Reichsmarschall Dule", "R. Dule", "R. Dule",      36, 100, "S",[2000000000, 2600000000, 3200000000, 4000000000]),
 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
