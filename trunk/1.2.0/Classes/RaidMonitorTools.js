@@ -114,7 +114,7 @@
                     }
                 }
                 else {
-                    if (blockp.className.indexOf("behind") < 0) {
+                    if (blockp.className.indexOf("behind") > 0) {
                         blockp.className = block.className.replace("behind", "");
                     }
                 }

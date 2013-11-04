@@ -23,7 +23,7 @@ DC_LoaTS_Helper.raids =
     missile_strike:     new RaidType("missile_strike",      "ZA", "Missile Strike", "Missiles", "Missile",            72,  10, "S",  [22000000, 28600000, 35200000, 44000000]),
     pi:                 new RaidType("pi",                 "ZA2", "Pi", "Pi", "Pi",                                   72,  10, "S",  [24000000, 31200000, 38400000, 48000000]),
     master_hao:         new RaidType("master_hao",         "Z19", "Master Hao", "Hao", "Hao",                         36,  10, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
-    trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               5,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000]),
+    trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               3,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000]),
 
     // Medium Raids
     "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
@@ -145,9 +145,9 @@ DC_LoaTS_Helper.raids =
     
     // World Raids
     // Infestation Trilogy
-    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python WR",               100,  90000, "SEH", "Infinite", "N/A",   1000000000),
-    inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony WR",          100,  90000, "SEH", "Infinite", "N/A",   1000000000),
-    inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair WR",                   100,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python WR",                72,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony WR",           72,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair WR",                    72,  90000, "SEH", "Infinite", "N/A",   1000000000),
     
     general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz WR",         72,  90000, "SEH", "Infinite", "N/A", 100000000000),
 
