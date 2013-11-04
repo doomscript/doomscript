@@ -334,7 +334,7 @@ Attempted critical Chrome 27 fix
 Added H8 RS
 Fixed Critical bug from Kong Change
 
-2013.10.?? - 1.2.0
+2013.11.?? - 1.2.0
 Added Inventor RS & WR
 Added Sweet and Jalfreezi alliance raids
 Changed defaults
