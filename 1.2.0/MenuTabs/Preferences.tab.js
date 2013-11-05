@@ -13,8 +13,9 @@
 				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
-				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
-				
+                loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
+                raidMonitorToolsLocationKey: "RaidMonitorToolsLocation",
+
 				initPane: function()
 				{
 					var wrapper = document.createElement("div");
@@ -109,22 +110,40 @@
 					);
 					wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
 
-					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-UseQueryTimeDeltaInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true), 
-							"Ignore Duplicates When Using /loadcconoly",
-							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
+//					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
+//							"PreferencesMenu-UseQueryTimeDeltaInput",
+//							"boolean",
+//							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true),
+//							"Ignore Duplicates When Using /loadcconoly",
+//							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
+//							{
+//								onclick: function()
+//								{
+//									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
+//								}
+//							}
+//					);
+//					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
 
-					this.pane.appendChild(wrapper);
+                    var raidMonitorToolsLocationOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-RaidMonitorToolsLocationInput",
+                        "select",
+                        DC_LoaTS_Helper.getPref(me.raidMonitorToolsLocationKey, "right"),
+                        "Location of the Raid Monitor tools (The Summon Orbs/Cooldown Menu)",
+                        "Default: Right",
+                        {
+                            options: {right: "Right", bottom: "Bottom", hidden: "Hidden"},
+                            onchange: function(event)
+                            {
+                                DC_LoaTS_Helper.setPref(me.raidMonitorToolsLocationKey, this.value);
+                                RaidMonitorTools.setLocation(event.srcElement.value);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(raidMonitorToolsLocationOption.wrapper);
+
+
+                    this.pane.appendChild(wrapper);
 				}
 							
 		});

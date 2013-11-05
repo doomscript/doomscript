@@ -334,7 +334,7 @@ Attempted critical Chrome 27 fix
 Added H8 RS
 Fixed Critical bug from Kong Change
 
-2013.10.?? - 1.2.0
+2013.11.?? - 1.2.0
 Added Inventor RS & WR
 Added Sweet and Jalfreezi alliance raids
 Changed defaults
@@ -489,7 +489,7 @@ function main()
 				{
 					Timer.start("Process Message");
 					// Be careful not to reprocess messages that we ourselves sent
-					if (user.toLowerCase() != "raidbot")
+                    if (user.toLowerCase() !== "raidbot" && msg)
 					{
 						// Just in case we need it
 						var originalMsg = msg;
@@ -949,12 +949,15 @@ function main()
 		/************************************/
 		
 		window.RaidButton = Class.create({
-			initialize: function(name, className, callback)
+			initialize: function(name, className, callback, title)
 			{
 				this.name = name || "";
 				this.callback = callback;
 				this.node = new Element("li", {"class": "DC_LoaTS_button_wrapper " + className + "Wrapper"});
 				this.anchor = new Element("a", {"class": "DC_LoaTS_button " + className});
+                if (title) {
+                    this.anchor.title = title;
+                }
 				this.anchor.appendChild(document.createTextNode(this.name));
 				this.anchor.observe("click", function(clickEvent)
 				{
@@ -4065,7 +4068,7 @@ function main()
 			
 			createSimpleOptionHTML: function(id, type, value, description, hoverText, additionalAttributes)
 			{
-				if (type == "boolean" || type == "text") // Not sure if other types would need different wrappers...
+				if (type === "boolean" || type === "text" || type === "select") // Not sure if other types would need different wrappers...
 				{
 						var outerWrapper = document.createElement("div");
 						outerWrapper.id = id + "Wrapper";
@@ -4126,6 +4129,44 @@ function main()
 						
 						return {wrapper: outerWrapper, option: option};
 					}
+                    case "select": {
+                        var select = document.createElement("select");
+                        select.id = id;
+                        select.title = hoverText;
+
+                        for (var attribute in additionalAttributes)
+                        {
+                            // Have to make the options
+                            if (attribute === "options") {
+                                for (var optVal in additionalAttributes[attribute]) {
+                                    if (additionalAttributes.hasOwnProperty(attribute)) {
+                                        var option = document.createElement("option");
+                                        option.value = optVal;
+                                        option.innerText = additionalAttributes[attribute][optVal];
+                                        if (value === optVal) {
+                                            option.selected = true;
+                                        }
+                                        select.appendChild(option);
+                                    }
+                                }
+                            }
+                            // Regular attributes
+                            else {
+                                select[attribute] = additionalAttributes[attribute];
+                            }
+                        }
+                        innerWrapper.appendChild(select);
+
+                        var desc = document.createElement("div");
+                        desc.className = "DC_LoaTS_raidMenuDescription";
+                        desc.innerHTML = description;
+                        outerWrapper.appendChild(desc);
+
+                        return {wrapper: outerWrapper, option: option};
+                    }
+                    default: {
+                        console.error("Cannot create Simple Option HTML for type " + type);
+                    }
 				}
 			}
 		});
@@ -4258,6 +4299,7 @@ function main()
                 raidMonitorTools.rmBlock.style.top = DC_LoaTS_Helper.getRealOffsetTop(mg) + mg.offsetHeight/2 - 200 + "px";
                 raidMonitorTools.rmBlock.style.left = mg.offsetLeft + mg.offsetWidth + "px";
                 raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("horizontal", "");
+                raidMonitorTools.rmBlock.style.display = "block";
             }
             else if (pos === "bottom") {
                 raidMonitorTools.rmBlock.style.top = DC_LoaTS_Helper.getRealOffsetTop(mg) + mg.offsetHeight + "px";
@@ -4265,6 +4307,13 @@ function main()
                 if (raidMonitorTools.rmBlock.className.indexOf("horizontal") < 0) {
                     raidMonitorTools.rmBlock.className += " horizontal";
                 }
+                raidMonitorTools.rmBlock.style.display = "block";
+            }
+            else if (pos === "hidden") {
+                raidMonitorTools.rmBlock.style.display = "none";
+            }
+            else {
+                console.log("Did not understand setting position to: " + pos);
             }
         }
     };
@@ -4292,18 +4341,26 @@ function main()
                 var sdt = parts[1].split(":");
 
                 cooldown.lastUpdate = new Date(sdd[0], sdd[1]-1, sdd[2], sdt[0], sdt[1], sdt[2]);
-                cooldown.endDate = new Date(cooldown.lastUpdate.getTime() + cooldown.cooldown + RaidMonitorAPI.wiggleRoom);
+                cooldown.endDate = new Date(cooldown.lastUpdate.getTime() + (cooldown.cooldown + RaidMonitorAPI.wiggleRoom)*60*60*1000);
+                console.log("Cooldown: ", cooldown, "Behind? ", (cooldown.endDate < new Date())?"Yes":"No");
                 if (cooldown.endDate < new Date()) {
                     if (blockp.className.indexOf("behind") < 0) {
                         blockp.className += " behind";
                     }
                 }
                 else {
-                    if (blockp.className.indexOf("behind") > 0) {
+                    if (blockp.className.indexOf("behind") >= 0) {
                         blockp.className = block.className.replace("behind", "");
                     }
                 }
             }
+            // Not dead
+            else if (cooldown) {
+                if (blockp.className.indexOf("behind") >= 0) {
+                    blockp.className = block.className.replace("behind", "");
+                }
+            }
+            // No raids ever summoned in this category
             else {
                 if (blockp.className.indexOf("behind") < 0) {
                     blockp.className += " behind";
@@ -4592,7 +4649,7 @@ function main()
 								RaidMenu.toggle();
 								
 								// If the menu was spawned by a click, move the menu there
-								if (typeof event != "undefined")
+								if (typeof event !== "undefined")
 								{
 									// Fixed Menu positioning - Needs to be relative to window scroll
 									var scrollOffsets = document.viewport.getScrollOffsets();
@@ -4602,9 +4659,10 @@ function main()
 									window.raidMenu.container.style.top = Event.pointerY(event) - scrollOffsets.top + 20 + "px";
 								}
 
-							}
+							}, "Show / Hide the LoaTS Helper Menu"
 						),
-						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload)
+                        reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload, "Reload the game"),
+                        toggleGame: new RaidButton("toggleGame", "DC_LoaTS_toggleGameButton", DC_LoaTS_Helper.toggleGame, "Show / Hide the game")
 					};
 					for (var buttonName in this.buttons)
 					{
@@ -5567,8 +5625,9 @@ function main()
 				hideVisitedRaidsKey: "HideVisitedRaids",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
-				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
-				
+                loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
+                raidMonitorToolsLocationKey: "RaidMonitorToolsLocation",
+
 				initPane: function()
 				{
 					var wrapper = document.createElement("div");
@@ -5663,22 +5722,40 @@ function main()
 					);
 					wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
 
-					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-UseQueryTimeDeltaInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true), 
-							"Ignore Duplicates When Using /loadcconoly",
-							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
+//					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
+//							"PreferencesMenu-UseQueryTimeDeltaInput",
+//							"boolean",
+//							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true),
+//							"Ignore Duplicates When Using /loadcconoly",
+//							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
+//							{
+//								onclick: function()
+//								{
+//									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
+//								}
+//							}
+//					);
+//					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
 
-					this.pane.appendChild(wrapper);
+                    var raidMonitorToolsLocationOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-RaidMonitorToolsLocationInput",
+                        "select",
+                        DC_LoaTS_Helper.getPref(me.raidMonitorToolsLocationKey, "right"),
+                        "Location of the Raid Monitor tools (The Summon Orbs/Cooldown Menu)",
+                        "Default: Right",
+                        {
+                            options: {right: "Right", bottom: "Bottom", hidden: "Hidden"},
+                            onchange: function(event)
+                            {
+                                DC_LoaTS_Helper.setPref(me.raidMonitorToolsLocationKey, this.value);
+                                RaidMonitorTools.setLocation(event.srcElement.value);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(raidMonitorToolsLocationOption.wrapper);
+
+
+                    this.pane.appendChild(wrapper);
 				}
 							
 		});
@@ -8224,7 +8301,7 @@ RaidCommand
 		
 
 
-/** TODO **/
+/** TODO /updatecooldowns **/
 		RaidCommand.create( 
 			{
 				commandName: "updateraiddata",
@@ -8524,9 +8601,9 @@ DC_LoaTS_Helper.raids =
     
     // World Raids
     // Infestation Trilogy
-    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python WR",               100,  90000, "SEH", "Infinite", "N/A",   1000000000),
-    inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony WR",          100,  90000, "SEH", "Infinite", "N/A",   1000000000),
-    inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair WR",                   100,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_ship:           new RaidType("inf_ship",            "WR", "The Python", "Python", "Python WR",                72,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_colony:         new RaidType("inf_colony",          "WR", "Infested Colony", "Colony", "Colony WR",           72,  90000, "SEH", "Infinite", "N/A",   1000000000),
+    inf_lair:           new RaidType("inf_lair",            "WR", "Alien Lair", "Lair", "Lair WR",                    72,  90000, "SEH", "Infinite", "N/A",   1000000000),
     
     general_skorzeny:   new RaidType("general_skorzeny",    "WR", "General Skorzeny", "Skorzeny", "Skorz WR",         72,  90000, "SEH", "Infinite", "N/A", 100000000000),
 
@@ -9929,14 +10006,15 @@ window.RaidMonitorAPI = {
             params.UUID = DC_LoaTS_Helper.generateUUID();
             document.addEventListener(params.UUID, function listener(event)
             {
-                if (event.data.responseObj.readyState == 4)
+                var data = event.detail || event.data;
+                if (data.responseObj.readyState == 4)
                 {
                     document.removeEventListener(params.UUID, listener);
                 }
-                
-                if (typeof params[event.data.callbackName] === "function")
+
+                if (typeof params[data.callbackName] === "function")
                 {
-                    params[event.data.callbackName](event.data.responseObj);
+                    params[data.callbackName](data.responseObj);
                 }
             });
             // Convert params to simple object
@@ -9953,12 +10031,13 @@ window.RaidMonitorAPI = {
                     }
                 }
             }
-            var origin = window.location.protocol + "//" + window.location.host;
-            var evt = document.createEvent("MessageEvent");
-            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, paramSimple, origin, 1, window, null);
+            var evt = new CustomEvent("DC_LoaTS_ExecuteGMXHR", {"bubbles": true, "cancelable": true, "detail": paramSimple}); 
             document.dispatchEvent(evt);
         };
-		
+
+        DC_LoaTS_Helper.toggleGame = function() {
+            $("gameiframe").toggle();
+        };
 		
 		// Check for updates
 		DC_LoaTS_Helper.checkForUpdates = function()
@@ -10881,8 +10960,14 @@ window.RaidMonitorAPI = {
 				rulesText += "\na.DC_LoaTS_reloadButton {\n";
 				rulesText += "\tbackground-position: -160px -64px;";
 				rulesText += "}\n";
-				
-				rulesText += "\na.DC_LoaTS_WRButton {\n";
+
+                rulesText += "\na.DC_LoaTS_toggleGameButton {\n";
+                rulesText += "\tbackground-position: -145px -97px;";
+                rulesText += "}\n";
+
+
+
+                rulesText += "\na.DC_LoaTS_WRButton {\n";
 				rulesText += "\ttext-indent: 0px;\n";
 				rulesText += "\tbackground: none;\n";
 				rulesText += "\twidth: auto;\n";
@@ -11183,7 +11268,11 @@ window.RaidMonitorAPI = {
         rulesText += "}\n";
 
         rulesText += "\n.RaidMonitor-Block .behind {\n";
-        rulesText += "\tbackground-color: #F00;\n";
+        rulesText += "\tbackground-color: #F00 !important;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-Block .warning {\n";
+        rulesText += "\tbackground-color: #FF0 !important;\n";
         rulesText += "}\n";
 
 
@@ -11222,16 +11311,16 @@ window.RaidMonitorAPI = {
 					window.GM_setValue = function(k, v)
 					{
 						localStorage.setItem(k, v);
-					}
+					};
 					window.GM_getValue = function(k, def)
 					{
 						var ret = localStorage.getItem(k);
 						return (ret == null?def:ret)
-					}
+					};
 					window.GM_deleteValue = function(k)
 					{
 						localStorage.removeItem(k);
-					}
+					};
 				} 
 				else
 				{
@@ -11246,16 +11335,16 @@ window.RaidMonitorAPI = {
 				window.GM_setValue = function(k, v)
 				{
 					localStorage.setItem(k, v);
-				}
+				};
 				window.GM_getValue = function(k, def)
 				{
 					var ret = localStorage.getItem(k);
 					return (ret == null?def:ret)
-				}
+				};
 				window.GM_deleteValue = function(k)
 				{
 					localStorage.removeItem(k);
-				}
+				};
 			}
 		}
 		
@@ -11357,7 +11446,7 @@ window.RaidMonitorAPI = {
 // GM Layer
 function xhrGo(event)
 {
-	var params = event.data;
+	var params = event.detail;
 	for (var param in params)
 	{
 		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
@@ -11388,23 +11477,21 @@ function xhrGo(event)
                     params.onload(xmlhttp);
                 }
             }
-        }
+        };
+
         xmlhttp.open(params.method,params.url,!params.synchronous);
         xmlhttp.send();
-        
     }
-};
+}
 
 function gmCallBack(UUID, funcName, response)
 {
 	setTimeout(function()
 	{
-		var origin = window.location.protocol + "//" + window.location.host;
-		var evt = document.createEvent("MessageEvent");
-		evt.initMessageEvent(UUID, true, true, {callbackName: funcName, responseObj: response}, origin, 1, window, null);
-		document.dispatchEvent(evt);
+        var evt = new CustomEvent(UUID, {"bubbles": true, "cancelable": true, "detail": {callbackName: funcName, responseObj: response}});
+        document.dispatchEvent(evt);
 	}, 0);
-};
+}
 
 document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
 

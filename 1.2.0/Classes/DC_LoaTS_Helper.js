@@ -66,7 +66,7 @@
 				{
 					Timer.start("Process Message");
 					// Be careful not to reprocess messages that we ourselves sent
-					if (user.toLowerCase() != "raidbot")
+                    if (user.toLowerCase() !== "raidbot" && msg)
 					{
 						// Just in case we need it
 						var originalMsg = msg;

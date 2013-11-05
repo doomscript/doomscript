@@ -1321,14 +1321,15 @@
             params.UUID = DC_LoaTS_Helper.generateUUID();
             document.addEventListener(params.UUID, function listener(event)
             {
-                if (event.detail.responseObj.readyState == 4)
+                var data = event.detail || event.data;
+                if (data.responseObj.readyState == 4)
                 {
                     document.removeEventListener(params.UUID, listener);
                 }
-                
-                if (typeof params[event.detail.callbackName] === "function")
+
+                if (typeof params[data.callbackName] === "function")
                 {
-                    params[event.detail.callbackName](event.detail.responseObj);
+                    params[data.callbackName](data.responseObj);
                 }
             });
             // Convert params to simple object
@@ -1348,7 +1349,10 @@
             var evt = new CustomEvent("DC_LoaTS_ExecuteGMXHR", {"bubbles": true, "cancelable": true, "detail": paramSimple}); 
             document.dispatchEvent(evt);
         };
-		
+
+        DC_LoaTS_Helper.toggleGame = function() {
+            $("gameiframe").toggle();
+        };
 		
 		// Check for updates
 		DC_LoaTS_Helper.checkForUpdates = function()

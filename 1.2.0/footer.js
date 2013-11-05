@@ -306,8 +306,14 @@
 				rulesText += "\na.DC_LoaTS_reloadButton {\n";
 				rulesText += "\tbackground-position: -160px -64px;";
 				rulesText += "}\n";
-				
-				rulesText += "\na.DC_LoaTS_WRButton {\n";
+
+                rulesText += "\na.DC_LoaTS_toggleGameButton {\n";
+                rulesText += "\tbackground-position: -145px -97px;";
+                rulesText += "}\n";
+
+
+
+                rulesText += "\na.DC_LoaTS_WRButton {\n";
 				rulesText += "\ttext-indent: 0px;\n";
 				rulesText += "\tbackground: none;\n";
 				rulesText += "\twidth: auto;\n";
@@ -608,7 +614,11 @@
         rulesText += "}\n";
 
         rulesText += "\n.RaidMonitor-Block .behind {\n";
-        rulesText += "\tbackground-color: #F00;\n";
+        rulesText += "\tbackground-color: #F00 !important;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-Block .warning {\n";
+        rulesText += "\tbackground-color: #FF0 !important;\n";
         rulesText += "}\n";
 
 
@@ -647,16 +657,16 @@
 					window.GM_setValue = function(k, v)
 					{
 						localStorage.setItem(k, v);
-					}
+					};
 					window.GM_getValue = function(k, def)
 					{
 						var ret = localStorage.getItem(k);
 						return (ret == null?def:ret)
-					}
+					};
 					window.GM_deleteValue = function(k)
 					{
 						localStorage.removeItem(k);
-					}
+					};
 				} 
 				else
 				{
@@ -671,16 +681,16 @@
 				window.GM_setValue = function(k, v)
 				{
 					localStorage.setItem(k, v);
-				}
+				};
 				window.GM_getValue = function(k, def)
 				{
 					var ret = localStorage.getItem(k);
 					return (ret == null?def:ret)
-				}
+				};
 				window.GM_deleteValue = function(k)
 				{
 					localStorage.removeItem(k);
-				}
+				};
 			}
 		}
 		
@@ -813,21 +823,21 @@ function xhrGo(event)
                     params.onload(xmlhttp);
                 }
             }
-        }
+        };
+
         xmlhttp.open(params.method,params.url,!params.synchronous);
         xmlhttp.send();
-        
     }
-};
+}
 
 function gmCallBack(UUID, funcName, response)
 {
 	setTimeout(function()
 	{
-		var evt = new CustomEvent(UUID, {"bubbles": true, "cancelable": true, "detail": {callbackName: funcName, responseObj: response}});
-		document.dispatchEvent(evt);
+        var evt = new CustomEvent(UUID, {"bubbles": true, "cancelable": true, "detail": {callbackName: funcName, responseObj: response}});
+        document.dispatchEvent(evt);
 	}, 0);
-};
+}
 
 document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
 

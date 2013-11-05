@@ -81,7 +81,7 @@
 			
 			createSimpleOptionHTML: function(id, type, value, description, hoverText, additionalAttributes)
 			{
-				if (type == "boolean" || type == "text") // Not sure if other types would need different wrappers...
+				if (type === "boolean" || type === "text" || type === "select") // Not sure if other types would need different wrappers...
 				{
 						var outerWrapper = document.createElement("div");
 						outerWrapper.id = id + "Wrapper";
@@ -142,6 +142,44 @@
 						
 						return {wrapper: outerWrapper, option: option};
 					}
+                    case "select": {
+                        var select = document.createElement("select");
+                        select.id = id;
+                        select.title = hoverText;
+
+                        for (var attribute in additionalAttributes)
+                        {
+                            // Have to make the options
+                            if (attribute === "options") {
+                                for (var optVal in additionalAttributes[attribute]) {
+                                    if (additionalAttributes.hasOwnProperty(attribute)) {
+                                        var option = document.createElement("option");
+                                        option.value = optVal;
+                                        option.innerText = additionalAttributes[attribute][optVal];
+                                        if (value === optVal) {
+                                            option.selected = true;
+                                        }
+                                        select.appendChild(option);
+                                    }
+                                }
+                            }
+                            // Regular attributes
+                            else {
+                                select[attribute] = additionalAttributes[attribute];
+                            }
+                        }
+                        innerWrapper.appendChild(select);
+
+                        var desc = document.createElement("div");
+                        desc.className = "DC_LoaTS_raidMenuDescription";
+                        desc.innerHTML = description;
+                        outerWrapper.appendChild(desc);
+
+                        return {wrapper: outerWrapper, option: option};
+                    }
+                    default: {
+                        console.error("Cannot create Simple Option HTML for type " + type);
+                    }
 				}
 			}
 		});
