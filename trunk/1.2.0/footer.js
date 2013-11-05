@@ -782,7 +782,7 @@
 // GM Layer
 function xhrGo(event)
 {
-	var params = event.data;
+	var params = event.detail;
 	for (var param in params)
 	{
 		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
@@ -824,9 +824,7 @@ function gmCallBack(UUID, funcName, response)
 {
 	setTimeout(function()
 	{
-		var origin = window.location.protocol + "//" + window.location.host;
-		var evt = document.createEvent("MessageEvent");
-		evt.initMessageEvent(UUID, true, true, {callbackName: funcName, responseObj: response}, origin, 1, window, null);
+		var evt = new CustomEvent(UUID, {"bubbles": true, "cancelable": true, "detail": {callbackName: funcName, responseObj: response}});
 		document.dispatchEvent(evt);
 	}, 0);
 };
