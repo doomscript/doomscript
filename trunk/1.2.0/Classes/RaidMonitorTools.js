@@ -73,6 +73,7 @@
                 raidMonitorTools.rmBlock.style.top = DC_LoaTS_Helper.getRealOffsetTop(mg) + mg.offsetHeight/2 - 200 + "px";
                 raidMonitorTools.rmBlock.style.left = mg.offsetLeft + mg.offsetWidth + "px";
                 raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("horizontal", "");
+                raidMonitorTools.rmBlock.style.display = "block";
             }
             else if (pos === "bottom") {
                 raidMonitorTools.rmBlock.style.top = DC_LoaTS_Helper.getRealOffsetTop(mg) + mg.offsetHeight + "px";
@@ -80,6 +81,13 @@
                 if (raidMonitorTools.rmBlock.className.indexOf("horizontal") < 0) {
                     raidMonitorTools.rmBlock.className += " horizontal";
                 }
+                raidMonitorTools.rmBlock.style.display = "block";
+            }
+            else if (pos === "hidden") {
+                raidMonitorTools.rmBlock.style.display = "none";
+            }
+            else {
+                console.log("Did not understand setting position to: " + pos);
             }
         }
     };
@@ -107,18 +115,26 @@
                 var sdt = parts[1].split(":");
 
                 cooldown.lastUpdate = new Date(sdd[0], sdd[1]-1, sdd[2], sdt[0], sdt[1], sdt[2]);
-                cooldown.endDate = new Date(cooldown.lastUpdate.getTime() + cooldown.cooldown + RaidMonitorAPI.wiggleRoom);
+                cooldown.endDate = new Date(cooldown.lastUpdate.getTime() + (cooldown.cooldown + RaidMonitorAPI.wiggleRoom)*60*60*1000);
+                console.log("Cooldown: ", cooldown, "Behind? ", (cooldown.endDate < new Date())?"Yes":"No");
                 if (cooldown.endDate < new Date()) {
                     if (blockp.className.indexOf("behind") < 0) {
                         blockp.className += " behind";
                     }
                 }
                 else {
-                    if (blockp.className.indexOf("behind") > 0) {
+                    if (blockp.className.indexOf("behind") >= 0) {
                         blockp.className = block.className.replace("behind", "");
                     }
                 }
             }
+            // Not dead
+            else if (cooldown) {
+                if (blockp.className.indexOf("behind") >= 0) {
+                    blockp.className = block.className.replace("behind", "");
+                }
+            }
+            // No raids ever summoned in this category
             else {
                 if (blockp.className.indexOf("behind") < 0) {
                     blockp.className += " behind";

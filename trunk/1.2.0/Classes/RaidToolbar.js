@@ -40,7 +40,7 @@
 								RaidMenu.toggle();
 								
 								// If the menu was spawned by a click, move the menu there
-								if (typeof event != "undefined")
+								if (typeof event !== "undefined")
 								{
 									// Fixed Menu positioning - Needs to be relative to window scroll
 									var scrollOffsets = document.viewport.getScrollOffsets();
@@ -50,9 +50,10 @@
 									window.raidMenu.container.style.top = Event.pointerY(event) - scrollOffsets.top + 20 + "px";
 								}
 
-							}
+							}, "Show / Hide the LoaTS Helper Menu"
 						),
-						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload)
+                        reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload, "Reload the game"),
+                        toggleGame: new RaidButton("toggleGame", "DC_LoaTS_toggleGameButton", DC_LoaTS_Helper.toggleGame, "Show / Hide the game")
 					};
 					for (var buttonName in this.buttons)
 					{
