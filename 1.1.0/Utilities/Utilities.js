@@ -1337,14 +1337,14 @@
             params.UUID = DC_LoaTS_Helper.generateUUID();
             document.addEventListener(params.UUID, function listener(event)
             {
-                if (event.data.responseObj.readyState == 4)
+                if (event.detail.responseObj.readyState == 4)
                 {
                     document.removeEventListener(params.UUID, listener);
                 }
                 
-                if (typeof params[event.data.callbackName] === "function")
+                if (typeof params[event.detail.callbackName] === "function")
                 {
-                    params[event.data.callbackName](event.data.responseObj);
+                    params[event.detail.callbackName](event.detail.responseObj);
                 }
             });
             // Convert params to simple object
@@ -1361,9 +1361,7 @@
                     }
                 }
             }
-            var origin = window.location.protocol + "//" + window.location.host;
-            var evt = document.createEvent("MessageEvent");
-            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, paramSimple, origin, 1, window, null);
+            var evt = new CustomEvent("DC_LoaTS_ExecuteGMXHR", {"bubbles": true, "cancelable": true, "detail": paramSimple}); 
             document.dispatchEvent(evt);
         };
 		
