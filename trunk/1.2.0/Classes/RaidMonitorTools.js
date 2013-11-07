@@ -114,7 +114,7 @@
             blockp = block.parentNode;
 
             // Empty out the contents block for regeneration
-            $(block).empty();
+            $(block).update();
             console.log("Refreshing cooldown: ", size, cooldown, block);
             // If there's a cooldown object
             if (cooldown) {

@@ -371,7 +371,7 @@ function main()
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
     	joinRaidURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
-    	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
+        lotsCDNUrl: "http://5thplanetlots.insnw.net/lots_live/",
     	
     	// Other URLS
     	RaidToolsURL: "http://userscripts.org/132671",
@@ -2614,7 +2614,7 @@ function main()
 				if (typeof this.raidTypeId !== "undefined")
 				{
 					// Locate the offsite image
-					imageSRC = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/" + this.raidTypeId + "_1.jpg";
+					imageSRC = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + this.raidTypeId + "_1.jpg";
 				}
 				
 				return imageSRC;
@@ -2690,33 +2690,28 @@ function main()
 			var raidLink = new RaidLink(this.parentNode.href);
 			
 			// First time failed, check for alternate fail names
-			if (this.src === "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
+			if (this.src === DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
 			{
 				switch(raidLink.raidTypeId)
 				{
 					case "wr_space_pox":
-						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/space_pox_1.jpg";
+						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/space_pox_1.jpg";
 						break;
 					case "dule_warmaster":
-						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/dule_1.jpg";
+						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/dule_1.jpg";
 						break;
 					case "hultex_quibberath":
-						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/hultex_1.jpg";
+						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/hultex_1.jpg";
 						break;
 					case "warden_ramiro":
-						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/ramiro_1.jpg";
+						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/ramiro_1.jpg";
 						break;
 					case "purple_lion":
 					case "kang":
 					case "tourniquet":
 					case "flora":
-					case "sky_commander_bethany":
-					case "vunlac":
-					case "reichsmarschall_dule":
-					case "master_hao":
-					case "noir2":
 					default:
-                        this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/" + raidLink.raidTypeId + "_small.jpg";
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/" + raidLink.raidTypeId + "_small.jpg";
 				}
 			}
 			// Second time failed, switch to default
@@ -4341,7 +4336,7 @@ function main()
             blockp = block.parentNode;
 
             // Empty out the contents block for regeneration
-            $(block).empty();
+            $(block).update();
             console.log("Refreshing cooldown: ", size, cooldown, block);
             // If there's a cooldown object
             if (cooldown) {
@@ -8327,9 +8322,40 @@ RaidCommand
 			}
 		);
 		
+RaidCommand.create(
+    {
+        commandName: "updatecooldowns",
+        aliases: ["ucd", "cd", "cooldowns", "updatecooldown", "cooldown", "updatecd", "updatecds"],
+        // No parsing needed
+        /*parsingClass: ,*/
+        handler: function(deck, parser, params, text, context)
+        {
+            // Declare ret object
+            var ret = {success: true, statusMessage: "Updating Cooldowns"};
 
+            DC_LoaTS_Helper.updateCooldowns();
 
-/** TODO /updatecooldowns **/
+            return ret;
+        },
+        getOptions: function()
+        {
+            var commandOptions = {
+                initialText: {
+                    text: "Update Cooldowns"
+                }
+            };
+
+            return commandOptions;
+        },
+        buildHelpText: function()
+        {
+            var helpText = "<b>Raid Command:</b> <code>/updatecooldowns</code>\n";
+            helpText += "Updates your cooldowns as displayed in the Raid Monitor orbs menu.\n";
+            return helpText;
+        }
+    }
+);
+		
 		RaidCommand.create( 
 			{
 				commandName: "updateraiddata",
@@ -11206,27 +11232,27 @@ window.RaidMonitorAPI = {
 
         // Raid Monitor stylings - small
         rulesText += "\n.RaidMonitor-SizeBlock-Small .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_small.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_small.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - medium
         rulesText += "\n.RaidMonitor-SizeBlock-Medium .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_medium.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_medium.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - large
         rulesText += "\n.RaidMonitor-SizeBlock-Large .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_large.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_large.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - epic
         rulesText += "\n.RaidMonitor-SizeBlock-Epic .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_epic.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_epic.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - colossal
         rulesText += "\n.RaidMonitor-SizeBlock-Colossal .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_colossal.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_colossal.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings
