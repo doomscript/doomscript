@@ -527,7 +527,7 @@
 				if (typeof this.raidTypeId !== "undefined")
 				{
 					// Locate the offsite image
-					imageSRC = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/" + this.raidTypeId + "_1.jpg";
+					imageSRC = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + this.raidTypeId + "_1.jpg";
 				}
 				
 				return imageSRC;
@@ -603,33 +603,28 @@
 			var raidLink = new RaidLink(this.parentNode.href);
 			
 			// First time failed, check for alternate fail names
-			if (this.src === "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
+			if (this.src === DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
 			{
 				switch(raidLink.raidTypeId)
 				{
 					case "wr_space_pox":
-						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/space_pox_1.jpg";
+						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/space_pox_1.jpg";
 						break;
 					case "dule_warmaster":
-						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/dule_1.jpg";
+						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/dule_1.jpg";
 						break;
 					case "hultex_quibberath":
-						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/hultex_1.jpg";
+						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/hultex_1.jpg";
 						break;
 					case "warden_ramiro":
-						this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/post/ramiro_1.jpg";
+						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/ramiro_1.jpg";
 						break;
 					case "purple_lion":
 					case "kang":
 					case "tourniquet":
 					case "flora":
-					case "sky_commander_bethany":
-					case "vunlac":
-					case "reichsmarschall_dule":
-					case "master_hao":
-					case "noir2":
 					default:
-                        this.src = "http://5thplanetgames-origin.cdnetworks.net/lots_live/images/bosses/" + raidLink.raidTypeId + "_small.jpg";
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/" + raidLink.raidTypeId + "_small.jpg";
 				}
 			}
 			// Second time failed, switch to default

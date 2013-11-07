@@ -371,7 +371,7 @@ function main()
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
     	
     	joinRaidURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
-    	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
+        lotsCDNUrl: "http://5thplanetlots.insnw.net/lots_live/",
     	
     	// Other URLS
     	RaidToolsURL: "http://userscripts.org/132671",

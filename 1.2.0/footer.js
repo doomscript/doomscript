@@ -518,27 +518,27 @@
 
         // Raid Monitor stylings - small
         rulesText += "\n.RaidMonitor-SizeBlock-Small .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_small.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_small.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - medium
         rulesText += "\n.RaidMonitor-SizeBlock-Medium .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_medium.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_medium.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - large
         rulesText += "\n.RaidMonitor-SizeBlock-Large .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_large.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_large.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - epic
         rulesText += "\n.RaidMonitor-SizeBlock-Epic .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_epic.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_epic.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - colossal
         rulesText += "\n.RaidMonitor-SizeBlock-Colossal .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_colossal.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.lotsCDNUrl + "images/items/consumables/icons/continuum_colossal.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings
