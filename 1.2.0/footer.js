@@ -486,6 +486,7 @@
 
         // Raid Monitor stylings - size block
         rulesText += "\n.RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tposition: relative;\n";
         rulesText += "\tborder-top-right-radius: 25px;\n";
         rulesText += "\tborder-bottom-right-radius: 25px;\n";
         rulesText += "\twidth: 50px;\n";
@@ -493,50 +494,74 @@
         rulesText += "\tcolor: transparent;\n";
         rulesText += "\ttext-indent: 10px;\n";
         rulesText += "\tborder: 1px solid #333333;\n";
-        rulesText += "\tbackground-repeat: no-repeat;\n";
-        rulesText += "\tbackground-position: bottom right;\n";
+//        rulesText += "\tbackground-repeat: no-repeat;\n";
+//        rulesText += "\tbackground-position: bottom right;\n";
         rulesText += "\t-moz-transition: width 1s ease-out, color 1s;\n";
         rulesText += "\t-webkit-transition: width 1s, color 1s;\n";
         rulesText += "\t-o-transition: width 1s, color 1s;\n";
         rulesText += "}\n";
 
-
-
-        // Raid Monitor stylings - size block
+        // Raid Monitor stylings - size block:hover
         rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner{\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tcolor: #000000;\n";
         rulesText += "}\n";
 
+        // Raid Monitor stylings - icon block
+        rulesText += "\n.RaidMonitor-SizeBlock .RaidMonitor-SizeBlockIcon{\n";
+        rulesText += "\twidth: 48px;\n";
+        rulesText += "\theight: 48px;\n";
+        rulesText += "\tfloat: right;\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tright: 0px;\n";
+        rulesText += "}\n";
+
         // Raid Monitor stylings - small
-        rulesText += "\n.RaidMonitor-SizeBlock-Small .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Small .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_small.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - medium
-        rulesText += "\n.RaidMonitor-SizeBlock-Medium .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Medium .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_medium.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - large
-        rulesText += "\n.RaidMonitor-SizeBlock-Large .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Large .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_large.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - epic
-        rulesText += "\n.RaidMonitor-SizeBlock-Epic .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Epic .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_epic.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - colossal
-        rulesText += "\n.RaidMonitor-SizeBlock-Colossal .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Colossal .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_colossal.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings
-        rulesText += "\n.RaidMonitor-SizeBlock-Settings .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Settings .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/gear.png);\n";
         rulesText += "}\n";
+
+        // Raid Monitor stylings - settings
+        rulesText += "\n.RaidMonitor-SizeBlock-Help .RaidMonitor-SizeBlockIcon {\n";
+        rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/question.png);\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - settings:hover
+        rulesText += "\n.RaidMonitor-SizeBlock-Settings:hover .RaidMonitor-SizeBlockIcon {\n";
+        rulesText += "\t-webkit-animation:spin 4s linear infinite;\n";
+        rulesText += "\t-moz-animation:spin 4s linear infinite;\n";
+        rulesText += "\tanimation:spin 4s linear infinite;\n";
+        rulesText += "}\n";
+
+        // Keyframe stuff
+        rulesText += "\n@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }\n";
+        rulesText += "\n@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }\n";
+        rulesText += "\n@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }\n";
 
         rulesText += "\n.RaidMonitor-SizeBlock p {\n";
         rulesText += "\tmargin: 0;\n";
@@ -585,28 +610,29 @@
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.RaidMonitor-Contents {\n";
+        rulesText += "\n.RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\tfloat: left;\n";
         rulesText += "\twidth: 0px;\n";
+        rulesText += "\tmax-width: 180px;\n";
         rulesText += "\toverflow: hidden;\n";
-        rulesText += "\tpadding-left: 10px;\n";
         rulesText += "\tpadding-top: 1px;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
         rulesText += "\n}";
 
-        rulesText += "\n.RaidMonitor-Contents label, .RaidMonitor-Contents p {\n";
+        rulesText += "\n.RaidMonitor-SizeBlockContents label, .RaidMonitor-SizeBlockContents p {\n";
         rulesText += "\twhite-space: nowrap;\n";
         rulesText += "\n}";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-Contents {\n";
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-Contents {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
@@ -614,11 +640,15 @@
         rulesText += "}\n";
 
         rulesText += "\n.RaidMonitor-Block .behind {\n";
-        rulesText += "\tbackground-color: #F00 !important;\n";
+        rulesText += "\tbackground-color: #f2dede !important;\n";
+        rulesText += "\tcolor: #b94a48 !important;\n";
+        rulesText += "\tborder-color: #eed3d7 !important;\n";
         rulesText += "}\n";
 
         rulesText += "\n.RaidMonitor-Block .warning {\n";
-        rulesText += "\tbackground-color: #FF0 !important;\n";
+        rulesText += "\tbackground-color: #fcf8e3 !important;\n";
+        rulesText += "\tcolor: #c09853 !important;\n";
+        rulesText += "\tborder-color: #fbeed5 !important;\n";
         rulesText += "}\n";
 
 
@@ -847,6 +877,10 @@ document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
 // Borrowed from: http://stackoverflow.com/a/2303228
 if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))
 {
+    var momentJS = document.createElement("script");
+    momentJS.src = "http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.4.0/moment.min.js";
+    (document.body || document.head || document.documentElement).appendChild(momentJS);
+
 	var script = document.createElement('script');
 	script.appendChild(document.createTextNode('('+ main +')();'));
 	(document.body || document.head || document.documentElement).appendChild(script);

@@ -33,7 +33,7 @@
         },
 
         _createBlock: function(size) {
-            var sizeBlock, sizeBlockInner, contents;
+            var sizeBlock, sizeBlockInner, contents, icon;
             sizeBlock = document.createElement("div");
             sizeBlock.className = "RaidMonitor-SizeBlock RaidMonitor-SizeBlock-" + size;
 
@@ -44,6 +44,10 @@
             contents = document.createElement("div");
             contents.className = "RaidMonitor-SizeBlockContents";
             sizeBlockInner.appendChild(contents);
+
+            icon = document.createElement("div");
+            icon.className = "RaidMonitor-SizeBlockIcon";
+            sizeBlockInner.appendChild(icon);
 
             this.blocks[size] = contents;
 
@@ -108,37 +112,60 @@
             cooldown = RaidMonitorAPI.cooldowns[size];
             block = raidMonitorTools.blocks[size];
             blockp = block.parentNode;
+
+            // Empty out the contents block for regeneration
+            $(block).empty();
             console.log("Refreshing cooldown: ", size, cooldown, block);
-            if (cooldown && cooldown.dead === 'Yes') {
+            // If there's a cooldown object
+            if (cooldown) {
                 var parts = cooldown.lastUpdateTime.split(" ");
                 var sdd = parts[0].split("-");
                 var sdt = parts[1].split(":");
 
                 cooldown.lastUpdate = new Date(sdd[0], sdd[1]-1, sdd[2], sdt[0], sdt[1], sdt[2]);
                 cooldown.endDate = new Date(cooldown.lastUpdate.getTime() + (cooldown.cooldown + RaidMonitorAPI.wiggleRoom)*60*60*1000);
-                console.log("Cooldown: ", cooldown, "Behind? ", (cooldown.endDate < new Date())?"Yes":"No");
-                if (cooldown.endDate < new Date()) {
-                    if (blockp.className.indexOf("behind") < 0) {
-                        blockp.className += " behind";
+
+                var cdPreface = "";
+
+                if (cooldown.dead === 'Yes') {
+                    console.log("Cooldown: ", cooldown, "Behind? ", (cooldown.endDate < new Date())?"Yes":"No");
+                    if (cooldown.endDate < new Date()) {
+                        if (blockp.className.indexOf("behind") < 0) {
+                            blockp.className += " behind";
+                        }
+                        cdPreface = "Access Expired ";
+                    }
+                    else {
+                        if (blockp.className.indexOf("behind") >= 0) {
+                            blockp.className = blockp.className.replace("behind", "");
+                        }
+                        cdPreface = "Access Expires ";
                     }
                 }
+                // Not dead and cooldown obj does exist
                 else {
                     if (blockp.className.indexOf("behind") >= 0) {
-                        blockp.className = block.className.replace("behind", "");
+                        blockp.className = blockp.className.replace("behind", "");
                     }
+                    cdPreface = "Access Expired ";
                 }
-            }
-            // Not dead
-            else if (cooldown) {
-                if (blockp.className.indexOf("behind") >= 0) {
-                    blockp.className = block.className.replace("behind", "");
-                }
+
+                var cd = document.createElement("p");
+                cd.appendChild(document.createTextNode(cdPreface + moment(cooldown.endDate).fromNow()));
+                block.appendChild(cd);
+
+                var lastSummon = document.createElement("p");
+                lastSummon.appendChild(document.createTextNode("Last Summoned: " + DC_LoaTS_Helper.raids[cooldown.boss].shortName));
+                block.appendChild(lastSummon);
             }
             // No raids ever summoned in this category
             else {
                 if (blockp.className.indexOf("behind") < 0) {
                     blockp.className += " behind";
                 }
+                var lastSummon = document.createElement("p");
+                lastSummon.appendChild(document.createTextNode("You haven't posted any raids!"));
+                block.appendChild(lastSummon);
             }
         }
     };

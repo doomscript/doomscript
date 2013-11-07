@@ -340,6 +340,7 @@ Added Sweet and Jalfreezi alliance raids
 Changed defaults
 Added Hel WR
 Added Trulcharn
+Added Zone A3 Raids: Saboteur, Dark Hat, Silj, CC Agent, Ragnar, Void Master
 Implemented Raid Monitor features
 
 
@@ -4259,7 +4260,7 @@ function main()
         },
 
         _createBlock: function(size) {
-            var sizeBlock, sizeBlockInner, contents;
+            var sizeBlock, sizeBlockInner, contents, icon;
             sizeBlock = document.createElement("div");
             sizeBlock.className = "RaidMonitor-SizeBlock RaidMonitor-SizeBlock-" + size;
 
@@ -4270,6 +4271,10 @@ function main()
             contents = document.createElement("div");
             contents.className = "RaidMonitor-SizeBlockContents";
             sizeBlockInner.appendChild(contents);
+
+            icon = document.createElement("div");
+            icon.className = "RaidMonitor-SizeBlockIcon";
+            sizeBlockInner.appendChild(icon);
 
             this.blocks[size] = contents;
 
@@ -4334,37 +4339,60 @@ function main()
             cooldown = RaidMonitorAPI.cooldowns[size];
             block = raidMonitorTools.blocks[size];
             blockp = block.parentNode;
+
+            // Empty out the contents block for regeneration
+            $(block).empty();
             console.log("Refreshing cooldown: ", size, cooldown, block);
-            if (cooldown && cooldown.dead === 'Yes') {
+            // If there's a cooldown object
+            if (cooldown) {
                 var parts = cooldown.lastUpdateTime.split(" ");
                 var sdd = parts[0].split("-");
                 var sdt = parts[1].split(":");
 
                 cooldown.lastUpdate = new Date(sdd[0], sdd[1]-1, sdd[2], sdt[0], sdt[1], sdt[2]);
                 cooldown.endDate = new Date(cooldown.lastUpdate.getTime() + (cooldown.cooldown + RaidMonitorAPI.wiggleRoom)*60*60*1000);
-                console.log("Cooldown: ", cooldown, "Behind? ", (cooldown.endDate < new Date())?"Yes":"No");
-                if (cooldown.endDate < new Date()) {
-                    if (blockp.className.indexOf("behind") < 0) {
-                        blockp.className += " behind";
+
+                var cdPreface = "";
+
+                if (cooldown.dead === 'Yes') {
+                    console.log("Cooldown: ", cooldown, "Behind? ", (cooldown.endDate < new Date())?"Yes":"No");
+                    if (cooldown.endDate < new Date()) {
+                        if (blockp.className.indexOf("behind") < 0) {
+                            blockp.className += " behind";
+                        }
+                        cdPreface = "Access Expired ";
+                    }
+                    else {
+                        if (blockp.className.indexOf("behind") >= 0) {
+                            blockp.className = blockp.className.replace("behind", "");
+                        }
+                        cdPreface = "Access Expires ";
                     }
                 }
+                // Not dead and cooldown obj does exist
                 else {
                     if (blockp.className.indexOf("behind") >= 0) {
-                        blockp.className = block.className.replace("behind", "");
+                        blockp.className = blockp.className.replace("behind", "");
                     }
+                    cdPreface = "Access Expired ";
                 }
-            }
-            // Not dead
-            else if (cooldown) {
-                if (blockp.className.indexOf("behind") >= 0) {
-                    blockp.className = block.className.replace("behind", "");
-                }
+
+                var cd = document.createElement("p");
+                cd.appendChild(document.createTextNode(cdPreface + moment(cooldown.endDate).fromNow()));
+                block.appendChild(cd);
+
+                var lastSummon = document.createElement("p");
+                lastSummon.appendChild(document.createTextNode("Last Summoned: " + DC_LoaTS_Helper.raids[cooldown.boss].shortName));
+                block.appendChild(lastSummon);
             }
             // No raids ever summoned in this category
             else {
                 if (blockp.className.indexOf("behind") < 0) {
                     blockp.className += " behind";
                 }
+                var lastSummon = document.createElement("p");
+                lastSummon.appendChild(document.createTextNode("You haven't posted any raids!"));
+                block.appendChild(lastSummon);
             }
         }
     };		/************************************/
@@ -8460,9 +8488,11 @@ DC_LoaTS_Helper.raids =
 {
 	// Personal Raids
     sherlock_holmes:    new RaidType("sherlock_holmes",    "Z10", "The Murderer", "Murderer", "Murderer",             12,   1, "S",    [6000000, "N/A", "N/A", "N/A"]),
-    your_wrath:         new RaidType("your_wrath",          "ZA", "Your Wrath", "Your Wrath", "Wrath",                12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
-    lubu:               new RaidType("lubu",               "ZA2", "LU BU", "LU BU", "Lubu",                           12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
-	
+    wrath_of_player:    new RaidType("wrath_of_player",     "ZA", "Your Wrath", "Your Wrath", "Wrath",                12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
+    lu_bu:              new RaidType("lu_bu",              "ZA2", "LU BU", "LU BU", "Lubu",                           12,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
+    ragnar:             new RaidType("ragnar",             "ZA3", "Ragnar", "Ragnar", "Ragnar",                        1,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
+    centurian_covert_agent:new RaidType("centurian_covert_agent","ZA3", "Centurian Covert Agent", "CC Agent", "Agent", 1,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
+
     // Public raids
     // Small Raids
     commander:          new RaidType("commander",           "Z1", "Centurian Commander", "CC Commander", "CC Comm",  168,  10, "S",     150000),
@@ -8496,9 +8526,10 @@ DC_LoaTS_Helper.raids =
     bashan:             new RaidType("bashan",              "ZA", "Bashan", "Bashan", "Bashan",                       72,  50, "S",   85000000),
     cyborg_shark:       new RaidType("cyborg_shark",        "ZA2", "Cyborg Shark", "C. Shark", "Shark",               72,  50, "S",   90000000),
     hulking_mutant:     new RaidType("hulking_mutant",      "Z15", "Hulking Mutant", "Mutant", "Mutant",              72,  50, "S",   90000000),
-    screaming_barracuda: new RaidType("screaming_barracuda","Z16", "Screaming Barracuda", "Barracuda", "Barracuda",   72,  50, "S",  110000000),
+    screaming_barracuda:new RaidType("screaming_barracuda", "Z16", "Screaming Barracuda", "Barracuda", "Barracuda",   72,  50, "S",  110000000),
     vunlac:             new RaidType("vunlac",              "Z19", "Vunlac", "Vunlac", "Vunlac",                      36,  50, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
-    
+    silj:               new RaidType("silj",                "ZA3", "Silj the Wurm-Rider", "Silj", "Silj",             30,  50, "S",  [750000000,  937500000, 1200000000, 1500000000]),
+
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
     carnifex:           new RaidType("carnifex",            "Z2", "Carnifex Prime", "Carnifex", "Carni",             120, 100, "S",   35000000),
@@ -8515,6 +8546,7 @@ DC_LoaTS_Helper.raids =
     tentacled_turkey:   new RaidType("tentacled_turkey",   "Z15","Tentacled Turkey","Turkey","Turkey",                72, 100, "S", [350000000, 455000000, 560000000, 700000000]),
     where_music_meets:  new RaidType("where_music_meets",  "Z16","Symphony of Two Worlds","Symphony","Symphony",      72, 100, "S", [400000000, 520000000, 640000000, 800000000]),
     reichsmarschall_dule:new RaidType("reichsmarschall_dule","Z19","Reichsmarschall Dule", "R. Dule", "R. Dule",      36, 100, "S",[2000000000, 2600000000, 3200000000, 4000000000]),
+    dark_hat:           new RaidType("dark_hat",           "ZA3","Dark Hat", "D. Hat", "D. Hat",                      30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
@@ -8532,8 +8564,9 @@ DC_LoaTS_Helper.raids =
     bile_beast:         new RaidType("bile_beast",         "ZA2", "Bile Beast", "Bile", "Bile",                       72, 250, "S", [1400000000, 1820000000, 2240000000, 2800000000]),
     al_husam:           new RaidType("al_husam",           "Z17", "Al-Husam", "Al-Husam", "Al-Husam",                 72, 250, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
     noir:               new RaidType("noir",               "Z18", "Noir", "Noir", "Noir",                             72, 250, "S", [1600000000, 2080000000, 2560000000, 3200000000]),
-    sky_commander_bethany:new RaidType("sky_commander_bethany", "Z19", "Sky Commander Bethany", "Bethany", "Bethany", 36, 250, "S", [2500000000, 3250000000, 4000000000, 5000000000]),
-    
+    sky_commander_bethany:new RaidType("sky_commander_bethany","Z19","Sky Commander Bethany","Bethany","Bethany",     36, 250, "S", [2500000000, 3250000000, 4000000000, 5000000000]),
+    void_master:        new RaidType("void_master",        "ZA3", "Void Master", "V. Master", "V. Master",            30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
+
     // Colossal Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
     mermara:            new RaidType("mermara",             "Z6", "Mermara", "Mermara", "Mermara",                   168, 500, "S",  800000000),
@@ -8544,8 +8577,9 @@ DC_LoaTS_Helper.raids =
     nosferatu_nick:     new RaidType("nosferatu_nick",     "Z14", "Nosferatu Nick", "Nick", "Nick",                   24, 500, "S", 3500000000),
     niflung_boar:       new RaidType("niflung_boar",        "ZA", "Niflung Boar", "Boar", "Boar",                     30, 500, "S", 4000000000),
     vlarg_relic_hunter: new RaidType("vlarg_relic_hunter", "ZA2", "Vlarg Relic Hunter", "R. Hunter", "Vlarg",         30, 500, "S", 4500000000),
-    noir2:              new RaidType("noir2",              "Z19", "Noir (II)", "Noir (II)", "Noir (II)",              30, 500, "S", 5000000000),
-    
+    noir2:              new RaidType("noir2",              "Z19", "Noir (II)", "Noir (II)", "Noir2",                  30, 500, "S", 5000000000),
+    the_saboteur:       new RaidType("the_saboteur",       "ZA3", "The Saboteur", "Saboteur", "Saboteur",             30, 500, "S", 5000000000),
+
     
     // Aliance Raids
     // Small Raids
@@ -11140,6 +11174,7 @@ window.RaidMonitorAPI = {
 
         // Raid Monitor stylings - size block
         rulesText += "\n.RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tposition: relative;\n";
         rulesText += "\tborder-top-right-radius: 25px;\n";
         rulesText += "\tborder-bottom-right-radius: 25px;\n";
         rulesText += "\twidth: 50px;\n";
@@ -11147,50 +11182,74 @@ window.RaidMonitorAPI = {
         rulesText += "\tcolor: transparent;\n";
         rulesText += "\ttext-indent: 10px;\n";
         rulesText += "\tborder: 1px solid #333333;\n";
-        rulesText += "\tbackground-repeat: no-repeat;\n";
-        rulesText += "\tbackground-position: bottom right;\n";
+//        rulesText += "\tbackground-repeat: no-repeat;\n";
+//        rulesText += "\tbackground-position: bottom right;\n";
         rulesText += "\t-moz-transition: width 1s ease-out, color 1s;\n";
         rulesText += "\t-webkit-transition: width 1s, color 1s;\n";
         rulesText += "\t-o-transition: width 1s, color 1s;\n";
         rulesText += "}\n";
 
-
-
-        // Raid Monitor stylings - size block
+        // Raid Monitor stylings - size block:hover
         rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner{\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tcolor: #000000;\n";
         rulesText += "}\n";
 
+        // Raid Monitor stylings - icon block
+        rulesText += "\n.RaidMonitor-SizeBlock .RaidMonitor-SizeBlockIcon{\n";
+        rulesText += "\twidth: 48px;\n";
+        rulesText += "\theight: 48px;\n";
+        rulesText += "\tfloat: right;\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tright: 0px;\n";
+        rulesText += "}\n";
+
         // Raid Monitor stylings - small
-        rulesText += "\n.RaidMonitor-SizeBlock-Small .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Small .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_small.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - medium
-        rulesText += "\n.RaidMonitor-SizeBlock-Medium .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Medium .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_medium.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - large
-        rulesText += "\n.RaidMonitor-SizeBlock-Large .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Large .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_large.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - epic
-        rulesText += "\n.RaidMonitor-SizeBlock-Epic .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Epic .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_epic.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - colossal
-        rulesText += "\n.RaidMonitor-SizeBlock-Colossal .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Colossal .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://5thplanetgames-origin.cdnetworks.net/lots_live/images/items/consumables/icons/continuum_colossal.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings
-        rulesText += "\n.RaidMonitor-SizeBlock-Settings .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Settings .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/gear.png);\n";
         rulesText += "}\n";
+
+        // Raid Monitor stylings - settings
+        rulesText += "\n.RaidMonitor-SizeBlock-Help .RaidMonitor-SizeBlockIcon {\n";
+        rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/question.png);\n";
+        rulesText += "}\n";
+
+        // Raid Monitor stylings - settings:hover
+        rulesText += "\n.RaidMonitor-SizeBlock-Settings:hover .RaidMonitor-SizeBlockIcon {\n";
+        rulesText += "\t-webkit-animation:spin 4s linear infinite;\n";
+        rulesText += "\t-moz-animation:spin 4s linear infinite;\n";
+        rulesText += "\tanimation:spin 4s linear infinite;\n";
+        rulesText += "}\n";
+
+        // Keyframe stuff
+        rulesText += "\n@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }\n";
+        rulesText += "\n@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }\n";
+        rulesText += "\n@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }\n";
 
         rulesText += "\n.RaidMonitor-SizeBlock p {\n";
         rulesText += "\tmargin: 0;\n";
@@ -11239,28 +11298,29 @@ window.RaidMonitorAPI = {
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.RaidMonitor-Contents {\n";
+        rulesText += "\n.RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\tfloat: left;\n";
         rulesText += "\twidth: 0px;\n";
+        rulesText += "\tmax-width: 180px;\n";
         rulesText += "\toverflow: hidden;\n";
-        rulesText += "\tpadding-left: 10px;\n";
         rulesText += "\tpadding-top: 1px;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
         rulesText += "\n}";
 
-        rulesText += "\n.RaidMonitor-Contents label, .RaidMonitor-Contents p {\n";
+        rulesText += "\n.RaidMonitor-SizeBlockContents label, .RaidMonitor-SizeBlockContents p {\n";
         rulesText += "\twhite-space: nowrap;\n";
         rulesText += "\n}";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-Contents {\n";
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-Contents {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
@@ -11268,11 +11328,15 @@ window.RaidMonitorAPI = {
         rulesText += "}\n";
 
         rulesText += "\n.RaidMonitor-Block .behind {\n";
-        rulesText += "\tbackground-color: #F00 !important;\n";
+        rulesText += "\tbackground-color: #f2dede !important;\n";
+        rulesText += "\tcolor: #b94a48 !important;\n";
+        rulesText += "\tborder-color: #eed3d7 !important;\n";
         rulesText += "}\n";
 
         rulesText += "\n.RaidMonitor-Block .warning {\n";
-        rulesText += "\tbackground-color: #FF0 !important;\n";
+        rulesText += "\tbackground-color: #fcf8e3 !important;\n";
+        rulesText += "\tcolor: #c09853 !important;\n";
+        rulesText += "\tborder-color: #fbeed5 !important;\n";
         rulesText += "}\n";
 
 
@@ -11501,6 +11565,10 @@ document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
 // Borrowed from: http://stackoverflow.com/a/2303228
 if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))
 {
+    var momentJS = document.createElement("script");
+    momentJS.src = "http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.4.0/moment.min.js";
+    (document.body || document.head || document.documentElement).appendChild(momentJS);
+
 	var script = document.createElement('script');
 	script.appendChild(document.createTextNode('('+ main +')();'));
 	(document.body || document.head || document.documentElement).appendChild(script);

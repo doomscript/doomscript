@@ -81,7 +81,7 @@ DC_LoaTS_Helper.raids =
     al_husam:           new RaidType("al_husam",           "Z17", "Al-Husam", "Al-Husam", "Al-Husam",                 72, 250, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
     noir:               new RaidType("noir",               "Z18", "Noir", "Noir", "Noir",                             72, 250, "S", [1600000000, 2080000000, 2560000000, 3200000000]),
     sky_commander_bethany:new RaidType("sky_commander_bethany","Z19","Sky Commander Bethany","Bethany","Bethany",     36, 250, "S", [2500000000, 3250000000, 4000000000, 5000000000]),
-    void_master:        new RaidType("void_master",        "ZA3", "Void Master", "V. Master", "Bethany",              30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
+    void_master:        new RaidType("void_master",        "ZA3", "Void Master", "V. Master", "V. Master",            30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
 
     // Colossal Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),

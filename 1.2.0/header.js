@@ -340,6 +340,7 @@ Added Sweet and Jalfreezi alliance raids
 Changed defaults
 Added Hel WR
 Added Trulcharn
+Added Zone A3 Raids: Saboteur, Dark Hat, Silj, CC Agent, Ragnar, Void Master
 Implemented Raid Monitor features
 
 
