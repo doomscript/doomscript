@@ -502,7 +502,7 @@
         rulesText += "}\n";
 
         // Raid Monitor stylings - size block:hover
-        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner {\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tcolor: #000000;\n";
         rulesText += "}\n";
@@ -594,7 +594,7 @@
         rulesText += "\tz-index: 10;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover {\n";
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover, .horizontal .RaidMonitor-SizeBlock.show {\n";
         rulesText += "\theight: 100px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: height 1s ease-out;\n";
@@ -602,7 +602,7 @@
         rulesText += "\t-o-transition: height 1s ease-out;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .horizontal .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
@@ -625,18 +625,35 @@
         rulesText += "\twhite-space: nowrap;\n";
         rulesText += "\n}";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .horizontal .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-SettingsLinkWrapper {\n";
+        rulesText += "\tpadding: 2px 0px;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-SettingsLinkInput {\n";
+        rulesText += "\twidth: 130px;\n";
+        rulesText += "\tborder-radius:5px;\n";
+        rulesText += "\t-webkit-transition: box-shadow .15s linear;\n";
+        rulesText += "\t-moz-transition: box-shadow .15s linear;\n";
+        rulesText += "\t-o-transition: box-shadow .15s linear;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-SettingsLinkInput:active {\n";
+        rulesText += "\tbox-shadow: 0 0 5px 3px #ffa853;\n";
+        rulesText += "\tborder: 1px solid #ffa853;\n";
         rulesText += "}\n";
 
         rulesText += "\n.RaidMonitor-Block .behind {\n";
@@ -806,7 +823,7 @@
             DC_LoaTS_Helper.updateRaidData();
 
             // Update cooldowns
-            DC_LoaTS_Helper.updateCooldowns();
+            DC_LoaTS_Helper._startUpdateCooldownsInterval();
 
         }
     	

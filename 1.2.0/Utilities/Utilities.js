@@ -941,7 +941,7 @@
 					var took = (endTime - startTime)/1000;
 					holodeck.activeDialogue().raidBotMessage("Load ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
 				}
-			}
+			};
 			
 
 			// Kick off the auto loading
@@ -1032,7 +1032,7 @@
 			}
 			
 			DC_LoaTS_Helper.updatePostedLinks();
-		}
+		};
 		
 		DC_LoaTS_Helper.listContainsRaid = function(list, raidLink) {
 			DCDebug("List contains raid: ", list, raidLink);
@@ -1048,7 +1048,7 @@
 			}
 			
 			return false;
-		}
+		};
 		
 		// Make sure the upl namespace exists
 		DC_LoaTS_Helper.upl = {now: {}, next: {}};
@@ -1056,168 +1056,6 @@
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
-			/*
-			// If updating posted links is locked
-			if (DC_LoaTS_Helper.upl.lock) {
-				DCDebug("UPL already locked trying to update: " + (raidLink ? raidLink.id : "ALL"));
-				// No raidLink provided. Load everything
-				if (!raidLink) {
-					DC_LoaTS_Helper.upl.next.refreshAll = true;
-					delete DC_LoaTS_Helper.upl.next.list;
-				}
-				// If we're not loading all
-				else if (!DC_LoaTS_Helper.upl.next.refreshAll) {
-					// Make sure the list is ready
-					if (!DC_LoaTS_Helper.upl.next.list) {
-						DC_LoaTS_Helper.upl.next.list = [];
-					}
-					DC_LoaTS_Helper.upl.next.list.push(raidLink);
-				}
-				
-				// If updating posted links became unlocked
-				if (DC_LoaTS_Helper.upl.lock) {
-					// Lock it
-					DC_LoaTS_Helper.upl.lock = true;
-					DCDebug("UPL became unlocked during update: " + (raidLink ? raidLink.id : "ALL"));
-					DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
-
-					// In theory, we now have the lock and other code can't get in here
-
-					// Copy over the important values
-					DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
-					DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
-					
-					// Clear out the nexts
-					DC_LoaTS_Helper.upl.next.refreshAll = false;
-					delete DC_LoaTS_Helper.upl.next.list;
-
-					DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
-					// Run the private runner. Will do the unlock for us
-					_upl();
-				}
-				// If it's still locked, don't do anything
-			}
-			else {
-				// Lock it
-				DC_LoaTS_Helper.upl.lock = true;
-				DCDebug("UPL already unlocked for: " + (raidLink ? raidLink.id : "ALL"));
-				DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
-				
-				// In theory, we now have the lock and other code can't get in here
-
-				// Set the important values
-				DC_LoaTS_Helper.upl.now.refreshAll = !raidLink;
-				DC_LoaTS_Helper.upl.now.list = raidLink ? [raidLink] : undefined;
-
-				DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
-				// Run the private runner. Will do the unlock for us
-				_upl();
-			}
-			
-			// Private function
-			function _upl() {
-				// At this time, we can assume that the locks prevent this code from every being run
-				// more than once at a time, and that the upl.now variables are set and won't change
-				
-				// Set a timeout to avoid sucking up all the cpu
-				setTimeout(function()
-				{
-					Timer.start("updatePostedLinksTimeout");
-					DCDebug("Running UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
-					try 
-					{
-						// Look up all raid links in chat
-						var elems = $("play").getElementsByClassName("raidMessage");
-						
-						// Retrieve the message format
-						var messageFormat = DC_LoaTS_Helper.getMessageFormat();
-						
-						// Retrieve the link format
-						var linkFormat = DC_LoaTS_Helper.getLinkFormat();
-						
-						// Iterate over all link elements in the chat
-						for (var i = 0; i < elems.length; i++)
-						{
-							// Convert them to RaidLink objects
-							var elem = elems[i];
-							var newRaidLink = new RaidLink(elem.children[0].href);
-							
-							// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-							if (newRaidLink.isValid() && (DC_LoaTS_Helper.upl.now.refreshAll || DC_LoaTS_Helper.listContainsRaid(DC_LoaTS_Helper.upl.now.list, newRaidLink)))
-							{
-								// Restyle the message as appropriate
-								var styles = newRaidLink.getMatchedStyles();
-								
-								// TODO: Eventually figure out how to style whispers without it being a PITA especially raidbot seenraids whispers
-								if ((elem.parentNode.parentNode.parentNode.className || "").indexOf("hisper") < 0) {
-									
-									// Remove existing doomscript styles. We don't want to double them up or anything weird
-									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "").trim();
-
-									// If there are styles, apply them
-									if (styles && styles.className)
-									{
-										// Append to the existing styles
-										elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
-									}
-								}
-								
-								// Remove the old link, and shove in the new, formatted, styled one
-								elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
-								elem.remove();
-							}
-							else if (!newRaidLink.isValid())
-							{
-								console.warn("Element did not produce a valid raid link:");
-								console.warn(elem);
-							}
-							else if (newRaidLink.hash === raidLink.hash || raidLink.id === newRaidLink.id)
-							{
-								DCDebug("Similar links found while updating posted links, but not similar enough?");
-								DCDebug(raidLink);
-								DCDebug(newRaidLink);
-							}
-						}
-					}
-					catch (e)
-					{
-						console.warn(e);
-					}
-					
-					// If there's other stuff to run
-					if (DC_LoaTS_Helper.upl.next.refreshAll || DC_LoaTS_Helper.upl.next.list) {
-						DCDebug("Additional links available. Scheduling UPL again for: ", DC_LoaTS_Helper.upl.next.list, " refreshAll: " + DC_LoaTS_Helper.upl.next.refreshAll);
-						setTimeout(function() {
-							// Copy over the important values
-							DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
-							DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
-							
-							// Clear out the nexts
-							DC_LoaTS_Helper.upl.next.refreshAll = false;
-							delete DC_LoaTS_Helper.upl.next.list;
-	
-							DCDebug("Calling UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
-							// Run the private runner. Will do the unlock for us
-							_upl();
-						// If we go to run this again, don't run it too soon
-						}, 500);
-					}
-					else {
-						DCDebug("Unlocking UPL");
-						DC_LoaTS_Helper.upl.lock = false;
-					}
-					Timer.stop("updatePostedLinksTimeout");
-				}, 100);
-			}
-			
-			
-			
-			*/
-			
-			
-			
-			
-			
 			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout !== "undefined")
 			{
 				clearTimeout(DC_LoaTS_Helper.updatePostedLinksTimeout);
@@ -1500,26 +1338,26 @@
 
 			if (state == "old")
 			{
-				var updateNotificationDiv = document.getElementById("DC_LoaTS_notifitcationBar");
+				var updateNotificationDiv = document.getElementById("DC_LoaTS_notificationBar");
 				
 				if (!updateNotificationDiv)
 				{
 					updateNotificationDiv = document.createElement("div");
-					updateNotificationDiv.id = "DC_LoaTS_notifitcationBar";
+					updateNotificationDiv.id = "DC_LoaTS_notificationBar";
 					updateNotificationDiv.className = "clearfix";
 					$(updateNotificationDiv).hide();
 					
 					var updateTitle = document.createElement("div");
 					updateTitle.appendChild(document.createTextNode("LoaTS Helper - "));
-					updateTitle.id = "DC_LoaTS_notifitcationBarTitle";
+					updateTitle.id = "DC_LoaTS_notificationBarTitle";
 					updateNotificationDiv.appendChild(updateTitle);
 					
 					var updateTextDiv = document.createElement("div");
-					updateTextDiv.id = "DC_LoaTS_notifitcationBarText";
+					updateTextDiv.id = "DC_LoaTS_notificationBarText";
 					updateNotificationDiv.appendChild(updateTextDiv);
 					
 					var updateButtonsDiv = document.createElement("div");
-					updateButtonsDiv.id = "DC_LoaTS_notifitcationBarButtons";
+					updateButtonsDiv.id = "DC_LoaTS_notificationBarButtons";
 					updateNotificationDiv.appendChild(updateButtonsDiv);
 					
 					var updateButton = document.createElement("a");
@@ -1529,9 +1367,10 @@
 					updateButton.target = "_blank";
 					updateButton.onclick = function()
 					{
-						if ($("DC_LoaTS_notifitcationBar"))
+                        var bar = $("DC_LoaTS_notificationBar");
+						if (bar)
 						{
-							$("DC_LoaTS_notifitcationBar").hide();
+							bar.hide();
 						}
 						
 						return true;
@@ -1539,14 +1378,15 @@
 					updateButtonsDiv.appendChild(updateButton);
 					
 					var remindButton = document.createElement("a");
-					remindButton.className = "DC_LoaTS_notifitcationBarButton";
+					remindButton.className = "DC_LoaTS_notificationBarButton";
 					remindButton.href = "#";
 					remindButton.appendChild(document.createTextNode("Remind me later"));
 					remindButton.onclick = function()
 					{
-						if ($("DC_LoaTS_notifitcationBar"))
+                        var bar = $("DC_LoaTS_notificationBar");
+						if (bar)
 						{
-							$("DC_LoaTS_notifitcationBar").hide();
+							bar.hide();
 						}
 						
 						return false;
@@ -1558,14 +1398,14 @@
 					if (typeof canAutoUpdate != "undefined" && canAutoUpdate)
 					{
 						var ignoreButton = document.createElement("a");
-						ignoreButton.className = "DC_LoaTS_notifitcationBarButton";
+						ignoreButton.className = "DC_LoaTS_notificationBarButton";
 						ignoreButton.href = "#";
 						ignoreButton.appendChild(document.createTextNode("Turn auto update check off"));
 						ignoreButton.onclick = function()
 						{
-							if ($("DC_LoaTS_notifitcationBar"))
+							if ($("DC_LoaTS_notificationBar"))
 							{
-								$("DC_LoaTS_notifitcationBar").hide();
+								$("DC_LoaTS_notificationBar").hide();
 							}
 							
 							GM_setValue(DC_LoaTS_Properties.storage.autoUpdate, false);
@@ -1578,7 +1418,7 @@
 					
 					document.body.appendChild(updateNotificationDiv);
 				}
-				$(updateNotificationDiv).down("#DC_LoaTS_notifitcationBarText").update(text);
+				$(updateNotificationDiv).down("#DC_LoaTS_notificationBarText").update(text);
 				$(updateNotificationDiv).show();
 			}
 		};
@@ -1827,6 +1667,23 @@
                     RaidMonitorTools.refresh();
                 }
             });
+        };
+
+        DC_LoaTS_Helper._startUpdateCooldownsInterval = function() {
+            if (DC_LoaTS_Helper._updateCooldownsInterval) {
+                clearInterval(DC_LoaTS_Helper._updateCooldownsInterval);
+            }
+
+            DC_LoaTS_Helper.updateCooldowns();
+            DC_LoaTS_Helper._updateCooldownsInterval = setInterval(DC_LoaTS_Helper.updateCooldowns, DC_LoaTS_Properties.updateCooldownsInterval);
+        };
+        
+        DC_LoaTS_Helper.getRaidMonitorLists = function() {
+            if (!DC_LoaTS_Helper.raidMonitorLists) {
+                DC_LoaTS_Helper.raidMonitorLists = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidMonitorLists) || '[{"name":"Public", "pass":"public"}]');
+            }
+
+            return DC_LoaTS_Helper.raidMonitorLists;
         };
 
 		DC_LoaTS_Helper.timeDifference = function(current, previous) {

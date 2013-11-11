@@ -378,6 +378,8 @@ function main()
     	QuickFriendURL: "http://userscripts.org/125666",
     	PlayNowFixURL: "http://userscripts.org/142619",
     	farmSpreadsheetURL: "https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4",
+
+        updateCooldownsInterval: 10 /*min*/ * 60 /*sec*/ * 1000 /*ms*/,
     	
     	// Do not check code in with this set to true. 
     	// Preferably, turn it on from the browser command line with DC_LoaTS_Properties.debugMode = true;
@@ -403,11 +405,14 @@ function main()
 	    	
 	    	// Overall container for raid link storage
 	    	raidStorage: "RaidManager_doomcat_v1",
-	    	
-	    	// RaidType Specific preferences
-	    	raidPrefs: "DC_LoaTS_raidPreferences",
-	    	
-	    	// General script behaviour preferences
+
+            // RaidType Specific preferences
+            raidPrefs: "DC_LoaTS_raidPreferences",
+
+            // Lists for pulling from Raid Monitor
+            raidMonitorLists: "DC_LoaTS_raidMonitorLists",
+
+            // General script behaviour preferences
 	    	behaviorPrefs: "DC_LoaTS_behaviorPreferences",
 	    	
 	    	// Quarantine addendum
@@ -599,18 +604,20 @@ function main()
 				// Take all the chat commands and register them with Kongregate
 				for (var commandName in DC_LoaTS_Helper.chatCommands)
 				{
-					// Get the command
-					var command = DC_LoaTS_Helper.chatCommands[commandName];
-					
-					// If there's really a command for this name
-					if (typeof command !== "undefined")
-					{
-						// Create a command factory for this command
-						var commandFactory = new RaidCommandFactory(command, "chat");
-						
-						// Attach the command factory to the holodeck callback
-						holodeck.addChatCommand(commandName, commandFactory.createAndExecuteCommand.bind(commandFactory));
-					}
+                    if (DC_LoaTS_Helper.chatCommands.hasOwnProperty(commandName)) {
+                        // Get the command
+                        var command = DC_LoaTS_Helper.chatCommands[commandName];
+
+                        // If there's really a command for this name
+                        if (typeof command !== "undefined")
+                        {
+                            // Create a command factory for this command
+                            var commandFactory = new RaidCommandFactory(command, "chat");
+
+                            // Attach the command factory to the holodeck callback
+                            holodeck.addChatCommand(commandName, commandFactory.createAndExecuteCommand.bind(commandFactory));
+                        }
+                    }
 				}
 				
 				// We want to intercept whispers to the raid bot and alias commands
@@ -652,7 +659,7 @@ function main()
 							str = command;
 						}
 						
-						// This supressed the command going to chat, even on failure
+						// This suppressed the command going to chat, even on failure
 						// and even if a real command is not found by that name
 						raidBotWhisper = true;
 					}
@@ -660,39 +667,41 @@ function main()
 					//TODO: This process could be optimized a bit when the user starts out using the official command name
 					// Iterate over the commands to find their aliases
 					for (var commandName in DC_LoaTS_Helper.chatCommands)
-					{
-						DCDebug(commandName);
-						// If the regular command name is here, just use that
-						if (new RegExp("^\/" + commandName + "\\b", "i").test(str))
-						{
-							// Stop trying to find aliases
-							break;
-						}
-						// Not this real command name. Check its aliases.
-						else
-						{
-							// Grab the aliases for this command
-							var aliases = DC_LoaTS_Helper.chatCommands[commandName].aliases;
-							
-							// If there are actually any aliases
-							if (typeof aliases != "undefined")
-							{
-								// For each alias
-								for (var i = 0; i < aliases.length; i++)
-								{
-									// Get this alias
-									var alias = aliases[i];
-									
-									// If we found an alias
-									if (new RegExp("^\/" + alias + "\\b", "i").test(str))
-									{
-										// Redirect to the official command
-										str = str.replace(new RegExp(alias, "i"), commandName);
-									}
-								}
-							}
-						}
-					}
+                    {
+                        if (DC_LoaTS_Helper.chatCommands.hasOwnProperty(commandName)) {
+                            DCDebug(commandName);
+                            // If the regular command name is here, just use that
+                            if (new RegExp("^\/" + commandName + "\\b", "i").test(str))
+                            {
+                                // Stop trying to find aliases
+                                break;
+                            }
+                            // Not this real command name. Check its aliases.
+                            else
+                            {
+                                // Grab the aliases for this command
+                                var aliases = DC_LoaTS_Helper.chatCommands[commandName].aliases;
+
+                                // If there are actually any aliases
+                                if (typeof aliases != "undefined")
+                                {
+                                    // For each alias
+                                    for (var i = 0; i < aliases.length; i++)
+                                    {
+                                        // Get this alias
+                                        var alias = aliases[i];
+
+                                        // If we found an alias
+                                        if (new RegExp("^\/" + alias + "\\b", "i").test(str))
+                                        {
+                                            // Redirect to the official command
+                                            str = str.replace(new RegExp(alias, "i"), commandName);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 					
 					// Capture the resulting state of the chat command
 					var chatCommandResult = holodeck.DC_LoaTS_processChatCommand(str);
@@ -731,26 +740,26 @@ function main()
 			var messageFormat = GM_getValue(DC_LoaTS_Properties.storage.messageFormat);
 
 			// Fall back to default messageFormat if necessary
-			if (typeof messageFormat == "undefined" || messageFormat.trim().length == 0)
+			if (!messageFormat || messageFormat.trim().length === 0)
 			{
 				messageFormat = RaidLink.defaultMessageFormat;
 				GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
 			}
 			return messageFormat;	
-	    }
+	    };
 	    
 	    // Set the message format
 	    DC_LoaTS_Helper.setMessageFormat = function(messageFormat)
 	    {
 			// Fall back to default messageFormat if necessary
-			if (typeof messageFormat == "undefined" || messageFormat.trim().length == 0)
+			if (!messageFormat || messageFormat.trim().length === 0)
 			{
 				messageFormat = RaidLink.defaultMessageFormat;
 			}
 			
 			// Set the message format
 			GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
-	    }
+	    };
 	    
 	    // Retrieve the link format
 	    DC_LoaTS_Helper.getLinkFormat = function()
@@ -781,7 +790,7 @@ function main()
 				linkFormat = RaidLink.defaultLinkFormat_v2;
 			}
 			return linkFormat;
-	    }
+	    };
 	    
 	    // Retrieve a preference value from storage
 	    DC_LoaTS_Helper.getPref = function(prefName, defaultValue)
@@ -808,7 +817,7 @@ function main()
 	    	}
 	    	
 	    	return (typeof ret !== "undefined") ? ret : defaultValue;
-	    }
+	    };
 	    
 	    // Store a preference value into storage
 	    DC_LoaTS_Helper.setPref = function(prefName, value)
@@ -834,7 +843,7 @@ function main()
 	    		console.warn("Could not parse prefs to store " + prefName + ": " + value);
 	    		console.warn(ex);
 	    	}
-	    }
+	    };
 	    
 	    // Find all raid types matching a given filter
 	    DC_LoaTS_Helper.getRaidTypes = function(raidFilter)
@@ -845,19 +854,21 @@ function main()
 			// Iterate over all raids
 			for (var raidId in DC_LoaTS_Helper.raids)
 			{
-				// Get the current raid
-				var raid = DC_LoaTS_Helper.raids[raidId];
-				
-				// If the user's text matches this raid name
-				if (raidFilter.matches({name: raid.getSearchableName(), size: raid.size, zone: raid.zone}))
-				{
-					// Capture this raid to return
-					matchedTypes.push(raid);
-				}
+                if (DC_LoaTS_Helper.raids.hasOwnProperty(raidId)) {
+                    // Get the current raid
+                    var raid = DC_LoaTS_Helper.raids[raidId];
+
+                    // If the user's text matches this raid name
+                    if (raidFilter.matches({name: raid.getSearchableName(), size: raid.size, zone: raid.zone}))
+                    {
+                        // Capture this raid to return
+                        matchedTypes.push(raid);
+                    }
+                }
 			}
 			
 			return matchedTypes;
-	    }
+	    };
 		
 	    // Print the description of the script
 	    DC_LoaTS_Helper.printScriptHelp = function(deck, text)
@@ -871,10 +882,10 @@ function main()
 			helpText += "\n";
 			helpText += "<span class=\"DC_LoaTS_versionWrapper\">";
 			// If we've checked for version before
-			if (typeof DC_LoaTS_Helper.needUpdateState != "undefined")
+			if (typeof DC_LoaTS_Helper.needUpdateState !== "undefined")
 			{
 				// If it's time to update
-				if (DC_LoaTS_Helper.needUpdateState == "old")
+				if (DC_LoaTS_Helper.needUpdateState === "old")
 				{
 					helpText += DC_LoaTS_Helper.needUpdateText + "\n";
 					helpText += "\n";
@@ -884,7 +895,7 @@ function main()
 					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='http://userscripts.org/scripts/source/124753.user.js' target='_blank'>Update</a></span>";
 				}
 				// If the user has a newer than public version
-				else if (DC_LoaTS_Helper.needUpdateState == "new")
+				else if (DC_LoaTS_Helper.needUpdateState === "new")
 				{
 					helpText += DC_LoaTS_Helper.needUpdateText + "\n";
 					helpText += "\n";
@@ -899,7 +910,6 @@ function main()
 					helpText += "<span style='float:left; padding-top: 5px;'>Check for updates?</span>";
 					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink DC_LoaTS_updateNotRun' onclick='DC_LoaTS_Helper.checkForUpdates(); return false' href='#' target='_blank'>Check now</a></span>";
 				}
-				
 			}
 			// We don't really know what the current version is
 			else
@@ -923,16 +933,18 @@ function main()
 			
 			// Iterate over all commands and display their summaries
 			for (var commandName in DC_LoaTS_Helper.chatCommands)
-			{
-				var command = DC_LoaTS_Helper.chatCommands[commandName];
-				if (typeof command.doNotEnumerateInHelp == "undefined" || command.doNotEnumerateInHelp === false)
-				{
-					if (typeof command.getParamText === "function")
-					{
-						helpText += "<code>/" + commandName + " " + command.getParamText() + "</code>\n";
-					}
-				}
-			}
+            {
+                if (DC_LoaTS_Helper.chatCommands.hasOwnProperty(commandName)) {
+                    var command = DC_LoaTS_Helper.chatCommands[commandName];
+                    if (typeof command.doNotEnumerateInHelp == "undefined" || command.doNotEnumerateInHelp === false)
+                    {
+                        if (typeof command.getParamText === "function")
+                        {
+                            helpText += "<code>/" + commandName + " " + command.getParamText() + "</code>\n";
+                        }
+                    }
+                }
+            }
 			
 			helpText += "\n";
 			helpText += "All commands can do <code>/commandname help</code> to learn more about them. Brackets <code>[]</code> indicate optional parameters; don't actually put brackets in your commands, please.\n";
@@ -940,7 +952,7 @@ function main()
 			
 			
 			return false;
-	    }
+	    };
 	    
 	DC_LoaTS_Helper.chatCommands = {};
 	DC_LoaTS_Helper.raidStyles = {};
@@ -4247,8 +4259,8 @@ function main()
                 rmBlock.appendChild(this._createBlock(sizes[i]));
             }
 
-            rmBlock.appendChild(this._createBlock("Settings"));
-            rmBlock.appendChild(this._createBlock("Help"));
+            rmBlock.appendChild(this._createSettingsBlock());
+            rmBlock.appendChild(this._createHelpBlock());
 
             document.body.appendChild(rmBlock);
             this.rmBlock = rmBlock;
@@ -4274,6 +4286,60 @@ function main()
             this.blocks[size] = contents;
 
             return sizeBlock;
+        },
+
+        _createSettingsBlock: function() {
+            var block = this._createBlock("Settings"),
+                contents = this.blocks["Settings"];
+
+            var linkWrapper = document.createElement("p");
+            linkWrapper.className = "RaidMonitor-SettingsLinkWrapper";
+            contents.appendChild(linkWrapper);
+
+            var linkLabel = document.createElement("label");
+            linkLabel.className = "RaidMonitor-SettingsLinkLabel";
+            linkLabel.appendChild(document.createTextNode("Link: "));
+            linkWrapper.appendChild(linkLabel);
+
+            var linkInput = document.createElement("input");
+            linkInput.type = "text";
+            linkInput.className = "RaidMonitor-SettingsLinkInput";
+            linkLabel.appendChild(linkInput);
+
+            var privacyWrapper = document.createElement("p");
+            privacyWrapper.className = "RaidMonitor-SettingsPrivacyWrapper";
+            contents.appendChild(privacyWrapper);
+
+            var privacyLabel = document.createElement("label");
+            privacyLabel.className = "RaidMonitor-SettingsPrivacyLabel";
+            privacyLabel.appendChild(document.createTextNode("Post To: "));
+            privacyWrapper.appendChild(privacyLabel);
+
+            var privacyInput = document.createElement("select");
+            privacyInput.className = "RaidMonitor-SettingsPrivacySelect RaidMonitorPrivacySelect";
+            privacyLabel.appendChild(privacyInput);
+
+
+            var lists = DC_LoaTS_Helper.getRaidMonitorLists();
+
+            for (var i = 0; i < lists.length; i++) {
+                var list = lists[i];
+                if (list.pass) {
+                    var listOption = document.createElement("option");
+                    listOption.value = list.pass;
+                    listOption.appendChild(document.createTextNode(list.name));
+                    privacyInput.appendChild(listOption);
+                }
+            }
+
+            return block;
+        },
+
+        _createHelpBlock: function() {
+            var block = this._createBlock("Help");
+
+
+            return block;
         },
 
         show: function() {
@@ -5466,6 +5532,9 @@ function main()
 					case "cconoly":
 						return "CConoly"
 						break;
+                    case "konge":
+                        return "KongE"
+                        break;
 					default:
 						return this.getWorkingUrl();
 						break;
@@ -5489,8 +5558,9 @@ function main()
 		
 		// Pattern to match different link types
 		UrlParsingFilter.urlPatterns = {
-			"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
-			"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
+			"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i,
+            "cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i,
+            "konge": /(?:https?:\/\/)?(?:www\.)?getkonge\.org\/games\/lots\/raids\?links/i
 		};
 		
 		/************************************/
@@ -7525,12 +7595,13 @@ RaidCommand
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {success: true};
+					var ret = {success: true},
+                        messageFormat;
 					
 					if (params.length == 0)
 					{
 						// Retrieve the message format
-						var messageFormat = DC_LoaTS_Helper.getMessageFormat();
+						messageFormat = DC_LoaTS_Helper.getMessageFormat();
 					
 						// Let the user know what the format is
 						ret.statusMessage = "Current raid format: <code>" + messageFormat + "</code>" + 
@@ -7539,7 +7610,7 @@ RaidCommand
 					}
 					else if (params == "reset")
 					{
-						var messageFormat = RaidLink.defaultMessageFormat;
+						messageFormat = RaidLink.defaultMessageFormat;
 						
 						// Retrieve the message format
 						GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
@@ -7581,13 +7652,15 @@ RaidCommand
 					
 					for (var stateName in RaidManager.STATE)
 					{
-						var state = RaidManager.STATE[stateName];
-						if (typeof state == "object")
-						{
-							cache_state_text += state.text + ", ";
-							cache_state_nice_text += state.niceText + ", ";
-							cache_state_short_text += state.shortText + ", ";
-						}
+                        if (RaidManager.STATE.hasOwnProperty(stateName)) {
+                            var state = RaidManager.STATE[stateName];
+                            if (typeof state == "object")
+                            {
+                                cache_state_text += state.text + ", ";
+                                cache_state_nice_text += state.niceText + ", ";
+                                cache_state_short_text += state.shortText + ", ";
+                            }
+                        }
 					}
 					
 					var unknownState = RaidManager.STATE.getUnknownState();
@@ -7661,10 +7734,10 @@ RaidCommand
 					helpText += "\n";
 					helpText += "<b>Short:</b>\n";
 					helpText += "<code>" + this.getCommandLink("{cache-state-short} {diff} {shorter-name}") + "</code>";
-					helpText += "\n"
-					helpText += "<b>Notes:</b>\n"
-					helpText += "<code>{fs}</code> can also do simple math like <code>{fs*2}</code>\n"
-					helpText += "Use <code>{line}</code> for new lines, and can be used multiple times.\n"
+					helpText += "\n";
+					helpText += "<b>Notes:</b>\n";
+					helpText += "<code>{fs}</code> can also do simple math like <code>{fs*2}</code>\n";
+					helpText += "Use <code>{line}</code> for new lines, and can be used multiple times.\n";
 					
 					return helpText;
 				}
@@ -8535,7 +8608,7 @@ DC_LoaTS_Helper.raids =
     missile_strike:     new RaidType("missile_strike",      "ZA", "Missile Strike", "Missiles", "Missile",            72,  10, "S",  [22000000, 28600000, 35200000, 44000000]),
     pi:                 new RaidType("pi",                 "ZA2", "Pi", "Pi", "Pi",                                   72,  10, "S",  [24000000, 31200000, 38400000, 48000000]),
     master_hao:         new RaidType("master_hao",         "Z19", "Master Hao", "Hao", "Hao",                         36,  10, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
-    trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               3,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000]),
+    trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               3,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000],/*FS calculated normally*/null,[1000000000, 1000000000, 1000000000, 1000000000]),
 
     // Medium Raids
     "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
@@ -9686,7 +9759,7 @@ window.RaidMonitorAPI = {
 					var took = (endTime - startTime)/1000;
 					holodeck.activeDialogue().raidBotMessage("Load ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
 				}
-			}
+			};
 			
 
 			// Kick off the auto loading
@@ -9777,7 +9850,7 @@ window.RaidMonitorAPI = {
 			}
 			
 			DC_LoaTS_Helper.updatePostedLinks();
-		}
+		};
 		
 		DC_LoaTS_Helper.listContainsRaid = function(list, raidLink) {
 			DCDebug("List contains raid: ", list, raidLink);
@@ -9793,7 +9866,7 @@ window.RaidMonitorAPI = {
 			}
 			
 			return false;
-		}
+		};
 		
 		// Make sure the upl namespace exists
 		DC_LoaTS_Helper.upl = {now: {}, next: {}};
@@ -9801,168 +9874,6 @@ window.RaidMonitorAPI = {
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
-			/*
-			// If updating posted links is locked
-			if (DC_LoaTS_Helper.upl.lock) {
-				DCDebug("UPL already locked trying to update: " + (raidLink ? raidLink.id : "ALL"));
-				// No raidLink provided. Load everything
-				if (!raidLink) {
-					DC_LoaTS_Helper.upl.next.refreshAll = true;
-					delete DC_LoaTS_Helper.upl.next.list;
-				}
-				// If we're not loading all
-				else if (!DC_LoaTS_Helper.upl.next.refreshAll) {
-					// Make sure the list is ready
-					if (!DC_LoaTS_Helper.upl.next.list) {
-						DC_LoaTS_Helper.upl.next.list = [];
-					}
-					DC_LoaTS_Helper.upl.next.list.push(raidLink);
-				}
-				
-				// If updating posted links became unlocked
-				if (DC_LoaTS_Helper.upl.lock) {
-					// Lock it
-					DC_LoaTS_Helper.upl.lock = true;
-					DCDebug("UPL became unlocked during update: " + (raidLink ? raidLink.id : "ALL"));
-					DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
-
-					// In theory, we now have the lock and other code can't get in here
-
-					// Copy over the important values
-					DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
-					DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
-					
-					// Clear out the nexts
-					DC_LoaTS_Helper.upl.next.refreshAll = false;
-					delete DC_LoaTS_Helper.upl.next.list;
-
-					DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
-					// Run the private runner. Will do the unlock for us
-					_upl();
-				}
-				// If it's still locked, don't do anything
-			}
-			else {
-				// Lock it
-				DC_LoaTS_Helper.upl.lock = true;
-				DCDebug("UPL already unlocked for: " + (raidLink ? raidLink.id : "ALL"));
-				DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
-				
-				// In theory, we now have the lock and other code can't get in here
-
-				// Set the important values
-				DC_LoaTS_Helper.upl.now.refreshAll = !raidLink;
-				DC_LoaTS_Helper.upl.now.list = raidLink ? [raidLink] : undefined;
-
-				DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
-				// Run the private runner. Will do the unlock for us
-				_upl();
-			}
-			
-			// Private function
-			function _upl() {
-				// At this time, we can assume that the locks prevent this code from every being run
-				// more than once at a time, and that the upl.now variables are set and won't change
-				
-				// Set a timeout to avoid sucking up all the cpu
-				setTimeout(function()
-				{
-					Timer.start("updatePostedLinksTimeout");
-					DCDebug("Running UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
-					try 
-					{
-						// Look up all raid links in chat
-						var elems = $("play").getElementsByClassName("raidMessage");
-						
-						// Retrieve the message format
-						var messageFormat = DC_LoaTS_Helper.getMessageFormat();
-						
-						// Retrieve the link format
-						var linkFormat = DC_LoaTS_Helper.getLinkFormat();
-						
-						// Iterate over all link elements in the chat
-						for (var i = 0; i < elems.length; i++)
-						{
-							// Convert them to RaidLink objects
-							var elem = elems[i];
-							var newRaidLink = new RaidLink(elem.children[0].href);
-							
-							// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-							if (newRaidLink.isValid() && (DC_LoaTS_Helper.upl.now.refreshAll || DC_LoaTS_Helper.listContainsRaid(DC_LoaTS_Helper.upl.now.list, newRaidLink)))
-							{
-								// Restyle the message as appropriate
-								var styles = newRaidLink.getMatchedStyles();
-								
-								// TODO: Eventually figure out how to style whispers without it being a PITA especially raidbot seenraids whispers
-								if ((elem.parentNode.parentNode.parentNode.className || "").indexOf("hisper") < 0) {
-									
-									// Remove existing doomscript styles. We don't want to double them up or anything weird
-									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "").trim();
-
-									// If there are styles, apply them
-									if (styles && styles.className)
-									{
-										// Append to the existing styles
-										elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
-									}
-								}
-								
-								// Remove the old link, and shove in the new, formatted, styled one
-								elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
-								elem.remove();
-							}
-							else if (!newRaidLink.isValid())
-							{
-								console.warn("Element did not produce a valid raid link:");
-								console.warn(elem);
-							}
-							else if (newRaidLink.hash === raidLink.hash || raidLink.id === newRaidLink.id)
-							{
-								DCDebug("Similar links found while updating posted links, but not similar enough?");
-								DCDebug(raidLink);
-								DCDebug(newRaidLink);
-							}
-						}
-					}
-					catch (e)
-					{
-						console.warn(e);
-					}
-					
-					// If there's other stuff to run
-					if (DC_LoaTS_Helper.upl.next.refreshAll || DC_LoaTS_Helper.upl.next.list) {
-						DCDebug("Additional links available. Scheduling UPL again for: ", DC_LoaTS_Helper.upl.next.list, " refreshAll: " + DC_LoaTS_Helper.upl.next.refreshAll);
-						setTimeout(function() {
-							// Copy over the important values
-							DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
-							DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
-							
-							// Clear out the nexts
-							DC_LoaTS_Helper.upl.next.refreshAll = false;
-							delete DC_LoaTS_Helper.upl.next.list;
-	
-							DCDebug("Calling UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
-							// Run the private runner. Will do the unlock for us
-							_upl();
-						// If we go to run this again, don't run it too soon
-						}, 500);
-					}
-					else {
-						DCDebug("Unlocking UPL");
-						DC_LoaTS_Helper.upl.lock = false;
-					}
-					Timer.stop("updatePostedLinksTimeout");
-				}, 100);
-			}
-			
-			
-			
-			*/
-			
-			
-			
-			
-			
 			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout !== "undefined")
 			{
 				clearTimeout(DC_LoaTS_Helper.updatePostedLinksTimeout);
@@ -10245,26 +10156,26 @@ window.RaidMonitorAPI = {
 
 			if (state == "old")
 			{
-				var updateNotificationDiv = document.getElementById("DC_LoaTS_notifitcationBar");
+				var updateNotificationDiv = document.getElementById("DC_LoaTS_notificationBar");
 				
 				if (!updateNotificationDiv)
 				{
 					updateNotificationDiv = document.createElement("div");
-					updateNotificationDiv.id = "DC_LoaTS_notifitcationBar";
+					updateNotificationDiv.id = "DC_LoaTS_notificationBar";
 					updateNotificationDiv.className = "clearfix";
 					$(updateNotificationDiv).hide();
 					
 					var updateTitle = document.createElement("div");
 					updateTitle.appendChild(document.createTextNode("LoaTS Helper - "));
-					updateTitle.id = "DC_LoaTS_notifitcationBarTitle";
+					updateTitle.id = "DC_LoaTS_notificationBarTitle";
 					updateNotificationDiv.appendChild(updateTitle);
 					
 					var updateTextDiv = document.createElement("div");
-					updateTextDiv.id = "DC_LoaTS_notifitcationBarText";
+					updateTextDiv.id = "DC_LoaTS_notificationBarText";
 					updateNotificationDiv.appendChild(updateTextDiv);
 					
 					var updateButtonsDiv = document.createElement("div");
-					updateButtonsDiv.id = "DC_LoaTS_notifitcationBarButtons";
+					updateButtonsDiv.id = "DC_LoaTS_notificationBarButtons";
 					updateNotificationDiv.appendChild(updateButtonsDiv);
 					
 					var updateButton = document.createElement("a");
@@ -10274,9 +10185,10 @@ window.RaidMonitorAPI = {
 					updateButton.target = "_blank";
 					updateButton.onclick = function()
 					{
-						if ($("DC_LoaTS_notifitcationBar"))
+                        var bar = $("DC_LoaTS_notificationBar");
+						if (bar)
 						{
-							$("DC_LoaTS_notifitcationBar").hide();
+							bar.hide();
 						}
 						
 						return true;
@@ -10284,14 +10196,15 @@ window.RaidMonitorAPI = {
 					updateButtonsDiv.appendChild(updateButton);
 					
 					var remindButton = document.createElement("a");
-					remindButton.className = "DC_LoaTS_notifitcationBarButton";
+					remindButton.className = "DC_LoaTS_notificationBarButton";
 					remindButton.href = "#";
 					remindButton.appendChild(document.createTextNode("Remind me later"));
 					remindButton.onclick = function()
 					{
-						if ($("DC_LoaTS_notifitcationBar"))
+                        var bar = $("DC_LoaTS_notificationBar");
+						if (bar)
 						{
-							$("DC_LoaTS_notifitcationBar").hide();
+							bar.hide();
 						}
 						
 						return false;
@@ -10303,14 +10216,14 @@ window.RaidMonitorAPI = {
 					if (typeof canAutoUpdate != "undefined" && canAutoUpdate)
 					{
 						var ignoreButton = document.createElement("a");
-						ignoreButton.className = "DC_LoaTS_notifitcationBarButton";
+						ignoreButton.className = "DC_LoaTS_notificationBarButton";
 						ignoreButton.href = "#";
 						ignoreButton.appendChild(document.createTextNode("Turn auto update check off"));
 						ignoreButton.onclick = function()
 						{
-							if ($("DC_LoaTS_notifitcationBar"))
+							if ($("DC_LoaTS_notificationBar"))
 							{
-								$("DC_LoaTS_notifitcationBar").hide();
+								$("DC_LoaTS_notificationBar").hide();
 							}
 							
 							GM_setValue(DC_LoaTS_Properties.storage.autoUpdate, false);
@@ -10323,7 +10236,7 @@ window.RaidMonitorAPI = {
 					
 					document.body.appendChild(updateNotificationDiv);
 				}
-				$(updateNotificationDiv).down("#DC_LoaTS_notifitcationBarText").update(text);
+				$(updateNotificationDiv).down("#DC_LoaTS_notificationBarText").update(text);
 				$(updateNotificationDiv).show();
 			}
 		};
@@ -10572,6 +10485,23 @@ window.RaidMonitorAPI = {
                     RaidMonitorTools.refresh();
                 }
             });
+        };
+
+        DC_LoaTS_Helper._startUpdateCooldownsInterval = function() {
+            if (DC_LoaTS_Helper._updateCooldownsInterval) {
+                clearInterval(DC_LoaTS_Helper._updateCooldownsInterval);
+            }
+
+            DC_LoaTS_Helper.updateCooldowns();
+            DC_LoaTS_Helper._updateCooldownsInterval = setInterval(DC_LoaTS_Helper.updateCooldowns, DC_LoaTS_Properties.updateCooldownsInterval);
+        };
+        
+        DC_LoaTS_Helper.getRaidMonitorLists = function() {
+            if (!DC_LoaTS_Helper.raidMonitorLists) {
+                DC_LoaTS_Helper.raidMonitorLists = JSON.parse(GM_getValue(DC_LoaTS_Properties.storage.raidMonitorLists) || '[{"name":"Public", "pass":"public"}]');
+            }
+
+            return DC_LoaTS_Helper.raidMonitorLists;
         };
 
 		DC_LoaTS_Helper.timeDifference = function(current, previous) {
@@ -11216,7 +11146,7 @@ window.RaidMonitorAPI = {
         rulesText += "}\n";
 
         // Raid Monitor stylings - size block:hover
-        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner {\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tcolor: #000000;\n";
         rulesText += "}\n";
@@ -11308,7 +11238,7 @@ window.RaidMonitorAPI = {
         rulesText += "\tz-index: 10;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover {\n";
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover, .horizontal .RaidMonitor-SizeBlock.show {\n";
         rulesText += "\theight: 100px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: height 1s ease-out;\n";
@@ -11316,7 +11246,7 @@ window.RaidMonitorAPI = {
         rulesText += "\t-o-transition: height 1s ease-out;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .horizontal .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
@@ -11339,18 +11269,35 @@ window.RaidMonitorAPI = {
         rulesText += "\twhite-space: nowrap;\n";
         rulesText += "\n}";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .horizontal .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-SettingsLinkWrapper {\n";
+        rulesText += "\tpadding: 2px 0px;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-SettingsLinkInput {\n";
+        rulesText += "\twidth: 130px;\n";
+        rulesText += "\tborder-radius:5px;\n";
+        rulesText += "\t-webkit-transition: box-shadow .15s linear;\n";
+        rulesText += "\t-moz-transition: box-shadow .15s linear;\n";
+        rulesText += "\t-o-transition: box-shadow .15s linear;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.RaidMonitor-SettingsLinkInput:active {\n";
+        rulesText += "\tbox-shadow: 0 0 5px 3px #ffa853;\n";
+        rulesText += "\tborder: 1px solid #ffa853;\n";
         rulesText += "}\n";
 
         rulesText += "\n.RaidMonitor-Block .behind {\n";
@@ -11520,7 +11467,7 @@ window.RaidMonitorAPI = {
             DC_LoaTS_Helper.updateRaidData();
 
             // Update cooldowns
-            DC_LoaTS_Helper.updateCooldowns();
+            DC_LoaTS_Helper._startUpdateCooldownsInterval();
 
         }
     	

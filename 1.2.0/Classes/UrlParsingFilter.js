@@ -69,6 +69,9 @@
 					case "cconoly":
 						return "CConoly"
 						break;
+                    case "konge":
+                        return "KongE"
+                        break;
 					default:
 						return this.getWorkingUrl();
 						break;
@@ -92,7 +95,8 @@
 		
 		// Pattern to match different link types
 		UrlParsingFilter.urlPatterns = {
-			"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i, 
-			"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
+			"pastebin": /(?:http:\/\/)?(?:www\.)?pastebin\.com\/(.+)/i,
+            "cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i,
+            "konge": /(?:https?:\/\/)?(?:www\.)?getkonge\.org\/games\/lots\/raids\?links/i
 		};
 		
