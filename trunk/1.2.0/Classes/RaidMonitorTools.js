@@ -25,8 +25,8 @@
                 rmBlock.appendChild(this._createBlock(sizes[i]));
             }
 
-            rmBlock.appendChild(this._createBlock("Settings"));
-            rmBlock.appendChild(this._createBlock("Help"));
+            rmBlock.appendChild(this._createSettingsBlock());
+            rmBlock.appendChild(this._createHelpBlock());
 
             document.body.appendChild(rmBlock);
             this.rmBlock = rmBlock;
@@ -52,6 +52,60 @@
             this.blocks[size] = contents;
 
             return sizeBlock;
+        },
+
+        _createSettingsBlock: function() {
+            var block = this._createBlock("Settings"),
+                contents = this.blocks["Settings"];
+
+            var linkWrapper = document.createElement("p");
+            linkWrapper.className = "RaidMonitor-SettingsLinkWrapper";
+            contents.appendChild(linkWrapper);
+
+            var linkLabel = document.createElement("label");
+            linkLabel.className = "RaidMonitor-SettingsLinkLabel";
+            linkLabel.appendChild(document.createTextNode("Link: "));
+            linkWrapper.appendChild(linkLabel);
+
+            var linkInput = document.createElement("input");
+            linkInput.type = "text";
+            linkInput.className = "RaidMonitor-SettingsLinkInput";
+            linkLabel.appendChild(linkInput);
+
+            var privacyWrapper = document.createElement("p");
+            privacyWrapper.className = "RaidMonitor-SettingsPrivacyWrapper";
+            contents.appendChild(privacyWrapper);
+
+            var privacyLabel = document.createElement("label");
+            privacyLabel.className = "RaidMonitor-SettingsPrivacyLabel";
+            privacyLabel.appendChild(document.createTextNode("Post To: "));
+            privacyWrapper.appendChild(privacyLabel);
+
+            var privacyInput = document.createElement("select");
+            privacyInput.className = "RaidMonitor-SettingsPrivacySelect RaidMonitorPrivacySelect";
+            privacyLabel.appendChild(privacyInput);
+
+
+            var lists = DC_LoaTS_Helper.getRaidMonitorLists();
+
+            for (var i = 0; i < lists.length; i++) {
+                var list = lists[i];
+                if (list.pass) {
+                    var listOption = document.createElement("option");
+                    listOption.value = list.pass;
+                    listOption.appendChild(document.createTextNode(list.name));
+                    privacyInput.appendChild(listOption);
+                }
+            }
+
+            return block;
+        },
+
+        _createHelpBlock: function() {
+            var block = this._createBlock("Help");
+
+
+            return block;
         },
 
         show: function() {

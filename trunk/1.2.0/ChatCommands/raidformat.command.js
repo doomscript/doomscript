@@ -11,12 +11,13 @@
 				handler: function(deck, parser, params, text, context)
 				{
 					// Declare ret object
-					var ret = {success: true};
+					var ret = {success: true},
+                        messageFormat;
 					
 					if (params.length == 0)
 					{
 						// Retrieve the message format
-						var messageFormat = DC_LoaTS_Helper.getMessageFormat();
+						messageFormat = DC_LoaTS_Helper.getMessageFormat();
 					
 						// Let the user know what the format is
 						ret.statusMessage = "Current raid format: <code>" + messageFormat + "</code>" + 
@@ -25,7 +26,7 @@
 					}
 					else if (params == "reset")
 					{
-						var messageFormat = RaidLink.defaultMessageFormat;
+						messageFormat = RaidLink.defaultMessageFormat;
 						
 						// Retrieve the message format
 						GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
@@ -67,13 +68,15 @@
 					
 					for (var stateName in RaidManager.STATE)
 					{
-						var state = RaidManager.STATE[stateName];
-						if (typeof state == "object")
-						{
-							cache_state_text += state.text + ", ";
-							cache_state_nice_text += state.niceText + ", ";
-							cache_state_short_text += state.shortText + ", ";
-						}
+                        if (RaidManager.STATE.hasOwnProperty(stateName)) {
+                            var state = RaidManager.STATE[stateName];
+                            if (typeof state == "object")
+                            {
+                                cache_state_text += state.text + ", ";
+                                cache_state_nice_text += state.niceText + ", ";
+                                cache_state_short_text += state.shortText + ", ";
+                            }
+                        }
 					}
 					
 					var unknownState = RaidManager.STATE.getUnknownState();
@@ -147,10 +150,10 @@
 					helpText += "\n";
 					helpText += "<b>Short:</b>\n";
 					helpText += "<code>" + this.getCommandLink("{cache-state-short} {diff} {shorter-name}") + "</code>";
-					helpText += "\n"
-					helpText += "<b>Notes:</b>\n"
-					helpText += "<code>{fs}</code> can also do simple math like <code>{fs*2}</code>\n"
-					helpText += "Use <code>{line}</code> for new lines, and can be used multiple times.\n"
+					helpText += "\n";
+					helpText += "<b>Notes:</b>\n";
+					helpText += "<code>{fs}</code> can also do simple math like <code>{fs*2}</code>\n";
+					helpText += "Use <code>{line}</code> for new lines, and can be used multiple times.\n";
 					
 					return helpText;
 				}

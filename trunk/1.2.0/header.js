@@ -378,6 +378,8 @@ function main()
     	QuickFriendURL: "http://userscripts.org/125666",
     	PlayNowFixURL: "http://userscripts.org/142619",
     	farmSpreadsheetURL: "https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4",
+
+        updateCooldownsInterval: 10 /*min*/ * 60 /*sec*/ * 1000 /*ms*/,
     	
     	// Do not check code in with this set to true. 
     	// Preferably, turn it on from the browser command line with DC_LoaTS_Properties.debugMode = true;
@@ -403,11 +405,14 @@ function main()
 	    	
 	    	// Overall container for raid link storage
 	    	raidStorage: "RaidManager_doomcat_v1",
-	    	
-	    	// RaidType Specific preferences
-	    	raidPrefs: "DC_LoaTS_raidPreferences",
-	    	
-	    	// General script behaviour preferences
+
+            // RaidType Specific preferences
+            raidPrefs: "DC_LoaTS_raidPreferences",
+
+            // Lists for pulling from Raid Monitor
+            raidMonitorLists: "DC_LoaTS_raidMonitorLists",
+
+            // General script behaviour preferences
 	    	behaviorPrefs: "DC_LoaTS_behaviorPreferences",
 	    	
 	    	// Quarantine addendum

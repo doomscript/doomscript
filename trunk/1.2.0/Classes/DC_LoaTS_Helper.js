@@ -175,18 +175,20 @@
 				// Take all the chat commands and register them with Kongregate
 				for (var commandName in DC_LoaTS_Helper.chatCommands)
 				{
-					// Get the command
-					var command = DC_LoaTS_Helper.chatCommands[commandName];
-					
-					// If there's really a command for this name
-					if (typeof command !== "undefined")
-					{
-						// Create a command factory for this command
-						var commandFactory = new RaidCommandFactory(command, "chat");
-						
-						// Attach the command factory to the holodeck callback
-						holodeck.addChatCommand(commandName, commandFactory.createAndExecuteCommand.bind(commandFactory));
-					}
+                    if (DC_LoaTS_Helper.chatCommands.hasOwnProperty(commandName)) {
+                        // Get the command
+                        var command = DC_LoaTS_Helper.chatCommands[commandName];
+
+                        // If there's really a command for this name
+                        if (typeof command !== "undefined")
+                        {
+                            // Create a command factory for this command
+                            var commandFactory = new RaidCommandFactory(command, "chat");
+
+                            // Attach the command factory to the holodeck callback
+                            holodeck.addChatCommand(commandName, commandFactory.createAndExecuteCommand.bind(commandFactory));
+                        }
+                    }
 				}
 				
 				// We want to intercept whispers to the raid bot and alias commands
@@ -228,7 +230,7 @@
 							str = command;
 						}
 						
-						// This supressed the command going to chat, even on failure
+						// This suppressed the command going to chat, even on failure
 						// and even if a real command is not found by that name
 						raidBotWhisper = true;
 					}
@@ -236,39 +238,41 @@
 					//TODO: This process could be optimized a bit when the user starts out using the official command name
 					// Iterate over the commands to find their aliases
 					for (var commandName in DC_LoaTS_Helper.chatCommands)
-					{
-						DCDebug(commandName);
-						// If the regular command name is here, just use that
-						if (new RegExp("^\/" + commandName + "\\b", "i").test(str))
-						{
-							// Stop trying to find aliases
-							break;
-						}
-						// Not this real command name. Check its aliases.
-						else
-						{
-							// Grab the aliases for this command
-							var aliases = DC_LoaTS_Helper.chatCommands[commandName].aliases;
-							
-							// If there are actually any aliases
-							if (typeof aliases != "undefined")
-							{
-								// For each alias
-								for (var i = 0; i < aliases.length; i++)
-								{
-									// Get this alias
-									var alias = aliases[i];
-									
-									// If we found an alias
-									if (new RegExp("^\/" + alias + "\\b", "i").test(str))
-									{
-										// Redirect to the official command
-										str = str.replace(new RegExp(alias, "i"), commandName);
-									}
-								}
-							}
-						}
-					}
+                    {
+                        if (DC_LoaTS_Helper.chatCommands.hasOwnProperty(commandName)) {
+                            DCDebug(commandName);
+                            // If the regular command name is here, just use that
+                            if (new RegExp("^\/" + commandName + "\\b", "i").test(str))
+                            {
+                                // Stop trying to find aliases
+                                break;
+                            }
+                            // Not this real command name. Check its aliases.
+                            else
+                            {
+                                // Grab the aliases for this command
+                                var aliases = DC_LoaTS_Helper.chatCommands[commandName].aliases;
+
+                                // If there are actually any aliases
+                                if (typeof aliases != "undefined")
+                                {
+                                    // For each alias
+                                    for (var i = 0; i < aliases.length; i++)
+                                    {
+                                        // Get this alias
+                                        var alias = aliases[i];
+
+                                        // If we found an alias
+                                        if (new RegExp("^\/" + alias + "\\b", "i").test(str))
+                                        {
+                                            // Redirect to the official command
+                                            str = str.replace(new RegExp(alias, "i"), commandName);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 					
 					// Capture the resulting state of the chat command
 					var chatCommandResult = holodeck.DC_LoaTS_processChatCommand(str);
@@ -307,26 +311,26 @@
 			var messageFormat = GM_getValue(DC_LoaTS_Properties.storage.messageFormat);
 
 			// Fall back to default messageFormat if necessary
-			if (typeof messageFormat == "undefined" || messageFormat.trim().length == 0)
+			if (!messageFormat || messageFormat.trim().length === 0)
 			{
 				messageFormat = RaidLink.defaultMessageFormat;
 				GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
 			}
 			return messageFormat;	
-	    }
+	    };
 	    
 	    // Set the message format
 	    DC_LoaTS_Helper.setMessageFormat = function(messageFormat)
 	    {
 			// Fall back to default messageFormat if necessary
-			if (typeof messageFormat == "undefined" || messageFormat.trim().length == 0)
+			if (!messageFormat || messageFormat.trim().length === 0)
 			{
 				messageFormat = RaidLink.defaultMessageFormat;
 			}
 			
 			// Set the message format
 			GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
-	    }
+	    };
 	    
 	    // Retrieve the link format
 	    DC_LoaTS_Helper.getLinkFormat = function()
@@ -357,7 +361,7 @@
 				linkFormat = RaidLink.defaultLinkFormat_v2;
 			}
 			return linkFormat;
-	    }
+	    };
 	    
 	    // Retrieve a preference value from storage
 	    DC_LoaTS_Helper.getPref = function(prefName, defaultValue)
@@ -384,7 +388,7 @@
 	    	}
 	    	
 	    	return (typeof ret !== "undefined") ? ret : defaultValue;
-	    }
+	    };
 	    
 	    // Store a preference value into storage
 	    DC_LoaTS_Helper.setPref = function(prefName, value)
@@ -410,7 +414,7 @@
 	    		console.warn("Could not parse prefs to store " + prefName + ": " + value);
 	    		console.warn(ex);
 	    	}
-	    }
+	    };
 	    
 	    // Find all raid types matching a given filter
 	    DC_LoaTS_Helper.getRaidTypes = function(raidFilter)
@@ -421,19 +425,21 @@
 			// Iterate over all raids
 			for (var raidId in DC_LoaTS_Helper.raids)
 			{
-				// Get the current raid
-				var raid = DC_LoaTS_Helper.raids[raidId];
-				
-				// If the user's text matches this raid name
-				if (raidFilter.matches({name: raid.getSearchableName(), size: raid.size, zone: raid.zone}))
-				{
-					// Capture this raid to return
-					matchedTypes.push(raid);
-				}
+                if (DC_LoaTS_Helper.raids.hasOwnProperty(raidId)) {
+                    // Get the current raid
+                    var raid = DC_LoaTS_Helper.raids[raidId];
+
+                    // If the user's text matches this raid name
+                    if (raidFilter.matches({name: raid.getSearchableName(), size: raid.size, zone: raid.zone}))
+                    {
+                        // Capture this raid to return
+                        matchedTypes.push(raid);
+                    }
+                }
 			}
 			
 			return matchedTypes;
-	    }
+	    };
 		
 	    // Print the description of the script
 	    DC_LoaTS_Helper.printScriptHelp = function(deck, text)
@@ -447,10 +453,10 @@
 			helpText += "\n";
 			helpText += "<span class=\"DC_LoaTS_versionWrapper\">";
 			// If we've checked for version before
-			if (typeof DC_LoaTS_Helper.needUpdateState != "undefined")
+			if (typeof DC_LoaTS_Helper.needUpdateState !== "undefined")
 			{
 				// If it's time to update
-				if (DC_LoaTS_Helper.needUpdateState == "old")
+				if (DC_LoaTS_Helper.needUpdateState === "old")
 				{
 					helpText += DC_LoaTS_Helper.needUpdateText + "\n";
 					helpText += "\n";
@@ -460,7 +466,7 @@
 					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='http://userscripts.org/scripts/source/124753.user.js' target='_blank'>Update</a></span>";
 				}
 				// If the user has a newer than public version
-				else if (DC_LoaTS_Helper.needUpdateState == "new")
+				else if (DC_LoaTS_Helper.needUpdateState === "new")
 				{
 					helpText += DC_LoaTS_Helper.needUpdateText + "\n";
 					helpText += "\n";
@@ -475,7 +481,6 @@
 					helpText += "<span style='float:left; padding-top: 5px;'>Check for updates?</span>";
 					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink DC_LoaTS_updateNotRun' onclick='DC_LoaTS_Helper.checkForUpdates(); return false' href='#' target='_blank'>Check now</a></span>";
 				}
-				
 			}
 			// We don't really know what the current version is
 			else
@@ -499,16 +504,18 @@
 			
 			// Iterate over all commands and display their summaries
 			for (var commandName in DC_LoaTS_Helper.chatCommands)
-			{
-				var command = DC_LoaTS_Helper.chatCommands[commandName];
-				if (typeof command.doNotEnumerateInHelp == "undefined" || command.doNotEnumerateInHelp === false)
-				{
-					if (typeof command.getParamText === "function")
-					{
-						helpText += "<code>/" + commandName + " " + command.getParamText() + "</code>\n";
-					}
-				}
-			}
+            {
+                if (DC_LoaTS_Helper.chatCommands.hasOwnProperty(commandName)) {
+                    var command = DC_LoaTS_Helper.chatCommands[commandName];
+                    if (typeof command.doNotEnumerateInHelp == "undefined" || command.doNotEnumerateInHelp === false)
+                    {
+                        if (typeof command.getParamText === "function")
+                        {
+                            helpText += "<code>/" + commandName + " " + command.getParamText() + "</code>\n";
+                        }
+                    }
+                }
+            }
 			
 			helpText += "\n";
 			helpText += "All commands can do <code>/commandname help</code> to learn more about them. Brackets <code>[]</code> indicate optional parameters; don't actually put brackets in your commands, please.\n";
@@ -516,7 +523,7 @@
 			
 			
 			return false;
-	    }
+	    };
 	    
 	DC_LoaTS_Helper.chatCommands = {};
 	DC_LoaTS_Helper.raidStyles = {};
