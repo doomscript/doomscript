@@ -72,6 +72,9 @@
 					this.omniboxWrapper.insert({bottom: this.omniboxCommandsWrapper});
 					this.container.insert({bottom: this.omniboxWrapper});
 
+                    this.rmContainer = new Element("li", {"id": "DC_LoaTS_rmToolbarWrapper"});
+                    this.container.insert({bottom: this.rmContainer});
+
 					this.omnibox.observe("mouseover", function() {
 						$(this).addClassName("DC_LoaTS_omnibox_focus");
 					});
@@ -412,14 +415,14 @@
 		RaidToolbar.hideCommandOptions = function()
 		{
 			$$(".DC_LoaTS_omniboxCommandsWrapper")[0].hide();
-		}
+		};
 		
 		// Hide the command options
 		RaidToolbar.resetOmnibox = function()
 		{
 			$$(".DC_LoaTS_omnibox")[0].value = "";
 			$$(".DC_LoaTS_omnibox")[0].focus();			
-		}
+		};
 		
 		RaidToolbar.createWRButton = function() {
 			var wr = DC_LoaTS_Helper.worldRaidInfo;
@@ -435,4 +438,4 @@
 				DC_LoaTS_Helper.wrButton = new RaidButton(DC_LoaTS_Helper.worldRaidInfo.name + " Info", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo);
 				raidToolbar.container.insert({bottom: DC_LoaTS_Helper.wrButton.node});
 			}
-		}
+		};

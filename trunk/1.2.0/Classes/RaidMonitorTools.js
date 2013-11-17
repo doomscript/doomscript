@@ -130,16 +130,33 @@
             if (pos === "right") {
                 raidMonitorTools.rmBlock.style.top = DC_LoaTS_Helper.getRealOffsetTop(mg) + mg.offsetHeight/2 - 200 + "px";
                 raidMonitorTools.rmBlock.style.left = mg.offsetLeft + mg.offsetWidth + "px";
-                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("horizontal", "");
+                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("bottom", "").trim();
+                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("toolbar", "").trim();
                 raidMonitorTools.rmBlock.style.display = "block";
+                raidMonitorTools.rmBlock.parentNode.removeChild(raidMonitorTools.rmBlock);
+                document.body.appendChild(raidMonitorTools.rmBlock);
             }
             else if (pos === "bottom") {
                 raidMonitorTools.rmBlock.style.top = DC_LoaTS_Helper.getRealOffsetTop(mg) + mg.offsetHeight + "px";
                 raidMonitorTools.rmBlock.style.left = mg.offsetLeft + mg.offsetWidth/2 - 200 + "px";
-                if (raidMonitorTools.rmBlock.className.indexOf("horizontal") < 0) {
-                    raidMonitorTools.rmBlock.className += " horizontal";
+                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("toolbar", "").trim();
+                if (raidMonitorTools.rmBlock.className.indexOf("bottom") < 0) {
+                    raidMonitorTools.rmBlock.className += " bottom";
                 }
                 raidMonitorTools.rmBlock.style.display = "block";
+                raidMonitorTools.rmBlock.parentNode.removeChild(raidMonitorTools.rmBlock);
+                document.body.appendChild(raidMonitorTools.rmBlock);
+            }
+            else if (pos === "toolbar") {
+                raidMonitorTools.rmBlock.style.top = "0px";
+                raidMonitorTools.rmBlock.style.left = "0px";
+                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("bottom", "").trim();
+                if (raidMonitorTools.rmBlock.className.indexOf("toolbar") < 0) {
+                    raidMonitorTools.rmBlock.className += " toolbar";
+                }
+                RaidToolbar.show();
+                raidMonitorTools.rmBlock.parentNode.removeChild(raidMonitorTools.rmBlock);
+                window.raidToolbar.rmContainer.appendChild(raidMonitorTools.rmBlock);
             }
             else if (pos === "hidden") {
                 raidMonitorTools.rmBlock.style.display = "none";
@@ -160,7 +177,7 @@
     };
 
     RaidMonitorTools.refresh = function() {
-        var i, size, cooldown, block, blockp;
+        var i, size, cooldown, block, blockp, anyBehind = false;
         for (i = 0; i < raidMonitorTools.sizes.length; i++) {
             size = raidMonitorTools.sizes[i];
             cooldown = RaidMonitorAPI.cooldowns[size];
@@ -188,10 +205,14 @@
                             blockp.className += " behind";
                         }
                         cdPreface = "Access Expired ";
+                        anyBehind = true;
+                        if (holodeck && typeof holodeck.activeDialogue === "function" && holodeck.activeDialogue() && DC_LoaTS_Helper.getPref("CooldownReminderWhispers", true)) {
+                            holodeck.activeDialogue().raidBotMessage(size + " cooldown expired " + moment(cooldown.endDate).fromNow());
+                        }
                     }
                     else {
                         if (blockp.className.indexOf("behind") >= 0) {
-                            blockp.className = blockp.className.replace("behind", "");
+                            blockp.className = blockp.className.replace("behind", "").trim();
                         }
                         cdPreface = "Access Expires ";
                     }
@@ -199,9 +220,9 @@
                 // Not dead and cooldown obj does exist
                 else {
                     if (blockp.className.indexOf("behind") >= 0) {
-                        blockp.className = blockp.className.replace("behind", "");
+                        blockp.className = blockp.className.replace("behind", "").trim();
                     }
-                    cdPreface = "Access Expired ";
+                    cdPreface = "Access Expires ";
                 }
 
                 var cd = document.createElement("p");
@@ -220,6 +241,15 @@
                 var lastSummon = document.createElement("p");
                 lastSummon.appendChild(document.createTextNode("You haven't posted any raids!"));
                 block.appendChild(lastSummon);
+                if (holodeck && typeof holodeck.activeDialogue === "function" && holodeck.activeDialogue() && DC_LoaTS_Helper.getPref("CooldownReminderWhispers", true)) {
+                    holodeck.activeDialogue().raidBotMessage(size + " raid has never been posted.");
+                }
+
             }
+        }
+
+        if (!anyBehind) {
+            // This would probably get annoying
+            //holodeck.activeDialogue().raidBotMessage("All raids properly summoned.");
         }
     };

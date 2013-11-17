@@ -366,6 +366,10 @@ function main()
         cooldownsURL: "http://getKongE.org/games/lots/raids/cooldowns.php",
         donateURL: "http://getKongE.org/donate",
 
+        assetsURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/",
+        emotesURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/emotes/",
+        emotesDefsURL: "http://getKongE.org/chat/emotesDefs.json",
+
     	worldRaidDataURL: "http://getKongE.org/old/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",

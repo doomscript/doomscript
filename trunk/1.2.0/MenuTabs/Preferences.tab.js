@@ -15,6 +15,7 @@
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
                 loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
                 raidMonitorToolsLocationKey: "RaidMonitorToolsLocation",
+                cooldownReminderWhispersKey: "CooldownReminderWhispers",
 
 				initPane: function()
 				{
@@ -132,7 +133,7 @@
                         "Location of the Raid Monitor tools (The Summon Orbs/Cooldown Menu)",
                         "Default: Right",
                         {
-                            options: {right: "Right", bottom: "Bottom", hidden: "Hidden"},
+                            options: {right: "Right", bottom: "Bottom", toolbar: "Toolbar", hidden: "Hidden"},
                             onchange: function(event)
                             {
                                 DC_LoaTS_Helper.setPref(me.raidMonitorToolsLocationKey, this.value);
@@ -141,6 +142,24 @@
                         }
                     );
                     wrapper.appendChild(raidMonitorToolsLocationOption.wrapper);
+
+
+                    var cooldownReminderWhispers = me.createSimpleOptionHTML(
+                        "PreferencesMenu-CooldownReminderWhispersInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.cooldownReminderWhispersKey, true),
+                        "Display cooldown reminders via RaidBot whispers (default: on)",
+                        "If checked, you will get whispers from RaidBot reminding you of raids that are off cooldown periodically.",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.cooldownReminderWhispersKey, this.checked);
+
+                                DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(cooldownReminderWhispers.wrapper);
 
 
                     this.pane.appendChild(wrapper);

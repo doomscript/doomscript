@@ -60,7 +60,7 @@
 
 
 				rulesText += "\n#DC_LoaTS_raidMenuTitleBar {\n";
-				rulesText += "\tbackground: #347D87 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/menutitlebarbg.png) 50% 50% repeat-x;\n";
+				rulesText += "\tbackground: #347D87 url(" + DC_LoaTS_Properties.assetsURL + "menutitlebarbg.png) 50% 50% repeat-x;\n";
 				//rulesText += "\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding:  2px 10px;\n";
 				rulesText += "\tborder-top-left-radius: 5px;\n";
@@ -93,7 +93,7 @@
 				rulesText += "}\n";
 				
 				rulesText += "\n#DC_LoaTS_raidMenuBodyWrapper {\n";
-				rulesText += "\tbackground: #0E5969 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/menubodywrapperbg.png) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #0E5969 url(" + DC_LoaTS_Properties.assetsURL + "menubodywrapperbg.png) 50% 50% repeat;\n";
 				//rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
 				rulesText += "\tborder: 3px solid #93CDD0;\n";
 				rulesText += "\tborder-top-width: 0px;\n";
@@ -161,7 +161,7 @@
 				
 				rulesText += "\n.DC_LoaTS_raidMenuPane {\n";
 				//rulesText += "\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;\n";
-				rulesText += "\tbackground: #77C0C0 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/menupanebg.png) 50% bottom repeat-x;\n";
+				rulesText += "\tbackground: #77C0C0 url(" + DC_LoaTS_Properties.assetsURL + "menupanebg.png) 50% bottom repeat-x;\n";
 				rulesText += "\tfont-size: 1.2em;\n";
 				rulesText += "\tpadding: 5px 10px;\n";
 				rulesText += "\tmin-height: 200px;\n";
@@ -222,7 +222,7 @@
 				
 				
 				rulesText += "\n#DC_LoaTS_notificationBar {\n";
-				rulesText += "\tbackground: #f8dc5a url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/notificationbg.png) 50% 50% repeat-x;\n";
+				rulesText += "\tbackground: #f8dc5a url(" + DC_LoaTS_Properties.assetsURL + "notificationbg.png) 50% 50% repeat-x;\n";
 				//rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding: 4px 10px; 0px\n";
 				rulesText += "\twidth: 100%;\n";
@@ -274,7 +274,7 @@
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer {\n";
 				rulesText += "\tcolor: #FFFFFF;\n"								
 				rulesText += "\tlist-style: none;\n"								
-				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/hexbg.png) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(" + DC_LoaTS_Properties.assetsURL + "hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\t-moz-border-radius: 5px;\n";
 				rulesText += "\t-webkit-border-radius: 5px;\n";
 				rulesText += "\tborder-radius: 5px;\n";
@@ -291,7 +291,7 @@
 				rulesText += "\na.DC_LoaTS_button {\n";
 				rulesText += "\twidth: 16px;\n";
 				rulesText += "\theight: 16px;\n";
-				rulesText += "\tbackground: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/icons.png);\n";
+				rulesText += "\tbackground: url(" + DC_LoaTS_Properties.assetsURL + "icons.png);\n";
 				rulesText += "\tbackground-repeat: no-repeat;\n";
 				rulesText += "\tcursor: pointer;\n";
 				rulesText += "\tdisplay: block;\n";
@@ -353,7 +353,7 @@
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_omniboxCommandsWrapper {\n";
-				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/hexbg.png) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(" + DC_LoaTS_Properties.assetsURL + "hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\tlist-style: none;\n";
 				rulesText += "\tz-index: 999;\n";
 				rulesText += "\tposition: absolute;\n";
@@ -507,6 +507,17 @@
         rulesText += "\tcolor: #000000;\n";
         rulesText += "}\n";
 
+        rulesText += "\n.RaidMonitor-SizeBlock .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\tfloat: left;\n";
+        rulesText += "\twidth: 0px;\n";
+        rulesText += "\tmax-width: 180px;\n";
+        rulesText += "\toverflow: hidden;\n";
+        rulesText += "\tpadding-top: 1px;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+        rulesText += "\n}";
+
         // Raid Monitor stylings - icon block
         rulesText += "\n.RaidMonitor-SizeBlock .RaidMonitor-SizeBlockIcon{\n";
         rulesText += "\twidth: 48px;\n";
@@ -514,6 +525,7 @@
         rulesText += "\tfloat: right;\n";
         rulesText += "\tposition: absolute;\n";
         rulesText += "\tright: 0px;\n";
+        rulesText += "\tbackground-repeat: no-repeat;\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - small
@@ -543,12 +555,12 @@
 
         // Raid Monitor stylings - settings
         rulesText += "\n.RaidMonitor-SizeBlock-Settings .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/gear.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.assetsURL + "gear.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings
         rulesText += "\n.RaidMonitor-SizeBlock-Help .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/question.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.assetsURL + "question.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings:hover
@@ -568,7 +580,13 @@
         rulesText += "\tpadding: 0;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock {\n";
+        rulesText += "\n.RaidMonitor-SizeBlockContents label, .RaidMonitor-SizeBlockContents p {\n";
+        rulesText += "\twhite-space: nowrap;\n";
+        rulesText += "\n}";
+
+
+        // Bottom
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock {\n";
         rulesText += "\tposition: relative;\n";
         rulesText += "\tfloat: left;\n";
         rulesText += "\tmargin-right: 2px;\n";
@@ -582,7 +600,7 @@
         rulesText += "\tz-index: 10;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockInner {\n";
         rulesText += "\tposition: absolute;\n";
         rulesText += "\tborder-radius: 25px;\n";
         rulesText += "\tbottom: 0px;\n";
@@ -594,7 +612,7 @@
         rulesText += "\tz-index: 10;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover, .horizontal .RaidMonitor-SizeBlock.show {\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock:hover, .bottom .RaidMonitor-SizeBlock.show {\n";
         rulesText += "\theight: 100px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: height 1s ease-out;\n";
@@ -602,7 +620,7 @@
         rulesText += "\t-o-transition: height 1s ease-out;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .horizontal .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .bottom .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
@@ -610,27 +628,104 @@
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.RaidMonitor-SizeBlockContents {\n";
-        rulesText += "\tfloat: left;\n";
-        rulesText += "\twidth: 0px;\n";
-        rulesText += "\tmax-width: 180px;\n";
-        rulesText += "\toverflow: hidden;\n";
-        rulesText += "\tpadding-top: 1px;\n";
-        rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
-        rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
-        rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
-        rulesText += "\n}";
-
-        rulesText += "\n.RaidMonitor-SizeBlockContents label, .RaidMonitor-SizeBlockContents p {\n";
-        rulesText += "\twhite-space: nowrap;\n";
-        rulesText += "\n}";
-
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .horizontal .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .bottom .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
+
+        // On the bar
+        rulesText += "\n#DC_LoaTS_rmToolbarWrapper {\n";
+        rulesText += "\tposition: relative;\n";
+        rulesText += "\tfloat: right !important;\n";
+        rulesText += "\twidth: 145px;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-Block {\n";
+        rulesText += "\tposition: relative;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock {\n";
+        rulesText += "\tposition: relative;\n";
+        rulesText += "\tfloat: left;\n";
+        rulesText += "\tmargin-right: 2px;\n";
+        rulesText += "\twidth: 18px;\n";
+        rulesText += "\theight: 18px;\n";
+        rulesText += "\tborder-radius: 25px;\n";
+        rulesText += "\t-moz-transition: height 1s ease-out .5s, bottom 1s ease-out .5s;\n";
+        rulesText += "\t-webkit-transition: height 1s ease-out .5s, bottom 1s ease-out .5s;\n";
+        rulesText += "\t-o-transition: height 1s ease-out .5s, bottom 1s ease-out .5s;\n";
+        rulesText += "\tbackground-color: #333;\n";
+        rulesText += "\tz-index: 10;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tborder-radius: 25px;\n";
+        rulesText += "\ttop: 0px;\n";
+        rulesText += "\tright: 0px;\n";
+        rulesText += "\twidth: 18px;\n";
+        rulesText += "\theight: 18px;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 0s, height .5s ease-out 0s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 0s, height .5s ease-out 0s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 0s, height .5s ease-out 0s;\n";
+        rulesText += "\tborder: 1px solid #333;\n";
+        rulesText += "\tbackground-color: #fff;\n";
+        rulesText += "\tz-index: 10;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover, .toolbar .RaidMonitor-SizeBlock.show {\n";
+        rulesText += "\theight: 100px;\n";
+        rulesText += "\tbottom: 82px;\n";
+        rulesText += "\tz-index: 20;\n";
+        rulesText += "\t-moz-transition: height 1s ease-out, bottom 1s ease-out;\n";
+        rulesText += "\t-webkit-transition: height 1s ease-out, bottom 1s ease-out;\n";
+        rulesText += "\t-o-transition: height 1s ease-out, bottom 1s ease-out;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .toolbar .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\twidth: 250px;\n";
+        rulesText += "\theight: 50px;\n";
+        rulesText += "\tz-index: 20;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .toolbar .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\twidth: 100%;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockIcon{\n";
+        rulesText += "\twidth: 18px;\n";
+        rulesText += "\theight: 18px;\n";
+        rulesText += "\tfloat: right;\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tright: 0px;\n";
+        rulesText += "\tbackground-size: 18px 18px;\n";
+        rulesText += "\t-moz-transition: background-size .5s ease-out, width .5s ease-out, height .5s ease-out;\n";
+        rulesText += "\t-webkit-transition: background-size .5s ease-out, width .5s ease-out, height .5s ease-out;\n";
+        rulesText += "\t-o-transition: background-size .5s ease-out, width .5s ease-out, height .5s ease-out;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockIcon, .toolbar .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockIcon{\n";
+        rulesText += "\twidth: 48px;\n";
+        rulesText += "\theight: 48px;\n";
+        rulesText += "\tfloat: right;\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tright: 0px;\n";
+        rulesText += "\tbackground-size: 48px 48px;\n";
+        rulesText += "\t-moz-transition: background-size .5s ease-out 1s, width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "\t-webkit-transition: background-size .5s ease-out 1s, width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "\t-o-transition: background-size .5s ease-out 1s, width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "}\n";
+
+
+
 
         rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
@@ -666,6 +761,18 @@
         rulesText += "\tbackground-color: #fcf8e3 !important;\n";
         rulesText += "\tcolor: #c09853 !important;\n";
         rulesText += "\tborder-color: #fbeed5 !important;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-Block .behind {\n";
+        rulesText += "\tbackground-color: #f99 !important;\n";
+        rulesText += "\tcolor: #a33 !important;\n";
+        rulesText += "\tborder-color: #F00 !important;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-Block .warning {\n";
+        rulesText += "\tbackground-color: #fe3 !important;\n";
+        rulesText += "\tcolor: #973 !important;\n";
+        rulesText += "\tborder-color: #dd3 !important;\n";
         rulesText += "}\n";
 
 
