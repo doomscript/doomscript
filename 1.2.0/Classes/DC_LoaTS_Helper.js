@@ -164,6 +164,10 @@
 							msg = msg.replace(/<a(?:(?!<a class="reply_link).)*<\/a>/i, allianceInviteFormat.format(match[0], match[1]));
 						}
 					}
+
+                    if (DC_LoaTS_Helper.getPref(DC_LoaTS_Helper.getPref("ReplaceEmotes", true))) {
+                        msg = DC_LoaTS_Helper.replaceEmotes(msg);
+                    }
 					
 					// Make sure to run the normal version of this function because
 					// it does all the heavy lifting for actually displaying the right string

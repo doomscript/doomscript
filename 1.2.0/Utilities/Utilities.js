@@ -1761,8 +1761,51 @@
             }
             return top;
         };
-		
-		// Go ahead and execute this, too
+
+        DC_LoaTS_Helper.loadEmotes = function() {
+            DC_LoaTS_Helper.ajax({
+                url: DC_LoaTS_Properties.emotesDefsURL,
+                onload: function(response) {
+                    if (response.status == 200) {
+                        DC_LoaTS_Helper.emotes = JSON.parse(response.responseText);
+                    }
+                    else {
+                        console.log("Failed to load emotes", response, response.responseText);
+                    }
+                }
+
+            });
+        };
+
+        DC_LoaTS_Helper.replaceEmotes = function(msg) {
+            for (var emoteText in DC_LoaTS_Helper.emotes) {
+                if (DC_LoaTS_Helper.emotes.hasOwnProperty(emoteText)) {
+                    msg = DC_LoaTS_Helper.replaceEmote(emoteText, DC_LoaTS_Helper.emotes[emoteText], msg);
+                }
+            }
+
+            return msg;
+        };
+
+        DC_LoaTS_Helper.replaceEmote = function(emoteText, emoteImg, msg) {
+            msg = msg.replace(
+                new RegExp(DC_LoaTS_Helper.escapeRegExp(emoteText), "g"),
+                "<img src='" + DC_LoaTS_Properties.emotesURL + emoteImg + "' title='" + emoteText + "' onclick='DC_LoaTS_Helper.hideEmote'/>"
+            );
+            return msg;
+        };
+
+        DC_LoaTS_Helper.hideEmote = function() {
+            this.parentNode.insertBefore(document.createTextNode(this.title), this);
+            this.parentNode.removeChild(this);
+        };
+
+        DC_LoaTS_Helper.escapeRegExp = function(str) {
+            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        };
+
+
+        // Go ahead and execute this, too
 		DC_LoaTS_Helper.calculateShortestRaidNames();
 
 		// Debug log wrapping function

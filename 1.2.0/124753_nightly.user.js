@@ -366,6 +366,10 @@ function main()
         cooldownsURL: "http://getKongE.org/games/lots/raids/cooldowns.php",
         donateURL: "http://getKongE.org/donate",
 
+        assetsURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/",
+        emotesURL: "http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/emotes/",
+        emotesDefsURL: "http://getKongE.org/chat/emotesDefs.json",
+
     	worldRaidDataURL: "http://getKongE.org/old/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
     	chatzyURL: "http://us5.chatzy.com/46964896557502",
@@ -593,6 +597,10 @@ function main()
 							msg = msg.replace(/<a(?:(?!<a class="reply_link).)*<\/a>/i, allianceInviteFormat.format(match[0], match[1]));
 						}
 					}
+
+                    if (DC_LoaTS_Helper.getPref(DC_LoaTS_Helper.getPref("ReplaceEmotes", true))) {
+                        msg = DC_LoaTS_Helper.replaceEmotes(msg);
+                    }
 					
 					// Make sure to run the normal version of this function because
 					// it does all the heavy lifting for actually displaying the right string
@@ -4364,16 +4372,33 @@ function main()
             if (pos === "right") {
                 raidMonitorTools.rmBlock.style.top = DC_LoaTS_Helper.getRealOffsetTop(mg) + mg.offsetHeight/2 - 200 + "px";
                 raidMonitorTools.rmBlock.style.left = mg.offsetLeft + mg.offsetWidth + "px";
-                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("horizontal", "");
+                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("bottom", "").trim();
+                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("toolbar", "").trim();
                 raidMonitorTools.rmBlock.style.display = "block";
+                raidMonitorTools.rmBlock.parentNode.removeChild(raidMonitorTools.rmBlock);
+                document.body.appendChild(raidMonitorTools.rmBlock);
             }
             else if (pos === "bottom") {
                 raidMonitorTools.rmBlock.style.top = DC_LoaTS_Helper.getRealOffsetTop(mg) + mg.offsetHeight + "px";
                 raidMonitorTools.rmBlock.style.left = mg.offsetLeft + mg.offsetWidth/2 - 200 + "px";
-                if (raidMonitorTools.rmBlock.className.indexOf("horizontal") < 0) {
-                    raidMonitorTools.rmBlock.className += " horizontal";
+                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("toolbar", "").trim();
+                if (raidMonitorTools.rmBlock.className.indexOf("bottom") < 0) {
+                    raidMonitorTools.rmBlock.className += " bottom";
                 }
                 raidMonitorTools.rmBlock.style.display = "block";
+                raidMonitorTools.rmBlock.parentNode.removeChild(raidMonitorTools.rmBlock);
+                document.body.appendChild(raidMonitorTools.rmBlock);
+            }
+            else if (pos === "toolbar") {
+                raidMonitorTools.rmBlock.style.top = "0px";
+                raidMonitorTools.rmBlock.style.left = "0px";
+                raidMonitorTools.rmBlock.className = raidMonitorTools.rmBlock.className.replace("bottom", "").trim();
+                if (raidMonitorTools.rmBlock.className.indexOf("toolbar") < 0) {
+                    raidMonitorTools.rmBlock.className += " toolbar";
+                }
+                RaidToolbar.show();
+                raidMonitorTools.rmBlock.parentNode.removeChild(raidMonitorTools.rmBlock);
+                window.raidToolbar.rmContainer.appendChild(raidMonitorTools.rmBlock);
             }
             else if (pos === "hidden") {
                 raidMonitorTools.rmBlock.style.display = "none";
@@ -4394,7 +4419,7 @@ function main()
     };
 
     RaidMonitorTools.refresh = function() {
-        var i, size, cooldown, block, blockp;
+        var i, size, cooldown, block, blockp, anyBehind = false;
         for (i = 0; i < raidMonitorTools.sizes.length; i++) {
             size = raidMonitorTools.sizes[i];
             cooldown = RaidMonitorAPI.cooldowns[size];
@@ -4422,10 +4447,14 @@ function main()
                             blockp.className += " behind";
                         }
                         cdPreface = "Access Expired ";
+                        anyBehind = true;
+                        if (holodeck && typeof holodeck.activeDialogue === "function" && holodeck.activeDialogue() && DC_LoaTS_Helper.getPref("CooldownReminderWhispers", true)) {
+                            holodeck.activeDialogue().raidBotMessage(size + " cooldown expired " + moment(cooldown.endDate).fromNow());
+                        }
                     }
                     else {
                         if (blockp.className.indexOf("behind") >= 0) {
-                            blockp.className = blockp.className.replace("behind", "");
+                            blockp.className = blockp.className.replace("behind", "").trim();
                         }
                         cdPreface = "Access Expires ";
                     }
@@ -4433,9 +4462,9 @@ function main()
                 // Not dead and cooldown obj does exist
                 else {
                     if (blockp.className.indexOf("behind") >= 0) {
-                        blockp.className = blockp.className.replace("behind", "");
+                        blockp.className = blockp.className.replace("behind", "").trim();
                     }
-                    cdPreface = "Access Expired ";
+                    cdPreface = "Access Expires ";
                 }
 
                 var cd = document.createElement("p");
@@ -4454,7 +4483,16 @@ function main()
                 var lastSummon = document.createElement("p");
                 lastSummon.appendChild(document.createTextNode("You haven't posted any raids!"));
                 block.appendChild(lastSummon);
+                if (holodeck && typeof holodeck.activeDialogue === "function" && holodeck.activeDialogue() && DC_LoaTS_Helper.getPref("CooldownReminderWhispers", true)) {
+                    holodeck.activeDialogue().raidBotMessage(size + " raid has never been posted.");
+                }
+
             }
+        }
+
+        if (!anyBehind) {
+            // This would probably get annoying
+            //holodeck.activeDialogue().raidBotMessage("All raids properly summoned.");
         }
     };		/************************************/
 		/****** RaidMultiFilter Class *******/
@@ -4769,6 +4807,9 @@ function main()
 					
 					this.omniboxWrapper.insert({bottom: this.omniboxCommandsWrapper});
 					this.container.insert({bottom: this.omniboxWrapper});
+
+                    this.rmContainer = new Element("li", {"id": "DC_LoaTS_rmToolbarWrapper"});
+                    this.container.insert({bottom: this.rmContainer});
 
 					this.omnibox.observe("mouseover", function() {
 						$(this).addClassName("DC_LoaTS_omnibox_focus");
@@ -5110,14 +5151,14 @@ function main()
 		RaidToolbar.hideCommandOptions = function()
 		{
 			$$(".DC_LoaTS_omniboxCommandsWrapper")[0].hide();
-		}
+		};
 		
 		// Hide the command options
 		RaidToolbar.resetOmnibox = function()
 		{
 			$$(".DC_LoaTS_omnibox")[0].value = "";
 			$$(".DC_LoaTS_omnibox")[0].focus();			
-		}
+		};
 		
 		RaidToolbar.createWRButton = function() {
 			var wr = DC_LoaTS_Helper.worldRaidInfo;
@@ -5133,7 +5174,7 @@ function main()
 				DC_LoaTS_Helper.wrButton = new RaidButton(DC_LoaTS_Helper.worldRaidInfo.name + " Info", "DC_LoaTS_WRButton", DC_LoaTS_Helper.showWRInfo);
 				raidToolbar.container.insert({bottom: DC_LoaTS_Helper.wrButton.node});
 			}
-		}
+		};
 		/************************************/
 		/********** RaidType Class **********/
 		/************************************/
@@ -5720,6 +5761,7 @@ function main()
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
                 loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
                 raidMonitorToolsLocationKey: "RaidMonitorToolsLocation",
+                cooldownReminderWhispersKey: "CooldownReminderWhispers",
 
 				initPane: function()
 				{
@@ -5837,7 +5879,7 @@ function main()
                         "Location of the Raid Monitor tools (The Summon Orbs/Cooldown Menu)",
                         "Default: Right",
                         {
-                            options: {right: "Right", bottom: "Bottom", hidden: "Hidden"},
+                            options: {right: "Right", bottom: "Bottom", toolbar: "Toolbar", hidden: "Hidden"},
                             onchange: function(event)
                             {
                                 DC_LoaTS_Helper.setPref(me.raidMonitorToolsLocationKey, this.value);
@@ -5848,10 +5890,51 @@ function main()
                     wrapper.appendChild(raidMonitorToolsLocationOption.wrapper);
 
 
+                    var cooldownReminderWhispers = me.createSimpleOptionHTML(
+                        "PreferencesMenu-CooldownReminderWhispersInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.cooldownReminderWhispersKey, true),
+                        "Display cooldown reminders via RaidBot whispers (default: on)",
+                        "If checked, you will get whispers from RaidBot reminding you of raids that are off cooldown periodically.",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.cooldownReminderWhispersKey, this.checked);
+
+                                DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(cooldownReminderWhispers.wrapper);
+
+
                     this.pane.appendChild(wrapper);
 				}
 							
 		});
+		
+/************************************/
+/********* Preferences Tab **********/
+/************************************/
+
+    // Class to manage a tab in the raid tab in the popup menu
+RaidMenuTab.create(
+    {
+        tabName: "Raid Monitor",
+        tabPosition: 70,
+
+        initPane: function()
+        {
+            var wrapper = document.createElement("div");
+            var me = this;
+
+            
+
+
+            this.pane.appendChild(wrapper);
+        }
+
+    });
 		
 		/************************************/
 		/************ Raids Tab *************/
@@ -10579,8 +10662,51 @@ window.RaidMonitorAPI = {
             }
             return top;
         };
-		
-		// Go ahead and execute this, too
+
+        DC_LoaTS_Helper.loadEmotes = function() {
+            DC_LoaTS_Helper.ajax({
+                url: DC_LoaTS_Properties.emotesDefsURL,
+                onload: function(response) {
+                    if (response.status == 200) {
+                        DC_LoaTS_Helper.emotes = JSON.parse(response.responseText);
+                    }
+                    else {
+                        console.log("Failed to load emotes", response, response.responseText);
+                    }
+                }
+
+            });
+        };
+
+        DC_LoaTS_Helper.replaceEmotes = function(msg) {
+            for (var emoteText in DC_LoaTS_Helper.emotes) {
+                if (DC_LoaTS_Helper.emotes.hasOwnProperty(emoteText)) {
+                    msg = DC_LoaTS_Helper.replaceEmote(emoteText, DC_LoaTS_Helper.emotes[emoteText], msg);
+                }
+            }
+
+            return msg;
+        };
+
+        DC_LoaTS_Helper.replaceEmote = function(emoteText, emoteImg, msg) {
+            msg = msg.replace(
+                new RegExp(DC_LoaTS_Helper.escapeRegExp(emoteText), "g"),
+                "<img src='" + DC_LoaTS_Properties.emotesURL + emoteImg + "' title='" + emoteText + "' onclick='DC_LoaTS_Helper.hideEmote'/>"
+            );
+            return msg;
+        };
+
+        DC_LoaTS_Helper.hideEmote = function() {
+            this.parentNode.insertBefore(document.createTextNode(this.title), this);
+            this.parentNode.removeChild(this);
+        };
+
+        DC_LoaTS_Helper.escapeRegExp = function(str) {
+            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        };
+
+
+        // Go ahead and execute this, too
 		DC_LoaTS_Helper.calculateShortestRaidNames();
 
 		// Debug log wrapping function
@@ -10704,7 +10830,7 @@ window.RaidMonitorAPI = {
 
 
 				rulesText += "\n#DC_LoaTS_raidMenuTitleBar {\n";
-				rulesText += "\tbackground: #347D87 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/menutitlebarbg.png) 50% 50% repeat-x;\n";
+				rulesText += "\tbackground: #347D87 url(" + DC_LoaTS_Properties.assetsURL + "menutitlebarbg.png) 50% 50% repeat-x;\n";
 				//rulesText += "\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding:  2px 10px;\n";
 				rulesText += "\tborder-top-left-radius: 5px;\n";
@@ -10737,7 +10863,7 @@ window.RaidMonitorAPI = {
 				rulesText += "}\n";
 				
 				rulesText += "\n#DC_LoaTS_raidMenuBodyWrapper {\n";
-				rulesText += "\tbackground: #0E5969 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/menubodywrapperbg.png) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #0E5969 url(" + DC_LoaTS_Properties.assetsURL + "menubodywrapperbg.png) 50% 50% repeat;\n";
 				//rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
 				rulesText += "\tborder: 3px solid #93CDD0;\n";
 				rulesText += "\tborder-top-width: 0px;\n";
@@ -10805,7 +10931,7 @@ window.RaidMonitorAPI = {
 				
 				rulesText += "\n.DC_LoaTS_raidMenuPane {\n";
 				//rulesText += "\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;\n";
-				rulesText += "\tbackground: #77C0C0 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/menupanebg.png) 50% bottom repeat-x;\n";
+				rulesText += "\tbackground: #77C0C0 url(" + DC_LoaTS_Properties.assetsURL + "menupanebg.png) 50% bottom repeat-x;\n";
 				rulesText += "\tfont-size: 1.2em;\n";
 				rulesText += "\tpadding: 5px 10px;\n";
 				rulesText += "\tmin-height: 200px;\n";
@@ -10866,7 +10992,7 @@ window.RaidMonitorAPI = {
 				
 				
 				rulesText += "\n#DC_LoaTS_notificationBar {\n";
-				rulesText += "\tbackground: #f8dc5a url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/notificationbg.png) 50% 50% repeat-x;\n";
+				rulesText += "\tbackground: #f8dc5a url(" + DC_LoaTS_Properties.assetsURL + "notificationbg.png) 50% 50% repeat-x;\n";
 				//rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
 				rulesText += "\tpadding: 4px 10px; 0px\n";
 				rulesText += "\twidth: 100%;\n";
@@ -10918,7 +11044,7 @@ window.RaidMonitorAPI = {
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer {\n";
 				rulesText += "\tcolor: #FFFFFF;\n"								
 				rulesText += "\tlist-style: none;\n"								
-				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/hexbg.png) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(" + DC_LoaTS_Properties.assetsURL + "hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\t-moz-border-radius: 5px;\n";
 				rulesText += "\t-webkit-border-radius: 5px;\n";
 				rulesText += "\tborder-radius: 5px;\n";
@@ -10935,7 +11061,7 @@ window.RaidMonitorAPI = {
 				rulesText += "\na.DC_LoaTS_button {\n";
 				rulesText += "\twidth: 16px;\n";
 				rulesText += "\theight: 16px;\n";
-				rulesText += "\tbackground: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/icons.png);\n";
+				rulesText += "\tbackground: url(" + DC_LoaTS_Properties.assetsURL + "icons.png);\n";
 				rulesText += "\tbackground-repeat: no-repeat;\n";
 				rulesText += "\tcursor: pointer;\n";
 				rulesText += "\tdisplay: block;\n";
@@ -10997,7 +11123,7 @@ window.RaidMonitorAPI = {
 				rulesText += "}\n";
 				
 				rulesText += "\n.DC_LoaTS_omniboxCommandsWrapper {\n";
-				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/hexbg.png) 50% 50% repeat;\n";
+				rulesText += "\tbackground: #113552 url(" + DC_LoaTS_Properties.assetsURL + "hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\tlist-style: none;\n";
 				rulesText += "\tz-index: 999;\n";
 				rulesText += "\tposition: absolute;\n";
@@ -11151,6 +11277,17 @@ window.RaidMonitorAPI = {
         rulesText += "\tcolor: #000000;\n";
         rulesText += "}\n";
 
+        rulesText += "\n.RaidMonitor-SizeBlock .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\tfloat: left;\n";
+        rulesText += "\twidth: 0px;\n";
+        rulesText += "\tmax-width: 180px;\n";
+        rulesText += "\toverflow: hidden;\n";
+        rulesText += "\tpadding-top: 1px;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+        rulesText += "\n}";
+
         // Raid Monitor stylings - icon block
         rulesText += "\n.RaidMonitor-SizeBlock .RaidMonitor-SizeBlockIcon{\n";
         rulesText += "\twidth: 48px;\n";
@@ -11158,6 +11295,7 @@ window.RaidMonitorAPI = {
         rulesText += "\tfloat: right;\n";
         rulesText += "\tposition: absolute;\n";
         rulesText += "\tright: 0px;\n";
+        rulesText += "\tbackground-repeat: no-repeat;\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - small
@@ -11187,12 +11325,12 @@ window.RaidMonitorAPI = {
 
         // Raid Monitor stylings - settings
         rulesText += "\n.RaidMonitor-SizeBlock-Settings .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/gear.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.assetsURL + "gear.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings
         rulesText += "\n.RaidMonitor-SizeBlock-Help .RaidMonitor-SizeBlockIcon {\n";
-        rulesText += "\tbackground-image: url(http://subversion.assembla.com/svn/doomscript/trunk/1.2.0/Assets/question.png);\n";
+        rulesText += "\tbackground-image: url(" + DC_LoaTS_Properties.assetsURL + "question.png);\n";
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings:hover
@@ -11212,7 +11350,13 @@ window.RaidMonitorAPI = {
         rulesText += "\tpadding: 0;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock {\n";
+        rulesText += "\n.RaidMonitor-SizeBlockContents label, .RaidMonitor-SizeBlockContents p {\n";
+        rulesText += "\twhite-space: nowrap;\n";
+        rulesText += "\n}";
+
+
+        // Bottom
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock {\n";
         rulesText += "\tposition: relative;\n";
         rulesText += "\tfloat: left;\n";
         rulesText += "\tmargin-right: 2px;\n";
@@ -11226,7 +11370,7 @@ window.RaidMonitorAPI = {
         rulesText += "\tz-index: 10;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockInner {\n";
         rulesText += "\tposition: absolute;\n";
         rulesText += "\tborder-radius: 25px;\n";
         rulesText += "\tbottom: 0px;\n";
@@ -11238,7 +11382,7 @@ window.RaidMonitorAPI = {
         rulesText += "\tz-index: 10;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover, .horizontal .RaidMonitor-SizeBlock.show {\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock:hover, .bottom .RaidMonitor-SizeBlock.show {\n";
         rulesText += "\theight: 100px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: height 1s ease-out;\n";
@@ -11246,7 +11390,7 @@ window.RaidMonitorAPI = {
         rulesText += "\t-o-transition: height 1s ease-out;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .horizontal .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .bottom .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
@@ -11254,27 +11398,104 @@ window.RaidMonitorAPI = {
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.RaidMonitor-SizeBlockContents {\n";
-        rulesText += "\tfloat: left;\n";
-        rulesText += "\twidth: 0px;\n";
-        rulesText += "\tmax-width: 180px;\n";
-        rulesText += "\toverflow: hidden;\n";
-        rulesText += "\tpadding-top: 1px;\n";
-        rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
-        rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
-        rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
-        rulesText += "\n}";
-
-        rulesText += "\n.RaidMonitor-SizeBlockContents label, .RaidMonitor-SizeBlockContents p {\n";
-        rulesText += "\twhite-space: nowrap;\n";
-        rulesText += "\n}";
-
-        rulesText += "\n.horizontal .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .horizontal .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .bottom .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
         rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
         rulesText += "}\n";
+
+        // On the bar
+        rulesText += "\n#DC_LoaTS_rmToolbarWrapper {\n";
+        rulesText += "\tposition: relative;\n";
+        rulesText += "\tfloat: right !important;\n";
+        rulesText += "\twidth: 145px;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-Block {\n";
+        rulesText += "\tposition: relative;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock {\n";
+        rulesText += "\tposition: relative;\n";
+        rulesText += "\tfloat: left;\n";
+        rulesText += "\tmargin-right: 2px;\n";
+        rulesText += "\twidth: 18px;\n";
+        rulesText += "\theight: 18px;\n";
+        rulesText += "\tborder-radius: 25px;\n";
+        rulesText += "\t-moz-transition: height 1s ease-out .5s, bottom 1s ease-out .5s;\n";
+        rulesText += "\t-webkit-transition: height 1s ease-out .5s, bottom 1s ease-out .5s;\n";
+        rulesText += "\t-o-transition: height 1s ease-out .5s, bottom 1s ease-out .5s;\n";
+        rulesText += "\tbackground-color: #333;\n";
+        rulesText += "\tz-index: 10;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockInner {\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tborder-radius: 25px;\n";
+        rulesText += "\ttop: 0px;\n";
+        rulesText += "\tright: 0px;\n";
+        rulesText += "\twidth: 18px;\n";
+        rulesText += "\theight: 18px;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 0s, height .5s ease-out 0s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 0s, height .5s ease-out 0s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 0s, height .5s ease-out 0s;\n";
+        rulesText += "\tborder: 1px solid #333;\n";
+        rulesText += "\tbackground-color: #fff;\n";
+        rulesText += "\tz-index: 10;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover, .toolbar .RaidMonitor-SizeBlock.show {\n";
+        rulesText += "\theight: 100px;\n";
+        rulesText += "\tbottom: 82px;\n";
+        rulesText += "\tz-index: 20;\n";
+        rulesText += "\t-moz-transition: height 1s ease-out, bottom 1s ease-out;\n";
+        rulesText += "\t-webkit-transition: height 1s ease-out, bottom 1s ease-out;\n";
+        rulesText += "\t-o-transition: height 1s ease-out, bottom 1s ease-out;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .toolbar .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\twidth: 250px;\n";
+        rulesText += "\theight: 50px;\n";
+        rulesText += "\tz-index: 20;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .toolbar .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
+        rulesText += "\twidth: 100%;\n";
+        rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
+        rulesText += "\t-webkit-transition: width .5s ease-out 1s;\n";
+        rulesText += "\t-o-transition: width .5s ease-out 1s;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock .RaidMonitor-SizeBlockIcon{\n";
+        rulesText += "\twidth: 18px;\n";
+        rulesText += "\theight: 18px;\n";
+        rulesText += "\tfloat: right;\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tright: 0px;\n";
+        rulesText += "\tbackground-size: 18px 18px;\n";
+        rulesText += "\t-moz-transition: background-size .5s ease-out, width .5s ease-out, height .5s ease-out;\n";
+        rulesText += "\t-webkit-transition: background-size .5s ease-out, width .5s ease-out, height .5s ease-out;\n";
+        rulesText += "\t-o-transition: background-size .5s ease-out, width .5s ease-out, height .5s ease-out;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockIcon, .toolbar .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockIcon{\n";
+        rulesText += "\twidth: 48px;\n";
+        rulesText += "\theight: 48px;\n";
+        rulesText += "\tfloat: right;\n";
+        rulesText += "\tposition: absolute;\n";
+        rulesText += "\tright: 0px;\n";
+        rulesText += "\tbackground-size: 48px 48px;\n";
+        rulesText += "\t-moz-transition: background-size .5s ease-out 1s, width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "\t-webkit-transition: background-size .5s ease-out 1s, width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "\t-o-transition: background-size .5s ease-out 1s, width .5s ease-out 1s, height .5s ease-out 1s;\n";
+        rulesText += "}\n";
+
+
+
 
         rulesText += "\n.RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockContents, .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockContents {\n";
         rulesText += "\twidth: 100%;\n";
@@ -11310,6 +11531,18 @@ window.RaidMonitorAPI = {
         rulesText += "\tbackground-color: #fcf8e3 !important;\n";
         rulesText += "\tcolor: #c09853 !important;\n";
         rulesText += "\tborder-color: #fbeed5 !important;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-Block .behind {\n";
+        rulesText += "\tbackground-color: #f99 !important;\n";
+        rulesText += "\tcolor: #a33 !important;\n";
+        rulesText += "\tborder-color: #F00 !important;\n";
+        rulesText += "}\n";
+
+        rulesText += "\n.toolbar .RaidMonitor-Block .warning {\n";
+        rulesText += "\tbackground-color: #fe3 !important;\n";
+        rulesText += "\tcolor: #973 !important;\n";
+        rulesText += "\tborder-color: #dd3 !important;\n";
         rulesText += "}\n";
 
 
