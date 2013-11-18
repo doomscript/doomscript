@@ -166,7 +166,7 @@
 			getVerboseText: function(difficulty)
 			{
 				// Put the name, size, and stat facts into the string
-				var text = "<b title=\"" + this.id + "\">" + this.fullName + "</b> \n";
+				var text = "<b title=\"kv_raid_boss: " + this.id + ", shortest name: " + this.shortestName + "\">" + this.fullName + "</b> \n";
 				text += "Raid Size: " + this.size + " \n";
 				text += "Stat(s) Used: " + this.stat + " \n";
 				text += "Duration: " + this.getTimeText() + " \n";
@@ -178,7 +178,7 @@
 					var difficulties;
 					
 					// If we're focusing on a single difficulty
-					if (typeof difficulty != "undefined")
+					if (typeof difficulty !== "undefined")
 					{
 						difficulties = [difficulty];
 						
@@ -202,7 +202,7 @@
 						// Get text for the difficulty
 						var diffText = RaidType.difficulty[d];
 	
-						if (typeof diffText == "undefined")
+						if (typeof diffText === "undefined")
 						{
 							diffText = "Unknown";
 						}
@@ -212,8 +212,8 @@
 						// Display the difficulty, health, fs, and target damage
 						text += "Difficulty: " + diffText + " \n";
 						text += "Health: " + healthText + " \n";
-						text += "<acronym title=\"FS = Fair Share (of damage) = Raid Health (" + healthText + 
-								") / Raid Size (" + this.size + ")\">FS</acronym>: " + this.getFairShareText(d) + " \n";
+						text += "<span class=\"abbr\" title=\"FS = Fair Share (of damage) = Raid Health (" + healthText +
+								") / Raid Size (" + this.size + ")\">FS</span>: " + this.getFairShareText(d) + " \n";
 						text += "<span class=\"abbr\" title=\"Target Damage is FS * Raid Size Multiplier. The multiplier is calculated from user tests in the spreadsheet.\">Target(OS)</span>: " +  this.getTargetDamageText(d) + " ";
 	
 					}
