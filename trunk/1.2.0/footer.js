@@ -133,7 +133,7 @@
 				rulesText += "\tborder-top-left-radius: 5px;\n";
 				rulesText += "\tborder-top-right-radius: 5px;\n";
 				rulesText += "\tfont-size: 115%;\n";
-				rulesText += "\tcolor: #FFFFFF;\n";
+                rulesText += "\twhite-space: nowrap;\n";
 				rulesText += "}\n";
 				
 				rulesText += "\n#DC_LoaTS_raidMenuTabs li a.active {\n";
@@ -564,7 +564,7 @@
         rulesText += "}\n";
 
         // Raid Monitor stylings - settings:hover
-        rulesText += "\n.RaidMonitor-SizeBlock-Settings:hover .RaidMonitor-SizeBlockIcon {\n";
+        rulesText += "\n.RaidMonitor-SizeBlock-Settings:hover .RaidMonitor-SizeBlockIcon, .RaidMonitor-SizeBlock-Settings.show .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\t-webkit-animation:spin 4s linear infinite;\n";
         rulesText += "\t-moz-animation:spin 4s linear infinite;\n";
         rulesText += "\tanimation:spin 4s linear infinite;\n";
@@ -620,7 +620,7 @@
         rulesText += "\t-o-transition: height 1s ease-out;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.bottom .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .bottom .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner{\n";
+        rulesText += "\n.bottom .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockInner, .bottom .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockInner {\n";
         rulesText += "\twidth: 250px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: width .5s ease-out 1s;\n";
@@ -676,8 +676,8 @@
         rulesText += "}\n";
 
         rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover, .toolbar .RaidMonitor-SizeBlock.show {\n";
-        rulesText += "\theight: 100px;\n";
-        rulesText += "\tbottom: 82px;\n";
+        rulesText += "\theight: 70px;\n";
+        rulesText += "\tbottom: 52px;\n";
         rulesText += "\tz-index: 20;\n";
         rulesText += "\t-moz-transition: height 1s ease-out, bottom 1s ease-out;\n";
         rulesText += "\t-webkit-transition: height 1s ease-out, bottom 1s ease-out;\n";
@@ -712,7 +712,7 @@
         rulesText += "\t-o-transition: background-size .5s ease-out, width .5s ease-out, height .5s ease-out;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockIcon, .toolbar .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockIcon{\n";
+        rulesText += "\n.toolbar .RaidMonitor-SizeBlock:hover .RaidMonitor-SizeBlockIcon, .toolbar .RaidMonitor-SizeBlock.show .RaidMonitor-SizeBlockIcon {\n";
         rulesText += "\twidth: 48px;\n";
         rulesText += "\theight: 48px;\n";
         rulesText += "\tfloat: right;\n";
@@ -763,13 +763,13 @@
         rulesText += "\tborder-color: #fbeed5 !important;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.toolbar .RaidMonitor-Block .behind {\n";
+        rulesText += "\n.RaidMonitor-Block.toolbar  .behind {\n";
         rulesText += "\tbackground-color: #f99 !important;\n";
         rulesText += "\tcolor: #a33 !important;\n";
         rulesText += "\tborder-color: #F00 !important;\n";
         rulesText += "}\n";
 
-        rulesText += "\n.toolbar .RaidMonitor-Block .warning {\n";
+        rulesText += "\n.RaidMonitor-Block.toolbar .warning {\n";
         rulesText += "\tbackground-color: #fe3 !important;\n";
         rulesText += "\tcolor: #973 !important;\n";
         rulesText += "\tborder-color: #dd3 !important;\n";
