@@ -9,6 +9,7 @@ DC_LoaTS_Helper.raids =
     ragnar:             new RaidType("ragnar",             "ZA3", "Ragnar", "Ragnar", "Ragnar",                        1,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
     centurian_covert_agent:new RaidType("centurian_covert_agent","ZA3", "Centurian Covert Agent", "CC Agent", "Agent", 1,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
     talia:              new RaidType("talia",              "ZA4", "Talia", "Talia", "Talia",                           1,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
+    myrmexidaks:        new RaidType("myrmexidaks",        "ZA4", "Myrmexidaks", "Myrmexidaks", "Myrm",                1,   1, "S",   [10000000, "N/A", "N/A", "N/A"]),
 
     // Public raids
     // Small Raids
@@ -45,8 +46,8 @@ DC_LoaTS_Helper.raids =
     hulking_mutant:     new RaidType("hulking_mutant",      "Z15", "Hulking Mutant", "Mutant", "Mutant",              72,  50, "S",   90000000),
     screaming_barracuda:new RaidType("screaming_barracuda", "Z16", "Screaming Barracuda", "Barracuda", "Barracuda",   72,  50, "S",  110000000),
     vunlac:             new RaidType("vunlac",              "Z19", "Vunlac", "Vunlac", "Vunlac",                      36,  50, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
-    silj:               new RaidType("silj",                "ZA3", "Silj the Wurm-Rider", "Silj", "Silj",             30,  50, "S",  [750000000,  937500000, 1200000000, 1500000000]),
-    tyraness_guard:     new RaidType("tyraness_guard",      "ZA4", "Tyraness' Guard", "T. Guard", "Guard",            30,  50, "S",  [750000000,  937500000, 1200000000, 1500000000]),
+    silj:               new RaidType("silj",                "ZA3", "Silj the Wurm-Rider", "Silj", "Silj",             30,  50, "S",  750000000),
+    tyraness_guard:     new RaidType("tyraness_guard",      "ZA4", "Tyraness' Guard", "Tyr. Guard", "Guard",          30,  50, "S",  750000000),
 
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -65,6 +66,7 @@ DC_LoaTS_Helper.raids =
     where_music_meets:  new RaidType("where_music_meets",  "Z16","Symphony of Two Worlds","Symphony","Symphony",      72, 100, "S", [400000000, 520000000, 640000000, 800000000]),
     reichsmarschall_dule:new RaidType("reichsmarschall_dule","Z19","Reichsmarschall Dule", "R. Dule", "R. Dule",      36, 100, "S",[2000000000, 2600000000, 3200000000, 4000000000]),
     dark_hat:           new RaidType("dark_hat",           "ZA3","Dark Hat", "D. Hat", "D. Hat",                      30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
+    rampaging_rackalax: new RaidType("rampaging_rackalax", "ZA4","Rampaging Rackalax", "Rackalax", "Rack",            30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
 
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
@@ -84,7 +86,7 @@ DC_LoaTS_Helper.raids =
     noir:               new RaidType("noir",               "Z18", "Noir", "Noir", "Noir",                             72, 250, "S", [1600000000, 2080000000, 2560000000, 3200000000]),
     sky_commander_bethany:new RaidType("sky_commander_bethany","Z19","Sky Commander Bethany","Bethany","Bethany",     36, 250, "S", [2500000000, 3250000000, 4000000000, 5000000000]),
     void_master:        new RaidType("void_master",        "ZA3", "Void Master", "V. Master", "V. Master",            30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
-    giant_kwelshax:     new RaidType("giant_kwelshax",     "ZA4", "Giant Kwelshax", "Kwelshax", "Kwelshax",           30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
+    giant_kwelshax:     new RaidType("giant_kwelshax",     "ZA4", "Giant Kwelshax", "Kwelshax", "Kwel",               30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
 
     // Colossal Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
