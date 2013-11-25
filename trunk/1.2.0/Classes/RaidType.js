@@ -157,7 +157,7 @@
 			/*public String*/
 			getSearchableName: function()
 			{
-				return this.fullName + "_" + this.shortName + "_" + this.colloqName;
+				return this.id + "_" + this.fullName + "_" + this.shortName + "_" + this.colloqName;
 			},
 			
 			// Gets a big descriptive block of text for the raid

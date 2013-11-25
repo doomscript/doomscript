@@ -290,7 +290,7 @@
 						// Let the user know the command failed
 						holodeck.activeDialogue().raidBotMessage("Did not understand command: <code>" + str + "</code>");
 					}
-					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", false)) {
+					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", true)) {
 						ignoredByPreference = true;
 
 						// Let the user know the command failed
