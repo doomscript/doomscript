@@ -336,11 +336,12 @@ Fixed Critical bug from Kong Change
 
 2013.11.?? - 1.2.0
 Added Inventor RS & WR
-Added Sweet and Jalfreezi alliance raids
-Changed defaults
+Added Sweet, Jalfreezi, and PATTI alliance raids
+Changed some preference defaults
 Added Hel WR
 Added Trulcharn
 Added Zone A3 Raids: Saboteur, Dark Hat, Silj, CC Agent, Ragnar, Void Master
+Added Zone A4 Raids: Tyraness, Tyr. Guard, Kwelshax, Myrmexidaks, Talia, Rackalax
 Implemented Raid Monitor features
 
 

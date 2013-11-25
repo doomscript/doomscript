@@ -83,6 +83,7 @@
                                                 remainingSecs = totalSecs - elapsedSecs;
                                             }
 
+                                            // TODO: Migrate to normal raid types
                                             var dcRaidDef = DC_LoaTS_Helper.raids[raid.boss];
                                             if (parser.matches({
                                                 age: elapsedSecs,

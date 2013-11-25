@@ -327,7 +327,7 @@
 				// Only care about valid links
 				if (raidLink.isValid())
 				{
-					if (DC_LoaTS_Helper.getPref("RightClickVisited") === true)
+					if (DC_LoaTS_Helper.getPref("RightClickVisited", true))
 					{
 						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 					}
@@ -612,7 +612,7 @@
 			
 			// Gather the info we need to load a raid, either from params or utility methods
 			gameIframe = gameIframe || DC_LoaTS_Helper.getGameIframe();
-			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
+			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined" ? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", true);
 			
 			try
 			{
@@ -875,8 +875,8 @@
 					_generateReportText: function() {return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed + "\n<span class='abbr' title='Invalid Hash, Wrong Alliance, Broken Links, etc'>Invalid</span>: " + this.invalid;}
 			};
 			var startTime = new Date()/1;
-			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
-			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 200);
+			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", true);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 50);
 			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
 			var gameIframe = DC_LoaTS_Helper.getGameIframe();
 
