@@ -177,6 +177,8 @@ DC_LoaTS_Helper.raids =
 
     hel:                new RaidType("hel",                 "WR", "Hel", "Hel", "Hel WR",                             72,  90000, "SEH", "Infinite", "N/A",  75000000000),
 
+    centi_priders:      new RaidType("centi_priders",       "WR", "Centi Priders", "Centies", "Centies WR",           72,  90000, "SEH", "Infinite", "N/A",  75000000000),
+
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
@@ -190,8 +192,9 @@ DC_LoaTS_Helper.raids =
 
     inventors_scheme:   new RaidType("inventors_scheme",    "RS", "Inventor's Scheme", "Scheme", "Scheme RS",         24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
-    predator_moon:      new RaidType("predator_moon",       "RS", "Predator Moon", "Predator", "Moon RS",             24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    predator_moon:      new RaidType("predator_moon",       "RS", "Predator Moon", "Predator", "Moon RS",             24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
+    "5th_planet":      new RaidType("5th_planet",           "RS", "5th Planet", "5th Planet", "5th Planet RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000)
 };
 
 
