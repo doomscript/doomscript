@@ -49,6 +49,7 @@
 
                                         if (!raid.def) {
                                             console.log("No def", i, raid);
+											continue;
                                         }
 
                                         if (raid.def && "Alliance" === raid.def.type) {
