@@ -8018,124 +8018,6 @@ RaidCommand
 			}
 		);
 		
-		RaidCommand.create( 
-			{
-				commandName: "rss",
-				aliases: ["forums", "threads", "posts"],
-				// No parsing needed
-				/*parsingClass: ,*/
-
-				handler: function(deck, parser, params, text, context)
-				{
-					// Declare ret object
-					var ret = {success: true, statusMessage: "Reading RSS feed..."};
-
-					DC_LoaTS_Helper.ajax({
-						url: "http://www.legacyofathousandsuns.com/forum/external.php?type=RSS2",
-						onload:function(response) {
-							var xmlDoc = (new DOMParser()).parseFromString(response.responseText, "text/xml"),
-							    items = xmlDoc.getElementsByTagName("item"),
-							    i, item, j, child, threads = [], thread, 
-							    str = "Recent posts (as of " + DC_LoaTS_Helper.getCurrentPrettyDate() + ")";
-							
-							for (i = 0; i < items.length; i++) {
-								item = items[i];
-                                threads.push({
-                                    title: getNodeValue(item, "title"),
-                                    url: getNodeValue(item, "link"),
-                                    date: getNodeValue(item, "pubDate"),
-                                    relativeDate: DC_LoaTS_Helper.timeDifference(new Date()/1, new Date(getNodeValue(item, "pubDate"))/1),
-                                    description: getNodeValue(item, "description"),
-                                    category: getNodeValue(item, "category"),
-                                    categoryUrl: getNodeValue(item, "category", "domain"),
-                                    creator: getNodeValue(item, "creator")
-                                });
-							}
-
-                            function getNodeValue(parent, tagName, attribute) {
-                                tags = parent.getElementsByTagNameNS("*", tagName);
-                                if (tags && tags[0]) {
-                                	if (attribute) {
-                                		return tags[0].attributes[attribute].nodeValue;
-                                	}
-                                	else {
-                                		return tags[0].childNodes[0].nodeValue;
-                                	}
-                                }
-                                
-                                return "<i>Unable to locate in RSS feed</i>";
-                            }
-
-                            for (i = 0; i < threads.length; i++) {
-                            	thread = threads[i];
-                            	str += "\n--------------------------------------------------\n"
-                                str += thread.relativeDate + " ";
-                            	str += "<a href='" + thread.categoryUrl + "' target='_blank'>" + thread.category + "</a>";
-                            	str += " &gt; <a href='" + thread.url + "' target='_blank'>" + thread.title + "</a>";
-                            }
-                            
-                            holodeck.activeDialogue().raidBotMessage(str);
-                            
-						} // end onload
-					});					
-					return ret;
-				},
-				getOptions: function()
-				{
-					var commandOptions = {					
-						initialText: {
-							text: "Lists recent threads from the forums"
-						}
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/threads</code>\n";
-					helpText += "Lists recent threads from the forums\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
-		RaidCommand.create( 
-			{
-				commandName: "timerdata",
-				aliases: [],
-				// No parsing needed
-				/*parsingClass: ,*/
-
-				handler: function(deck, parser, params, text, context)
-				{
-					// Declare ret object
-					var ret = {success: true};
-						
-					deck.activeDialogue().raidBotMessage(Timer.getReport());
-						
-					return ret;
-				},
-				getOptions: function()
-				{
-					var commandOptions = {					
-						initialText: {
-							text: "Print the timer report"
-						}
-					};
-					
-					return commandOptions;
-				},
-				buildHelpText: function()
-				{
-					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
-					helpText += "Prints out timing and performance data about the script\n";
-					
-					return helpText;
-				}
-			}
-		);
-		
 		
 		// Manage data related to the CConoly API
 		window.CConolyAPI = {
@@ -9701,14 +9583,14 @@ DC_LoaTS_Helper.raids =
             params.UUID = DC_LoaTS_Helper.generateUUID();
             document.addEventListener(params.UUID, function listener(event)
             {
-                if (event.data.responseObj.readyState == 4)
+                if (event.detail.responseObj.readyState == 4)
                 {
                     document.removeEventListener(params.UUID, listener);
                 }
                 
-                if (typeof params[event.data.callbackName] === "function")
+                if (typeof params[event.detail.callbackName] === "function")
                 {
-                    params[event.data.callbackName](event.data.responseObj);
+                    params[event.detail.callbackName](event.detail.responseObj);
                 }
             });
             // Convert params to simple object
@@ -9725,9 +9607,7 @@ DC_LoaTS_Helper.raids =
                     }
                 }
             }
-            var origin = window.location.protocol + "//" + window.location.host;
-            var evt = document.createEvent("MessageEvent");
-            evt.initMessageEvent("DC_LoaTS_ExecuteGMXHR", true, true, paramSimple, origin, 1, window, null);
+            var evt = new CustomEvent("DC_LoaTS_ExecuteGMXHR", {"bubbles": true, "cancelable": true, "detail": paramSimple}); 
             document.dispatchEvent(evt);
         };
 		
@@ -10967,7 +10847,7 @@ DC_LoaTS_Helper.raids =
 // GM Layer
 function xhrGo(event)
 {
-	var params = event.data;
+	var params = event.detail;
 	for (var param in params)
 	{
 		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
@@ -11009,9 +10889,7 @@ function gmCallBack(UUID, funcName, response)
 {
 	setTimeout(function()
 	{
-		var origin = window.location.protocol + "//" + window.location.host;
-		var evt = document.createEvent("MessageEvent");
-		evt.initMessageEvent(UUID, true, true, {callbackName: funcName, responseObj: response}, origin, 1, window, null);
+		var evt = new CustomEvent(UUID, {"bubbles": true, "cancelable": true, "detail": {callbackName: funcName, responseObj: response}});
 		document.dispatchEvent(evt);
 	}, 0);
 };
