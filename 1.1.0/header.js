@@ -338,7 +338,7 @@ Fixed Critical bug from Kong Change
 Added Inventor RS & WR
 Added Sweet and Jalfreezi alliance raids
 Changed defaults
-
+Fixed Critical bug in Latest Firefox [greenkabbage]
 
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
