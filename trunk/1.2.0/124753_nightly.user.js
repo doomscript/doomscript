@@ -7171,6 +7171,7 @@ RaidMenuTab.create(
 
                                         if (!raid.def) {
                                             console.log("No def", i, raid);
+											continue;
                                         }
 
                                         if (raid.def && "Alliance" === raid.def.type) {
@@ -8737,7 +8738,7 @@ DC_LoaTS_Helper.raids =
     sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  100000000),
     sludge_serpent:     new RaidType("sludge_serpent",      "Z8", "Sludge Serpent", "Serpent", "Serpent",             72, 100, "S",  120000000),
     kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress", "Cult-Mistress", "Cult",72, 100, "S", [180000000, 234000000, 288000000, 320000000]),
-    shuborunth: 		new RaidType("shuborunth",         "Z13","Wublunralxanachi", "Blob", "Blob",                  72, 100, "S", [200000000, 260000000, 320000000, 400000000]),
+    shuborunth: 		new RaidType("shuborunth",         "Z13","Wulblunralxanachi", "Blob", "Blob",                 72, 100, "S", [200000000, 260000000, 320000000, 400000000]),
     birthday_cake_of_doom: new RaidType("birthday_cake_of_doom", "ZA","Birthday Cake of Doom", "Cake", "Cake",        72, 100, "S", [250000000, 325000000, 400000000, 500000000]),
     anthropist_xenocide_warship:new RaidType("anthropist_xenocide_warship","ZA2","Anthropist Xenocide Warship","Xenocide","Xeno",72,100,"S",[300000000, 390000000, 480000000, 600000000]),
     tentacled_turkey:   new RaidType("tentacled_turkey",   "Z15","Tentacled Turkey","Turkey","Turkey",                72, 100, "S", [350000000, 455000000, 560000000, 700000000]),
@@ -8855,6 +8856,8 @@ DC_LoaTS_Helper.raids =
 
     hel:                new RaidType("hel",                 "WR", "Hel", "Hel", "Hel WR",                             72,  90000, "SEH", "Infinite", "N/A",  75000000000),
 
+    centi_priders:      new RaidType("centi_priders",       "WR", "Centi Priders", "Centies", "Centies WR",           72,  90000, "SEH", "Infinite", "N/A",  75000000000),
+
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
@@ -8868,8 +8871,9 @@ DC_LoaTS_Helper.raids =
 
     inventors_scheme:   new RaidType("inventors_scheme",    "RS", "Inventor's Scheme", "Scheme", "Scheme RS",         24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
-    predator_moon:      new RaidType("predator_moon",       "RS", "Predator Moon", "Predator", "Moon RS",             24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    predator_moon:      new RaidType("predator_moon",       "RS", "Predator Moon", "Predator", "Moon RS",             24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
+    "5th_planet":      new RaidType("5th_planet",           "RS", "5th Planet", "5th Planet", "5th Planet RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000)
 };
 
 
