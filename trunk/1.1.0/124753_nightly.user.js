@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.25
+// @version        1.1.26
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -334,11 +334,14 @@ Attempted critical Chrome 27 fix
 Added H8 RS
 Fixed Critical bug from Kong Change
 
-2013.06.18 - 1.1.25
+2013.12.18 - 1.1.25
 Added Inventor RS & WR
 Added Sweet and Jalfreezi alliance raids
 Changed defaults
 Fixed Critical bug in Latest Firefox [greenkabbage]
+
+2013.12.31 - 1.1.26
+Added CMM RS
 
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
@@ -8377,7 +8380,9 @@ DC_LoaTS_Helper.raids =
 
     predator_moon:      new RaidType("predator_moon",       "RS", "Predator Moon", "Predator", "Moon RS",             24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
-    "5th_planet":      new RaidType("5th_planet",           "RS", "5th Planet", "5th Planet", "5th Planet RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000)
+    "5th_planet":      new RaidType("5th_planet",           "RS", "5th Planet", "5th Planet", "5th Planet RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000),
+
+    "cerebral_monster_mech":new RaidType("cerebral_monster_mech","RS", "Cerebral Monster Mech", "Cerebral MM", "CMM RS",24,90000, "SEH", "Infinite", "N/A",  20000000000)
 };
 
 
