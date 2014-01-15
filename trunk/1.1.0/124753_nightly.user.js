@@ -4474,7 +4474,9 @@ function main()
 
 							}
 						),
-						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload)
+						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload),
+                        toggleGame: new RaidButton("toggleGame", "DC_LoaTS_toggleGameButton", DC_LoaTS_Helper.toggleGame, "Show / Hide the game"),
+                        toggleWorldChat: new RaidButton("toggleWorldChat", "DC_LoaTS_toggleWorldChatButton", DC_LoaTS_Helper.toggleWorldChat, "Show / Hide World Chat")
 					};
 					for (var buttonName in this.buttons)
 					{
@@ -9459,7 +9461,22 @@ DC_LoaTS_Helper.raids =
                 el.className = el.className.replace("hideWorldChat", "");
             }
         };
-		
+
+        DC_LoaTS_Helper.toggleWorldChat = function() {
+            var hide = !DC_LoaTS_Helper.getPref("HideWorldChat", false),
+                checkbox = document.getElementById("PreferencesMenu-HideWorldChatInput");
+            DC_LoaTS_Helper.setPref("HideWorldChat", hide);
+            DC_LoaTS_Helper.handleHideWorldChat(hide);
+
+            if (checkbox) {
+                checkbox.checked = hide;
+            }
+        };
+
+        DC_LoaTS_Helper.toggleGame = function() {
+            $("gameiframe").toggle();
+        };
+
 		DC_LoaTS_Helper.listContainsRaid = function(list, raidLink) {
 			DCDebug("List contains raid: ", list, raidLink);
 			if (list && raidLink && raidLink.isValid()) {
@@ -10675,7 +10692,15 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\na.DC_LoaTS_reloadButton {\n";
 				rulesText += "\tbackground-position: -160px -64px;";
 				rulesText += "}\n";
-				
+
+                rulesText += "\na.DC_LoaTS_toggleGameButton {\n";
+                rulesText += "\tbackground-position: 0 -176px;";
+                rulesText += "}\n";
+
+                rulesText += "\na.DC_LoaTS_toggleWorldChatButton {\n";
+                rulesText += "\tbackground-position: -128px -96px;";
+                rulesText += "}\n";
+
 				rulesText += "\na.DC_LoaTS_WRButton {\n";
 				rulesText += "\ttext-indent: 0px;\n";
 				rulesText += "\tbackground: none;\n";

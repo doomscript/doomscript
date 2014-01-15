@@ -52,7 +52,9 @@
 
 							}
 						),
-						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload)
+						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload),
+                        toggleGame: new RaidButton("toggleGame", "DC_LoaTS_toggleGameButton", DC_LoaTS_Helper.toggleGame, "Show / Hide the game"),
+                        toggleWorldChat: new RaidButton("toggleWorldChat", "DC_LoaTS_toggleWorldChatButton", DC_LoaTS_Helper.toggleWorldChat, "Show / Hide World Chat")
 					};
 					for (var buttonName in this.buttons)
 					{
