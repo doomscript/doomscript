@@ -471,7 +471,7 @@
 				rulesText += "\twidth: 100%;\n";
 				rulesText += "\theight: 400px;\n";
 				rulesText += "}\n";
-				
+
 				rulesText += "\n.DC_LoaTS_raidMenuCloseTabA {\n";
 				rulesText += "\tborder-radius: 100px;\n";
 				rulesText += "\twidth: 5px;\n";
@@ -480,7 +480,32 @@
 				rulesText += "\tbackground-color: #CCCCCC;\n";
 				rulesText += "}\n";
 
-				var head = document.getElementsByTagName('head')[0],
+                rulesText += "\n#maingame {\n";
+                rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+                rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+                rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+                rulesText += "}\n";
+
+                rulesText += "\n#maingame.hideWorldChat {\n";
+                rulesText += "\twidth: 1060px !important;\n";
+                rulesText += "}\n";
+
+                rulesText += "\n#game {\n";
+                rulesText += "\toverflow: hidden;\n";
+                rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+                rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+                rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+                rulesText += "}\n";
+
+                rulesText += "\n.hideWorldChat #game {\n";
+                rulesText += "\twidth: 759px !important;\n";
+                rulesText += "}\n";
+
+                rulesText += "\n#gameholder {\n";
+                rulesText += "\twidth: auto !important;\n";
+                rulesText += "}\n";
+
+        var head = document.getElementsByTagName('head')[0],
 				    style = document.createElement('style'),
 				    rules = document.createTextNode(rulesText);
 				

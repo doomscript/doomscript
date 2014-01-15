@@ -342,6 +342,8 @@ Fixed Critical bug in Latest Firefox [greenkabbage]
 
 2013.12.31 - 1.1.26
 Added CMM RS
+Fixed default prefs not working
+ dded new pref to hide world chat
 
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
@@ -354,7 +356,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.25",
+    	version: "1.1.26",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

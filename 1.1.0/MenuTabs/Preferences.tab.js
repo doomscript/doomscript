@@ -11,6 +11,7 @@
 				rightClickVisitedKey: "RightClickVisited",
 				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
 				hideVisitedRaidsKey: "HideVisitedRaids",
+				hideWorldChatKey: "HideWorldChat",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				reportDeadRaidsKey: "ReportDeadRaids",
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
@@ -51,25 +52,42 @@
 					);
 					wrapper.appendChild(ignoreInvalidOption.wrapper);
 
-			
-					var hideVisitedOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-HideVisitedRaidsInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.hideVisitedRaidsKey), 
-							"Hide Visited and Completed Raids.", 
-							"If checked, Visited and Completed Raids posted into chat will be hidden", 
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
-									
-									DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(hideVisitedOption.wrapper);
 
-					var loadBackgroundOption = me.createSimpleOptionHTML(
+                    var hideVisitedOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-HideVisitedRaidsInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.hideVisitedRaidsKey, false),
+                        "Hide Visited and Completed Raids.",
+                        "If checked, Visited and Completed Raids posted into chat will be hidden",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
+
+                                DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(hideVisitedOption.wrapper);
+
+                    var hideWorldChat = me.createSimpleOptionHTML(
+                        "PreferencesMenu-HideWorldChatInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.hideWorldChatKey, false),
+                        "Hide World Chat",
+                        "If checked, World Chat will not be visible",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.hideWorldChatKey, this.checked);
+
+                                DC_LoaTS_Helper.handleHideWorldChat(this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(hideWorldChat.wrapper);
+
+                    var loadBackgroundOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
 									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey, true), 
@@ -110,35 +128,35 @@
 					);
 					wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
 
-					var reportDeadRaidsOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-ReportDeadRaidsInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true), 
-							"Report Dead Raids to CConoly",
-							"When a raid is marked Complete (Dead or Timed Out), inform CConoly",
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.reportDeadRaidsKey, this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(reportDeadRaidsOption.wrapper);
-
-					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-UseQueryTimeDeltaInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true), 
-							"Ignore Duplicates When Using /loadcconoly",
-							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
+//					var reportDeadRaidsOption = me.createSimpleOptionHTML(
+//							"PreferencesMenu-ReportDeadRaidsInput",
+//							"boolean",
+//							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true),
+//							"Report Dead Raids to CConoly",
+//							"When a raid is marked Complete (Dead or Timed Out), inform CConoly",
+//							{
+//								onclick: function()
+//								{
+//									DC_LoaTS_Helper.setPref(me.reportDeadRaidsKey, this.checked);
+//								}
+//							}
+//					);
+//					wrapper.appendChild(reportDeadRaidsOption.wrapper);
+//
+//					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
+//							"PreferencesMenu-UseQueryTimeDeltaInput",
+//							"boolean",
+//							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true),
+//							"Ignore Duplicates When Using /loadcconoly",
+//							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
+//							{
+//								onclick: function()
+//								{
+//									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
+//								}
+//							}
+//					);
+//					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}

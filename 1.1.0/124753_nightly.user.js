@@ -342,6 +342,8 @@ Fixed Critical bug in Latest Firefox [greenkabbage]
 
 2013.12.31 - 1.1.26
 Added CMM RS
+Fixed default prefs not working
+ dded new pref to hide world chat
 
 [TODO] Post new Opera instructions 
 [TODO] Fix missing images on menu
@@ -354,7 +356,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.25",
+    	version: "1.1.26",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -465,6 +467,9 @@ function main()
 				
 				// Show the raid toolbar
 				RaidToolbar.show();
+
+                // Hide the game (or not)
+                DC_LoaTS_Helper.handleHideWorldChat(DC_LoaTS_Helper.getPref("HideWorldChat", false));
 				
 				
 				// ChatDialogue is the Kongregate ChatDialogue class that is part of the Kongregate Holodeck
@@ -700,7 +705,7 @@ function main()
 						// Let the user know the command failed
 						holodeck.activeDialogue().raidBotMessage("Did not understand command: <code>" + str + "</code>");
 					}
-					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", false)) {
+					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", true)) {
 						ignoredByPreference = true;
 
 						// Let the user know the command failed
@@ -5430,6 +5435,7 @@ function main()
 				rightClickVisitedKey: "RightClickVisited",
 				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
 				hideVisitedRaidsKey: "HideVisitedRaids",
+				hideWorldChatKey: "HideWorldChat",
 				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
 				reportDeadRaidsKey: "ReportDeadRaids",
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
@@ -5470,25 +5476,42 @@ function main()
 					);
 					wrapper.appendChild(ignoreInvalidOption.wrapper);
 
-			
-					var hideVisitedOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-HideVisitedRaidsInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.hideVisitedRaidsKey), 
-							"Hide Visited and Completed Raids.", 
-							"If checked, Visited and Completed Raids posted into chat will be hidden", 
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
-									
-									DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(hideVisitedOption.wrapper);
 
-					var loadBackgroundOption = me.createSimpleOptionHTML(
+                    var hideVisitedOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-HideVisitedRaidsInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.hideVisitedRaidsKey, false),
+                        "Hide Visited and Completed Raids.",
+                        "If checked, Visited and Completed Raids posted into chat will be hidden",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
+
+                                DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(hideVisitedOption.wrapper);
+
+                    var hideWorldChat = me.createSimpleOptionHTML(
+                        "PreferencesMenu-HideWorldChatInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.hideWorldChatKey, false),
+                        "Hide World Chat",
+                        "If checked, World Chat will not be visible",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.hideWorldChatKey, this.checked);
+
+                                DC_LoaTS_Helper.handleHideWorldChat(this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(hideWorldChat.wrapper);
+
+                    var loadBackgroundOption = me.createSimpleOptionHTML(
 									"PreferencesMenu-LoadRaidsInBackgroundInput",
 									"boolean", 
 									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey, true), 
@@ -5529,35 +5552,35 @@ function main()
 					);
 					wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
 
-					var reportDeadRaidsOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-ReportDeadRaidsInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true), 
-							"Report Dead Raids to CConoly",
-							"When a raid is marked Complete (Dead or Timed Out), inform CConoly",
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.reportDeadRaidsKey, this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(reportDeadRaidsOption.wrapper);
-
-					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-UseQueryTimeDeltaInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true), 
-							"Ignore Duplicates When Using /loadcconoly",
-							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
+//					var reportDeadRaidsOption = me.createSimpleOptionHTML(
+//							"PreferencesMenu-ReportDeadRaidsInput",
+//							"boolean",
+//							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true),
+//							"Report Dead Raids to CConoly",
+//							"When a raid is marked Complete (Dead or Timed Out), inform CConoly",
+//							{
+//								onclick: function()
+//								{
+//									DC_LoaTS_Helper.setPref(me.reportDeadRaidsKey, this.checked);
+//								}
+//							}
+//					);
+//					wrapper.appendChild(reportDeadRaidsOption.wrapper);
+//
+//					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
+//							"PreferencesMenu-UseQueryTimeDeltaInput",
+//							"boolean",
+//							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true),
+//							"Ignore Duplicates When Using /loadcconoly",
+//							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
+//							{
+//								onclick: function()
+//								{
+//									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
+//								}
+//							}
+//					);
+//					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}
@@ -8715,7 +8738,7 @@ DC_LoaTS_Helper.raids =
 				// Only care about valid links
 				if (raidLink.isValid())
 				{
-					if (DC_LoaTS_Helper.getPref("RightClickVisited") === true)
+					if (DC_LoaTS_Helper.getPref("RightClickVisited", true) === true)
 					{
 						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 					}
@@ -8992,7 +9015,7 @@ DC_LoaTS_Helper.raids =
 			
 			// Gather the info we need to load a raid, either from params or utility methods
 			gameIframe = gameIframe || DC_LoaTS_Helper.getGameIframe();
-			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
+			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", true);
 			
 			try
 			{
@@ -9249,21 +9272,8 @@ DC_LoaTS_Helper.raids =
 			});
 		};
 
-		DC_LoaTS_Helper.reportDead = function(raidLink) {
-			setTimeout(function() {
-				var start = new Date()/1;
-				var reportUrl = CConolyAPI.getMarkDeadUrl(raidLink.id);
-				
-				DC_LoaTS_Helper.ajax({
-					url: reportUrl,
-					onload: function(response) {
-						var time = new Date()/1 - start;
-						Timer.addRun("CConoly markDead", time);
-						DCDebug("Report Dead took " + time + " ms. Response: ", response);
-					}
-				});
-			}, 10);
-		};
+        // Deprecated
+		DC_LoaTS_Helper.reportDead = function(raidLink) { };
 
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			// Private variable to be closed over in the autoLoader
@@ -9279,9 +9289,9 @@ DC_LoaTS_Helper.raids =
 					_generateReportText: function() {return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed + "\n<span class='abbr' title='Invalid Hash, Wrong Alliance, Broken Links, etc'>Invalid</span>: " + this.invalid;}
 			};
 			var startTime = new Date()/1;
-			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
-			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 200);
-			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
+			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", true);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 50);
+			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 500);
 			var gameIframe = DC_LoaTS_Helper.getGameIframe();
 
 			// Create function closure to be called repeatedly
@@ -9436,7 +9446,19 @@ DC_LoaTS_Helper.raids =
 			}
 			
 			DC_LoaTS_Helper.updatePostedLinks();
-		}
+		};
+
+        DC_LoaTS_Helper.handleHideWorldChat = function(hide) {
+            var el = document.getElementById("maingame"),
+                hidden = el.className.indexOf("hideWorldChat") > -1;
+
+            if (hide && !hidden) {
+                el.className += " hideWorldChat";
+            }
+            else if (!hide && hidden) {
+                el.className = el.className.replace("hideWorldChat", "");
+            }
+        };
 		
 		DC_LoaTS_Helper.listContainsRaid = function(list, raidLink) {
 			DCDebug("List contains raid: ", list, raidLink);
@@ -9452,7 +9474,7 @@ DC_LoaTS_Helper.raids =
 			}
 			
 			return false;
-		}
+		};
 		
 		// Make sure the upl namespace exists
 		DC_LoaTS_Helper.upl = {now: {}, next: {}};
@@ -10818,7 +10840,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\twidth: 100%;\n";
 				rulesText += "\theight: 400px;\n";
 				rulesText += "}\n";
-				
+
 				rulesText += "\n.DC_LoaTS_raidMenuCloseTabA {\n";
 				rulesText += "\tborder-radius: 100px;\n";
 				rulesText += "\twidth: 5px;\n";
@@ -10827,7 +10849,32 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\tbackground-color: #CCCCCC;\n";
 				rulesText += "}\n";
 
-				var head = document.getElementsByTagName('head')[0],
+                rulesText += "\n#maingame {\n";
+                rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+                rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+                rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+                rulesText += "}\n";
+
+                rulesText += "\n#maingame.hideWorldChat {\n";
+                rulesText += "\twidth: 1060px !important;\n";
+                rulesText += "}\n";
+
+                rulesText += "\n#game {\n";
+                rulesText += "\toverflow: hidden;\n";
+                rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
+                rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
+                rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
+                rulesText += "}\n";
+
+                rulesText += "\n.hideWorldChat #game {\n";
+                rulesText += "\twidth: 759px !important;\n";
+                rulesText += "}\n";
+
+                rulesText += "\n#gameholder {\n";
+                rulesText += "\twidth: auto !important;\n";
+                rulesText += "}\n";
+
+        var head = document.getElementsByTagName('head')[0],
 				    style = document.createElement('style'),
 				    rules = document.createTextNode(rulesText);
 				
