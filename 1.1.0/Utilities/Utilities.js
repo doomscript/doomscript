@@ -1048,7 +1048,22 @@
                 el.className = el.className.replace("hideWorldChat", "");
             }
         };
-		
+
+        DC_LoaTS_Helper.toggleWorldChat = function() {
+            var hide = !DC_LoaTS_Helper.getPref("HideWorldChat", false),
+                checkbox = document.getElementById("PreferencesMenu-HideWorldChatInput");
+            DC_LoaTS_Helper.setPref("HideWorldChat", hide);
+            DC_LoaTS_Helper.handleHideWorldChat(hide);
+
+            if (checkbox) {
+                checkbox.checked = hide;
+            }
+        };
+
+        DC_LoaTS_Helper.toggleGame = function() {
+            $("gameiframe").toggle();
+        };
+
 		DC_LoaTS_Helper.listContainsRaid = function(list, raidLink) {
 			DCDebug("List contains raid: ", list, raidLink);
 			if (list && raidLink && raidLink.isValid()) {

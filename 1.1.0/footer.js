@@ -306,7 +306,15 @@
 				rulesText += "\na.DC_LoaTS_reloadButton {\n";
 				rulesText += "\tbackground-position: -160px -64px;";
 				rulesText += "}\n";
-				
+
+                rulesText += "\na.DC_LoaTS_toggleGameButton {\n";
+                rulesText += "\tbackground-position: 0 -176px;";
+                rulesText += "}\n";
+
+                rulesText += "\na.DC_LoaTS_toggleWorldChatButton {\n";
+                rulesText += "\tbackground-position: -128px -96px;";
+                rulesText += "}\n";
+
 				rulesText += "\na.DC_LoaTS_WRButton {\n";
 				rulesText += "\ttext-indent: 0px;\n";
 				rulesText += "\tbackground: none;\n";
