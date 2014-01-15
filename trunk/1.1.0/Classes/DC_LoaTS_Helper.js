@@ -43,6 +43,9 @@
 				
 				// Show the raid toolbar
 				RaidToolbar.show();
+
+                // Hide the game (or not)
+                DC_LoaTS_Helper.handleHideWorldChat(DC_LoaTS_Helper.getPref("HideWorldChat", false));
 				
 				
 				// ChatDialogue is the Kongregate ChatDialogue class that is part of the Kongregate Holodeck
@@ -278,7 +281,7 @@
 						// Let the user know the command failed
 						holodeck.activeDialogue().raidBotMessage("Did not understand command: <code>" + str + "</code>");
 					}
-					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", false)) {
+					else if (chatCommandResult && str.indexOf("/") == 0 && str.indexOf("/me") !== 0 && str.indexOf("/wrists") !== 0 && DC_LoaTS_Helper.getPref("IgnoreInvalidCommands", true)) {
 						ignoredByPreference = true;
 
 						// Let the user know the command failed

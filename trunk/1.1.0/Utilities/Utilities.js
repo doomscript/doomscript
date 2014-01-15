@@ -327,7 +327,7 @@
 				// Only care about valid links
 				if (raidLink.isValid())
 				{
-					if (DC_LoaTS_Helper.getPref("RightClickVisited") === true)
+					if (DC_LoaTS_Helper.getPref("RightClickVisited", true) === true)
 					{
 						RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 					}
@@ -604,7 +604,7 @@
 			
 			// Gather the info we need to load a raid, either from params or utility methods
 			gameIframe = gameIframe || DC_LoaTS_Helper.getGameIframe();
-			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
+			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", true);
 			
 			try
 			{
@@ -861,21 +861,8 @@
 			});
 		};
 
-		DC_LoaTS_Helper.reportDead = function(raidLink) {
-			setTimeout(function() {
-				var start = new Date()/1;
-				var reportUrl = CConolyAPI.getMarkDeadUrl(raidLink.id);
-				
-				DC_LoaTS_Helper.ajax({
-					url: reportUrl,
-					onload: function(response) {
-						var time = new Date()/1 - start;
-						Timer.addRun("CConoly markDead", time);
-						DCDebug("Report Dead took " + time + " ms. Response: ", response);
-					}
-				});
-			}, 10);
-		};
+        // Deprecated
+		DC_LoaTS_Helper.reportDead = function(raidLink) { };
 
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			// Private variable to be closed over in the autoLoader
@@ -891,9 +878,9 @@
 					_generateReportText: function() {return "Joined: " + this.loaded + "\nVisited: " + this.visited + "\nDead: " + this.completed + "\n<span class='abbr' title='Invalid Hash, Wrong Alliance, Broken Links, etc'>Invalid</span>: " + this.invalid;}
 			};
 			var startTime = new Date()/1;
-			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", false);
-			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 200);
-			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 1500);
+			var lrib = DC_LoaTS_Helper.getPref("LoadRaidsInBackground", true);
+			var lribDelay = DC_LoaTS_Helper.getPref("LoadRaidsInBackgroundDelay", 50);
+			var lrDelay = DC_LoaTS_Helper.getPref("LoadRaidsDelay", 500);
 			var gameIframe = DC_LoaTS_Helper.getGameIframe();
 
 			// Create function closure to be called repeatedly
@@ -1048,7 +1035,19 @@
 			}
 			
 			DC_LoaTS_Helper.updatePostedLinks();
-		}
+		};
+
+        DC_LoaTS_Helper.handleHideWorldChat = function(hide) {
+            var el = document.getElementById("maingame"),
+                hidden = el.className.indexOf("hideWorldChat") > -1;
+
+            if (hide && !hidden) {
+                el.className += " hideWorldChat";
+            }
+            else if (!hide && hidden) {
+                el.className = el.className.replace("hideWorldChat", "");
+            }
+        };
 		
 		DC_LoaTS_Helper.listContainsRaid = function(list, raidLink) {
 			DCDebug("List contains raid: ", list, raidLink);
@@ -1064,7 +1063,7 @@
 			}
 			
 			return false;
-		}
+		};
 		
 		// Make sure the upl namespace exists
 		DC_LoaTS_Helper.upl = {now: {}, next: {}};
