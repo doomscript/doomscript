@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.26
+// @version        1.1.27
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -343,9 +343,12 @@ Fixed Critical bug in Latest Firefox [greenkabbage]
 2013.12.31 - 1.1.26
 Added CMM RS
 Fixed default prefs not working
- dded new pref to hide world chat
+Added new pref to hide world chat
 
-[TODO] Post new Opera instructions 
+2014.??.?? - 1.1.27
+Added Mega Mimes Alliance raid
+
+[TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
 
@@ -356,7 +359,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.26",
+    	version: "1.1.27",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

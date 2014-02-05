@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.26
+// @version        1.1.27
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -343,9 +343,12 @@ Fixed Critical bug in Latest Firefox [greenkabbage]
 2013.12.31 - 1.1.26
 Added CMM RS
 Fixed default prefs not working
- dded new pref to hide world chat
+Added new pref to hide world chat
 
-[TODO] Post new Opera instructions 
+2014.??.?? - 1.1.27
+Added Mega Mimes Alliance raid
+
+[TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
 
@@ -356,7 +359,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.26",
+    	version: "1.1.27",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -8334,6 +8337,7 @@ DC_LoaTS_Helper.raids =
     luna:               new RaidType("luna",                "A6", "Luna", "Luna", "Luna",                            120,  50, "H",   50000000),
     trashmaster:        new RaidType("trashmaster",         "A6", "Trashmaster Colby", "Colby", "Colby",             144,  50, "H",  100000000),
     santas_workshop:    new RaidType("santas_workshop",     "A8", "SANTA's Workshop", "Workshop", "Workshop",         72,  50, "H",  125000000),
+    the_mega_mimes:     new RaidType("the_mega_mimes",      "A2-2", "The Mega Mimes", "Mimes", "Mimes",               84,  50, "H",   50000000),
 
     // Large Raids
     saucers:            new RaidType("saucers",             "A0", "Flying Saucers",    "Saucers", "Saucers",         168,  100, "H",    55000000),
