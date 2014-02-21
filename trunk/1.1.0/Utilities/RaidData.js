@@ -141,8 +141,9 @@ DC_LoaTS_Helper.raids =
     nutcracker_sweet:   new RaidType("nutcracker_sweet",    "A11", "Nutcracker Sweet", "Sweet", "Sweet",              84,  100, "H", [ 750000000, 1000000000, 1500000000, 3000000000]),
     crazy_jalfrezi:     new RaidType("crazy_jalfrezi",      "A12", "The Crazy Jalfrezi", "Jalfrezi", "Freezi",        84,  100, "H", [1000000000, 1250000000, 2000000000, 4000000000]),
     patti:              new RaidType("patti",               "A13", "PATTI", "PATTI", "PATTI",                         84,  100, "H", [1000000000, 1250000000, 2000000000, 4000000000]),
-    crimzo_the_killer_clown:new RaidType("crimzo_the_killer_clown","A2-1", "Crimzo the Killer Clown", "Crimzo", "Crimzo",84,100,"H", [1000000000, 1250000000, 2000000000, 4000000000]),
+    crimzo_the_killer_clown:new RaidType("crimzo_the_killer_clown","A2-1","Crimzo the Killer Clown","Crimzo","Crimzo",84,  100, "H", [1000000000, 1250000000, 2000000000, 4000000000]),
     the_neon_knights:   new RaidType("the_neon_knights",    "A2-2", "The Neon Knights", "Neon", "Neon",               84,  100, "H",   500000000),
+    the_gamma_hammers:  new RaidType("the_gamma_hammers",   "A2-3", "The Gamma Hammers", "Gammas", "Gammas",          84,  100, "H",  2500000000),
 
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
