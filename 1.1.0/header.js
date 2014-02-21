@@ -346,7 +346,7 @@ Fixed default prefs not working
 Added new pref to hide world chat
 
 2014.??.?? - 1.1.27
-Added Mega Mimes and Neon Knights Alliance raids
+Added Mega Mimes, Neon Knights, and Gamma Hammers Alliance raids
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
