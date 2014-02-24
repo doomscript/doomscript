@@ -345,8 +345,9 @@ Added CMM RS
 Fixed default prefs not working
 Added new pref to hide world chat
 
-2014.??.?? - 1.1.27
+2014.02.21 - 1.1.27
 Added Mega Mimes, Neon Knights, and Gamma Hammers Alliance raids
+Fixed raid icons
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -372,8 +373,9 @@ function main()
     	
     	joinRaidURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
     	kongLoaTSURL: "http://web1.legacyofathousandsuns.com/kong/raidjoin.php",
-    	
-    	// Other URLS
+        lotsCDNUrl: "http://5thplanetlots.insnw.net/lots_live/",
+
+        // Other URLS
     	RaidToolsURL: "http://userscripts.org/132671",
     	QuickFriendURL: "http://userscripts.org/125666",
     	PlayNowFixURL: "http://userscripts.org/142619",
