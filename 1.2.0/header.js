@@ -337,7 +337,7 @@ Fixed Critical bug from Kong Change
 2013.11.?? - 1.2.0
 Added Inventor RS & WR
 Added Sweet, Jalfreezi, and PATTI alliance raids
-Added Mega Mimes, Neon Knights, and Gamma Hammers Alliance raids
+Added Mega Mimes, Neon Knights, Gamma Hammers, and Chem Runners Alliance raids
 Changed some preference defaults
 Added Hel WR
 Added Trulcharn

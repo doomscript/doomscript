@@ -337,7 +337,7 @@ Fixed Critical bug from Kong Change
 2013.11.?? - 1.2.0
 Added Inventor RS & WR
 Added Sweet, Jalfreezi, and PATTI alliance raids
-Added Mega Mimes, Neon Knights, and Gamma Hammers Alliance raids
+Added Mega Mimes, Neon Knights, Gamma Hammers, and Chem Runners Alliance raids
 Changed some preference defaults
 Added Hel WR
 Added Trulcharn
@@ -8826,6 +8826,7 @@ DC_LoaTS_Helper.raids =
     crimzo_the_killer_clown:new RaidType("crimzo_the_killer_clown","A2-1", "Crimzo the Killer Clown", "Crimzo", "Crimzo",84,100,"H", [1000000000, 1250000000, 2000000000, 4000000000]),
     the_neon_knights:   new RaidType("the_neon_knights",    "A2-2", "The Neon Knights", "Neon", "Neon",               84,  100, "H",   500000000),
     the_gamma_hammers:  new RaidType("the_gamma_hammers",   "A2-3", "The Gamma Hammers", "Gammas", "Gammas",          84,  100, "H",  2500000000),
+    the_chem_runners:   new RaidType("the_chem_runners",    "A2-4", "The Chem-Runners", "C-Runners", "Chem",          84,  100, "H", 50000000000),
 
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
