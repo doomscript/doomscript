@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.27
+// @version        1.1.28
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -365,7 +365,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.27",
+    	version: "1.1.28",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
