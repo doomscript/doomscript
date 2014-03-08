@@ -31,6 +31,9 @@
 					
 					if (typeof linkURL != "undefined")
 					{
+                        // Correct for World Chat's broken links
+                        linkURL = linkURL.replace("thousand-sunskv_", "thousand-suns?kv_");
+
 						// Execute our regular expression (defined below) against the message
 						// This checks to see if the message contained a LoaTS raid link
 						var match = RaidLink.linkPattern.exec(linkURL);

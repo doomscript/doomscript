@@ -349,8 +349,10 @@ Added new pref to hide world chat
 Added Mega Mimes, Neon Knights, and Gamma Hammers Alliance raids
 Fixed raid icons
 
-2014.03.?? - 1.1.28
+2014.03.08 - 1.1.28
 Added Chem-Runners Alliance raid
+Added two KX raids, Battle Station and Subjugator
+Attempt to handle WC's bad link copying bug
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu

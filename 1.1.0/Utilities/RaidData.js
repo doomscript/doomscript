@@ -68,6 +68,9 @@ DC_LoaTS_Helper.raids =
     dark_hat:           new RaidType("dark_hat",           "ZA3","Dark Hat", "D. Hat", "D. Hat",                      30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
     rampaging_rackalax: new RaidType("rampaging_rackalax", "ZA4","Rampaging Rackalax", "Rackalax", "Rack",            30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
 
+    // Large Plus Raids
+    kulnarxex_subjugator_1:new RaidType("kulnarxex_subjugator_1","S","Kulnar-Xex Subjugator","K-X Subjugator","KX Sub",8, 125, "S", 12500000000, /*FS calculated normally */null, [100000000,125000000,160000000,200000000]),
+
     // Epic Raids
     colonel:            new RaidType("colonel",             "Z1", "Psychic Colonel", "CC Colonel", "Col.",           168, 250, "S",  150000000),
     vespasia:           new RaidType("vespasia",            "Z2", "Vespasia's Android", "Vespasia Bot", "Vesp",      168, 250, "S",  250000000),
@@ -123,7 +126,7 @@ DC_LoaTS_Helper.raids =
     luna:               new RaidType("luna",                "A6", "Luna", "Luna", "Luna",                            120,  50, "H",   50000000),
     trashmaster:        new RaidType("trashmaster",         "A6", "Trashmaster Colby", "Colby", "Colby",             144,  50, "H",  100000000),
     santas_workshop:    new RaidType("santas_workshop",     "A8", "SANTA's Workshop", "Workshop", "Workshop",         72,  50, "H",  125000000),
-    the_mega_mimes:     new RaidType("the_mega_mimes",      "A2-2", "The Mega Mimes", "Mimes", "Mimes",               84,  50, "H",   50000000),
+    the_mega_mimes:     new RaidType("the_mega_mimes",      "A2-2", "The Mega Mimes", "Mimes", "Mimes",               84,  50, "H",   50000000, null, [1000000,1250000,1600000,2000000]),
 
     // Large Raids
     saucers:            new RaidType("saucers",             "A0", "Flying Saucers",    "Saucers", "Saucers",         168,  100, "H",    55000000),
@@ -142,9 +145,9 @@ DC_LoaTS_Helper.raids =
     crazy_jalfrezi:     new RaidType("crazy_jalfrezi",      "A12", "The Crazy Jalfrezi", "Jalfrezi", "Freezi",        84,  100, "H", [1000000000, 1250000000, 2000000000, 4000000000]),
     patti:              new RaidType("patti",               "A13", "PATTI", "PATTI", "PATTI",                         84,  100, "H", [1000000000, 1250000000, 2000000000, 4000000000]),
     crimzo_the_killer_clown:new RaidType("crimzo_the_killer_clown","A2-1","Crimzo the Killer Clown","Crimzo","Crimzo",84,  100, "H", [1000000000, 1250000000, 2000000000, 4000000000]),
-    the_neon_knights:   new RaidType("the_neon_knights",    "A2-2", "The Neon Knights", "Neon", "Neon",               84,  100, "H",   500000000),
+    the_neon_knights:   new RaidType("the_neon_knights",    "A2-2", "The Neon Knights", "Neon", "Neon",               84,  100, "H",   500000000, null, [5000000,6250000,8000000,10000000]),
     the_gamma_hammers:  new RaidType("the_gamma_hammers",   "A2-3", "The Gamma Hammers", "Gammas", "Gammas",          84,  100, "H",  2500000000),
-    the_chem_runners:   new RaidType("the_chem_runners",    "A2-4", "The Chem-Runners", "C-Runners", "Chem",          84,  100, "H", 50000000000),
+    the_chem_runners:   new RaidType("the_chem_runners",    "A2-4", "The Chem-Runners", "C-Runners", "Chem",          84,  100, "H", 50000000000, null, [500000000,625000000,800000000,1000000000]),
 
     // Epic Raids
     lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
@@ -182,6 +185,8 @@ DC_LoaTS_Helper.raids =
     hel:                new RaidType("hel",                 "WR", "Hel", "Hel", "Hel WR",                             72,  90000, "SEH", "Infinite", "N/A",  75000000000),
 
     centi_priders:      new RaidType("centi_priders",       "WR", "Centi Priders", "Centies", "Centies WR",           72,  90000, "SEH", "Infinite", "N/A",  75000000000),
+
+    kulnar_xex_battle_station_1:new RaidType("kulnar_xex_battle_station_1","WR","Kulnar-Xex Battle Station","K-X Battle Station","KX BS WR",72,90000,"SEH","Infinite","N/A",200000000000),
 
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
