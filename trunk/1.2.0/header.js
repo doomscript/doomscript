@@ -334,7 +334,7 @@ Attempted critical Chrome 27 fix
 Added H8 RS
 Fixed Critical bug from Kong Change
 
-2013.11.?? - 1.2.0
+2014.04.?? - 1.2.0
 Added Inventor RS & WR
 Added Sweet, Jalfreezi, and PATTI alliance raids
 Added Mega Mimes, Neon Knights, Gamma Hammers, and Chem Runners Alliance raids
@@ -346,6 +346,8 @@ Added Zone A4 Raids: Tyraness, Tyr. Guard, Kwelshax, Myrmexidaks, Talia, Rackala
 Added CMM RS
 Changed to new Event methods [greenkabbage]
 Implemented Raid Monitor features
+Added two KX raids, Battle Station and Subjugator
+Attempt to handle WC's bad link copying bug
 
 
 [TODO] Post new Opera instructions 
