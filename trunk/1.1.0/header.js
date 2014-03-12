@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.28
+// @version        1.1.29
 // @date           02.01.2012
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
@@ -354,6 +354,9 @@ Added Chem-Runners Alliance raid
 Added two KX raids, Battle Station and Subjugator
 Attempt to handle WC's bad link copying bug
 
+2014.03.?? - 1.1.29
+Added Zone 20 Raid: Weiqi Game
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -365,7 +368,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.28",
+    	version: "1.1.29",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

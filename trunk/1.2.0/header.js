@@ -343,6 +343,7 @@ Added Hel WR
 Added Trulcharn
 Added Zone A3 Raids: Saboteur, Dark Hat, Silj, CC Agent, Ragnar, Void Master
 Added Zone A4 Raids: Tyraness, Tyr. Guard, Kwelshax, Myrmexidaks, Talia, Rackalax
+Added Zone 20 Raid: Weiqi Game
 Added CMM RS
 Changed to new Event methods [greenkabbage]
 Implemented Raid Monitor features
