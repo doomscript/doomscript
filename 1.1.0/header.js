@@ -356,6 +356,7 @@ Attempt to handle WC's bad link copying bug
 
 2014.03.?? - 1.1.29
 Added Zone 20 Raid: Weiqi Game
+Added KX Scout Ships RS
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu

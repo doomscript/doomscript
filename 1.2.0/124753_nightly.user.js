@@ -345,6 +345,7 @@ Added Zone A3 Raids: Saboteur, Dark Hat, Silj, CC Agent, Ragnar, Void Master
 Added Zone A4 Raids: Tyraness, Tyr. Guard, Kwelshax, Myrmexidaks, Talia, Rackalax
 Added Zone 20 Raid: Weiqi Game
 Added CMM RS
+Added KX Scout Ships RS
 Changed to new Event methods [greenkabbage]
 Implemented Raid Monitor features
 Added two KX raids, Battle Station and Subjugator
@@ -8894,7 +8895,9 @@ DC_LoaTS_Helper.raids =
 
     "5th_planet":      new RaidType("5th_planet",           "RS", "5th Planet", "5th Planet", "5th Planet RS",        24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
-    cerebral_monster_mech:new RaidType("cerebral_monster_mech","RS", "Cerebral Monster Mech", "Cerebral MM", "CMM RS",24,90000, "SEH", "Infinite", "N/A",  20000000000)
+    cerebral_monster_mech:new RaidType("cerebral_monster_mech","RS", "Cerebral Monster Mech", "Cerebral MM", "CMM RS",24,  90000, "SEH", "Infinite", "N/A",  20000000000),
+
+    kulnarxex_scout_ships_1:new RaidType("kulnarxex_scout_ships_1","RS","Kulnar-Xex Scout Ships","K-X Scout Ships","KX Scout RS",24,90000,"SEH","Infinite","N/A",25000000000)
 };
 
 
