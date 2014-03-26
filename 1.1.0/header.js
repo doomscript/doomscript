@@ -356,7 +356,8 @@ Attempt to handle WC's bad link copying bug
 
 2014.03.?? - 1.1.29
 Added Zone 20 Raid: Weiqi Game
-Added KX Scout Ships RS
+Added KX Shock Trooper Alliance raid
+Added KX Scout Ships and KX Bombarder RS
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
