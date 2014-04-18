@@ -345,8 +345,10 @@ Added Zone A3 Raids: Saboteur, Dark Hat, Silj, CC Agent, Ragnar, Void Master
 Added Zone A4 Raids: Tyraness, Tyr. Guard, Kwelshax, Myrmexidaks, Talia, Rackalax
 Added Zone 20 Raid: Weiqi Game
 Added CMM RS
+Added Cow Abduction WR
 Added KX Shock Trooper and KX Tank Alliance raids
 Added KX Scout Ships and KX Bombarder RS
+Added KX Elite Sub
 Changed to new Event methods [greenkabbage]
 Implemented Raid Monitor features
 Added two KX raids, Battle Station and Subjugator
@@ -2738,6 +2740,8 @@ function main()
 					case "warden_ramiro":
 						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/ramiro_1.jpg";
 						break;
+                    case "kulnarxex_elite_subjugator":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator.jpg";
 					case "purple_lion":
 					case "kang":
 					case "tourniquet":
@@ -8707,7 +8711,6 @@ DC_LoaTS_Helper.raids =
     ragebeasts:         new RaidType("ragebeasts",          "Z2", "Garlax Ragebeasts", "Ragebeasts", "Rage",         120,  10, "S",    2000000),
     cybertollahs:       new RaidType("cybertollahs",        "Z3", "Supreme Cybertollahs", "Cybertollahs", "Cyber-T",  72,  10, "S",    4000000),
     seth:               new RaidType("seth",                "Z4", "Nathaniel Vorden", "Vorden", "Vorden",             72,  10, "S",    6000000),
-    purple_lion:        new RaidType("purple_lion",         "Z5", "Purple Lion", "Lion", "Lion",                      72,  10, "S",    8000000),
     scarlet_harlet:     new RaidType("scarlet_harlet",      "Z6", "The Scarlet Harlot", "Scarlet", "Harlot",          72,  10, "S",   10000000),
     lupin:              new RaidType("lupin",               "Z7", "Lupin", "Lupin", "Lupin",                          72,  10, "S",   12000000),
     lieutenant_targe:   new RaidType("lieutenant_targe",    "Z8", "Lieutenant Targe", "Targe", "Targe",              120,  10, "S",   14000000),
@@ -8719,12 +8722,14 @@ DC_LoaTS_Helper.raids =
     master_hao:         new RaidType("master_hao",         "Z19", "Master Hao", "Hao", "Hao",                         36,  10, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
     trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               3,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000],/*FS calculated normally*/null,[1000000000, 1000000000, 1000000000, 1000000000]),
 
+    // Small+ Raids
+    purple_lion:        new RaidType("purple_lion",         "Z5", "Purple Lion", "Lion", "Lion",                      72,  10, "S",    8000000),
+
     // Medium Raids
     "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
     carnus:             new RaidType("carnus",              "Z2", "Carnus 9000", "Carnus", "Carnus",                 120,  50, "S",   15000000),
     cruiser:            new RaidType("cruiser",             "Z3", "Centurian Cruiser", "CC Cruiser", "Cruiser",       72,  50, "S",   25000000),
     china:              new RaidType("china",               "Z4", "Blood Alley Gang", "Gang", "Gang",                 72,  50, "S",   35000000),
-    advocate_tulk:      new RaidType("advocate_tulk",       "Z5", "Advocate Tulk", "Tulk", "Tulk",                    75,  50, "S",   45000000),
     caligula:           new RaidType("caligula",            "Z6", "Caligula", "Caligula", "Cali",                     72,  50, "S",   55000000),
     warden_ramiro:      new RaidType("warden_ramiro",       "Z7", "Warden Ramiro", "Ramiro", "Ramiro",                72,  50, "S",   60000000),
     vulture_gunship:    new RaidType("vulture_gunship",     "Z8", "Vulture Gunship", "Vulture", "Vulture",            72,  50, "S",   65000000),
@@ -8739,12 +8744,14 @@ DC_LoaTS_Helper.raids =
     silj:               new RaidType("silj",                "ZA3", "Silj the Wurm-Rider", "Silj", "Silj",             30,  50, "S",  750000000),
     tyraness_guard:     new RaidType("tyraness_guard",      "ZA4", "Tyraness' Guard", "Tyr. Guard", "Guard",          30,  50, "S",  750000000),
 
+    // Medium+ Raids
+    advocate_tulk:      new RaidType("advocate_tulk",       "Z5", "Advocate Tulk", "Tulk", "Tulk",                    75,  50, "S",   45000000),
+
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
     carnifex:           new RaidType("carnifex",            "Z2", "Carnifex Prime", "Carnifex", "Carni",             120, 100, "S",   35000000),
     rautha:             new RaidType("rautha",              "Z3", "Commander Rautha", "Rautha", "Rautha",             72, 100, "S",   50000000),
     assasin:            new RaidType("assasin",             "Z4", "Kelovar Assassin", "Assassin", "Assa",             72, 100, "S",   65000000),
-    robotic_rautha:     new RaidType("robotic_rautha",      "Z5", "Robotic Rautha", "Rautha 2.0", "Robo Rautha",      75, 100, "S",   80000000),
     agony_and_ecstasy:  new RaidType("agony_and_ecstasy",   "Z6", "Agony and Ecstasy", "Agony, Ecstasy", "A&E",       72, 100, "S",   95000000),
     sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  100000000),
     sludge_serpent:     new RaidType("sludge_serpent",      "Z8", "Sludge Serpent", "Serpent", "Serpent",             72, 100, "S",  120000000),
@@ -8759,7 +8766,9 @@ DC_LoaTS_Helper.raids =
     rampaging_rackalax: new RaidType("rampaging_rackalax", "ZA4", "Rampaging Rackalax", "Rackalax", "Rack",           30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
 
     // Large Plus Raids
+    robotic_rautha:     new RaidType("robotic_rautha",      "Z5", "Robotic Rautha", "Rautha 2.0", "Robo Rautha",      75, 100, "S",   80000000),
     kulnarxex_subjugator_1:new RaidType("kulnarxex_subjugator_1","S","Kulnar-Xex Subjugator","K-X Subjugator","KX Sub",8, 125, "S", 12500000000, /*FS calculated normally */null, 200000000),
+    kulnarxex_elite_subjugator_1:new RaidType("kulnarxex_elite_subjugator_1","S","Kulnar-Xex Elite Subjugator","K-X E. Subjugator","KX ELITE Sub",8, 125, "S", 125000000000, /*FS calculated normally */null, 2000000000),
     weiqi_game_1:       new RaidType("weiqi_game_1",       "Z20", "Weiqi Game", "Weiqi Game", "Weiqi",                36, 180, "S", 90000000000, /*FS calculated normally */null, 1000000000),
 
     // Epic Raids
@@ -8767,7 +8776,6 @@ DC_LoaTS_Helper.raids =
     vespasia:           new RaidType("vespasia",            "Z2", "Vespasia's Android", "Vespasia Bot", "Vesp",      168, 250, "S",  250000000),
     generalrahn:        new RaidType("generalrahn",         "Z3", "Centurian General", "CC General", "General",      168, 250, "S",  350000000),
     natasha:            new RaidType("natasha",             "Z4", "Natasha Cybersmash", "Cybersmash", "Cyber-S",     168, 250, "S",  450000000),
-    centurian_sentinel: new RaidType("centurian_sentinel",  "Z5", "Centurian Sentinel", "CC Sentinel", "Sentinel",   165, 250, "S",  550000000),
     mercury:            new RaidType("mercury",             "Z6", "Mercury", "Mercury", "Mercury",                    72, 250, "S",  700000000),
     hultex_quibberath:  new RaidType("hultex_quibberath",   "Z7", "Guldax Quibberath", "Quibberath", "Quib",         168, 250, "S",  800000000),
     commander_veck:     new RaidType("commander_veck",      "Z8", "Centurian Storm Commander", "Storm", "Storm",     168, 250, "S",  900000000),
@@ -8782,8 +8790,10 @@ DC_LoaTS_Helper.raids =
     void_master:        new RaidType("void_master",        "ZA3", "Void Master", "V. Master", "V. Master",            30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
     giant_kwelshax:     new RaidType("giant_kwelshax",     "ZA4", "Giant Kwelshax", "Kwelshax", "Kwel",               30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
 
+    // Epic+ Raids
+    centurian_sentinel: new RaidType("centurian_sentinel",  "Z5", "Centurian Sentinel", "CC Sentinel", "Sentinel",   165, 250, "S",  550000000),
+
     // Colossal Raids
-    besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
     mermara:            new RaidType("mermara",             "Z6", "Mermara", "Mermara", "Mermara",                   168, 500, "S",  800000000),
     nemo:               new RaidType("nemo",                "Z7", "Nemo",    "Nemo", "Nemo",                         168, 500, "S", 1000000000),
     the_emperor:        new RaidType("the_emperor",         "Z8", "Dule's Robot", "Dule's Bot", "Dule",              168, 500, "S", 5000000000),
@@ -8796,6 +8806,8 @@ DC_LoaTS_Helper.raids =
     the_saboteur:       new RaidType("the_saboteur",       "ZA3", "The Saboteur", "Saboteur", "Saboteur",             30, 500, "S", 5000000000),
     the_tyraness:       new RaidType("the_tyraness",       "ZA4", "The Tyraness", "Tyraness", "Tyraness",             30, 500, "S", 5000000000),
 
+    // Colossal+ Raids
+    besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
 
     // Aliance Raids
     // Small Raids
@@ -8880,6 +8892,8 @@ DC_LoaTS_Helper.raids =
     centi_priders:      new RaidType("centi_priders",       "WR", "Centi Priders", "Centies", "Centies WR",           72,  90000, "SEH", "Infinite", "N/A",  75000000000),
 
     kulnar_xex_battle_station_1:new RaidType("kulnar_xex_battle_station_1","WR","Kulnar-Xex Battle Station","K-X Battle Station","KX BS WR",72,90000,"SEH","Infinite","N/A",200000000000),
+
+    cow_abduction_1:    new RaidType("cow_abduction_1",     "WR", "Rylattu Cow Abduction", "Cow Abduction", "Cow WR", 72, 90000, "SEH", "Infinite", "N/A",   10000000000),
 
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),

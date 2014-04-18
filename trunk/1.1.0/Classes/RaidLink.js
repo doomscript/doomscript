@@ -622,7 +622,9 @@
 					case "warden_ramiro":
 						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/ramiro_1.jpg";
 						break;
-					case "purple_lion":
+                    case "kulnarxex_elite_subjugator":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator.jpg";
+                    case "purple_lion":
 					case "kang":
 					case "tourniquet":
 					case "flora":
