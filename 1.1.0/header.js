@@ -354,10 +354,12 @@ Added Chem-Runners Alliance raid
 Added two KX raids, Battle Station and Subjugator
 Attempt to handle WC's bad link copying bug
 
-2014.03.?? - 1.1.29
+2014.04.?? - 1.1.29
 Added Zone 20 Raid: Weiqi Game
 Added KX Shock Trooper and KX Tank Alliance raids
 Added KX Scout Ships and KX Bombarder RS
+Added Cow Abduction WR
+Added KX Elite Sub
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
