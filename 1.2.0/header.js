@@ -353,6 +353,7 @@ Changed to new Event methods [greenkabbage]
 Implemented Raid Monitor features
 Added two KX raids, Battle Station and Subjugator
 Attempt to handle WC's bad link copying bug
+Fixed raid size for 250 man to 100 man alliance raids
 
 
 [TODO] Post new Opera instructions 

@@ -160,14 +160,14 @@ DC_LoaTS_Helper.raids =
     kulnar_xex_shock_trooper_1:new RaidType("kulnar_xex_shock_trooper_1","A2-5","Kulnar-Xex Shock Trooper","K-X Shock Trooper","KX Shock",72,100,"H",500000000,null,10000000),
 
     // Epic Raids
-    lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  250, "H",  250000000),
-    ship_of_the_damned: new RaidType("ship_of_the_damned",  "A3", "Ship of the Damned", "Damned", "Damned",          168,  250, "H",  300000000),
-    mecha_wyrm:         new RaidType("mecha_wyrm",          "A4", "Mecha-Wyrm", "Wyrm", "Wyrm",                      168,  250, "H",  350000000),
-    contest_winners:    new RaidType("contest_winners",     "A6", "Shadows of the Void", "Shadows", "Shadows",       168,  250, "H",  500000000),
-    genesis:            new RaidType("genesis",             "A5", "Genesis", "Genesis", "Genesis",                   165,  250, "H", 1000000000),
-    celebration_enhancer_1: new RaidType("celebration_enhancer_1","AX","Celebration Enhancer J-54","Celebrator","Celeb",84,250, "H",  600000000),
-    quiskan_psi_hound:  new RaidType("quiskan_psi_hound",   "A7","Quiskan Psi-Hound","Psi-Hound","Hound",            168,  250, "H", [1000000000, 1500000000, 2500000000, 10000000000]),
-    ms_myriad_and_steelstike: new RaidType("ms_myriad_and_steelstike","A10","Ms. Myriad and Steelstrike","M & S","M & S",168,250,"H",[1500000000, 2000000000, 3000000000, 12500000000]),
+    lurking_horror:     new RaidType("lurking_horror",      "A2", "Lurking Horror", "Lurking", "Lurking",            168,  100, "H",  250000000),
+    ship_of_the_damned: new RaidType("ship_of_the_damned",  "A3", "Ship of the Damned", "Damned", "Damned",          168,  100, "H",  300000000),
+    mecha_wyrm:         new RaidType("mecha_wyrm",          "A4", "Mecha-Wyrm", "Wyrm", "Wyrm",                      168,  100, "H",  350000000),
+    contest_winners:    new RaidType("contest_winners",     "A6", "Shadows of the Void", "Shadows", "Shadows",       168,  100, "H",  500000000),
+    genesis:            new RaidType("genesis",             "A5", "Genesis", "Genesis", "Genesis",                   165,  100, "H", 1000000000),
+    celebration_enhancer_1: new RaidType("celebration_enhancer_1","AX","Celebration Enhancer J-54","Celebrator","Celeb",84,100, "H",  600000000),
+    quiskan_psi_hound:  new RaidType("quiskan_psi_hound",   "A7","Quiskan Psi-Hound","Psi-Hound","Hound",            168,  100, "H", [1000000000, 1500000000, 2500000000, 10000000000]),
+    ms_myriad_and_steelstike: new RaidType("ms_myriad_and_steelstike","A10","Ms. Myriad and Steelstrike","M & S","M & S",168,100,"H",[1500000000, 2000000000, 3000000000, 12500000000]),
     kulnarxex_tank_1:   new RaidType("kulnarxex_tank_1",  "A2-4", "Kulnar-Xex Tank", "K-X Tank", "KX Tank",           72,  100, "H", 2500000000, null, 50000000),
 
     // Galaxy Dome Raids
