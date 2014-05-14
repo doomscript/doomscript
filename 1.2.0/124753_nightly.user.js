@@ -354,6 +354,7 @@ Implemented Raid Monitor features
 Added two KX raids, Battle Station and Subjugator
 Attempt to handle WC's bad link copying bug
 Fixed raid size for 250 man to 100 man alliance raids
+Added Zone 21 Raids: Sian Dragonfly and Lady Victoria Ashdown
 
 
 [TODO] Post new Opera instructions 
@@ -8744,6 +8745,8 @@ DC_LoaTS_Helper.raids =
     vunlac:             new RaidType("vunlac",              "Z19", "Vunlac", "Vunlac", "Vunlac",                      36,  50, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
     silj:               new RaidType("silj",                "ZA3", "Silj the Wurm-Rider", "Silj", "Silj",             30,  50, "S",  750000000),
     tyraness_guard:     new RaidType("tyraness_guard",      "ZA4", "Tyraness' Guard", "Tyr. Guard", "Guard",          30,  50, "S",  750000000),
+    sian_dragonfly_1:   new RaidType("sian_dragonfly_1",    "Z21", "Sian Dragonfly", "Dragonfly", "Dfly",             48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
+    lady_victoria_ashdown_1:new RaidType("lady_victoria_ashdown_1","Z21","Lady Victoria Ashdown", "Ashdown", "Ash",48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
 
     // Medium+ Raids
     advocate_tulk:      new RaidType("advocate_tulk",       "Z5", "Advocate Tulk", "Tulk", "Tulk",                    75,  50, "S",   45000000),
