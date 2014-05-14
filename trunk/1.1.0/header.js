@@ -361,6 +361,7 @@ Added KX Scout Ships and KX Bombarder RS
 Added Cow Abduction WR
 Added KX Elite Sub
 Fixed raid size for 250 man to 100 man alliance raids
+Added Zone 21 Raids: Sian Dragonfly and Lady Victoria Ashdown
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu

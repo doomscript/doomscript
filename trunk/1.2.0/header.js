@@ -354,6 +354,7 @@ Implemented Raid Monitor features
 Added two KX raids, Battle Station and Subjugator
 Attempt to handle WC's bad link copying bug
 Fixed raid size for 250 man to 100 man alliance raids
+Added Zone 21 Raids: Sian Dragonfly and Lady Victoria Ashdown
 
 
 [TODO] Post new Opera instructions 
