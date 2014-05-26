@@ -365,6 +365,9 @@ Added Zone 21 Raids: Sian Dragonfly and Lady Victoria Ashdown
 Corrected values for Zone 5 raids
 Updated the dynamic raid update feature to accept updates to existing raids
 
+2014.05.?? - 1.1.30
+Updated Ashdown and Dragonfly OS
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -8281,8 +8284,8 @@ DC_LoaTS_Helper.raids =
     vunlac:             new RaidType("vunlac",              "Z19", "Vunlac", "Vunlac", "Vunlac",                      36,  50, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
     silj:               new RaidType("silj",                "ZA3", "Silj the Wurm-Rider", "Silj", "Silj",             30,  50, "S",  750000000),
     tyraness_guard:     new RaidType("tyraness_guard",      "ZA4", "Tyraness' Guard", "Tyr. Guard", "Guard",          30,  50, "S",  750000000),
-    sian_dragonfly_1:   new RaidType("sian_dragonfly_1",    "Z21", "Sian Dragonfly", "Dragonfly", "Dfly",             48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
-    lady_victoria_ashdown_1:new RaidType("lady_victoria_ashdown_1","Z21","Lady Victoria Ashdown", "Ashdown", "Ash",   48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
+    sian_dragonfly_1:   new RaidType("sian_dragonfly_1",    "Z21", "Sian Dragonfly", "Dragonfly", "Dfly",             48,  50, "S",  [10000000000,15000000000,20000000000,30000000000], null, [200000000,400000000,400000000,600000000]),
+    lady_victoria_ashdown_1:new RaidType("lady_victoria_ashdown_1","Z21","Lady Victoria Ashdown", "Ashdown", "Ash",   48,  50, "S",  [10000000000,15000000000,20000000000,30000000000], null, [200000000,400000000,400000000,600000000]),
 
     // Medium+ Raids
     advocate_tulk:      new RaidType("advocate_tulk",       "Z5", "Advocate Tulk", "Tulk", "Tulk",                    72,  75, "S",  [69000000,103500000,138000000,207000000], null, [2760000,2760000,2760000,2760000]),
