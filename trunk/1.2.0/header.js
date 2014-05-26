@@ -355,9 +355,11 @@ Added two KX raids, Battle Station and Subjugator
 Attempt to handle WC's bad link copying bug
 Fixed raid size for 250 man to 100 man alliance raids
 Added Zone 21 Raids: Sian Dragonfly and Lady Victoria Ashdown
+Corrected values for Zone 5 raids
+Updated the dynamic raid update feature to accept updates to existing raids
 
 
-[TODO] Post new Opera instructions 
+[TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
 
