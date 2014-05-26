@@ -354,7 +354,7 @@ Added Chem-Runners Alliance raid
 Added two KX raids, Battle Station and Subjugator
 Attempt to handle WC's bad link copying bug
 
-2014.04.?? - 1.1.29
+2014.05.25 - 1.1.29
 Added Zone 20 Raid: Weiqi Game
 Added KX Shock Trooper and KX Tank Alliance raids
 Added KX Scout Ships and KX Bombarder RS
@@ -362,6 +362,8 @@ Added Cow Abduction WR
 Added KX Elite Sub
 Fixed raid size for 250 man to 100 man alliance raids
 Added Zone 21 Raids: Sian Dragonfly and Lady Victoria Ashdown
+Corrected values for Zone 5 raids
+Updated the dynamic raid update feature to accept updates to existing raids
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -8259,7 +8261,7 @@ DC_LoaTS_Helper.raids =
     trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               3,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000],/*FS calculated normally*/null,[1000000000, 1000000000, 1000000000, 1000000000]),
 
     // Small+ Raids
-    purple_lion:        new RaidType("purple_lion",         "Z5", "Purple Lion", "Lion", "Lion",                      72,  10, "S",    8000000),
+    purple_lion:        new RaidType("purple_lion",         "Z5", "Purple Lion", "Lion", "Lion",                      72,  20, "S",   [15500000,23250000,31000000,46500000], null, [2325000,2325000,2325000,2325000]),
 
     // Medium Raids
     "void":             new RaidType("void",                "Z1", "Centurian Void Killer", "Void Killer", "VK",      168,  50, "S",    5000000),
@@ -8280,10 +8282,10 @@ DC_LoaTS_Helper.raids =
     silj:               new RaidType("silj",                "ZA3", "Silj the Wurm-Rider", "Silj", "Silj",             30,  50, "S",  750000000),
     tyraness_guard:     new RaidType("tyraness_guard",      "ZA4", "Tyraness' Guard", "Tyr. Guard", "Guard",          30,  50, "S",  750000000),
     sian_dragonfly_1:   new RaidType("sian_dragonfly_1",    "Z21", "Sian Dragonfly", "Dragonfly", "Dfly",             48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
-    lady_victoria_ashdown_1:new RaidType("lady_victoria_ashdown_1","Z21","Lady Victoria Ashdown", "Ashdown", "Ash",48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
+    lady_victoria_ashdown_1:new RaidType("lady_victoria_ashdown_1","Z21","Lady Victoria Ashdown", "Ashdown", "Ash",   48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
 
     // Medium+ Raids
-    advocate_tulk:      new RaidType("advocate_tulk",       "Z5", "Advocate Tulk", "Tulk", "Tulk",                    75,  50, "S",   45000000),
+    advocate_tulk:      new RaidType("advocate_tulk",       "Z5", "Advocate Tulk", "Tulk", "Tulk",                    72,  75, "S",  [69000000,103500000,138000000,207000000], null, [2760000,2760000,2760000,2760000]),
 
     // Large Raids
     telemachus:         new RaidType("telemachus",          "Z1", "Telemachus", "Telemachus", "Tele",                168, 100, "S",   20000000),
@@ -8304,7 +8306,7 @@ DC_LoaTS_Helper.raids =
     rampaging_rackalax: new RaidType("rampaging_rackalax", "ZA4", "Rampaging Rackalax", "Rackalax", "Rack",           30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
 
     // Large Plus Raids
-    robotic_rautha:     new RaidType("robotic_rautha",      "Z5", "Robotic Rautha", "Rautha 2.0", "Robo Rautha",      75, 100, "S",   80000000),
+    robotic_rautha:     new RaidType("robotic_rautha",      "Z5", "Robotic Rautha", "Rautha 2.0", "Robo Rautha",      72, 125, "S",   [135000000,202500000,270000000,405000000], null, [3240000,3240000,3240000,3240000]),
     kulnarxex_subjugator_1:new RaidType("kulnarxex_subjugator_1","S","Kulnar-Xex Subjugator","K-X Subjugator","KX Sub",8, 125, "S", 12500000000, /*FS calculated normally */null, 200000000),
     kulnarxex_elite_subjugator_1:new RaidType("kulnarxex_elite_subjugator_1","S","Kulnar-Xex Elite Subjugator","K-X E. Subjugator","KX ELITE Sub",8, 125, "S", 125000000000, /*FS calculated normally */null, 2000000000),
     weiqi_game_1:       new RaidType("weiqi_game_1",       "Z20", "Weiqi Game", "Weiqi Game", "Weiqi",                36, 180, "S", 90000000000, /*FS calculated normally */null, 1000000000),
@@ -8329,7 +8331,7 @@ DC_LoaTS_Helper.raids =
     giant_kwelshax:     new RaidType("giant_kwelshax",     "ZA4", "Giant Kwelshax", "Kwelshax", "Kwel",               30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
 
     // Epic+ Raids
-    centurian_sentinel: new RaidType("centurian_sentinel",  "Z5", "Centurian Sentinel", "CC Sentinel", "Sentinel",   165, 250, "S",  550000000),
+    centurian_sentinel: new RaidType("centurian_sentinel",  "Z5", "Centurian Sentinel", "CC Sentinel", "Sentinel",   168, 275, "S", [340000000,510000000,680000000,1020000000], null, [7418182,7418182,7418182,7418182]),
 
     // Colossal Raids
     mermara:            new RaidType("mermara",             "Z6", "Mermara", "Mermara", "Mermara",                   168, 500, "S",  800000000),
@@ -8345,7 +8347,7 @@ DC_LoaTS_Helper.raids =
     the_tyraness:       new RaidType("the_tyraness",       "ZA4", "The Tyraness", "Tyraness", "Tyraness",             30, 500, "S", 5000000000),
 
     // Colossal+ Raids
-    besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    160, 500, "S",  700000000),
+    besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    168, 550, "S",  [767250000, 1150875000, 1534500000, 2301750000], null, [12555000,12555000,12555000,12555000]),
 
     // Aliance Raids
     // Small Raids
@@ -10078,9 +10080,12 @@ DC_LoaTS_Helper.raids =
 						eval(response.responseText.replace("DC_LoaTS_Helper.raids", "var data"));
 						var added = [];
 						for (var i in data) {
-							if (data.hasOwnProperty(i) && typeof DC_LoaTS_Helper.raids[i] === "undefined") {
+							if (data.hasOwnProperty(i)) {
+                                var newRaid = typeof DC_LoaTS_Helper.raids[i] === "undefined";
 								DC_LoaTS_Helper.raids[i] = data[i];
-								added.push(data[i].fullName);
+                                if (newRaid) {
+                                    added.push(data[i].fullName);
+                                }
 							}
 						}
 						if (added.length > 0) {

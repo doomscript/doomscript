@@ -1431,12 +1431,15 @@
 					if (response.status === 200) {
 						eval(response.responseText.replace("DC_LoaTS_Helper.raids", "var data"));
 						var added = [];
-						for (var i in data) {
-							if (data.hasOwnProperty(i) && typeof DC_LoaTS_Helper.raids[i] === "undefined") {
-								DC_LoaTS_Helper.raids[i] = data[i];
-								added.push(data[i].fullName);
-							}
-						}
+                        for (var i in data) {
+                            if (data.hasOwnProperty(i)) {
+                                var newRaid = typeof DC_LoaTS_Helper.raids[i] === "undefined";
+                                DC_LoaTS_Helper.raids[i] = data[i];
+                                if (newRaid) {
+                                    added.push(data[i].fullName);
+                                }
+                            }
+                        }
 						if (added.length > 0) {
 							message = "Loaded " + added.length + " new raid type" + ((added.length!=1)?"s":"") + ".\n" + added.join("\n");
 							DC_LoaTS_Helper.updatePostedLinks();
