@@ -365,6 +365,9 @@ Added Zone 21 Raids: Sian Dragonfly and Lady Victoria Ashdown
 Corrected values for Zone 5 raids
 Updated the dynamic raid update feature to accept updates to existing raids
 
+2014.05.?? - 1.1.30
+Updated Ashdown and Dragonfly OS
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
