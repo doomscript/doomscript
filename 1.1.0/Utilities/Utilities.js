@@ -571,21 +571,37 @@
                 var reg = new RegExp(/(new GameIframe\(.*?\)).createGameIframeElement\(\);/g);
                 
                 // If Kong has defined the properties we need to scrape from            
-                if (typeof activateGame !== "undefined")
+                var children = document.getElementById("game");
+                if (typeof children !== "undefined")
                 {
-                    // Attempt to find the properties we need
-                    var match = reg.exec(activateGame); 
-                    
-                    // If we have the iframe options
-                    if (match != null)
-                    {
-                        // Needed for the creation of GameIframe
-                        var urlOptions = '';
-                        
-                        // Parse and return the existing iframe options
-                        return eval(match[1]);
-                    }
+					//find the <script> tag in the collection that has the gameiframe info
+					var scriptNodes = children.getElementsByTagName("SCRIPT");
+				
+					var match = null;
+					for (var i = 0; i < scriptNodes.length; i++)
+					{
+						// Attempt to find the properties we need
+						match = reg.exec(scriptNodes[i].innerHTML);
+						if (match != null)
+							break;
+					}
+				
+					// If we have the iframe options
+					if (match != null)
+					{
+						// Needed for the creation of GameIframe
+						var urlOptions = '';
+						
+						// Parse and return the existing iframe options
+						return eval(match[1]);
+					}
+					console.warn("Could not locate the gameIframe options.");					
                 }
+				else
+				{
+					console.warn("Can't locate the game container.");
+				}
+				return {};
             }
             catch (ex) {
                 console.error("Failed to parse GameIframe.", ex);

@@ -3,8 +3,9 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.29
-// @date           02.01.2012
+// @version        1.1.31
+// @date           19.08.2014
+// @grant          GM_xmlhttpRequest
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
 
@@ -368,6 +369,11 @@ Updated the dynamic raid update feature to accept updates to existing raids
 2014.05.?? - 1.1.30
 Updated Ashdown and Dragonfly OS
 
+2014.08.19 - 1.1.31
+Fixed background loading for raids [greenkabbage]
+Comply with new GreaseMonkey requirements [greenkabbage]
+
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -379,7 +385,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.29",
+    	version: "1.1.31",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
