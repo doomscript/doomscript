@@ -3,8 +3,9 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.29
-// @date           02.01.2012
+// @version        1.1.31
+// @date           19.08.2014
+// @grant          GM_xmlhttpRequest
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
 
@@ -365,6 +366,15 @@ Added Zone 21 Raids: Sian Dragonfly and Lady Victoria Ashdown
 Corrected values for Zone 5 raids
 Updated the dynamic raid update feature to accept updates to existing raids
 
+2014.05.?? - 1.1.30
+Updated Ashdown and Dragonfly OS
+
+2014.08.19 - 1.1.31
+Fixed background loading for raids [greenkabbage]
+Comply with new GreaseMonkey requirements [greenkabbage]
+Fixed Chrome App manifest problem
+Changed update url
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -376,12 +386,12 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.29",
+    	version: "1.1.31",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
-    	scriptURL: "http://userscripts.org/124753",
-    	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
+    	scriptURL: "http://bit.ly/doomscript",
+    	scriptDownloadURL: "https://openuserjs.org/install/doomcat/Kongregate_Legacy_of_a_Thousand_Suns_Raid_Link_Helper.user.js",
     	raidDataURL: "http://getKongE.org/old/RaidData.js",
     	worldRaidDataURL: "http://getKongE.org/old/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
@@ -402,10 +412,8 @@ function main()
     	// Or add debugMode=true to the game url in the browser
     	debugMode: (function() {
     		var value = /debugMode=(\w+)/.exec(document.location.href);
-    		if (value && value[1]) {
-    			return true;
-    		}
-    		return false;
+    		return value && value[1];
+
     	})(),
     	
     	// GreaseMonkey Storage Keys
@@ -757,7 +765,7 @@ function main()
 				GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
 			}
 			return messageFormat;	
-	    }
+	    };
 	    
 	    // Set the message format
 	    DC_LoaTS_Helper.setMessageFormat = function(messageFormat)
@@ -770,7 +778,7 @@ function main()
 			
 			// Set the message format
 			GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
-	    }
+	    };
 	    
 	    // Retrieve the link format
 	    DC_LoaTS_Helper.getLinkFormat = function()
@@ -801,7 +809,7 @@ function main()
 				linkFormat = RaidLink.defaultLinkFormat_v2;
 			}
 			return linkFormat;
-	    }
+	    };
 	    
 	    // Retrieve a preference value from storage
 	    DC_LoaTS_Helper.getPref = function(prefName, defaultValue)
@@ -828,7 +836,7 @@ function main()
 	    	}
 	    	
 	    	return (typeof ret !== "undefined") ? ret : defaultValue;
-	    }
+	    };
 	    
 	    // Store a preference value into storage
 	    DC_LoaTS_Helper.setPref = function(prefName, value)
@@ -854,7 +862,7 @@ function main()
 	    		console.warn("Could not parse prefs to store " + prefName + ": " + value);
 	    		console.warn(ex);
 	    	}
-	    }
+	    };
 	    
 	    // Find all raid types matching a given filter
 	    DC_LoaTS_Helper.getRaidTypes = function(raidFilter)
@@ -877,7 +885,7 @@ function main()
 			}
 			
 			return matchedTypes;
-	    }
+	    };
 		
 	    // Print the description of the script
 	    DC_LoaTS_Helper.printScriptHelp = function(deck, text)
@@ -901,7 +909,7 @@ function main()
 					helpText += "\n";
 					helpText += "<span class='clearfix'>";
 					helpText += "<span style='float:left; padding-top: 5px;'>Update now?</span>";
-					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='http://userscripts.org/scripts/source/124753.user.js' target='_blank'>Update</a></span>";
+					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='" + DC_LoaTS_Properties.scriptDownloadURL + "' target='_blank'>Update</a></span>";
 				}
 				// If the user has a newer than public version
 				else if (DC_LoaTS_Helper.needUpdateState == "new")
@@ -960,7 +968,7 @@ function main()
 			
 			
 			return false;
-	    }
+	    };
 	    
 	DC_LoaTS_Helper.chatCommands = {};
 	DC_LoaTS_Helper.raidStyles = {};
@@ -8249,8 +8257,8 @@ DC_LoaTS_Helper.raids =
     ragebeasts:         new RaidType("ragebeasts",          "Z2", "Garlax Ragebeasts", "Ragebeasts", "Rage",         120,  10, "S",    2000000),
     cybertollahs:       new RaidType("cybertollahs",        "Z3", "Supreme Cybertollahs", "Cybertollahs", "Cyber-T",  72,  10, "S",    4000000),
     seth:               new RaidType("seth",                "Z4", "Nathaniel Vorden", "Vorden", "Vorden",             72,  10, "S",    6000000),
-    scarlet_harlet:     new RaidType("scarlet_harlet",      "Z6", "The Scarlet Harlot", "Scarlet", "Harlot",          72,  10, "S",   10000000),
-    lupin:              new RaidType("lupin",               "Z7", "Lupin", "Lupin", "Lupin",                          72,  10, "S",   12000000),
+    scarlet_harlet:     new RaidType("scarlet_harlet",      "Z6", "The Scarlet Harlot", "Scarlet", "Harlot",          72,  10, "S",   [15300000, 22950000, 30600000, 45900000],/*FS calculated normally*/null,[4590000, 4590000, 4590000, 4590000]),
+    lupin:              new RaidType("lupin",               "Z7", "Lupin", "Lupin", "Lupin",                          72,  10, "S",   [25500000, 38250000, 51000000, 76500000],/*FS calculated normally*/null,[7650000, 7650000, 7650000, 7650000]),
     lieutenant_targe:   new RaidType("lieutenant_targe",    "Z8", "Lieutenant Targe", "Targe", "Targe",              120,  10, "S",   14000000),
     sigurd:             new RaidType("sigurd",              "Z9", "Sigurd Spinebreaker", "Sigurd", "Sigurd",          72,  10, "S",   16000000),
     space_pox:          new RaidType("space_pox",           "P1", "Space Pox", "Pox", "Pox",                           5,  12, "S", [100000000, 500000000, 1000000000, 1500000000],/*FS calculated normally*/null,[35000000, 175000000, 350000000, 525000000]),
@@ -8268,8 +8276,8 @@ DC_LoaTS_Helper.raids =
     carnus:             new RaidType("carnus",              "Z2", "Carnus 9000", "Carnus", "Carnus",                 120,  50, "S",   15000000),
     cruiser:            new RaidType("cruiser",             "Z3", "Centurian Cruiser", "CC Cruiser", "Cruiser",       72,  50, "S",   25000000),
     china:              new RaidType("china",               "Z4", "Blood Alley Gang", "Gang", "Gang",                 72,  50, "S",   35000000),
-    caligula:           new RaidType("caligula",            "Z6", "Caligula", "Caligula", "Cali",                     72,  50, "S",   55000000),
-    warden_ramiro:      new RaidType("warden_ramiro",       "Z7", "Warden Ramiro", "Ramiro", "Ramiro",                72,  50, "S",   60000000),
+    caligula:           new RaidType("caligula",            "Z6", "Caligula", "Caligula", "Cali",                     72,  50, "S",   [92250000, 138375000, 184500000, 276750000],/*FS calculated normally*/null,[7380000, 7380000, 7380000, 7380000]),
+    warden_ramiro:      new RaidType("warden_ramiro",       "Z7", "Warden Ramiro", "Ramiro", "Ramiro",                72,  50, "S",   [153750000, 230625000, 307500000, 461250000],/*FS calculated normally*/null,[12300000, 12300000, 12300000, 12300000]),
     vulture_gunship:    new RaidType("vulture_gunship",     "Z8", "Vulture Gunship", "Vulture", "Vulture",            72,  50, "S",   65000000),
     xarpa:              new RaidType("xarpa",               "Z9", "Centurian Fleet Commander", "Fleet Com.", "Fleet Comm",72,50,"S",  70000000),
     bachanghenfil:      new RaidType("bachanghenfil",      "Z10", "Bachanghenfil", "Bachanghenfil", "Bach",           72,  50, "S",  [75000000, 97500000, 120000000, 150000000]),
@@ -8281,8 +8289,8 @@ DC_LoaTS_Helper.raids =
     vunlac:             new RaidType("vunlac",              "Z19", "Vunlac", "Vunlac", "Vunlac",                      36,  50, "S", [1500000000, 1950000000, 2400000000, 3000000000]),
     silj:               new RaidType("silj",                "ZA3", "Silj the Wurm-Rider", "Silj", "Silj",             30,  50, "S",  750000000),
     tyraness_guard:     new RaidType("tyraness_guard",      "ZA4", "Tyraness' Guard", "Tyr. Guard", "Guard",          30,  50, "S",  750000000),
-    sian_dragonfly_1:   new RaidType("sian_dragonfly_1",    "Z21", "Sian Dragonfly", "Dragonfly", "Dfly",             48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
-    lady_victoria_ashdown_1:new RaidType("lady_victoria_ashdown_1","Z21","Lady Victoria Ashdown", "Ashdown", "Ash",   48,  50, "S",  [10000000000,15000000000,20000000000,30000000000]),
+    sian_dragonfly_1:   new RaidType("sian_dragonfly_1",    "Z21", "Sian Dragonfly", "Dragonfly", "Dfly",             48,  50, "S",  [10000000000,15000000000,20000000000,30000000000], null, [200000000,400000000,400000000,600000000]),
+    lady_victoria_ashdown_1:new RaidType("lady_victoria_ashdown_1","Z21","Lady Victoria Ashdown", "Ashdown", "Ash",   48,  50, "S",  [10000000000,15000000000,20000000000,30000000000], null, [200000000,400000000,400000000,600000000]),
 
     // Medium+ Raids
     advocate_tulk:      new RaidType("advocate_tulk",       "Z5", "Advocate Tulk", "Tulk", "Tulk",                    72,  75, "S",  [69000000,103500000,138000000,207000000], null, [2760000,2760000,2760000,2760000]),
@@ -8292,8 +8300,8 @@ DC_LoaTS_Helper.raids =
     carnifex:           new RaidType("carnifex",            "Z2", "Carnifex Prime", "Carnifex", "Carni",             120, 100, "S",   35000000),
     rautha:             new RaidType("rautha",              "Z3", "Commander Rautha", "Rautha", "Rautha",             72, 100, "S",   50000000),
     assasin:            new RaidType("assasin",             "Z4", "Kelovar Assassin", "Assassin", "Assa",             72, 100, "S",   65000000),
-    agony_and_ecstasy:  new RaidType("agony_and_ecstasy",   "Z6", "Agony and Ecstasy", "Agony, Ecstasy", "A&E",       72, 100, "S",   95000000),
-    sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  100000000),
+    agony_and_ecstasy:  new RaidType("agony_and_ecstasy",   "Z6", "Agony and Ecstasy", "Agony, Ecstasy", "A&E",       72, 100, "S",  [216000000, 324000000, 432000000, 648000000],/*FS calculated normally*/null,[8640000, 8640000, 8640000, 8640000]),
+    sun_xi:             new RaidType("sun_xi",              "Z7", "Sun Xi's Echo", "Psi-Echo", "Echo",                72, 100, "S",  [360000000, 540000000, 720000000, 1080000000],/*FS calculated normally*/null,[14400000, 14400000, 14400000, 14400000]),
     sludge_serpent:     new RaidType("sludge_serpent",      "Z8", "Sludge Serpent", "Serpent", "Serpent",             72, 100, "S",  120000000),
     kalaxian_cult_mistress: new RaidType("kalaxian_cult_mistress","Z10","Kalaxian Cult-Mistress","Cult-Mistress","Cult",72, 100, "S", [180000000, 234000000, 288000000, 320000000]),
     shuborunth: 		new RaidType("shuborunth",         "Z13","Wulblunralxanachi", "Blob", "Blob",                 72, 100, "S", [200000000, 260000000, 320000000, 400000000]),
@@ -8316,8 +8324,8 @@ DC_LoaTS_Helper.raids =
     vespasia:           new RaidType("vespasia",            "Z2", "Vespasia's Android", "Vespasia Bot", "Vesp",      168, 250, "S",  250000000),
     generalrahn:        new RaidType("generalrahn",         "Z3", "Centurian General", "CC General", "General",      168, 250, "S",  350000000),
     natasha:            new RaidType("natasha",             "Z4", "Natasha Cybersmash", "Cybersmash", "Cyber-S",     168, 250, "S",  450000000),
-    mercury:            new RaidType("mercury",             "Z6", "Mercury", "Mercury", "Mercury",                    72, 250, "S",  700000000),
-    hultex_quibberath:  new RaidType("hultex_quibberath",   "Z7", "Guldax Quibberath", "Quibberath", "Quib",         168, 250, "S",  800000000),
+    mercury:            new RaidType("mercury",             "Z6", "Mercury", "Mercury", "Mercury",                    72, 250, "S",  [618750000, 928125000, 1237500000, 1856250000],/*FS calculated normally*/null,[14850000, 14850000, 14850000, 14850000]),
+    hultex_quibberath:  new RaidType("hultex_quibberath",   "Z7", "Guldax Quibberath", "Quibberath", "Quib",         168, 250, "S",  [1031250000, 1546875000, 2062500000, 3093750000],/*FS calculated normally*/null,[24750000, 24750000, 24750000, 24750000]),
     commander_veck:     new RaidType("commander_veck",      "Z8", "Centurian Storm Commander", "Storm", "Storm",     168, 250, "S",  900000000),
     reaver:             new RaidType("reaver",              "Z9", "Galactic Reaver", "Reaver", "Reaver",              72, 250, "S", 1000000000),
     the_hat:            new RaidType("the_hat",            "Z10", "The Hat", "Hat", "Hat",         	                  72, 250, "S", [1100000000, 1475000000, 1850000000, 2200000000]),
@@ -8334,8 +8342,8 @@ DC_LoaTS_Helper.raids =
     centurian_sentinel: new RaidType("centurian_sentinel",  "Z5", "Centurian Sentinel", "CC Sentinel", "Sentinel",   168, 275, "S", [340000000,510000000,680000000,1020000000], null, [7418182,7418182,7418182,7418182]),
 
     // Colossal Raids
-    mermara:            new RaidType("mermara",             "Z6", "Mermara", "Mermara", "Mermara",                   168, 500, "S",  800000000),
-    nemo:               new RaidType("nemo",                "Z7", "Nemo",    "Nemo", "Nemo",                         168, 500, "S", 1000000000),
+    mermara:            new RaidType("mermara",             "Z6", "Mermara", "Mermara", "Mermara",                   168, 500, "S", [1395000000, 2092500000, 2790000000, 4185000000],/*FS calculated normally*/null,[25110000, 25110000, 25110000, 25110000]),
+    nemo:               new RaidType("nemo",                "Z7", "Nemo",    "Nemo", "Nemo",                         168, 500, "S", [2325000000, 3487500000, 4650000000, 6975000000],/*FS calculated normally*/null,[41850000, 41850000, 41850000, 41850000]),
     the_emperor:        new RaidType("the_emperor",         "Z8", "Dule's Robot", "Dule's Bot", "Dule",              168, 500, "S", 5000000000),
     dule_warmaster:     new RaidType("dule_warmaster",      "Z9", "Centurian Councilor", "CC Councilor", "Councilor", 24, 500, "S", 2500000000),
     crush_colossa:      new RaidType("crush_colossa",      "Z10", "Crush Colossa", "Colossa", "Crush",                72, 500, "S", [3000000000, 3900000000, 4800000000, 6000000000]),
@@ -9033,21 +9041,43 @@ DC_LoaTS_Helper.raids =
                 var reg = new RegExp(/(new GameIframe\(.*?\)).createGameIframeElement\(\);/g);
                 
                 // If Kong has defined the properties we need to scrape from            
-                if (typeof activateGame !== "undefined")
+                var children = document.getElementById("game");
+                if (typeof children !== "undefined")
                 {
-                    // Attempt to find the properties we need
-                    var match = reg.exec(activateGame); 
-                    
-                    // If we have the iframe options
-                    if (match != null)
-                    {
-                        // Needed for the creation of GameIframe
-                        var urlOptions = '';
-                        
-                        // Parse and return the existing iframe options
-                        return eval(match[1]);
-                    }
+					//find the <script> tag in the collection that has the gameiframe info
+					var scriptNodes = children.getElementsByTagName("script");
+				
+					var match = null;
+					for (var i = 0; i < scriptNodes.length; i++)
+					{
+						// Attempt to find the properties we need
+						match = reg.exec(scriptNodes[i].innerHTML);
+						if (match != null)
+							break;
+					}
+				
+					// If we have the iframe options
+					if (match != null)
+					{
+                        DC_LoaTS_Helper.getGameIframe_old = DC_LoaTS_Helper.getGameIframe;
+
+						// Needed for the creation of GameIframe
+						var urlOptions = '';
+						
+						// Parse and return the existing iframe options
+						var optionsVal = eval(match[1]);
+
+                        DC_LoaTS_Helper.getGameIframe = function() {return optionsVal;};
+
+                        return optionsVal;
+					}
+					console.warn("Could not locate the gameIframe options.");					
                 }
+				else
+				{
+					console.warn("Can't locate the game container.");
+				}
+				return {};
             }
             catch (ex) {
                 console.error("Failed to parse GameIframe.", ex);
@@ -9956,7 +9986,7 @@ DC_LoaTS_Helper.raids =
 				newHTML += "<br>\n";
 				newHTML += "<span class='clearfix'>";
 				newHTML += "<span style='float:left; padding-top: 5px;'>Update now?</span>";
-				newHTML += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='http://userscripts.org/scripts/source/124753.user.js' target='_blank'>Update</a></span>";
+				newHTML += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='" + DC_LoaTS_Properties.scriptDownloadURL + "' target='_blank'>Update</a></span>";
 				newHTML += "<br><br>\n";
 			}
 			// If the user has a newer than public version
@@ -10012,7 +10042,7 @@ DC_LoaTS_Helper.raids =
 					
 					var updateButton = document.createElement("a");
 					updateButton.className = "DC_LoaTS_updateLink";
-					updateButton.href = "http://userscripts.org/scripts/source/124753.user.js";
+					updateButton.href = DC_LoaTS_Properties.scriptDownloadURL;
 					updateButton.appendChild(document.createTextNode("Update"));
 					updateButton.target = "_blank";
 					updateButton.onclick = function()
@@ -11020,7 +11050,7 @@ DC_LoaTS_Helper.raids =
 		}
 		
 		if (typeof GM_xmlhttpRequest !== "function") {
-		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts.org/scripts/show/105153");
+		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts-mirror.org/scripts/show/105153");
 		}
 	}
 	

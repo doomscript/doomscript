@@ -372,7 +372,8 @@ Updated Ashdown and Dragonfly OS
 2014.08.19 - 1.1.31
 Fixed background loading for raids [greenkabbage]
 Comply with new GreaseMonkey requirements [greenkabbage]
-
+Fixed Chrome App manifest problem
+Changed update url
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -389,8 +390,8 @@ function main()
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
-    	scriptURL: "http://userscripts.org/124753",
-    	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
+    	scriptURL: "http://bit.ly/doomscript",
+    	scriptDownloadURL: "https://openuserjs.org/install/doomcat/Kongregate_Legacy_of_a_Thousand_Suns_Raid_Link_Helper.user.js",
     	raidDataURL: "http://getKongE.org/old/RaidData.js",
     	worldRaidDataURL: "http://getKongE.org/old/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
@@ -411,10 +412,8 @@ function main()
     	// Or add debugMode=true to the game url in the browser
     	debugMode: (function() {
     		var value = /debugMode=(\w+)/.exec(document.location.href);
-    		if (value && value[1]) {
-    			return true;
-    		}
-    		return false;
+    		return value && value[1];
+
     	})(),
     	
     	// GreaseMonkey Storage Keys
@@ -766,7 +765,7 @@ function main()
 				GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
 			}
 			return messageFormat;	
-	    }
+	    };
 	    
 	    // Set the message format
 	    DC_LoaTS_Helper.setMessageFormat = function(messageFormat)
@@ -779,7 +778,7 @@ function main()
 			
 			// Set the message format
 			GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
-	    }
+	    };
 	    
 	    // Retrieve the link format
 	    DC_LoaTS_Helper.getLinkFormat = function()
@@ -810,7 +809,7 @@ function main()
 				linkFormat = RaidLink.defaultLinkFormat_v2;
 			}
 			return linkFormat;
-	    }
+	    };
 	    
 	    // Retrieve a preference value from storage
 	    DC_LoaTS_Helper.getPref = function(prefName, defaultValue)
@@ -837,7 +836,7 @@ function main()
 	    	}
 	    	
 	    	return (typeof ret !== "undefined") ? ret : defaultValue;
-	    }
+	    };
 	    
 	    // Store a preference value into storage
 	    DC_LoaTS_Helper.setPref = function(prefName, value)
@@ -863,7 +862,7 @@ function main()
 	    		console.warn("Could not parse prefs to store " + prefName + ": " + value);
 	    		console.warn(ex);
 	    	}
-	    }
+	    };
 	    
 	    // Find all raid types matching a given filter
 	    DC_LoaTS_Helper.getRaidTypes = function(raidFilter)
@@ -886,7 +885,7 @@ function main()
 			}
 			
 			return matchedTypes;
-	    }
+	    };
 		
 	    // Print the description of the script
 	    DC_LoaTS_Helper.printScriptHelp = function(deck, text)
@@ -910,7 +909,7 @@ function main()
 					helpText += "\n";
 					helpText += "<span class='clearfix'>";
 					helpText += "<span style='float:left; padding-top: 5px;'>Update now?</span>";
-					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='http://userscripts.org/scripts/source/124753.user.js' target='_blank'>Update</a></span>";
+					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='" + DC_LoaTS_Properties.scriptDownloadURL + "' target='_blank'>Update</a></span>";
 				}
 				// If the user has a newer than public version
 				else if (DC_LoaTS_Helper.needUpdateState == "new")
@@ -969,7 +968,7 @@ function main()
 			
 			
 			return false;
-	    }
+	    };
 	    
 	DC_LoaTS_Helper.chatCommands = {};
 	DC_LoaTS_Helper.raidStyles = {};
@@ -8076,6 +8075,124 @@ RaidCommand
 			}
 		);
 		
+		RaidCommand.create( 
+			{
+				commandName: "rss",
+				aliases: ["forums", "threads", "posts"],
+				// No parsing needed
+				/*parsingClass: ,*/
+
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true, statusMessage: "Reading RSS feed..."};
+
+					DC_LoaTS_Helper.ajax({
+						url: "http://www.legacyofathousandsuns.com/forum/external.php?type=RSS2",
+						onload:function(response) {
+							var xmlDoc = (new DOMParser()).parseFromString(response.responseText, "text/xml"),
+							    items = xmlDoc.getElementsByTagName("item"),
+							    i, item, j, child, threads = [], thread, 
+							    str = "Recent posts (as of " + DC_LoaTS_Helper.getCurrentPrettyDate() + ")";
+							
+							for (i = 0; i < items.length; i++) {
+								item = items[i];
+                                threads.push({
+                                    title: getNodeValue(item, "title"),
+                                    url: getNodeValue(item, "link"),
+                                    date: getNodeValue(item, "pubDate"),
+                                    relativeDate: DC_LoaTS_Helper.timeDifference(new Date()/1, new Date(getNodeValue(item, "pubDate"))/1),
+                                    description: getNodeValue(item, "description"),
+                                    category: getNodeValue(item, "category"),
+                                    categoryUrl: getNodeValue(item, "category", "domain"),
+                                    creator: getNodeValue(item, "creator")
+                                });
+							}
+
+                            function getNodeValue(parent, tagName, attribute) {
+                                tags = parent.getElementsByTagNameNS("*", tagName);
+                                if (tags && tags[0]) {
+                                	if (attribute) {
+                                		return tags[0].attributes[attribute].nodeValue;
+                                	}
+                                	else {
+                                		return tags[0].childNodes[0].nodeValue;
+                                	}
+                                }
+                                
+                                return "<i>Unable to locate in RSS feed</i>";
+                            }
+
+                            for (i = 0; i < threads.length; i++) {
+                            	thread = threads[i];
+                            	str += "\n--------------------------------------------------\n"
+                                str += thread.relativeDate + " ";
+                            	str += "<a href='" + thread.categoryUrl + "' target='_blank'>" + thread.category + "</a>";
+                            	str += " &gt; <a href='" + thread.url + "' target='_blank'>" + thread.title + "</a>";
+                            }
+                            
+                            holodeck.activeDialogue().raidBotMessage(str);
+                            
+						} // end onload
+					});					
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Lists recent threads from the forums"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/threads</code>\n";
+					helpText += "Lists recent threads from the forums\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
+				commandName: "timerdata",
+				aliases: [],
+				// No parsing needed
+				/*parsingClass: ,*/
+
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+						
+					deck.activeDialogue().raidBotMessage(Timer.getReport());
+						
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {					
+						initialText: {
+							text: "Print the timer report"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/timerdata</code>\n";
+					helpText += "Prints out timing and performance data about the script\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
 		
 		// Manage data related to the CConoly API
 		window.CConolyAPI = {
@@ -8928,7 +9045,7 @@ DC_LoaTS_Helper.raids =
                 if (typeof children !== "undefined")
                 {
 					//find the <script> tag in the collection that has the gameiframe info
-					var scriptNodes = children.getElementsByTagName("SCRIPT");
+					var scriptNodes = children.getElementsByTagName("script");
 				
 					var match = null;
 					for (var i = 0; i < scriptNodes.length; i++)
@@ -8942,11 +9059,17 @@ DC_LoaTS_Helper.raids =
 					// If we have the iframe options
 					if (match != null)
 					{
+                        DC_LoaTS_Helper.getGameIframe_old = DC_LoaTS_Helper.getGameIframe;
+
 						// Needed for the creation of GameIframe
 						var urlOptions = '';
 						
 						// Parse and return the existing iframe options
-						return eval(match[1]);
+						var optionsVal = eval(match[1]);
+
+                        DC_LoaTS_Helper.getGameIframe = function() {return optionsVal;};
+
+                        return optionsVal;
 					}
 					console.warn("Could not locate the gameIframe options.");					
                 }
@@ -9863,7 +9986,7 @@ DC_LoaTS_Helper.raids =
 				newHTML += "<br>\n";
 				newHTML += "<span class='clearfix'>";
 				newHTML += "<span style='float:left; padding-top: 5px;'>Update now?</span>";
-				newHTML += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='http://userscripts.org/scripts/source/124753.user.js' target='_blank'>Update</a></span>";
+				newHTML += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='" + DC_LoaTS_Properties.scriptDownloadURL + "' target='_blank'>Update</a></span>";
 				newHTML += "<br><br>\n";
 			}
 			// If the user has a newer than public version
@@ -9919,7 +10042,7 @@ DC_LoaTS_Helper.raids =
 					
 					var updateButton = document.createElement("a");
 					updateButton.className = "DC_LoaTS_updateLink";
-					updateButton.href = "http://userscripts.org/scripts/source/124753.user.js";
+					updateButton.href = DC_LoaTS_Properties.scriptDownloadURL;
 					updateButton.appendChild(document.createTextNode("Update"));
 					updateButton.target = "_blank";
 					updateButton.onclick = function()
@@ -10927,7 +11050,7 @@ DC_LoaTS_Helper.raids =
 		}
 		
 		if (typeof GM_xmlhttpRequest !== "function") {
-		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts.org/scripts/show/105153");
+		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts-mirror.org/scripts/show/105153");
 		}
 	}
 	

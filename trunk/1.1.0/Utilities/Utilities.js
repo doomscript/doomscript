@@ -575,7 +575,7 @@
                 if (typeof children !== "undefined")
                 {
 					//find the <script> tag in the collection that has the gameiframe info
-					var scriptNodes = children.getElementsByTagName("SCRIPT");
+					var scriptNodes = children.getElementsByTagName("script");
 				
 					var match = null;
 					for (var i = 0; i < scriptNodes.length; i++)
@@ -589,11 +589,17 @@
 					// If we have the iframe options
 					if (match != null)
 					{
+                        DC_LoaTS_Helper.getGameIframe_old = DC_LoaTS_Helper.getGameIframe;
+
 						// Needed for the creation of GameIframe
 						var urlOptions = '';
 						
 						// Parse and return the existing iframe options
-						return eval(match[1]);
+						var optionsVal = eval(match[1]);
+
+                        DC_LoaTS_Helper.getGameIframe = function() {return optionsVal;};
+
+                        return optionsVal;
 					}
 					console.warn("Could not locate the gameIframe options.");					
                 }
@@ -1510,7 +1516,7 @@
 				newHTML += "<br>\n";
 				newHTML += "<span class='clearfix'>";
 				newHTML += "<span style='float:left; padding-top: 5px;'>Update now?</span>";
-				newHTML += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='http://userscripts.org/scripts/source/124753.user.js' target='_blank'>Update</a></span>";
+				newHTML += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='" + DC_LoaTS_Properties.scriptDownloadURL + "' target='_blank'>Update</a></span>";
 				newHTML += "<br><br>\n";
 			}
 			// If the user has a newer than public version
@@ -1566,7 +1572,7 @@
 					
 					var updateButton = document.createElement("a");
 					updateButton.className = "DC_LoaTS_updateLink";
-					updateButton.href = "http://userscripts.org/scripts/source/124753.user.js";
+					updateButton.href = DC_LoaTS_Properties.scriptDownloadURL;
 					updateButton.appendChild(document.createTextNode("Update"));
 					updateButton.target = "_blank";
 					updateButton.onclick = function()
