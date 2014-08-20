@@ -582,7 +582,7 @@
 		}
 		
 		if (typeof GM_xmlhttpRequest !== "function") {
-		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts.org/scripts/show/105153");
+		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts-mirror.org/scripts/show/105153");
 		}
 	}
 	

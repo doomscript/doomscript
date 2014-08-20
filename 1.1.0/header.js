@@ -372,7 +372,8 @@ Updated Ashdown and Dragonfly OS
 2014.08.19 - 1.1.31
 Fixed background loading for raids [greenkabbage]
 Comply with new GreaseMonkey requirements [greenkabbage]
-
+Fixed Chrome App manifest problem
+Changed update url
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -389,8 +390,8 @@ function main()
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
-    	scriptURL: "http://userscripts.org/124753",
-    	scriptDownloadURL: "http://userscripts.org/scripts/source/124753.user.js",
+    	scriptURL: "http://bit.ly/doomscript",
+    	scriptDownloadURL: "https://openuserjs.org/install/doomcat/Kongregate_Legacy_of_a_Thousand_Suns_Raid_Link_Helper.user.js",
     	raidDataURL: "http://getKongE.org/old/RaidData.js",
     	worldRaidDataURL: "http://getKongE.org/old/WorldRaidData.js",
     	docsURL: "http://www.tinyurl.com/doomscript-docs",
@@ -411,10 +412,8 @@ function main()
     	// Or add debugMode=true to the game url in the browser
     	debugMode: (function() {
     		var value = /debugMode=(\w+)/.exec(document.location.href);
-    		if (value && value[1]) {
-    			return true;
-    		}
-    		return false;
+    		return value && value[1];
+
     	})(),
     	
     	// GreaseMonkey Storage Keys

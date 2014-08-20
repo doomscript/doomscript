@@ -312,7 +312,7 @@
 				GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
 			}
 			return messageFormat;	
-	    }
+	    };
 	    
 	    // Set the message format
 	    DC_LoaTS_Helper.setMessageFormat = function(messageFormat)
@@ -325,7 +325,7 @@
 			
 			// Set the message format
 			GM_setValue(DC_LoaTS_Properties.storage.messageFormat, messageFormat);
-	    }
+	    };
 	    
 	    // Retrieve the link format
 	    DC_LoaTS_Helper.getLinkFormat = function()
@@ -356,7 +356,7 @@
 				linkFormat = RaidLink.defaultLinkFormat_v2;
 			}
 			return linkFormat;
-	    }
+	    };
 	    
 	    // Retrieve a preference value from storage
 	    DC_LoaTS_Helper.getPref = function(prefName, defaultValue)
@@ -383,7 +383,7 @@
 	    	}
 	    	
 	    	return (typeof ret !== "undefined") ? ret : defaultValue;
-	    }
+	    };
 	    
 	    // Store a preference value into storage
 	    DC_LoaTS_Helper.setPref = function(prefName, value)
@@ -409,7 +409,7 @@
 	    		console.warn("Could not parse prefs to store " + prefName + ": " + value);
 	    		console.warn(ex);
 	    	}
-	    }
+	    };
 	    
 	    // Find all raid types matching a given filter
 	    DC_LoaTS_Helper.getRaidTypes = function(raidFilter)
@@ -432,7 +432,7 @@
 			}
 			
 			return matchedTypes;
-	    }
+	    };
 		
 	    // Print the description of the script
 	    DC_LoaTS_Helper.printScriptHelp = function(deck, text)
@@ -456,7 +456,7 @@
 					helpText += "\n";
 					helpText += "<span class='clearfix'>";
 					helpText += "<span style='float:left; padding-top: 5px;'>Update now?</span>";
-					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='http://userscripts.org/scripts/source/124753.user.js' target='_blank'>Update</a></span>";
+					helpText += "<span style='float:right;'><a class='DC_LoaTS_updateLink' href='" + DC_LoaTS_Properties.scriptDownloadURL + "' target='_blank'>Update</a></span>";
 				}
 				// If the user has a newer than public version
 				else if (DC_LoaTS_Helper.needUpdateState == "new")
@@ -515,7 +515,7 @@
 			
 			
 			return false;
-	    }
+	    };
 	    
 	DC_LoaTS_Helper.chatCommands = {};
 	DC_LoaTS_Helper.raidStyles = {};
