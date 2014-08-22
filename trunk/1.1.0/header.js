@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.31
+// @version        1.1.32
 // @date           19.08.2014
 // @grant          GM_xmlhttpRequest
 // @include        http://www.kongregate.com/games/*/*
@@ -375,6 +375,9 @@ Comply with new GreaseMonkey requirements [greenkabbage]
 Fixed Chrome App manifest problem
 Changed update url
 
+2014.08.?? - 1.1.32
+Added Pinata RS and Pinata's Revenge raid data [greenkabbage]
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -386,7 +389,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.31",
+    	version: "1.1.32",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

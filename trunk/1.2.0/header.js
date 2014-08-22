@@ -349,6 +349,7 @@ Added Cow Abduction WR
 Added KX Shock Trooper and KX Tank Alliance raids
 Added KX Scout Ships and KX Bombarder RS
 Added KX Elite Sub
+Added Pinata RS and Pinata's Revenge raid data [greenkabbage]
 Changed to new Event methods [greenkabbage]
 Implemented Raid Monitor features
 Added two KX raids, Battle Station and Subjugator
