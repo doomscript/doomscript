@@ -229,7 +229,3 @@ DC_LoaTS_Helper.raids =
 	
     ship_pinata:		new RaidType("ship_pinata","RS","Ship Pinata","Pinata","Pinata RS",24,90000,"SEH","Infinite","N/A",25000000000)
 };
-
-
-
-
