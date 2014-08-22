@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.31
+// @version        1.1.32
 // @date           19.08.2014
 // @grant          GM_xmlhttpRequest
 // @include        http://www.kongregate.com/games/*/*
@@ -375,6 +375,9 @@ Comply with new GreaseMonkey requirements [greenkabbage]
 Fixed Chrome App manifest problem
 Changed update url
 
+2014.08.?? - 1.1.32
+Added Pinata RS and Pinata's Revenge raid data [greenkabbage]
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -386,7 +389,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.31",
+    	version: "1.1.32",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -8356,6 +8359,7 @@ DC_LoaTS_Helper.raids =
 
     // Colossal+ Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    168, 550, "S",  [767250000, 1150875000, 1534500000, 2301750000], null, [12555000,12555000,12555000,12555000]),
+    pinatas_revenge1:	new RaidType("pinatas_revenge1",  "S", "Pinata's Revenge", "Pinata II", "Pinata",    		 128, 500, "S",  [50000000000, 87500000000, 110000000000, 205000000000], null, 1000000000),
 
     // Aliance Raids
     // Small Raids
@@ -8464,11 +8468,10 @@ DC_LoaTS_Helper.raids =
 
     kulnarxex_scout_ships_1:new RaidType("kulnarxex_scout_ships_1","RS","Kulnar-Xex Scout Ships","K-X Scout Ships","KX Scout RS",24,90000,"SEH","Infinite","N/A",25000000000),
 
-    kulnarxex_bombarder_1:new RaidType("kulnarxex_bombarder_1","RS","Kulnar-Xex Bombarder","K-X Bombarder","KX Bomb RS",24,90000,"SEH","Infinite","N/A",25000000000)
-};
-
-
-		/************************************/
+    kulnarxex_bombarder_1:new RaidType("kulnarxex_bombarder_1","RS","Kulnar-Xex Bombarder","K-X Bombarder","KX Bomb RS",24,90000,"SEH","Infinite","N/A",25000000000),
+	
+    ship_pinata:		new RaidType("ship_pinata","RS","Ship Pinata","Pinata","Pinata RS",24,90000,"SEH","Infinite","N/A",25000000000)
+};		/************************************/
 		/********* Utility Functions ********/
 		/************************************/
 		
