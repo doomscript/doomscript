@@ -1346,6 +1346,7 @@
 		};
 		
 		DC_LoaTS_Helper.ajax = function(params){
+            DCDebug("DC_LoaTS_Helper.ajax: ", params);
             if (!params.method)
             {
                 params.method = "GET";
@@ -1373,14 +1374,23 @@
             params.UUID = DC_LoaTS_Helper.generateUUID();
             document.addEventListener(params.UUID, function listener(event)
             {
+                DCDebug("Received XHR Response from server", event);
                 if (event.detail.responseObj.readyState == 4)
                 {
+                    DCDebug("XHR Response in ReadyState 4, removing listener");
                     document.removeEventListener(params.UUID, listener);
+                }
+                else {
+                    DCDebug("XHR Response in ReadyState ", event.detail.responseObj.readyState);
                 }
                 
                 if (typeof params[event.detail.callbackName] === "function")
                 {
+                    DCDebug("Callback function exists. calbackName: ", event.detail.callbackName, "func: ", params[event.detail.callbackName], " Invoking...");
                     params[event.detail.callbackName](event.detail.responseObj);
+                }
+                else {
+                    DCDebug("Callback function does not exist. calbackName: ", event.detail.callbackName, "func: ", params[event.detail.callbackName]);
                 }
             });
             // Convert params to simple object
@@ -1397,7 +1407,8 @@
                     }
                 }
             }
-            var evt = new CustomEvent("DC_LoaTS_ExecuteGMXHR", {"bubbles": true, "cancelable": true, "detail": paramSimple}); 
+            var evt = new CustomEvent("DC_LoaTS_ExecuteGMXHR", {"bubbles": true, "cancelable": true, "detail": paramSimple});
+            DCDebug("Publishing Ajax event", evt);
             document.dispatchEvent(evt);
         };
 		
@@ -1575,8 +1586,7 @@
 					updateButton.href = DC_LoaTS_Properties.scriptDownloadURL;
 					updateButton.appendChild(document.createTextNode("Update"));
 					updateButton.target = "_blank";
-					updateButton.onclick = function()
-					{
+					updateButton.onclick = function() {
 						if ($("DC_LoaTS_notifitcationBar"))
 						{
 							$("DC_LoaTS_notifitcationBar").hide();
@@ -1590,8 +1600,7 @@
 					remindButton.className = "DC_LoaTS_notifitcationBarButton";
 					remindButton.href = "#";
 					remindButton.appendChild(document.createTextNode("Remind me later"));
-					remindButton.onclick = function()
-					{
+					remindButton.onclick = function() {
 						if ($("DC_LoaTS_notifitcationBar"))
 						{
 							$("DC_LoaTS_notifitcationBar").hide();
@@ -1603,16 +1612,13 @@
 
 					var canAutoUpdate = GM_getValue(DC_LoaTS_Properties.storage.autoUpdate, true);
 
-					if (typeof canAutoUpdate != "undefined" && canAutoUpdate)
-					{
+					if (typeof canAutoUpdate != "undefined" && canAutoUpdate) {
 						var ignoreButton = document.createElement("a");
 						ignoreButton.className = "DC_LoaTS_notifitcationBarButton";
 						ignoreButton.href = "#";
 						ignoreButton.appendChild(document.createTextNode("Turn auto update check off"));
-						ignoreButton.onclick = function()
-						{
-							if ($("DC_LoaTS_notifitcationBar"))
-							{
+						ignoreButton.onclick = function() {
+							if ($("DC_LoaTS_notifitcationBar")) {
 								$("DC_LoaTS_notifitcationBar").hide();
 							}
 							
@@ -1947,7 +1953,7 @@
 			{
 				console.log.apply(console, arguments);
 			}
-		}
+		};
 		
 		// Borrowed from: http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format/4673436#4673436
 		String.prototype.format = function()
