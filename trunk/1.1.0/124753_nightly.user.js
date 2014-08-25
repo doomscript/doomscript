@@ -380,10 +380,10 @@ Comply with new GreaseMonkey requirements [greenkabbage]
 Fixed Chrome App manifest problem
 Changed update url
 
-2014.08.?? - 1.1.32
+2014.08.25 - 1.1.32
+Fix critical issue with latest Firefox/GM changes around events
 Added Pinata RS and Pinata's Revenge raid data [greenkabbage]
 Minor fix to debugMode
-Fix issue with latest Firefox/GM changes around events
 Added a bunch more logging statements in debug mode
 
 [TODO] Post new Opera instructions
