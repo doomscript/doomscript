@@ -6,8 +6,13 @@
 // @version        1.1.32
 // @date           19.08.2014
 // @grant          GM_xmlhttpRequest
+// @grant          GM_getValue
+// @grant          GM_setValue
+// @grant          GM_deleteValue
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
+
+// Even though we include all of Kongregate, we use a Regex to prevent the script from being injected on the wrong pages
 
 /*
 License: "Kongregate Legacy of a Thousand Suns Raid Link Helper for Chat" (henceforth known as "doomscript") is free to download and use unlimited times on unlimited devices. You're allowed to modify the script for personal use, but you need written permission from doomcat to distribute those modifications. If you plan to distribute doomscript in whole or in part, modified or not, as part of an application other than in userscript form, some fees may apply. Contact doomcat for pricing. 
@@ -377,6 +382,9 @@ Changed update url
 
 2014.08.?? - 1.1.32
 Added Pinata RS and Pinata's Revenge raid data [greenkabbage]
+Minor fix to debugMode
+Fix issue with latest Firefox/GM changes around events
+Added a bunch more logging statements in debug mode
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -412,11 +420,10 @@ function main()
     	
     	// Do not check code in with this set to true. 
     	// Preferably, turn it on from the browser command line with DC_LoaTS_Properties.debugMode = true;
-    	// Or add debugMode=true to the game url in the browser
+    	// Or add ?debugMode=true to the game url in the browser
     	debugMode: (function() {
     		var value = /debugMode=(\w+)/.exec(document.location.href);
-    		return value && value[1];
-
+    		return value && !!value[1];
     	})(),
     	
     	// GreaseMonkey Storage Keys
@@ -9819,6 +9826,7 @@ DC_LoaTS_Helper.raids =
 		};
 		
 		DC_LoaTS_Helper.ajax = function(params){
+            DCDebug("DC_LoaTS_Helper.ajax: ", params);
             if (!params.method)
             {
                 params.method = "GET";
@@ -9846,14 +9854,23 @@ DC_LoaTS_Helper.raids =
             params.UUID = DC_LoaTS_Helper.generateUUID();
             document.addEventListener(params.UUID, function listener(event)
             {
+                DCDebug("Received XHR Response from server", event);
                 if (event.detail.responseObj.readyState == 4)
                 {
+                    DCDebug("XHR Response in ReadyState 4, removing listener");
                     document.removeEventListener(params.UUID, listener);
+                }
+                else {
+                    DCDebug("XHR Response in ReadyState ", event.detail.responseObj.readyState);
                 }
                 
                 if (typeof params[event.detail.callbackName] === "function")
                 {
+                    DCDebug("Callback function exists. calbackName: ", event.detail.callbackName, "func: ", params[event.detail.callbackName], " Invoking...");
                     params[event.detail.callbackName](event.detail.responseObj);
+                }
+                else {
+                    DCDebug("Callback function does not exist. calbackName: ", event.detail.callbackName, "func: ", params[event.detail.callbackName]);
                 }
             });
             // Convert params to simple object
@@ -9870,7 +9887,8 @@ DC_LoaTS_Helper.raids =
                     }
                 }
             }
-            var evt = new CustomEvent("DC_LoaTS_ExecuteGMXHR", {"bubbles": true, "cancelable": true, "detail": paramSimple}); 
+            var evt = new CustomEvent("DC_LoaTS_ExecuteGMXHR", {"bubbles": true, "cancelable": true, "detail": paramSimple});
+            DCDebug("Publishing Ajax event", evt);
             document.dispatchEvent(evt);
         };
 		
@@ -10048,8 +10066,7 @@ DC_LoaTS_Helper.raids =
 					updateButton.href = DC_LoaTS_Properties.scriptDownloadURL;
 					updateButton.appendChild(document.createTextNode("Update"));
 					updateButton.target = "_blank";
-					updateButton.onclick = function()
-					{
+					updateButton.onclick = function() {
 						if ($("DC_LoaTS_notifitcationBar"))
 						{
 							$("DC_LoaTS_notifitcationBar").hide();
@@ -10063,8 +10080,7 @@ DC_LoaTS_Helper.raids =
 					remindButton.className = "DC_LoaTS_notifitcationBarButton";
 					remindButton.href = "#";
 					remindButton.appendChild(document.createTextNode("Remind me later"));
-					remindButton.onclick = function()
-					{
+					remindButton.onclick = function() {
 						if ($("DC_LoaTS_notifitcationBar"))
 						{
 							$("DC_LoaTS_notifitcationBar").hide();
@@ -10076,16 +10092,13 @@ DC_LoaTS_Helper.raids =
 
 					var canAutoUpdate = GM_getValue(DC_LoaTS_Properties.storage.autoUpdate, true);
 
-					if (typeof canAutoUpdate != "undefined" && canAutoUpdate)
-					{
+					if (typeof canAutoUpdate != "undefined" && canAutoUpdate) {
 						var ignoreButton = document.createElement("a");
 						ignoreButton.className = "DC_LoaTS_notifitcationBarButton";
 						ignoreButton.href = "#";
 						ignoreButton.appendChild(document.createTextNode("Turn auto update check off"));
-						ignoreButton.onclick = function()
-						{
-							if ($("DC_LoaTS_notifitcationBar"))
-							{
+						ignoreButton.onclick = function() {
+							if ($("DC_LoaTS_notifitcationBar")) {
 								$("DC_LoaTS_notifitcationBar").hide();
 							}
 							
@@ -10420,7 +10433,7 @@ DC_LoaTS_Helper.raids =
 			{
 				console.log.apply(console, arguments);
 			}
-		}
+		};
 		
 		// Borrowed from: http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format/4673436#4673436
 		String.prototype.format = function()
@@ -10496,7 +10509,7 @@ DC_LoaTS_Helper.raids =
 				rulesText += "}\n";
 								
                 rulesText += "\na.DC_LoaTS_updateLink:hover {\n";
-                rulesText += "\tcolor: #08F !important;\n"                              
+                rulesText += "\tcolor: #08F !important;\n";
                 rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
                 rulesText += "}\n";
                 
@@ -10726,7 +10739,7 @@ DC_LoaTS_Helper.raids =
 				
 				rulesText += "\na.DC_LoaTS_notificationBarButton {\n";
 				rulesText += "\tbackground-color: #F9B83E;\n";
-				rulesText += "\tborder: 1px solid #915608;"
+				rulesText += "\tborder: 1px solid #915608;";
 				rulesText += "\tpadding: 2px 10px;\n";
 				rulesText += "\tmargin-right: 10px;\n";
 				rulesText += "\ttext-decoration: none;\n";
@@ -10738,13 +10751,13 @@ DC_LoaTS_Helper.raids =
 				rulesText += "}\n";
 								
 				rulesText += "\na.DC_LoaTS_notificationBarButton:hover {\n";
-				rulesText += "\tcolor: #915608;\n"								
+				rulesText += "\tcolor: #915608;\n";
 				rulesText += "\tbackground: #FDE477;\n";
 				rulesText += "}\n";
 				
 				rulesText += "\n#DC_LoaTS_raidToolbarContainer {\n";
-				rulesText += "\tcolor: #FFFFFF;\n"								
-				rulesText += "\tlist-style: none;\n"								
+				rulesText += "\tcolor: #FFFFFF;\n";
+				rulesText += "\tlist-style: none;\n";
 				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
 				rulesText += "\t-moz-border-radius: 5px;\n";
 				rulesText += "\t-webkit-border-radius: 5px;\n";
@@ -10807,13 +10820,13 @@ DC_LoaTS_Helper.raids =
 				rulesText += "\t-moz-border-radius: 5px;\n";
 				rulesText += "\t-webkit-border-radius: 5px;\n";
 				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\tborder-color: #FFFFFF;\n"								
+				rulesText += "\tborder-color: #FFFFFF;\n";
 				rulesText += "\tbackground-color: #71A5CE;\n";
 				rulesText += "\tpadding: 0px 2px !important;\n";
 				rulesText += "}\n";
 								
 				rulesText += "\n.DC_LoaTS_omnibox_focus {\n";
-				rulesText += "\tborder-color: #71A5CE;\n"								
+				rulesText += "\tborder-color: #71A5CE;\n";
 				rulesText += "\tbackground-color: #FFFFFF;\n";
 				rulesText += "}\n";
 				
@@ -11015,12 +11028,12 @@ DC_LoaTS_Helper.raids =
 					window.GM_setValue = function(k, v)
 					{
 						localStorage.setItem(k, v);
-					}
+					};
 					window.GM_getValue = function(k, def)
 					{
 						var ret = localStorage.getItem(k);
 						return (ret == null?def:ret)
-					}
+					};
 					window.GM_deleteValue = function(k)
 					{
 						localStorage.removeItem(k);
@@ -11039,12 +11052,12 @@ DC_LoaTS_Helper.raids =
 				window.GM_setValue = function(k, v)
 				{
 					localStorage.setItem(k, v);
-				}
+				};
 				window.GM_getValue = function(k, def)
 				{
 					var ret = localStorage.getItem(k);
 					return (ret == null?def:ret)
-				}
+				};
 				window.GM_deleteValue = function(k)
 				{
 					localStorage.removeItem(k);
@@ -11139,13 +11152,16 @@ DC_LoaTS_Helper.raids =
     }
     
     // Hit the go button and activate the main script.
-    bootstrap_DC_LoaTS_Helper();
+    bootstrap_DC_LoaTS_Helper(false);
 }
 
 
 // GM Layer
+// This is handling XHR via events
 function xhrGo(event)
 {
+    DCDebug("GM XHR: GM Received XHR Event: ", event);
+
 	var params = event.detail;
 	for (var param in params)
 	{
@@ -11155,10 +11171,13 @@ function xhrGo(event)
 			params[funcName] = gmCallBack.bind(this, params.UUID, funcName);
 		}
 	}
+    DCDebug("GM XHR: final params ", params);
     if (typeof GM_xmlhttpRequest === "function") {
+        DCDebug("GM XHR: GM_XHR is available");
 	    setTimeout(function(){GM_xmlhttpRequest(params);},0);
     }
     else {
+        DCDebug("GM XHR: GM_XHR is not available");
         console.error("Browser is not configured to allow GM_xmlhttpRequest. This could be due to a Chrome v27 bug.");
         var xmlhttp;
         if (window.XMLHttpRequest)
@@ -11173,31 +11192,78 @@ function xhrGo(event)
         {
             if (xmlhttp.readyState === 4)
             {
+                DCDebug("GM XHR: XHR ready state changed. Has onload? ", !!params.onload);
                 if (typeof params.onload === "function") {
                     params.onload(xmlhttp);
                 }
             }
-        }
-        xmlhttp.open(params.method,params.url,!params.synchronous);
+        };
+        xmlhttp.open(params.method, params.url, !params.synchronous);
         xmlhttp.send();
-        
     }
-};
+}
 
 function gmCallBack(UUID, funcName, response)
 {
+    DCDebug("GM XHR: Preparing to call back to page JS");
 	setTimeout(function()
 	{
-		var evt = new CustomEvent(UUID, {"bubbles": true, "cancelable": true, "detail": {callbackName: funcName, responseObj: response}});
-		document.dispatchEvent(evt);
+        DCDebug("GM XHR: Creating event to send back to the page  UUID: ", UUID, " funcName: ", funcName, " response: ", response);
+        var detail = {callbackName: funcName, responseObj: response};
+        DCDebug("GM XHR: Creating event detail: ", detail);
+        try {
+            if (typeof cloneInto === "function") {
+                DCDebug("GM XHR: Using cloneInto");
+
+                var cloned = {callbackName: funcName, responseObj: {}};
+                for (var p in detail.responseObj) {
+                    if (detail.responseObj.hasOwnProperty(p)) {
+                        DCDebug("GM XHR: Cloning property ", p, " which is a ", typeof detail.responseObj[p]);
+                        cloned.responseObj[p] = detail.responseObj[p];
+                    }
+                }
+
+                DCDebug("GM XHR: Using cloneInto for real");
+                cloned = cloneInto(cloned, document.defaultView || unsafeWindow || window);
+                DCDebug("GM XHR: cloned version: ", cloned);
+
+                // It seems like the latest Firefox prefers this deprecated code? Bizarre
+                var evt = document.createEvent('CustomEvent');
+                evt.initCustomEvent(UUID, true, true, cloned);
+                document.documentElement.dispatchEvent(evt);
+            }
+            else {
+                DCDebug("GM XHR: Not using cloneInto (it doesn't exist or isn't a function)");
+                var evt = new CustomEvent(UUID, {"bubbles": true, "cancelable": true, "detail": detail});
+                DCDebug("GM XHR: Dispatching event to page", evt);
+                document.dispatchEvent(evt);
+            }
+        }
+        catch (ex) {
+            DCDebug("GM XHR: Caught exception while trying to respond to client XHR event", ex, " Fn Args: ", arguments);
+        }
 	}, 0);
-};
+}
 
 document.addEventListener("DC_LoaTS_ExecuteGMXHR", xhrGo);
 
 
+var GMDebugMode = (function() {
+    var value = /debugMode=(\w+)/.exec(document.location.href);
+    return value && !!value[1];
+})();
 
-// This injects our script onto the page.
+// Debug log wrapping function
+// Special scope debugging for just this script
+DCDebug = function() {
+    if (GMDebugMode === true) {
+        console.log.apply(console, arguments);
+    }
+};
+
+
+
+    // This injects our script onto the page.
 // Borrowed from: http://stackoverflow.com/a/2303228
 if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))
 {

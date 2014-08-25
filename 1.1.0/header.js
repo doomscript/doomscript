@@ -6,8 +6,13 @@
 // @version        1.1.32
 // @date           19.08.2014
 // @grant          GM_xmlhttpRequest
+// @grant          GM_getValue
+// @grant          GM_setValue
+// @grant          GM_deleteValue
 // @include        http://www.kongregate.com/games/*/*
 // ==/UserScript== 
+
+// Even though we include all of Kongregate, we use a Regex to prevent the script from being injected on the wrong pages
 
 /*
 License: "Kongregate Legacy of a Thousand Suns Raid Link Helper for Chat" (henceforth known as "doomscript") is free to download and use unlimited times on unlimited devices. You're allowed to modify the script for personal use, but you need written permission from doomcat to distribute those modifications. If you plan to distribute doomscript in whole or in part, modified or not, as part of an application other than in userscript form, some fees may apply. Contact doomcat for pricing. 
@@ -377,6 +382,9 @@ Changed update url
 
 2014.08.?? - 1.1.32
 Added Pinata RS and Pinata's Revenge raid data [greenkabbage]
+Minor fix to debugMode
+Fix issue with latest Firefox/GM changes around events
+Added a bunch more logging statements in debug mode
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -412,11 +420,10 @@ function main()
     	
     	// Do not check code in with this set to true. 
     	// Preferably, turn it on from the browser command line with DC_LoaTS_Properties.debugMode = true;
-    	// Or add debugMode=true to the game url in the browser
+    	// Or add ?debugMode=true to the game url in the browser
     	debugMode: (function() {
     		var value = /debugMode=(\w+)/.exec(document.location.href);
-    		return value && value[1];
-
+    		return value && !!value[1];
     	})(),
     	
     	// GreaseMonkey Storage Keys
