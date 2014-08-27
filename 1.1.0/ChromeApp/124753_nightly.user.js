@@ -3,8 +3,8 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.32
-// @date           19.08.2014
+// @version        1.1.33
+// @date           27.08.2014
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getValue
 // @grant          GM_setValue
@@ -380,11 +380,14 @@ Comply with new GreaseMonkey requirements [greenkabbage]
 Fixed Chrome App manifest problem
 Changed update url
 
-2014.08.?? - 1.1.32
+2014.08.25 - 1.1.32
+Fix critical issue with latest Firefox/GM changes around events
 Added Pinata RS and Pinata's Revenge raid data [greenkabbage]
 Minor fix to debugMode
-Fix issue with latest Firefox/GM changes around events
 Added a bunch more logging statements in debug mode
+
+2014.08.27 - 1.1.33
+Fix XHR for Firefox 32+
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -397,7 +400,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.32",
+    	version: "1.1.33",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -11160,9 +11163,17 @@ DC_LoaTS_Helper.raids =
 // This is handling XHR via events
 function xhrGo(event)
 {
-    DCDebug("GM XHR: GM Received XHR Event: ", event);
+    if (typeof XPCNativeWrapper !== "undefined" && typeof XPCNativeWrapper.unwrap === "function")
+    {   //this takes 'event' out of the heavy duty sandbox so we can access the details for FF32+
+        //INFO: tested and confirmed as working on FF31 and FF32 + GM 2.1
+        DCDebug("GM XHR: Firefox sandbox, unwrapping 'event' for processing");
 
+        event = XPCNativeWrapper.unwrap(event);
+    }
+
+    DCDebug("GM XHR: GM Received XHR Event: ", event);
 	var params = event.detail;
+	
 	for (var param in params)
 	{
 		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
