@@ -3,8 +3,8 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.32
-// @date           19.08.2014
+// @version        1.1.33
+// @date           27.08.2014
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getValue
 // @grant          GM_setValue
@@ -386,6 +386,9 @@ Added Pinata RS and Pinata's Revenge raid data [greenkabbage]
 Minor fix to debugMode
 Added a bunch more logging statements in debug mode
 
+2014.08.27 - 1.1.33
+Fix XHR for Firefox 32+
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -397,7 +400,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.32",
+    	version: "1.1.33",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
