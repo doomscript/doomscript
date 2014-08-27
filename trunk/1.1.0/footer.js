@@ -676,18 +676,17 @@
 // This is handling XHR via events
 function xhrGo(event)
 {
+    if (typeof XPCNativeWrapper !== "undefined" && typeof XPCNativeWrapper.unwrap === "function")
+    {   //this takes 'event' out of the heavy duty sandbox so we can access the details for FF32+
+        //INFO: tested and confirmed as working on FF31 and FF32 + GM 2.1
+        DCDebug("GM XHR: Firefox sandbox, unwrapping 'event' for processing");
+
+        event = XPCNativeWrapper.unwrap(event);
+    }
+
     DCDebug("GM XHR: GM Received XHR Event: ", event);
 	var params = event.detail;
-	
-	if (typeof XPCNativeWrapper.unwrap === "function") 
-	{   //this takes 'event' out of the heavy duty sandbox so we can access the details for FF32+
-		//INFO: tested and confirmed as working on FF31 and FF32 + GM 2.1
-		DCDebug("GM XHR: Firefox sandbox, unwrapping 'event' for processing");
-		
-		var evt = XPCNativeWrapper.unwrap(event);
-		params = evt.detail;
-	}
-	
+
 	for (var param in params)
 	{
 		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)
