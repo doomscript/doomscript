@@ -389,6 +389,11 @@ Added a bunch more logging statements in debug mode
 2014.08.27 - 1.1.33
 Fix XHR for Firefox 32+
 
+2014.09.?? - 1.1.34
+Added Trouble in Tokyo WR
+Added two new raids, King Krandar and Sultan Shrakzan
+Added /ad alias to /linktools post
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */

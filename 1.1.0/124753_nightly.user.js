@@ -389,6 +389,11 @@ Added a bunch more logging statements in debug mode
 2014.08.27 - 1.1.33
 Fix XHR for Firefox 32+
 
+2014.09.?? - 1.1.34
+Added Trouble in Tokyo WR
+Added two new raids, King Krandar and Sultan Shrakzan
+Added /ad alias to /linktools post
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -6579,7 +6584,7 @@ function main()
 		RaidCommand.create( 
 			{
 				commandName: "linktools",
-				aliases: ["advertise", "blatantselfpromotion", "getdoomscript"],
+				aliases: ["ad", "advertise", "blatantselfpromotion", "getdoomscript"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)
@@ -6587,8 +6592,8 @@ function main()
 					// Declare ret object
 					var ret = {success: true};
 
-					
-					if (params.trim() === "post") {
+					// If the user passed in the "post" param or is using /ad, show it publicly
+					if (params.trim() === "post" || text.toLowerCase().trim() === "/ad") {
 						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " and any of: ";
 						toolsText += "\nRaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
 						toolsText += "\nQuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
@@ -6622,8 +6627,10 @@ function main()
 					var helpText = "<b>Raid Command:</b> <code>/linktools [post]</code>\n";
 					helpText += "Displays a list of scripts that you might find useful.\n";
 					helpText += "<code>" + this.getCommandLink("") + "</code> will post the links just to you.\n";
-					helpText += "<code>" + this.getCommandLink("post") + "</code> will post the links to chat.";
-					
+					helpText += "<code>" + this.getCommandLink("post") + "</code> will post the links to chat.\n";
+					helpText += "\n";
+					helpText += "Note: The <code>" + DC_LoaTS_Helper.getCommandLink("/ad") + "</code> alias automatically posts, unlike the other aliases.";
+
 					return helpText;
 				}
 			}
@@ -8369,7 +8376,13 @@ DC_LoaTS_Helper.raids =
 
     // Colossal+ Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    168, 550, "S",  [767250000, 1150875000, 1534500000, 2301750000], null, [12555000,12555000,12555000,12555000]),
-    pinatas_revenge1:	new RaidType("pinatas_revenge1",  "S", "Pinata's Revenge", "Pinata II", "Pinata",    		 128, 500, "S",  [50000000000, 87500000000, 110000000000, 205000000000], null, 1000000000),
+    pinatas_revenge1:	new RaidType("pinatas_revenge1",    "S",  "Pinata's Revenge", "Pinata II", "Pinata",         128, 500, "S",  [50000000000, 87500000000, 110000000000, 205000000000], null, 1000000000),
+
+    // Titanic Raids
+    king_krandar1:	    new RaidType("king_krandar1",       "E",  "King Krandar", "Krandar", "Krandar",    		      44, 500, "E",  [250000000000, 250000000000, 250000000000, 250000000000], null, 1000000000),
+
+    // Galactic Raids
+    sultan_shrakzan1:	new RaidType("sultan_shrakzan1",    "S",  "Sultan Shrakzan", "Shrakzan", "Shrakzan",    	  44, 500, "S",  [300000000000, 300000000000, 300000000000, 300000000000], null, 1000000000),
 
     // Aliance Raids
     // Small Raids
@@ -8426,8 +8439,8 @@ DC_LoaTS_Helper.raids =
     ms_myriad_and_steelstike: new RaidType("ms_myriad_and_steelstike","A10","Ms. Myriad and Steelstrike","M & S","M & S",168,100,"H",[1500000000, 2000000000, 3000000000, 12500000000]),
     kulnarxex_tank_1:   new RaidType("kulnarxex_tank_1",  "A2-4", "Kulnar-Xex Tank", "K-X Tank", "KX Tank",           72,  100, "H", 2500000000, null, 50000000),
 
-    // Galaxy Dome Raids
-    vince_vortex:       new RaidType("vince_vortex",        "GD", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000),
+    // Energy Raids
+    vince_vortex:       new RaidType("vince_vortex",        "E", "Vince Vortex", "Vince", "Vince",                   72,  500, "E",  600000000),
 
     // World Raids
     // Infestation Trilogy
@@ -8457,6 +8470,8 @@ DC_LoaTS_Helper.raids =
 
     cow_abduction_1:    new RaidType("cow_abduction_1",     "WR", "Rylattu Cow Abduction", "Cow Abduction", "Cow WR", 72, 90000, "SEH", "Infinite", "N/A",   10000000000),
 
+    trouble_in_tokyo:   new RaidType("trouble_in_tokyo",    "WR", "Trouble in Tokyo", "Tokyo", "Tokyo WR",           120, 90000, "SEH", "Infinite", "N/A",  400000000000),
+
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
 
@@ -8478,9 +8493,11 @@ DC_LoaTS_Helper.raids =
 
     kulnarxex_scout_ships_1:new RaidType("kulnarxex_scout_ships_1","RS","Kulnar-Xex Scout Ships","K-X Scout Ships","KX Scout RS",24,90000,"SEH","Infinite","N/A",25000000000),
 
-    kulnarxex_bombarder_1:new RaidType("kulnarxex_bombarder_1","RS","Kulnar-Xex Bombarder","K-X Bombarder","KX Bomb RS",24,90000,"SEH","Infinite","N/A",25000000000),
-	
-    ship_pinata:		new RaidType("ship_pinata","RS","Ship Pinata","Pinata","Pinata RS",24,90000,"SEH","Infinite","N/A",25000000000)
+    kulnarxex_bombarder_1:new RaidType("kulnarxex_bombarder_1","RS","Kulnar-Xex Bombarder","K-X Bombarder","KX Bomb RS",24,90000,"SEH", "Infinite", "N/A", 25000000000),
+
+    ship_pinata:		new RaidType("ship_pinata",         "RS", "Ship Pinata", "Pinata", "Pinata RS",               24, 90000, "SEH", "Infinite", "N/A", 25000000000),
+
+    dimetrodon_riot:    new RaidType("dimetrodon_riot",     "WR", "Dimetrodon Riot", "D. Riot", "Riot RS",            24, 90000, "SEH", "Infinite", "N/A",  200000000000)
 };		/************************************/
 		/********* Utility Functions ********/
 		/************************************/
@@ -11173,7 +11190,7 @@ function xhrGo(event)
 
     DCDebug("GM XHR: GM Received XHR Event: ", event);
 	var params = event.detail;
-	
+
 	for (var param in params)
 	{
 		if (typeof params[param] === "string" && param.toLowerCase().indexOf("__callback_") === 0)

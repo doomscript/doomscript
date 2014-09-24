@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "linktools",
-				aliases: ["advertise", "blatantselfpromotion", "getdoomscript"],
+				aliases: ["ad", "advertise", "blatantselfpromotion", "getdoomscript"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)
@@ -9,8 +9,8 @@
 					// Declare ret object
 					var ret = {success: true};
 
-					
-					if (params.trim() === "post") {
+					// If the user passed in the "post" param or is using /ad, show it publicly
+					if (params.trim() === "post" || text.toLowerCase().trim() === "/ad") {
 						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " and any of: ";
 						toolsText += "\nRaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
 						toolsText += "\nQuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
@@ -44,8 +44,10 @@
 					var helpText = "<b>Raid Command:</b> <code>/linktools [post]</code>\n";
 					helpText += "Displays a list of scripts that you might find useful.\n";
 					helpText += "<code>" + this.getCommandLink("") + "</code> will post the links just to you.\n";
-					helpText += "<code>" + this.getCommandLink("post") + "</code> will post the links to chat.";
-					
+					helpText += "<code>" + this.getCommandLink("post") + "</code> will post the links to chat.\n";
+					helpText += "\n";
+					helpText += "Note: The <code>" + DC_LoaTS_Helper.getCommandLink("/ad") + "</code> alias automatically posts, unlike the other aliases.";
+
 					return helpText;
 				}
 			}
