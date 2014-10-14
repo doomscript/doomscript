@@ -3,533 +3,560 @@
 	// Define some CSS Styles
 	function defineStyles()
 	{
-				var rulesText = "abbr, acronym, span.abbr {\n";
-				rulesText += "\tborder-bottom: 1px dashed #444444;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.smallText {\n";
-				rulesText += "\tfont-size: 85%;\n";
-				rulesText += "}\n";
-				
-				
-				rulesText += "\na.DC_LoaTS_updateLink {\n";
-				rulesText += "\tbackground: #BAE37F url(http://userscripts.org/images/sprite.png?2) right -130px no-repeat;\n";
-				rulesText += "\tborder: 1px solid #888; padding: 2px 16px;\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tfont-weight: bold;\n";
-				rulesText += "\tfont-size: 1.5em;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "\tcolor: #004 !important;\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "}\n";
-								
-                rulesText += "\na.DC_LoaTS_updateLink:hover {\n";
-                rulesText += "\tcolor: #08F !important;\n";
-                rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
-                rulesText += "}\n";
-                
-                
-                rulesText += "\nimg.raidIcon {\n";
-                rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
-                rulesText += "}\n";
-                
-                
-				// -- Raid Menu Styles -- \\
-				
-				rulesText += "\n#DC_LoaTS_raidMenu {\n";
-//				rulesText += "\theight: 60%;\n";
-				rulesText += "\twidth: 775px;\n";
-//				rulesText += "\tbackground: #062834;\n";
-//				rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
-				rulesText += "\tposition: fixed;\n";
-				rulesText += "\tleft: 7%;\n";
-				rulesText += "\ttop: 20%;\n";
-				rulesText += "\tz-index: 99999999;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-//				rulesText += "\tborder:  2px solid #93CDD0;\n";
-				rulesText += "}\n";
+        console.info("Defining doomscript styles");
 
-				rulesText += "\n#DC_LoaTS_raidMenuClose {\n";
-				rulesText += "\tfloat: right;\n";
-				rulesText += "\tdisplay: block;\n";
-				rulesText += "\twidth: 50px;\n";
-				rulesText += "\theight: 45px;\n";
-				rulesText += "\tcursor: pointer;\n";
-				rulesText += "}\n";
+        var rulesText = [
+        "abbr, acronym, span.abbr {",
+        "\tborder-bottom: 1px dashed #444444;",
+        "}",
+
+        "\n.smallText {",
+        "\tfont-size: 85%;",
+        "}",
 
 
-				rulesText += "\n#DC_LoaTS_raidMenuTitleBar {\n";
-				rulesText += "\tbackground: #347D87 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menutitlebarbg.png) 50% 50% repeat-x;\n";
-				//rulesText += "\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
-				rulesText += "\tpadding:  2px 10px;\n";
-				rulesText += "\tborder-top-left-radius: 5px;\n";
-//				rulesText += "\tborder-top-right-radius: 5px;\n";
-				rulesText += "\tborder-right-width: 0px;\n";
-				rulesText += "\twidth: 702px;\n";
-				rulesText += "\theight: 37px;\n";
-				rulesText += "\tcursor: move;\n";
-				rulesText += "\tfont-size: 15pt;\n";
-				rulesText += "\tcolor: #DEECED;\n";
-				rulesText += "\tborder: 3px solid #93CDD0;\n";
-				rulesText += "\tborder-bottom: 1px solid #062834;\n";
-				rulesText += "\tborder-right-width: 0px;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
+        "\na.DC_LoaTS_updateLink {",
+        "\tbackground: #BAE37F url(http://userscripts.org/images/sprite.png?2) right -130px no-repeat;",
+        "\tborder: 1px solid #888; padding: 2px 16px;",
+        "\ttext-decoration: none;",
+        "\tfont-weight: bold;",
+        "\tfont-size: 1.5em;",
+        "\ttext-align: center;",
+        "\tcolor: #004 !important;",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "}",
 
-				rulesText += "\n#DC_LoaTS_raidMenuTitleBarLeft {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTitleBarCenter {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "\tmargin: auto;\n";
-				rulesText += "\twidth: 400px;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTitleBarRight {\n";
-				rulesText += "\tfloat: right;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuBodyWrapper {\n";
-				rulesText += "\tbackground: #0E5969 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menubodywrapperbg.png) 50% 50% repeat;\n";
-				//rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
-				rulesText += "\tborder: 3px solid #93CDD0;\n";
-				rulesText += "\tborder-top-width: 0px;\n";
-				rulesText += "\tborder-bottom-left-radius: 5px;\n";
-				rulesText += "\tborder-bottom-right-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTabs {\n";
-				rulesText += "\tclear: both;\n";
-				rulesText += "\tborder-bottom: 1px solid #CCC;\n";
-				rulesText += "\theight: 23px;\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTabs li {\n";
-				rulesText += "\tlist-style: none;\n";
-				rulesText += "\tfont-family: Verdana, sans;\n";
-				rulesText += "\tfont-size: 11px;\n";
-				rulesText += "\tline-height: 18px;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "\tmargin-right: 5px;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "\t;\n";
-				rulesText += "\t;\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTabs li a {\n";
-				rulesText += "\tdisplay: block;\n";
-				rulesText += "\theight: 20px;\n";
-				rulesText += "\tpadding: 0px 6px;\n";
-				rulesText += "\twidth: 80px;\n";
-				rulesText += "\tbackground-color: #153041;\n";
-				rulesText += "\tborder: 2px solid #41B0B5;\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tborder-top-left-radius: 5px;\n";
-				rulesText += "\tborder-top-right-radius: 5px;\n";
-				rulesText += "\tfont-size: 115%;\n";
-				rulesText += "\tcolor: #FFFFFF;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTabs li a.active {\n";
-				rulesText += "\tbackground-color: #57959E;\n";
-				rulesText += "\tborder: 2px solid #F1FFFF;\n";
-				rulesText += "\tcolor: #B7E5EE;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.RaidMenuTab-Header {\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuOptionWrapper {\n";
-				rulesText += "\tborder-bottom: 1px solid #479090;\n";
-				rulesText += "\tmargin-bottom: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuOptionWrapper div{\n";
-				rulesText += "\tpadding: 5px;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuDescription{\n";
-				rulesText += "\tpadding-left: 15px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuPane {\n";
-				//rulesText += "\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;\n";
-				rulesText += "\tbackground: #77C0C0 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menupanebg.png) 50% bottom repeat-x;\n";
-				rulesText += "\tfont-size: 1.2em;\n";
-				rulesText += "\tpadding: 5px 10px;\n";
-				rulesText += "\tmin-height: 200px;\n";
-				rulesText += "\tmax-height: 600px;\n";
-				rulesText += "\toverflow: auto;\n";
-				rulesText += "\tclear: both;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuPane h1{\n";
-				rulesText += "\tborder-bottom: 1px solid #000000;\n";
-				rulesText += "\tmargin-bottom: 15px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuPane h2{\n";
-				rulesText += "\tborder-bottom: 1px solid #479090;\n";
-				rulesText += "\tmargin-bottom: 10px;\n";
-				rulesText += "}\n";
-				
-				
-				
-				rulesText += "\n#RaidsMenu-SearchWrapper {\n";
-				rulesText += "\twidth: 50%;\n";
-				rulesText += "\tmargin: auto;\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#RaidsMenu-SearchBox {\n";
-				rulesText += "\twidth: 70%;\n";
-				rulesText += "\tmin-width: 150px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#RaidsMenu-ResultsBox {\n";
-				rulesText += "\tmax-height: 300px;\n";
-				rulesText += "\toverflow: auto;\n";
-				rulesText += "}\n";				
-				
-				rulesText += "\n#FormattingTab-MessageFormatTextArea {\n";
-				rulesText += "\twidth: 100%;\n";
-				rulesText += "\tmin-height: 35px;\n";
-				rulesText += "}\n";				
-				
-				
-				rulesText += "\n.FormattingTab-Button {\n";
-				rulesText += "\tpadding: 3px 15px 4px;\n";
-				rulesText += "}\n";				
-				
-				rulesText += "\n.StylesTab-RaidNamesPicker {\n";
-				rulesText += "\tfloat:left;\n";
-				rulesText += "}\n";				
-				
-				
-				rulesText += "\n#PreferencesMenu-LoadRaidsInBackgroundDelayInputWrapper input {\n";
-				rulesText += "\twidth: 30px;\n";
-				rulesText += "\theight: 10px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "}\n";				
-				
-				
-				rulesText += "\n#DC_LoaTS_notificationBar {\n";
-				rulesText += "\tbackground: #f8dc5a url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/notificationbg.png) 50% 50% repeat-x;\n";
-				//rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
-				rulesText += "\tpadding: 4px 10px; 0px\n";
-				rulesText += "\twidth: 100%;\n";
-				rulesText += "\tfont-size: 12pt;\n";
-				rulesText += "\tcolor: #915608;\n";
-				rulesText += "\tborder-bottom: 1px solid #fcd113;\n";
-				rulesText += "\tposition: fixed;\n";
-				rulesText += "\ttop: 0px;\n";
-				rulesText += "\tleft: 0px;\n";
-				rulesText += "\tz-index: 99999999;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_notificationBarTitle {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_notificationBarText {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_notificationBarButtons {\n";
-				rulesText += "\tfloat: right;\n";
-				rulesText += "\tpadding-top:1px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_notificationBarButtons a.DC_LoaTS_updateLink {\n";
-				rulesText += "\tfont-size: inherit;\n";
-				rulesText += "\tmargin-right:10px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\na.DC_LoaTS_notificationBarButton {\n";
-				rulesText += "\tbackground-color: #F9B83E;\n";
-				rulesText += "\tborder: 1px solid #915608;";
-				rulesText += "\tpadding: 2px 10px;\n";
-				rulesText += "\tmargin-right: 10px;\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tfont-weight: bold;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "}\n";
-								
-				rulesText += "\na.DC_LoaTS_notificationBarButton:hover {\n";
-				rulesText += "\tcolor: #915608;\n";
-				rulesText += "\tbackground: #FDE477;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer {\n";
-				rulesText += "\tcolor: #FFFFFF;\n";
-				rulesText += "\tlist-style: none;\n";
-				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\theight: 16px;\n";
-				rulesText += "\tpadding: 2px 5px;\n";
-				rulesText += "\ttext-align:left;\n";
-				rulesText += "}\n";
+        "\na.DC_LoaTS_updateLink:hover {",
+        "\tcolor: #08F !important;",
+        "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;",
+        "}",
 
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li {\n";
-				rulesText += "float:left;";
-				rulesText += "}\n";
-				
 
-				rulesText += "\na.DC_LoaTS_button {\n";
-				rulesText += "\twidth: 16px;\n";
-				rulesText += "\theight: 16px;\n";
-				rulesText += "\tbackground: url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/icons.png);\n";
-				rulesText += "\tbackground-repeat: no-repeat;\n";
-				rulesText += "\tcursor: pointer;\n";
-				rulesText += "\tdisplay: block;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "\ttext-indent: -99999px;\n";
-				rulesText += "}\n";
+        "\nimg.raidIcon {",
+        "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;",
+        "}",
 
-				rulesText += "\na.DC_LoaTS_menuButton {\n";
-				rulesText += "\tbackground-position: -48px -80px;";
-				rulesText += "}\n";
+        "\n.context-menu {",
+        "\tbackground-color: #433F3E;",
+        "\tcolor: #FFFFFF;",
+        "\tmin-width: 180px;",
+        "\tlist-style-type: none;",
+        "\tborder: 1px solid #000;",
+        "}",
 
-				rulesText += "\na.DC_LoaTS_reloadButton {\n";
-				rulesText += "\tbackground-position: -160px -64px;";
-				rulesText += "}\n";
+        "\n.menu-item {",
+        "\tcursor: pointer;",
+        "}",
 
-                rulesText += "\na.DC_LoaTS_toggleGameButton {\n";
-                rulesText += "\tbackground-position: 0 -176px;";
-                rulesText += "}\n";
+        "\n.menu-item a {",
+        "\tdisplay: block;",
+        "\ttext-decoration: none;",
+        "\tpadding: 5px 5px 5px 20px;",
+        "}",
 
-                rulesText += "\na.DC_LoaTS_toggleWorldChatButton {\n";
-                rulesText += "\tbackground-position: -128px -96px;";
-                rulesText += "}\n";
+        "\n.menu-item a:hover {",
+        "\tbackground-color: #710000;",
+        "\tcolor: #FFFFFF;",
+        "}",
 
-				rulesText += "\na.DC_LoaTS_WRButton {\n";
-				rulesText += "\ttext-indent: 0px;\n";
-				rulesText += "\tbackground: none;\n";
-				rulesText += "\twidth: auto;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\na.DC_LoaTS_WRButton:hover {\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tbackground-color: #71A5CE;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li.DC_LoaTS_WRButtonWrapper {\n";
-				rulesText += "\tfloat: right;\n";
-				rulesText += "}\n";
-				
 
-				rulesText += "\n.DC_LoaTS_omnibox {\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\tborder-color: #FFFFFF;\n";
-				rulesText += "\tbackground-color: #71A5CE;\n";
-				rulesText += "\tpadding: 0px 2px !important;\n";
-				rulesText += "}\n";
-								
-				rulesText += "\n.DC_LoaTS_omnibox_focus {\n";
-				rulesText += "\tborder-color: #71A5CE;\n";
-				rulesText += "\tbackground-color: #FFFFFF;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_omniboxWrapper {\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\tposition: relative;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_omniboxCommandsWrapper {\n";
-				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
-				rulesText += "\tlist-style: none;\n";
-				rulesText += "\tz-index: 999;\n";
-				rulesText += "\tposition: absolute;\n";
-				rulesText += "\twidth: 630px;\n";
-				rulesText += "\tpadding: 5px;;\n";
-				rulesText += "\tborder-bottom-left-radius: 5px;\n";
-				rulesText += "\tborder-bottom-right-radius: 5px;\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
+        // -- Raid Menu Styles -- \\
 
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li{\n";
-				rulesText += "\tfloat:none;\n";
-				rulesText += "\tmargin: 0px;\n";
-				rulesText += "\tbackground-color: #051E2A;\n";
-				rulesText += "\tfont-size: 1.3em;\n";
-				rulesText += "\toverflow: hidden;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li a{\n";
-				rulesText += "\tdisplay: block;\n";
-				rulesText += "\tcolor: #EEEEEE;\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tfloat:left;\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li a:hover{\n";
-				rulesText += "\tbackground-color: #57959E;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li:first-child{\n";
-				rulesText += "\tborder-top-left-radius: 5px;\n";
-				rulesText += "\tborder-top-right-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li:last-child{\n";
-				rulesText += "\tborder-bottom-left-radius: 5px;\n";
-				rulesText += "\tborder-bottom-right-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li a:first-child, #DC_LoaTS_raidToolbarContainer li li div:first-child{\n";
-				rulesText += "\tpadding-left: 10px !important;\n";
-				rulesText += "}\n";				
-				
-				//--- Onnibox Option Styles ---\\
-				
-				rulesText += "\n.DC_LoaTS_initialtext {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "\tpadding-left: 0px !important;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_omniboxOption {\n";
-				rulesText += "\tpadding: 2px 10px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_any {\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_normal {\n";
-				rulesText += "\tcolor:#48C957;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_normal:hover {\n";
-				rulesText += "\tcolor:#FFFFFF;\n";
-				rulesText += "\tbackground-color:#48C957;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_hard {\n";
-				rulesText += "\tcolor:#E3E72E;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_hard:hover {\n";
-				rulesText += "\tcolor:#FFFFFF;\n";
-				rulesText += "\tbackground-color:#E3E72E;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_legendary {\n";
-				rulesText += "\tcolor:#CB0039;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_legendary:hover {\n";
-				rulesText += "\tcolor:#FFFFFF;\n";
-				rulesText += "\tbackground-color:#CB0039;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare {\n";
-				rulesText += "\tcolor:#B84EFE;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare:hover {\n";
-				rulesText += "\tcolor:#FFFFFF;\n";
-				rulesText += "\tbackground-color:#B84EFE;\n";
-				rulesText += "}\n";
-				
+        "\n#DC_LoaTS_raidMenu {",
+//				"\theight: 60%;",
+        "\twidth: 775px;",
+//				"\tbackground: #062834;",
+//				"\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;",
+        "\tposition: fixed;",
+        "\tleft: 7%;",
+        "\ttop: 20%;",
+        "\tz-index: 99999999;",
+        "\t-webkit-border-radius: 5px;",
+//				"\tborder:  2px solid #93CDD0;",
+        "}",
 
-				rulesText += "\na.raidDiffNormal:hover {\n";
-				rulesText += "\tcolor:#48C957;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\na.raidDiffHard:hover {\n";
-				rulesText += "\tcolor:#828505;\n";
-				rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuClose {",
+        "\tfloat: right;",
+        "\tdisplay: block;",
+        "\twidth: 50px;",
+        "\theight: 45px;",
+        "\tcursor: pointer;",
+        "}",
 
-				rulesText += "\na.raidDiffLegendary:hover {\n";
-				rulesText += "\tcolor:#CB0039;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\na.raidDiffNightmare:hover {\n";
-				rulesText += "\tcolor:#B84EFE;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.hidden {\n";
-				rulesText += "\tdisplay: none;\n";
-				rulesText += "}\n";
-				
-				
-				rulesText += "\n.DataDumpTab-Data {\n";
-				rulesText += "\twidth: 100%;\n";
-				rulesText += "\theight: 400px;\n";
-				rulesText += "}\n";
 
-				rulesText += "\n.DC_LoaTS_raidMenuCloseTabA {\n";
-				rulesText += "\tborder-radius: 100px;\n";
-				rulesText += "\twidth: 5px;\n";
-				rulesText += "\theight: 5px;\n";
-				rulesText += "\tcolor: #FFFFFF;\n";
-				rulesText += "\tbackground-color: #CCCCCC;\n";
-				rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuTitleBar {",
+        "\tbackground: #347D87 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menutitlebarbg.png) 50% 50% repeat-x;",
+        //"\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;",
+        "\tpadding:  2px 10px;",
+        "\tborder-top-left-radius: 5px;",
+//				"\tborder-top-right-radius: 5px;",
+        "\tborder-right-width: 0px;",
+        "\twidth: 702px;",
+        "\theight: 37px;",
+        "\tcursor: move;",
+        "\tfont-size: 15pt;",
+        "\tcolor: #DEECED;",
+        "\tborder: 3px solid #93CDD0;",
+        "\tborder-bottom: 1px solid #062834;",
+        "\tborder-right-width: 0px;",
+        "\tfloat: left;",
+        "}",
 
-                rulesText += "\n#maingame {\n";
-                rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
-                rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
-                rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
-                rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuTitleBarLeft {",
+        "\tfloat: left;",
+        "}",
 
-                rulesText += "\n#maingame.hideWorldChat {\n";
-                rulesText += "\twidth: 1060px !important;\n";
-                rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuTitleBarCenter {",
+        "\tfloat: left;",
+        "\tmargin: auto;",
+        "\twidth: 400px;",
+        "\ttext-align: center;",
+        "}",
 
-                rulesText += "\n#game {\n";
-                rulesText += "\toverflow: hidden;\n";
-                rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
-                rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
-                rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
-                rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuTitleBarRight {",
+        "\tfloat: right;",
+        "}",
 
-                rulesText += "\n.hideWorldChat #game {\n";
-                rulesText += "\twidth: 759px !important;\n";
-                rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuBodyWrapper {",
+        "\tbackground: #0E5969 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menubodywrapperbg.png) 50% 50% repeat;",
+        //"\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;",
+        "\tborder: 3px solid #93CDD0;",
+        "\tborder-top-width: 0px;",
+        "\tborder-bottom-left-radius: 5px;",
+        "\tborder-bottom-right-radius: 5px;",
+        "}",
 
-                rulesText += "\n#gameholder {\n";
-                rulesText += "\twidth: auto !important;\n";
-                rulesText += "}\n";
+
+        "\n#DC_LoaTS_raidMenuTabs {",
+        "\tclear: both;",
+        "\tborder-bottom: 1px solid #CCC;",
+        "\theight: 23px;",
+        "}",
+
+        "\n#DC_LoaTS_raidMenuTabs li {",
+        "\tlist-style: none;",
+        "\tfont-family: Verdana, sans;",
+        "\tfont-size: 11px;",
+        "\tline-height: 18px;",
+        "\tfloat: left;",
+        "\tmargin-right: 5px;",
+        "\ttext-align: center;",
+        "}",
+
+        "\n#DC_LoaTS_raidMenuTabs li a {",
+        "\tdisplay: block;",
+        "\theight: 20px;",
+        "\tpadding: 0px 6px;",
+        "\twidth: 80px;",
+        "\tbackground-color: #153041;",
+        "\tborder: 2px solid #41B0B5;",
+        "\ttext-decoration: none;",
+        "\tborder-top-left-radius: 5px;",
+        "\tborder-top-right-radius: 5px;",
+        "\tfont-size: 115%;",
+        "\tcolor: #FFFFFF;",
+        "}",
+
+        "\n#DC_LoaTS_raidMenuTabs li a.active {",
+        "\tbackground-color: #57959E;",
+        "\tborder: 2px solid #F1FFFF;",
+        "\tcolor: #B7E5EE;",
+        "}",
+
+        "\n.RaidMenuTab-Header {",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuOptionWrapper {",
+        "\tborder-bottom: 1px solid #479090;",
+        "\tmargin-bottom: 5px;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuOptionWrapper div{",
+        "\tpadding: 5px;",
+        "\tfloat: left;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuDescription{",
+        "\tpadding-left: 15px;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuPane {",
+        //"\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;",
+        "\tbackground: #77C0C0 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menupanebg.png) 50% bottom repeat-x;",
+        "\tfont-size: 1.2em;",
+        "\tpadding: 5px 10px;",
+        "\tmin-height: 200px;",
+        "\tmax-height: 600px;",
+        "\toverflow: auto;",
+        "\tclear: both;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuPane h1{",
+        "\tborder-bottom: 1px solid #000000;",
+        "\tmargin-bottom: 15px;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuPane h2{",
+        "\tborder-bottom: 1px solid #479090;",
+        "\tmargin-bottom: 10px;",
+        "}",
+
+
+
+        "\n#RaidsMenu-SearchWrapper {",
+        "\twidth: 50%;",
+        "\tmargin: auto;",
+        "\t;",
+        "}",
+
+        "\n#RaidsMenu-SearchBox {",
+        "\twidth: 70%;",
+        "\tmin-width: 150px;",
+        "}",
+
+        "\n#RaidsMenu-ResultsBox {",
+        "\tmax-height: 300px;",
+        "\toverflow: auto;",
+        "}",
+
+        "\n#FormattingTab-MessageFormatTextArea {",
+        "\twidth: 100%;",
+        "\tmin-height: 35px;",
+        "}",
+
+
+        "\n.FormattingTab-Button {",
+        "\tpadding: 3px 15px 4px;",
+        "}",
+
+        "\n.StylesTab-RaidNamesPicker {",
+        "\tfloat:left;",
+        "}",
+
+
+        "\n#PreferencesMenu-LoadRaidsInBackgroundDelayInputWrapper input {",
+        "\twidth: 30px;",
+        "\theight: 10px;",
+        "\tborder-radius: 5px;",
+        "\ttext-align: center;",
+        "}",
+
+
+        "\n#DC_LoaTS_notificationBar {",
+        "\tbackground: #f8dc5a url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/notificationbg.png) 50% 50% repeat-x;",
+        //"\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;",
+        "\tpadding: 4px 10px; 0px",
+        "\twidth: 100%;",
+        "\tfont-size: 12pt;",
+        "\tcolor: #915608;",
+        "\tborder-bottom: 1px solid #fcd113;",
+        "\tposition: fixed;",
+        "\ttop: 0px;",
+        "\tleft: 0px;",
+        "\tz-index: 99999999;",
+        "}",
+
+        "\n#DC_LoaTS_notificationBarTitle {",
+        "\tfloat: left;",
+        "}",
+
+        "\n#DC_LoaTS_notificationBarText {",
+        "\tfloat: left;",
+        "}",
+
+        "\n#DC_LoaTS_notificationBarButtons {",
+        "\tfloat: right;",
+        "\tpadding-top:1px;",
+        "}",
+
+        "\n#DC_LoaTS_notificationBarButtons a.DC_LoaTS_updateLink {",
+        "\tfont-size: inherit;",
+        "\tmargin-right:10px;",
+        "}",
+
+        "\na.DC_LoaTS_notificationBarButton {",
+        "\tbackground-color: #F9B83E;",
+        "\tborder: 1px solid #915608;",
+        "\tpadding: 2px 10px;",
+        "\tmargin-right: 10px;",
+        "\ttext-decoration: none;",
+        "\tfont-weight: bold;",
+        "\ttext-align: center;",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "}",
+
+        "\na.DC_LoaTS_notificationBarButton:hover {",
+        "\tcolor: #915608;",
+        "\tbackground: #FDE477;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer {",
+        "\tcolor: #FFFFFF;",
+        "\tlist-style: none;",
+        "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "\theight: 16px;",
+        "\tpadding: 2px 5px;",
+        "\ttext-align:left;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li {",
+        "float:left;",
+        "}",
+
+
+        "\na.DC_LoaTS_button {",
+        "\twidth: 16px;",
+        "\theight: 16px;",
+        "\tbackground: url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/icons.png);",
+        "\tbackground-repeat: no-repeat;",
+        "\tcursor: pointer;",
+        "\tdisplay: block;",
+        "\tfloat: left;",
+        "\ttext-indent: -99999px;",
+        "}",
+
+        "\na.DC_LoaTS_menuButton {",
+        "\tbackground-position: -48px -80px;",
+        "}",
+
+        "\na.DC_LoaTS_reloadButton {",
+        "\tbackground-position: -160px -64px;",
+        "}",
+
+        "\na.DC_LoaTS_toggleGameButton {",
+        "\tbackground-position: 0 -176px;",
+        "}",
+
+        "\na.DC_LoaTS_toggleWorldChatButton {",
+        "\tbackground-position: -128px -96px;",
+        "}",
+
+        "\na.DC_LoaTS_WRButton {",
+        "\ttext-indent: 0px;",
+        "\tbackground: none;",
+        "\twidth: auto;",
+        "\tborder-radius: 5px;",
+        "}",
+
+        "\na.DC_LoaTS_WRButton:hover {",
+        "\ttext-decoration: none;",
+        "\tbackground-color: #71A5CE;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li.DC_LoaTS_WRButtonWrapper {",
+        "\tfloat: right;",
+        "}",
+
+
+        "\n.DC_LoaTS_omnibox {",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "\tborder-color: #FFFFFF;",
+        "\tbackground-color: #71A5CE;",
+        "\tpadding: 0px 2px !important;",
+        "}",
+
+        "\n.DC_LoaTS_omnibox_focus {",
+        "\tborder-color: #71A5CE;",
+        "\tbackground-color: #FFFFFF;",
+        "}",
+
+        "\n.DC_LoaTS_omniboxWrapper {",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "\tposition: relative;",
+        "\tfloat: left;",
+        "}",
+
+        "\n.DC_LoaTS_omniboxCommandsWrapper {",
+        "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;",
+        "\tlist-style: none;",
+        "\tz-index: 999;",
+        "\tposition: absolute;",
+        "\twidth: 630px;",
+        "\tpadding: 5px;;",
+        "\tborder-bottom-left-radius: 5px;",
+        "\tborder-bottom-right-radius: 5px;",
+        "\t;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li{",
+        "\tfloat:none;",
+        "\tmargin: 0px;",
+        "\tbackground-color: #051E2A;",
+        "\tfont-size: 1.3em;",
+        "\toverflow: hidden;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li a{",
+        "\tdisplay: block;",
+        "\tcolor: #EEEEEE;",
+        "\ttext-decoration: none;",
+        "\tfloat:left;",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li a:hover{",
+        "\tbackground-color: #57959E;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li:first-child{",
+        "\tborder-top-left-radius: 5px;",
+        "\tborder-top-right-radius: 5px;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li:last-child{",
+        "\tborder-bottom-left-radius: 5px;",
+        "\tborder-bottom-right-radius: 5px;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li a:first-child, #DC_LoaTS_raidToolbarContainer li li div:first-child{",
+        "\tpadding-left: 10px !important;",
+        "}",
+
+        //--- Onnibox Option Styles ---\\
+
+        "\n.DC_LoaTS_initialtext {",
+        "\tfloat: left;",
+        "\tpadding-left: 0px !important;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_omniboxOption {",
+        "\tpadding: 2px 10px;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_any {",
+        "\t;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_normal {",
+        "\tcolor:#48C957;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_normal:hover {",
+        "\tcolor:#FFFFFF;",
+        "\tbackground-color:#48C957;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_hard {",
+        "\tcolor:#E3E72E;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_hard:hover {",
+        "\tcolor:#FFFFFF;",
+        "\tbackground-color:#E3E72E;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_legendary {",
+        "\tcolor:#CB0039;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_legendary:hover {",
+        "\tcolor:#FFFFFF;",
+        "\tbackground-color:#CB0039;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare {",
+        "\tcolor:#B84EFE;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare:hover {",
+        "\tcolor:#FFFFFF;",
+        "\tbackground-color:#B84EFE;",
+        "}",
+
+
+        "\na.raidLink {",
+        "\ttextDecoration: none;",
+        "}",
+
+        "\na.raidDiffNormal:hover {",
+        "\tcolor:#48C957;",
+        "}",
+
+        "\na.raidDiffHard:hover {",
+        "\tcolor:#828505;",
+        "}",
+
+        "\na.raidDiffLegendary:hover {",
+        "\tcolor:#CB0039;",
+        "}",
+
+        "\na.raidDiffNightmare:hover {",
+        "\tcolor:#B84EFE;",
+        "}",
+
+        "\n.hidden {",
+        "\tdisplay: none;",
+        "}",
+
+
+        "\n.DataDumpTab-Data {",
+        "\twidth: 100%;",
+        "\theight: 400px;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuCloseTabA {",
+        "\tborder-radius: 100px;",
+        "\twidth: 5px;",
+        "\theight: 5px;",
+        "\tcolor: #FFFFFF;",
+        "\tbackground-color: #CCCCCC;",
+        "}",
+
+        "\n#maingame {",
+        "\t-moz-transition: width .5s ease-out 0s;",
+        "\t-webkit-transition: width .5s ease-out 0s;",
+        "\t-o-transition: width .5s ease-out 0s;",
+        "}",
+
+        "\n#maingame.hideWorldChat {",
+        "\twidth: 1060px !important;",
+        "}",
+
+        "\n#game {",
+        "\toverflow: hidden;",
+        "\t-moz-transition: width .5s ease-out 0s;",
+        "\t-webkit-transition: width .5s ease-out 0s;",
+        "\t-o-transition: width .5s ease-out 0s;",
+        "}",
+
+        "\n.hideWorldChat #game {",
+        "\twidth: 759px !important;",
+        "}",
+
+        "\n#gameholder {",
+        "\twidth: auto !important;",
+        "}"
+        ];
 
         var head = document.getElementsByTagName('head')[0],
-				    style = document.createElement('style'),
-				    rules = document.createTextNode(rulesText);
-				
-				style.type = 'text/css';
-				
-				if(style.styleSheet)
-				{
-				    style.styleSheet.cssText = rules.nodeValue;
-				}
-				else
-				{
-					style.appendChild(rules);
-				}
-				
-				head.appendChild(style);
-	}
+            style = document.createElement('style'),
+            rules = document.createTextNode(rulesText.join("\n"));
+
+        style.type = 'text/css';
+
+        if(style.styleSheet)
+        {
+            style.styleSheet.cssText = rules.nodeValue;
+        }
+        else
+        {
+            style.appendChild(rules);
+        }
+
+        head.appendChild(style);
+    }
 	
 	function setupGMFunctions()
 	{

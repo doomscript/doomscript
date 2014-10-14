@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.33
+// @version        1.1.34
 // @date           27.08.2014
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getValue
@@ -389,10 +389,12 @@ Added a bunch more logging statements in debug mode
 2014.08.27 - 1.1.33
 Fix XHR for Firefox 32+
 
-2014.09.?? - 1.1.34
+2014.10.?? - 1.1.34
 Added Trouble in Tokyo WR
 Added two new raids, King Krandar and Sultan Shrakzan
 Added /ad alias to /linktools post
+Added Left Click to Whisper preference and functionality
+Added Right Click on Username menu
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -405,7 +407,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.33",
+    	version: "1.1.34",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
