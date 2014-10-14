@@ -1,7 +1,9 @@
 		/************************************/
 		/********** RaidLink Class **********/
 		/************************************/
-		
+
+        console.info("Declaring RaidLink");
+
 		// Represents and parses actual raid link
 		// Constructor is either
 		// new RaidLink(str)
@@ -250,8 +252,8 @@
 						newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
 						newMessage = newMessage.replace(/{(?:cache-state-nice|state|status)}/gi, linkState.niceText);
 						newMessage = newMessage.replace(/{(?:cache-state|state|status)-short}/gi, linkState.shortText);
-						newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.niceText:"");
-						newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.shortText:"");
+						newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED) || RaidManager.STATE.equals(linkState, RaidManager.STATE.COMPLETED))?RaidManager.STATE.VISITED.niceText:"");
+						newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED) || RaidManager.STATE.equals(linkState, RaidManager.STATE.COMPLETED))?RaidManager.STATE.VISITED.shortText:"");
 						
 						if (typeof linkState == "undefined" || linkState.text == "undefined")
 						{
@@ -354,8 +356,8 @@
 					newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
 					newMessage = newMessage.replace(/{cache-state-nice}/gi, linkState.niceText);
 					newMessage = newMessage.replace(/{cache-state-short}/gi, linkState.shortText);
-					newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.niceText:"");
-					newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.shortText:"");
+                    newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED) || RaidManager.STATE.equals(linkState, RaidManager.STATE.COMPLETED))?RaidManager.STATE.VISITED.niceText:"");
+                    newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED) || RaidManager.STATE.equals(linkState, RaidManager.STATE.COMPLETED))?RaidManager.STATE.VISITED.shortText:"");
 					
 					// Remove fields we don't want
 					newMessage = newMessage.replace(/{line}/gi, "");
@@ -604,16 +606,17 @@
 		{
 			// Get the relevant raid link
 			var raidLink = new RaidLink(this.parentNode.href);
-			
+
 			// First time failed, check for alternate fail names
-			if (this.src === DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
+			if (this.src === DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src !== RaidLink.defaultImageSRC)
 			{
 				switch(raidLink.raidTypeId)
 				{
 					case "wr_space_pox":
 						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/space_pox_1.jpg";
 						break;
-					case "dule_warmaster":
+                    case "dule_warmaster_1":
+                    case "dule_warmaster":
 						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/dule_1.jpg";
 						break;
 					case "hultex_quibberath":
@@ -622,12 +625,64 @@
 					case "warden_ramiro":
 						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/ramiro_1.jpg";
 						break;
-                    case "kulnarxex_elite_subjugator":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator.jpg";
+                    case "celebration_enhancer_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/celebration_enhancer_1.jpg";
+                        break;
+                    case "weiqi_game_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/weiqi_game_1.jpg";
+                        break;
+                    case "crimzo_the_killer_clown":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/crimzo_1.jpg";
+                        break;
+                    case "kulnarxex_subjugator_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator_1.jpg";
+                        break;
+                    case "kulnarxex_elite_subjugator_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator_1.jpg";
+                        break;
+                    case "kulnarxex_scout_ships_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_scout_ships_1.jpg";
+                        break;
+                    case "cow_abduction_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/cow_abduction_1.jpg";
+                        break;
+                    case "pinatas_revenge1":
+                        // This one even has a weird location for its small image
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/pinatas_revenge_small.jpg";
+                        break;
+                    case "king_krandar1":
+                        // This one even has a weird location for its small image
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/king_krandar_small.jpg";
+                        break;
+                    case "sultan_shrakzan1":
+                        // This one even has a weird location for its small image
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/king_krandar_small.jpg";
+                        break;
+                    // These are ones that we've not found alternate images for except for the raid list image
                     case "purple_lion":
 					case "kang":
 					case "tourniquet":
 					case "flora":
+                    case "talia":
+                    case "myrmexidaks":
+                    case "tyraness_guard":
+                    case "sian_dragonfly_1":
+                    case "lady_victoria_ashdown_1":
+                    case "rampaging_rackalax_1":
+                    case "giant_kwelshax":
+                    case "the_tyraness":
+                    case "the_mega_mimes":
+                    case "the_neon_knights":
+                    case "the_gamma_hammers":
+                    case "the_chem_runners":
+                    case "kulnar_xex_shock_trooper_1":
+                    case "kulnar_xex_battle_station_1":
+                    case "kulnarxex_bombarder_1":
+                    case "schism":
+                    case "trouble_in_tokyo":
+                    case "cerebral_monster_mech":
+                    case "ship_pinata":
+                    case "dimetrodon_riot":
 					default:
                         this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/" + raidLink.raidTypeId + "_small.jpg";
 				}
@@ -643,4 +698,5 @@
 				this.src="";
 			}
 		};
-		
+
+        console.info("Declared RaidLink");

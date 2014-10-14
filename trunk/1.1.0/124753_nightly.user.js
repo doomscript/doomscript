@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.33
+// @version        1.1.34
 // @date           27.08.2014
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getValue
@@ -389,10 +389,12 @@ Added a bunch more logging statements in debug mode
 2014.08.27 - 1.1.33
 Fix XHR for Firefox 32+
 
-2014.09.?? - 1.1.34
+2014.10.?? - 1.1.34
 Added Trouble in Tokyo WR
 Added two new raids, King Krandar and Sultan Shrakzan
 Added /ad alias to /linktools post
+Added Left Click to Whisper preference and functionality
+Added Right Click on Username menu
 
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
@@ -405,7 +407,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.33",
+    	version: "1.1.34",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -762,8 +764,12 @@ function main()
 					// Only pass the message along if it wasn't a /w RaidBot and it's not a command and we're not ignoring this message by preference
 					return !raidBotWhisper && chatCommandResult && !ignoredByPreference;
 				}; // End Replacement displayUnsanitizedMessage
-				
-				
+
+                // This is how we're going to manage left clicks on the chat area
+                DC_LoaTS_Helper.handleMessageWindowClickHandler();
+                // This is how we're going to manage right clicks on the chat area
+                DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
+
 				// Make sure the ignore visited thing is working
 				// TODO: If we ever do more of these, make a framework for it, or something
 				DC_LoaTS_Helper.handleIgnoreVisitedRaids();
@@ -2131,7 +2137,9 @@ function main()
 		/************************************/
 		/********** RaidLink Class **********/
 		/************************************/
-		
+
+        console.info("Declaring RaidLink");
+
 		// Represents and parses actual raid link
 		// Constructor is either
 		// new RaidLink(str)
@@ -2380,8 +2388,8 @@ function main()
 						newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
 						newMessage = newMessage.replace(/{(?:cache-state-nice|state|status)}/gi, linkState.niceText);
 						newMessage = newMessage.replace(/{(?:cache-state|state|status)-short}/gi, linkState.shortText);
-						newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.niceText:"");
-						newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.shortText:"");
+						newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED) || RaidManager.STATE.equals(linkState, RaidManager.STATE.COMPLETED))?RaidManager.STATE.VISITED.niceText:"");
+						newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED) || RaidManager.STATE.equals(linkState, RaidManager.STATE.COMPLETED))?RaidManager.STATE.VISITED.shortText:"");
 						
 						if (typeof linkState == "undefined" || linkState.text == "undefined")
 						{
@@ -2484,8 +2492,8 @@ function main()
 					newMessage = newMessage.replace(/{cache-state}/gi, linkState.text);
 					newMessage = newMessage.replace(/{cache-state-nice}/gi, linkState.niceText);
 					newMessage = newMessage.replace(/{cache-state-short}/gi, linkState.shortText);
-					newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.niceText:"");
-					newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED))?RaidManager.STATE.VISITED.shortText:"");
+                    newMessage = newMessage.replace(/{visited}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED) || RaidManager.STATE.equals(linkState, RaidManager.STATE.COMPLETED))?RaidManager.STATE.VISITED.niceText:"");
+                    newMessage = newMessage.replace(/{visited-short}/gi, (RaidManager.STATE.equals(linkState, RaidManager.STATE.VISITED) || RaidManager.STATE.equals(linkState, RaidManager.STATE.COMPLETED))?RaidManager.STATE.VISITED.shortText:"");
 					
 					// Remove fields we don't want
 					newMessage = newMessage.replace(/{line}/gi, "");
@@ -2734,16 +2742,17 @@ function main()
 		{
 			// Get the relevant raid link
 			var raidLink = new RaidLink(this.parentNode.href);
-			
+
 			// First time failed, check for alternate fail names
-			if (this.src === DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src != RaidLink.defaultImageSRC)
+			if (this.src === DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src !== RaidLink.defaultImageSRC)
 			{
 				switch(raidLink.raidTypeId)
 				{
 					case "wr_space_pox":
 						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/space_pox_1.jpg";
 						break;
-					case "dule_warmaster":
+                    case "dule_warmaster_1":
+                    case "dule_warmaster":
 						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/dule_1.jpg";
 						break;
 					case "hultex_quibberath":
@@ -2752,12 +2761,64 @@ function main()
 					case "warden_ramiro":
 						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/ramiro_1.jpg";
 						break;
-                    case "kulnarxex_elite_subjugator":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator.jpg";
+                    case "celebration_enhancer_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/celebration_enhancer_1.jpg";
+                        break;
+                    case "weiqi_game_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/weiqi_game_1.jpg";
+                        break;
+                    case "crimzo_the_killer_clown":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/crimzo_1.jpg";
+                        break;
+                    case "kulnarxex_subjugator_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator_1.jpg";
+                        break;
+                    case "kulnarxex_elite_subjugator_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator_1.jpg";
+                        break;
+                    case "kulnarxex_scout_ships_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_scout_ships_1.jpg";
+                        break;
+                    case "cow_abduction_1":
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/cow_abduction_1.jpg";
+                        break;
+                    case "pinatas_revenge1":
+                        // This one even has a weird location for its small image
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/pinatas_revenge_small.jpg";
+                        break;
+                    case "king_krandar1":
+                        // This one even has a weird location for its small image
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/king_krandar_small.jpg";
+                        break;
+                    case "sultan_shrakzan1":
+                        // This one even has a weird location for its small image
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/king_krandar_small.jpg";
+                        break;
+                    // These are ones that we've not found alternate images for except for the raid list image
                     case "purple_lion":
 					case "kang":
 					case "tourniquet":
 					case "flora":
+                    case "talia":
+                    case "myrmexidaks":
+                    case "tyraness_guard":
+                    case "sian_dragonfly_1":
+                    case "lady_victoria_ashdown_1":
+                    case "rampaging_rackalax_1":
+                    case "giant_kwelshax":
+                    case "the_tyraness":
+                    case "the_mega_mimes":
+                    case "the_neon_knights":
+                    case "the_gamma_hammers":
+                    case "the_chem_runners":
+                    case "kulnar_xex_shock_trooper_1":
+                    case "kulnar_xex_battle_station_1":
+                    case "kulnarxex_bombarder_1":
+                    case "schism":
+                    case "trouble_in_tokyo":
+                    case "cerebral_monster_mech":
+                    case "ship_pinata":
+                    case "dimetrodon_riot":
 					default:
                         this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/" + raidLink.raidTypeId + "_small.jpg";
 				}
@@ -2773,7 +2834,8 @@ function main()
 				this.src="";
 			}
 		};
-		
+
+        console.info("Declared RaidLink");
 		/************************************/
 		/**** RaidLinkstateParser Class *****/
 		/************************************/
@@ -5489,41 +5551,43 @@ function main()
 				reportDeadRaidsKey: "ReportDeadRaids",
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
 				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
-				
+				leftClickToWhisperKey: "LeftClickToWhisper",
+				rightClickUserMenu: "RightClickUserMenu",
+
 				initPane: function()
 				{
 					var wrapper = document.createElement("div");
 					var me = this;
-					
-					var rightClickOption = me.createSimpleOptionHTML(
-									"PreferencesMenu-RightClickVisitedInput",
-									"boolean", 
-									DC_LoaTS_Helper.getPref(me.rightClickVisitedKey, true), 
-									"Right-click should mark raids visited.", 
-									"If checked, right clicking a link will mark it visited", 
-									{
-										onclick: function()
-										{
-											DC_LoaTS_Helper.setPref(me.rightClickVisitedKey, this.checked);
-										}
-									}
-					);
+
+                    var rightClickOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-RightClickVisitedInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.rightClickVisitedKey, true),
+                        "Right-click should mark raids visited.",
+                        "If checked, right clicking a link will mark it visited",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.rightClickVisitedKey, this.checked);
+                            }
+                        }
+                    );
 					wrapper.appendChild(rightClickOption.wrapper);
 
-					var ignoreInvalidOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-IgnoreInvalidCommandsInput",
-							"boolean", 
-							DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey, true), 
-							"Ignore invalid commands.", 
-							"If checked, any command that is not a valid command will be ignored", 
-							{
-								onclick: function()
-								{
-									DC_LoaTS_Helper.setPref(me.ignoreInvalidCommandsKey, this.checked);
-								}
-							}
-					);
-					wrapper.appendChild(ignoreInvalidOption.wrapper);
+                    var ignoreInvalidOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-IgnoreInvalidCommandsInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey, true),
+                        "Ignore invalid commands.",
+                        "If checked, any command that is not a valid command will be ignored",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.ignoreInvalidCommandsKey, this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(ignoreInvalidOption.wrapper);
 
 
                     var hideVisitedOption = me.createSimpleOptionHTML(
@@ -5561,81 +5625,91 @@ function main()
                     wrapper.appendChild(hideWorldChat.wrapper);
 
                     var loadBackgroundOption = me.createSimpleOptionHTML(
-									"PreferencesMenu-LoadRaidsInBackgroundInput",
-									"boolean", 
-									DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey, true), 
-									"Load Raids in Background (Skips the Play Now screen when loading raids)", 
-									"If checked, raids won't load in the game area.", 
-									{
-										onclick: function()
-										{
-											DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundKey, this.checked);
-										}
-									}
-					);
-					wrapper.appendChild(loadBackgroundOption.wrapper);
-					
-					var loadRaidsInBackgroundDelayOption = me.createSimpleOptionHTML(
-							"PreferencesMenu-LoadRaidsInBackgroundDelayInput",
-							"text", 
-							DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 50), 
-							"ms. Time Between Loading Raids (Only applicable if Load Raids in Background is enabled)",
-							"Default = 50; No delay = 0; Half a second = 500.",
-							{
-								size: 4,
-								maxlength: 4,
-								onchange: function()
-								{
-									var v = this.value;
-									
-									if (/^\d+$/.test(v))
-									{
-										DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundDelayKey, v);
-									}
-									else
-									{
-										holodeck.activeDialogue().raidBotMessage("Load Raids In Background Delay: Please enter only numbers.");
-									}
-								}
-							}
-					);
-					wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
+                        "PreferencesMenu-LoadRaidsInBackgroundInput",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey, true),
+                        "Load Raids in Background (Skips the Play Now screen when loading raids)",
+                        "If checked, raids won't load in the game area.",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundKey, this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(loadBackgroundOption.wrapper);
 
-//					var reportDeadRaidsOption = me.createSimpleOptionHTML(
-//							"PreferencesMenu-ReportDeadRaidsInput",
-//							"boolean",
-//							DC_LoaTS_Helper.getPref(me.reportDeadRaidsKey, true),
-//							"Report Dead Raids to CConoly",
-//							"When a raid is marked Complete (Dead or Timed Out), inform CConoly",
-//							{
-//								onclick: function()
-//								{
-//									DC_LoaTS_Helper.setPref(me.reportDeadRaidsKey, this.checked);
-//								}
-//							}
-//					);
-//					wrapper.appendChild(reportDeadRaidsOption.wrapper);
-//
-//					var useQueryTimeDeltaOption = me.createSimpleOptionHTML(
-//							"PreferencesMenu-UseQueryTimeDeltaInput",
-//							"boolean",
-//							DC_LoaTS_Helper.getPref(me.useQueryTimeDeltaKey, true),
-//							"Ignore Duplicates When Using /loadcconoly",
-//							"If enabled, when you use /loadccconoly (/lcc), it will only collect raids since the last time you used it (Saves your time and saves CConoly bandwidth money)",
-//							{
-//								onclick: function()
-//								{
-//									DC_LoaTS_Helper.setPref(me.useQueryTimeDeltaKey, this.checked);
-//								}
-//							}
-//					);
-//					wrapper.appendChild(useQueryTimeDeltaOption.wrapper);
+                    var loadRaidsInBackgroundDelayOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-LoadRaidsInBackgroundDelayInput",
+                        "text",
+                        DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 50),
+                        "ms. Time Between Loading Raids (Only applicable if Load Raids in Background is enabled)",
+                        "Default = 50; No delay = 0; Half a second = 500.",
+                        {
+                            size: 4,
+                            maxlength: 4,
+                            onchange: function()
+                            {
+                                var v = this.value;
+
+                                if (/^\d+$/.test(v))
+                                {
+                                    DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundDelayKey, v);
+                                }
+                                else
+                                {
+                                    holodeck.activeDialogue().raidBotMessage("Load Raids In Background Delay: Please enter only numbers.");
+                                }
+                            }
+                        }
+                    );
+                    wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
+
+                    var leftClickToWhisperOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-LeftClickToWhisper",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.leftClickToWhisperKey, true),
+                        "Left click a user's name in chat to whisper them (Requires refresh after change)",
+                        "Overrides default functionality of showing mini-profile",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.leftClickToWhisperKey, this.checked);
+
+                                // Attach or detach the handlers
+                                DC_LoaTS_Helper.handleMessageWindowClickHandler();
+
+                                // Ask the user if they want to refresh now
+                                if (window.confirm && window.confirm("The page needs to be refreshed in order for your preference change to take effect. Confirm to refresh now; Cancel to refresh later.")) {
+                                    document.location.reload();
+                                }
+                            }
+                        }
+                    );
+                    wrapper.appendChild(leftClickToWhisperOption.wrapper);
+
+                    var rightClickUserMenuOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-RightClickUserMenu",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.rightClickUserMenu, true),
+                        "Right click a user's name to show an action menu",
+                        "Contains options to show their profile, friend them, and eventually more",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.rightClickUserMenu, this.checked);
+
+                                // Attach or detach the handlers
+                                DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
+                            }
+                        }
+                    );
+                    wrapper.appendChild(rightClickUserMenuOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}
-							
 		});
-		
+
 		/************************************/
 		/************ Raids Tab *************/
 		/************************************/
@@ -5943,10 +6017,10 @@ function main()
 				handler: function(deck, raidLink, params, text, context)
 				{
 					// Declare ret object
-					var ret = {sucess: true, statusMessage: "Chat cleared at " + (new Date().toLocaleString())};
+					var ret = {success: true, statusMessage: "Chat cleared at " + (new Date().toLocaleString())};
 						
 					// Load the raid from the link's url
-					holodeck._active_dialogue._message_window_node.childElements().invoke("remove");
+					holodeck.activeDialogue().clear();
 					
 					return ret;
 				},
@@ -8501,8 +8575,74 @@ DC_LoaTS_Helper.raids =
 };		/************************************/
 		/********* Utility Functions ********/
 		/************************************/
-		
-		// Hooks up a listener for a particular event on a specific object
+
+        if (!window.holodeck) {
+            window.holodeck = new Holodeck();
+        }
+
+        /**
+         * Returns the boolean opposite of the result of the given function
+         * @param fn The function to take the opposite of
+         * @param scope {Object?} The scope to call the function with
+         */
+        DC_LoaTS_Helper.not = function(fn, scope) {
+            return function() {
+                return !fn.apply(scope || window, arguments);
+            }
+        };
+
+        /**
+         * Returns a function of all the arguments passed in called in order
+         */
+        DC_LoaTS_Helper.chain = function() {
+            var fns = arguments;
+            return function() {
+                var ret;
+                for (var i = 0; i < fns.length; i++) {
+                    try {
+                        ret = fns[i].apply(this, arguments);
+                    }
+                    catch (e) {
+                        console.error("Utilities.js: Error during function chain", e);
+                    }
+                }
+                return ret;
+            }
+        };
+
+        DC_LoaTS_Helper.getCurrentUsername = function() {
+            return holodeck._active_user._attributes._object.username;
+        };
+
+        DC_LoaTS_Helper.isFriend = function(username) {
+            return holodeck.chatWindow().isFriend(username);
+        };
+
+        DC_LoaTS_Helper.addFriend = function(username) {
+            new Ajax.Request("http://www.kongregate.com/accounts/" + DC_LoaTS_Helper.getCurrentUsername() + "/friends/"+ username + "?friend_from=chat", {
+                method: 'put',
+                onComplete: function(transport)
+                {
+                    DCDebug("Added Friend: " + transport.request.url);
+                    // Update the listing in the top of the chat
+                    holodeck.addFriend(this);
+                }
+            });
+        };
+
+        DC_LoaTS_Helper.removeFriend = function(username) {
+            new Ajax.Request("http://www.kongregate.com/accounts/" + DC_LoaTS_Helper.getCurrentUsername() + "/friends/"+ username + "?friend_from=chat", {
+                method: 'delete',
+                onComplete: function(transport)
+                {
+                    DCDebug("Removed Friend: " + transport.request.url);
+                    // Update the listing in the top of the chat
+                    holodeck.removeFriend(this);
+                }
+            });
+        };
+
+        // Hooks up a listener for a particular event on a specific object
 		// Borrowed from: http://www.quirksmode.org/js/eventSimple.html
 		DC_LoaTS_Helper.registerEventHandler = function(obj,evt,fn)
 		{
@@ -8529,6 +8669,28 @@ DC_LoaTS_Helper.raids =
 				obj.detachEvent('on'+evt,fn);
 			}
 		};
+
+        DC_LoaTS_Helper.isLeftClickEvent = function(evt) {
+            // evt.which for IE6,7,8/Opera. evt.button for everyone else
+            return  (evt.button && (evt.button == 0)) || (evt.which && (evt.which == 1));
+        };
+
+        DC_LoaTS_Helper.isRightClickEvent = function(evt) {
+            // evt.which for IE6,7,8/Opera. evt.button for everyone else
+            return (evt.button && (evt.button == 2)) || (evt.which && (evt.which == 3));
+        };
+
+        DC_LoaTS_Helper.getEventTarget = function(evt) {
+            var target = evt.target || evt.srcElement;
+
+            // Safari work around, not that we even support Safari...
+            if (target.nodeType && target.nodeType == 3)
+            {
+                target = target.parentNode;
+            }
+
+            return target;
+        };
 		
 		// Should prevent the event from doing its normal action
 		// like selecting text on click and drag.
@@ -8545,6 +8707,21 @@ DC_LoaTS_Helper.raids =
 		    }
 		    return false;
 		};
+
+		// Should prevent the event from propagating to Kongregate code
+		DC_LoaTS_Helper.stopEventPropagation = function(evt)
+		{
+		    if (evt && evt.stopPropagation)
+		    {
+		        evt.stopPropagation();
+		    }
+		    return false;
+		};
+
+        // Borrowed from http://stackoverflow.com/a/384380
+        DC_LoaTS_Helper.isElement = function(o) {
+            return o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string";
+        };
 
 		// Pretty format health / damage numbers
 		DC_LoaTS_Helper.prettyFormatNumber = function(num)
@@ -8673,39 +8850,41 @@ DC_LoaTS_Helper.raids =
 						// Iterate over all possible states
 						// This is basically a hack for the fact that the 
 						// STATEs don't have any inherit ordinal values that could be incremented
-						//TODO: Reorganize STATE to have ordinals if this ever happens somewhere else in the code
-						for (var stateKey in RaidManager.STATE)
-						{
-							// Grab the state
-							var state = RaidManager.STATE[stateKey];
-							
-							// Make sure this isn't a function or anything from STATE
-							if (typeof state == "object")
-							{
-								// If this is the first state we've seen
-								if (typeof firstState == "undefined")
-								{
-									// Capture it so we can roll back around past the last state
-									firstState = state;
-								}
-							
-								// If this is the same state as the link is currently in
-								if (RaidManager.STATE.equals(linkState, state))
-								{
-									// Note the current state
-									foundCurrent = true;
-								}
-								// If we found current, this must be the next state
-								else if (foundCurrent)
-								{
-									// Grab this state to save as the new state
-									newLinkState = state;
-									
-									// Don't accidentally find other states
-									break;
-								}
-							}
-						}
+                        //TODO: Reorganize STATE to have ordinals if this ever happens somewhere else in the code
+                        for (var stateKey in RaidManager.STATE)
+                        {
+                            if (RaidManager.STATE.hasOwnProperty(stateKey)) {
+                                // Grab the state
+                                var state = RaidManager.STATE[stateKey];
+
+                                // Make sure this isn't a function or anything from STATE
+                                if (typeof state == "object")
+                                {
+                                    // If this is the first state we've seen
+                                    if (typeof firstState == "undefined")
+                                    {
+                                        // Capture it so we can roll back around past the last state
+                                        firstState = state;
+                                    }
+
+                                    // If this is the same state as the link is currently in
+                                    if (RaidManager.STATE.equals(linkState, state))
+                                    {
+                                        // Note the current state
+                                        foundCurrent = true;
+                                    }
+                                    // If we found current, this must be the next state
+                                    else if (foundCurrent)
+                                    {
+                                        // Grab this state to save as the new state
+                                        newLinkState = state;
+
+                                        // Don't accidentally find other states
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 						
 						// If we did not find a new state to set it to
 						if (typeof newLinkState == "undefined")
@@ -8758,40 +8937,15 @@ DC_LoaTS_Helper.raids =
 				// Don't cancel the click
 				return;
 			}
-			
-			// Detect right click
-			var rightclick;
-			if (event.which)
-			{
-				rightclick = (event.which == 3);
-			}
-			else if (event.button)
-			{
-				rightclick = (event.button == 2);
-			}
-			
+
 			// Only care about right clicks
-			if (rightclick)
+			if (DC_LoaTS_Helper.isRightClickEvent(event))
 			{
 				// Get the target element
-				var target;			
-				if (event.target) 
-				{
-					target = event.target;
-				}
-				else if (event.srcElement)
-				{
-					target = event.srcElement;
-				}
-				
-				// Safari work around
-				if (target.nodeType == 3)
-				{
-					target = target.parentNode;
-				}
+				var target = DC_LoaTS_Helper.getEventTarget(event);
 
 				// If there was no target
-				if (typeof target == "undefined")
+				if (typeof target === "undefined")
 				{
 					console.warn("Couldn't locate the target for right-click detection");
 					
@@ -8838,14 +8992,266 @@ DC_LoaTS_Helper.raids =
 					console.warn(raidLink);
 				}
 			}
-			
-
 		};
-		
-		// Force the download of some data as a file
+
+        DC_LoaTS_Helper.handleMessageWindowClickHandler = function() {
+            DCDebug("Utilities.js: DC_LoaTS_Helper.handleMessageWindowClickHandler");
+            var lctw = DC_LoaTS_Helper.getPref("LeftClickToWhisper", true);
+            DCDebug("LeftClickToWhisper: ", lctw);
+            if (holodeck._chat_window && holodeck._chat_window._chat_rooms_container_node) {
+                // We should be attaching the left click handler
+                if (lctw) {
+                    // This destroys the existing Kong functionality of left-clicking to load mini-profile
+                    ChatDialogue.MESSAGE_TEMPLATE.template = ChatDialogue.MESSAGE_TEMPLATE.template.replace('username="#{username}"', '_username="#{username}"');
+
+                    // Actually register the click handler onto the node
+                    DC_LoaTS_Helper.registerEventHandler(
+                        holodeck._chat_window._chat_rooms_container_node,
+                        "click",
+                        DC_LoaTS_Helper.messageWindowClick
+                    );
+
+                    // Register the click handler to hide the menu on the body
+                    DC_LoaTS_Helper.registerEventHandler(
+                        document.body,
+                        "click",
+                        DC_LoaTS_Helper.hideContextMenu
+                    );
+                }
+                else {
+                    // This repairs the existing Kong functionality of left-clicking to load mini-profile
+                    ChatDialogue.MESSAGE_TEMPLATE.template = ChatDialogue.MESSAGE_TEMPLATE.template.replace('_username="#{username}"', 'username="#{username}"');
+
+                    // Actually unregister the click handler onto the node
+                    DC_LoaTS_Helper.unregisterEventHandler(
+                        holodeck._chat_window._chat_rooms_container_node,
+                        "click",
+                        DC_LoaTS_Helper.messageWindowClick
+                    );
+
+                    // Unregister the click handler to hide the menu on the body
+                    DC_LoaTS_Helper.unregisterEventHandler(
+                        document.body,
+                        "click",
+                        DC_LoaTS_Helper.hideContextMenu
+                    );
+
+                }
+            }
+            else {
+                DCDebug("Waiting 1 second to try again");
+                setTimeout(DC_LoaTS_Helper.handleMessageWindowClickHandler, 1000);
+            }
+        };
+
+        DC_LoaTS_Helper.handleMessageWindowContextMenuHandler = function() {
+            DCDebug("Utilities.js: DC_LoaTS_Helper.handleMessageWindowContextMenuHandler");
+            var rcm = DC_LoaTS_Helper.getPref("RightClickUserMenu", true);
+            DCDebug("RightClickUserMenu: ", rcm);
+            if (holodeck._chat_window && holodeck._chat_window._chat_rooms_container_node) {
+                // We should be attaching the context menu
+                if (rcm) {
+                    // Actually register the click handler onto the node
+                    DC_LoaTS_Helper.registerEventHandler(
+                        holodeck._chat_window._chat_rooms_container_node,
+                        "contextmenu",
+                        DC_LoaTS_Helper.messageWindowRightClick
+                    );
+                }
+                else {
+                    // Unregister the click handler onto the node
+                    DC_LoaTS_Helper.unregisterEventHandler(
+                        holodeck._chat_window._chat_rooms_container_node,
+                        "contextmenu",
+                        DC_LoaTS_Helper.messageWindowRightClick
+                    );
+                }
+            }
+            else {
+                DCDebug("Waiting 1 second to try again");
+                setTimeout(DC_LoaTS_Helper.handleMessageWindowContextMenuHandler, 1000);
+            }
+        };
+
+        DC_LoaTS_Helper.messageWindowClick = function(event) {
+            var ret,
+                lctw = DC_LoaTS_Helper.getPref("LeftClickToWhisper", true),
+                username;
+
+            if (lctw) {
+                // If we've altered the left click functionality (lctw==true), the username will be in _username
+                if (event.target &&
+                    (username = event.target.getAttribute("_username") || event.target.getAttribute("username"))) {
+
+                    // Is it a left click
+                    if (DC_LoaTS_Helper.isLeftClickEvent(event)) {
+                        // Since we're doing this, don't let any other actions have it
+                        DC_LoaTS_Helper.stopDefaultEventAction(event);
+
+                        DCDebug("Caught left click on name", event, username);
+
+                        // Insert the /w username into the chat area
+                        holodeck.chatWindow().insertPrivateMessagePrefixFor(username);
+                        ret = false;
+                    }
+                }
+            }
+
+            return ret;
+        };
+
+        DC_LoaTS_Helper.messageWindowRightClick = function(event) {
+            var ret,
+                rcm = DC_LoaTS_Helper.getPref("RightClickUserMenu", true),
+                contextMenu,
+                username, coords;
+
+            if (rcm) {
+                // If we've altered the left click functionality (lctw==true), the username will be in _username
+                if (event.target &&
+                    (username = event.target.getAttribute("_username") || event.target.getAttribute("username"))) {
+
+                    // Since we're doing this, don't let any other actions have it
+                    DC_LoaTS_Helper.stopDefaultEventAction(event);
+
+                    DCDebug("Caught right click on name", event, username);
+
+                    // Hide the existing context menu
+                    DC_LoaTS_Helper.hideContextMenu();
+
+                    // Get the absolute coordinates of mouse event
+                    coords = DC_LoaTS_Helper.getMouseEventCoords(event);
+
+                    DCDebug("Utilities.js: Right click event", event);
+
+                    // Create context menu
+                    contextMenu = DC_LoaTS_Helper.createUserContextMenu(username);
+
+                    // Pop-up context menu
+                    DC_LoaTS_Helper.showContextMenu(contextMenu, coords.x, coords.y);
+
+                    ret = false;
+                }
+            }
+
+            return ret;
+        };
+
+        DC_LoaTS_Helper.getMouseEventCoords = function(e) {
+            var posx = 0,
+                posy = 0;
+            e = e || window.event;
+
+            if (e.pageX || e.pageY) 	{
+                posx = e.pageX;
+                posy = e.pageY;
+            }
+            else if (e.clientX || e.clientY) 	{
+                posx = e.clientX + document.body.scrollLeft
+                    + document.documentElement.scrollLeft;
+                posy = e.clientY + document.body.scrollTop
+                    + document.documentElement.scrollTop;
+            }
+
+            return {x: posx, y: posy};
+        };
+
+        DC_LoaTS_Helper.userContextMenuItems = [
+            {
+                text: "{username}'s Kong Profile",
+                title: "Show {username}'s Kongregate mini-profile normally shown on left-clicks",
+                fn: holodeck.chatWindow().showProfile.bind(holodeck.chatWindow())
+            },
+            {
+                text: "Add Friend",
+                title: "Add {username} as your friend",
+                condition: DC_LoaTS_Helper.not(DC_LoaTS_Helper.isFriend),
+                fn: DC_LoaTS_Helper.addFriend
+            },
+            {
+                text: "Unfriend",
+                title: "Remove {username} from your friends list",
+                condition: DC_LoaTS_Helper.isFriend,
+                fn: DC_LoaTS_Helper.removeFriend
+            }
+        ];
+
+        DC_LoaTS_Helper.createUserContextMenu = function (username) {
+            DCDebug("Utilities.js: Creating Context Menu for user " + username);
+            var menu = document.createElement("ul"),
+                itemDef, li, a;
+            menu.id = "DC_LoaTS_contextMenu";
+            menu.className = "context-menu user-context-menu";
+            for (var i = 0; i < DC_LoaTS_Helper.userContextMenuItems.length; i++) {
+                itemDef = DC_LoaTS_Helper.userContextMenuItems[i];
+                a = null;
+
+                DCDebug("Utilities.js: itemDef: ", itemDef);
+
+                if (typeof itemDef.condition === "undefined" ||
+                    (typeof itemDef.condition === "function" && itemDef.condition(username))) {
+                    li = document.createElement("li");
+                    li.className = "menu-item";
+
+
+                    if (itemDef.fn) {
+                        a = document.createElement("a");
+                        a.onclick = DC_LoaTS_Helper.chain(
+                            itemDef.fn.bind(this, username),
+                            function(clickEvent) {
+                                DC_LoaTS_Helper.stopDefaultEventAction(clickEvent);
+                                DC_LoaTS_Helper.stopEventPropagation(clickEvent);
+                                DC_LoaTS_Helper.hideContextMenu(menu);
+                            });
+                        li.appendChild(a);
+                    }
+
+                    if (itemDef.title) {
+                        (a||li).title = itemDef.title.replace("{username}", username);
+                    }
+                    if (itemDef.text) {
+                        (a||li).appendChild(document.createTextNode(itemDef.text.replace("{username}", username)));
+                    }
+
+                    menu.appendChild(li);
+                }
+            }
+
+            DCDebug("Utilities.js: Created Menu", menu);
+
+            return menu;
+        };
+
+        DC_LoaTS_Helper.showContextMenu = function (contextMenu, x, y) {
+            DCDebug("Utilities.js: showContextMenu ", arguments);
+            if (DC_LoaTS_Helper.contextMenu) {
+                DC_LoaTS_Helper.hideContextMenu(DC_LoaTS_Helper.contextMenu);
+            }
+            DC_LoaTS_Helper.contextMenu = contextMenu;
+            contextMenu.style.position = "absolute";
+            contextMenu.style.left = x + "px";
+            contextMenu.style.top = y + "px";
+            contextMenu.style.visible = "visible";
+            contextMenu.style.display = "auto";
+            document.body.appendChild(contextMenu);
+        };
+
+        DC_LoaTS_Helper.hideContextMenu = function(contextMenu) {
+            // If this is a click event or something, it's not an element
+            if (!DC_LoaTS_Helper.isElement(contextMenu)) {
+                contextMenu = null;
+            }
+            contextMenu = contextMenu || DC_LoaTS_Helper.contextMenu || document.getElementById("DC_LoaTS_contextMenu");
+            DCDebug("Hiding Context Menu: ", DC_LoaTS_Helper.isElement(contextMenu), contextMenu, DC_LoaTS_Helper.contextMenu, document.getElementById("DC_LoaTS_contextMenu"));
+            contextMenu && contextMenu.parentNode.removeChild(contextMenu);
+            DC_LoaTS_Helper.contextMenu = null;
+        };
+
+
+        // Force the download of some data as a file
 		// Works nice on some browsers
 		// Title parameter only works in some browsers as well.
-		DC_LoaTS_Helper.forceDownload = function(data, title)
+		DC_LoaTS_Helper.forceDownload = function(data/*, title*/)
 		{
 //			// Awesome style
 //			window.requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
@@ -8957,7 +9363,7 @@ DC_LoaTS_Helper.raids =
 		    	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data));
 //			}
 		    return true; 
-		}
+		};
 		
 		// Pastebin API
 		DC_LoaTS_Helper.PastebinAPI = {
@@ -9091,9 +9497,9 @@ DC_LoaTS_Helper.raids =
 					{
                         DC_LoaTS_Helper.getGameIframe_old = DC_LoaTS_Helper.getGameIframe;
 
-						// Needed for the creation of GameIframe
+						// Needed for the creation of GameIframe. It's part of the eval process.
 						var urlOptions = '';
-						
+
 						// Parse and return the existing iframe options
 						var optionsVal = eval(match[1]);
 
@@ -9139,7 +9545,7 @@ DC_LoaTS_Helper.raids =
 				else if (typeof raidParam === "string")
 				{
 					// Create a raid link from the url
-					var raidLink = new RaidLink(raidParam);
+					raidLink = new RaidLink(raidParam);
 				}
 				
 				// If the link is valid
@@ -9155,7 +9561,9 @@ DC_LoaTS_Helper.raids =
 						
 						for (var option in iframe_options)
 						{
-							collapsedOptions += option + "=" + iframe_options[option] + "&";
+                            if (iframe_options.hasOwnProperty(option)) {
+                                collapsedOptions += option + "=" + iframe_options[option] + "&";
+                            }
 						}
 						
 						DC_LoaTS_Helper.ajax({
@@ -9210,7 +9618,7 @@ DC_LoaTS_Helper.raids =
 			DCDebug("Ajax Raid Join: ", raidLink.raidTypeId + " (" + raidLink.id + ")", " Message: ", raidJoinMessage);
 			
 			// Get the current state of the raid form the cache
-			var oldState = RaidManager.fetchState(raidLink)
+			var oldState = RaidManager.fetchState(raidLink);
 			
 			if (responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
@@ -9466,7 +9874,7 @@ DC_LoaTS_Helper.raids =
 					var took = (endTime - startTime)/1000;
 					holodeck.activeDialogue().raidBotMessage("Load ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
 				}
-			}
+			};
 			
 
 			// Kick off the auto loading
@@ -9486,7 +9894,7 @@ DC_LoaTS_Helper.raids =
 			var didReload = false;
 			
 			// Try to reload the game
-			if (typeof activateGame  != "undefined")
+			if (typeof activateGame  !== "undefined")
 			{
 				holodeck.activeDialogue().raidBotMessage("Reloading game, please wait...");
 				activateGame();
@@ -9513,6 +9921,8 @@ DC_LoaTS_Helper.raids =
 			
 			// Find all the styles matching this filter
 			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
+
+            var i;
 			
 			//console.log("Ignore: ", ignore);
 			if (ignore === true) {
@@ -9530,7 +9940,7 @@ DC_LoaTS_Helper.raids =
 				else
 				{
 					var found = false;
-					for (var i = 0; i < matchingStyles.length; i++) {
+					for (i = 0; i < matchingStyles.length; i++) {
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							found = true;
 							break;
@@ -9547,7 +9957,7 @@ DC_LoaTS_Helper.raids =
 				// - If yes, disable it
 				// - If no, do nothing
 				if (typeof matchingStyles !== "undefined") {
-					for (var i = 0; i < matchingStyles.length; i++) {
+					for (i = 0; i < matchingStyles.length; i++) {
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							matchingStyles.splice(i, 1);
 							break;
@@ -9608,168 +10018,6 @@ DC_LoaTS_Helper.raids =
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
-			/*
-			// If updating posted links is locked
-			if (DC_LoaTS_Helper.upl.lock) {
-				DCDebug("UPL already locked trying to update: " + (raidLink ? raidLink.id : "ALL"));
-				// No raidLink provided. Load everything
-				if (!raidLink) {
-					DC_LoaTS_Helper.upl.next.refreshAll = true;
-					delete DC_LoaTS_Helper.upl.next.list;
-				}
-				// If we're not loading all
-				else if (!DC_LoaTS_Helper.upl.next.refreshAll) {
-					// Make sure the list is ready
-					if (!DC_LoaTS_Helper.upl.next.list) {
-						DC_LoaTS_Helper.upl.next.list = [];
-					}
-					DC_LoaTS_Helper.upl.next.list.push(raidLink);
-				}
-				
-				// If updating posted links became unlocked
-				if (DC_LoaTS_Helper.upl.lock) {
-					// Lock it
-					DC_LoaTS_Helper.upl.lock = true;
-					DCDebug("UPL became unlocked during update: " + (raidLink ? raidLink.id : "ALL"));
-					DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
-
-					// In theory, we now have the lock and other code can't get in here
-
-					// Copy over the important values
-					DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
-					DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
-					
-					// Clear out the nexts
-					DC_LoaTS_Helper.upl.next.refreshAll = false;
-					delete DC_LoaTS_Helper.upl.next.list;
-
-					DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
-					// Run the private runner. Will do the unlock for us
-					_upl();
-				}
-				// If it's still locked, don't do anything
-			}
-			else {
-				// Lock it
-				DC_LoaTS_Helper.upl.lock = true;
-				DCDebug("UPL already unlocked for: " + (raidLink ? raidLink.id : "ALL"));
-				DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
-				
-				// In theory, we now have the lock and other code can't get in here
-
-				// Set the important values
-				DC_LoaTS_Helper.upl.now.refreshAll = !raidLink;
-				DC_LoaTS_Helper.upl.now.list = raidLink ? [raidLink] : undefined;
-
-				DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
-				// Run the private runner. Will do the unlock for us
-				_upl();
-			}
-			
-			// Private function
-			function _upl() {
-				// At this time, we can assume that the locks prevent this code from every being run
-				// more than once at a time, and that the upl.now variables are set and won't change
-				
-				// Set a timeout to avoid sucking up all the cpu
-				setTimeout(function()
-				{
-					Timer.start("updatePostedLinksTimeout");
-					DCDebug("Running UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
-					try 
-					{
-						// Look up all raid links in chat
-						var elems = $("play").getElementsByClassName("raidMessage");
-						
-						// Retrieve the message format
-						var messageFormat = DC_LoaTS_Helper.getMessageFormat();
-						
-						// Retrieve the link format
-						var linkFormat = DC_LoaTS_Helper.getLinkFormat();
-						
-						// Iterate over all link elements in the chat
-						for (var i = 0; i < elems.length; i++)
-						{
-							// Convert them to RaidLink objects
-							var elem = elems[i];
-							var newRaidLink = new RaidLink(elem.children[0].href);
-							
-							// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-							if (newRaidLink.isValid() && (DC_LoaTS_Helper.upl.now.refreshAll || DC_LoaTS_Helper.listContainsRaid(DC_LoaTS_Helper.upl.now.list, newRaidLink)))
-							{
-								// Restyle the message as appropriate
-								var styles = newRaidLink.getMatchedStyles();
-								
-								// TODO: Eventually figure out how to style whispers without it being a PITA especially raidbot seenraids whispers
-								if ((elem.parentNode.parentNode.parentNode.className || "").indexOf("hisper") < 0) {
-									
-									// Remove existing doomscript styles. We don't want to double them up or anything weird
-									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "").trim();
-
-									// If there are styles, apply them
-									if (styles && styles.className)
-									{
-										// Append to the existing styles
-										elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
-									}
-								}
-								
-								// Remove the old link, and shove in the new, formatted, styled one
-								elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
-								elem.remove();
-							}
-							else if (!newRaidLink.isValid())
-							{
-								console.warn("Element did not produce a valid raid link:");
-								console.warn(elem);
-							}
-							else if (newRaidLink.hash === raidLink.hash || raidLink.id === newRaidLink.id)
-							{
-								DCDebug("Similar links found while updating posted links, but not similar enough?");
-								DCDebug(raidLink);
-								DCDebug(newRaidLink);
-							}
-						}
-					}
-					catch (e)
-					{
-						console.warn(e);
-					}
-					
-					// If there's other stuff to run
-					if (DC_LoaTS_Helper.upl.next.refreshAll || DC_LoaTS_Helper.upl.next.list) {
-						DCDebug("Additional links available. Scheduling UPL again for: ", DC_LoaTS_Helper.upl.next.list, " refreshAll: " + DC_LoaTS_Helper.upl.next.refreshAll);
-						setTimeout(function() {
-							// Copy over the important values
-							DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
-							DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
-							
-							// Clear out the nexts
-							DC_LoaTS_Helper.upl.next.refreshAll = false;
-							delete DC_LoaTS_Helper.upl.next.list;
-	
-							DCDebug("Calling UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
-							// Run the private runner. Will do the unlock for us
-							_upl();
-						// If we go to run this again, don't run it too soon
-						}, 500);
-					}
-					else {
-						DCDebug("Unlocking UPL");
-						DC_LoaTS_Helper.upl.lock = false;
-					}
-					Timer.stop("updatePostedLinksTimeout");
-				}, 100);
-			}
-			
-			
-			
-			*/
-			
-			
-			
-			
-			
 			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout !== "undefined")
 			{
 				clearTimeout(DC_LoaTS_Helper.updatePostedLinksTimeout);
@@ -9926,7 +10174,7 @@ DC_LoaTS_Helper.raids =
 				elem.removeClassName("DC_LoaTS_checkingForUpdate");
 			}
 		    
-			
+			// TODO Migrate to use DC_LoaTS_Helper.ajax?
 			new Ajax.Request(DC_LoaTS_Properties.updateURL,
 				{
 					method: 'get',
@@ -10342,7 +10590,7 @@ DC_LoaTS_Helper.raids =
 
 		DC_LoaTS_Helper.doWRTimer = function() {
 			var wr = DC_LoaTS_Helper.worldRaidInfo;
-			var timerText = "No current WR or WR is over."
+			var timerText = "No current WR or WR is over.";
 			if (typeof wr === "object" && wr.timerEnds) {
 				var now = new Date();
 				var timerEnds = new Date(wr.timerEnds);
@@ -10372,7 +10620,7 @@ DC_LoaTS_Helper.raids =
 					wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
 				}
 			}
-		}
+		};
 		
 		DC_LoaTS_Helper.timeDifference = function(current, previous) {
 
@@ -10433,6 +10681,22 @@ DC_LoaTS_Helper.raids =
 			}).call(new Date())
 		};
 
+        DC_LoaTS_Helper.__debug_generatePostImageBlocks = function() {
+            for (var i in DC_LoaTS_Helper.raids) {
+                if (DC_LoaTS_Helper.raids.hasOwnProperty(i)) {
+                    var a = document.createElement("a"),
+                        img = document.createElement("img");
+                    img.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + i + "_1.jpg";
+                    img.title = i + " - " + DC_LoaTS_Helper.raids[i].shortName;
+                    img.onerror = RaidLink.fixBrokenImage;
+
+                    a.href = "?kv_raid_boss=" + i + "&kv_hash=test&kv_raid_id=123";
+                    a.appendChild(img);
+
+                    document.body.appendChild(a);
+                }
+            }
+        };
 
 		DC_LoaTS_Helper.generateUUID = function()
 		{
@@ -10507,533 +10771,560 @@ DC_LoaTS_Helper.raids =
 	// Define some CSS Styles
 	function defineStyles()
 	{
-				var rulesText = "abbr, acronym, span.abbr {\n";
-				rulesText += "\tborder-bottom: 1px dashed #444444;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.smallText {\n";
-				rulesText += "\tfont-size: 85%;\n";
-				rulesText += "}\n";
-				
-				
-				rulesText += "\na.DC_LoaTS_updateLink {\n";
-				rulesText += "\tbackground: #BAE37F url(http://userscripts.org/images/sprite.png?2) right -130px no-repeat;\n";
-				rulesText += "\tborder: 1px solid #888; padding: 2px 16px;\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tfont-weight: bold;\n";
-				rulesText += "\tfont-size: 1.5em;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "\tcolor: #004 !important;\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "}\n";
-								
-                rulesText += "\na.DC_LoaTS_updateLink:hover {\n";
-                rulesText += "\tcolor: #08F !important;\n";
-                rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
-                rulesText += "}\n";
-                
-                
-                rulesText += "\nimg.raidIcon {\n";
-                rulesText += "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;\n";
-                rulesText += "}\n";
-                
-                
-				// -- Raid Menu Styles -- \\
-				
-				rulesText += "\n#DC_LoaTS_raidMenu {\n";
-//				rulesText += "\theight: 60%;\n";
-				rulesText += "\twidth: 775px;\n";
-//				rulesText += "\tbackground: #062834;\n";
-//				rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
-				rulesText += "\tposition: fixed;\n";
-				rulesText += "\tleft: 7%;\n";
-				rulesText += "\ttop: 20%;\n";
-				rulesText += "\tz-index: 99999999;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-//				rulesText += "\tborder:  2px solid #93CDD0;\n";
-				rulesText += "}\n";
+        console.info("Defining doomscript styles");
 
-				rulesText += "\n#DC_LoaTS_raidMenuClose {\n";
-				rulesText += "\tfloat: right;\n";
-				rulesText += "\tdisplay: block;\n";
-				rulesText += "\twidth: 50px;\n";
-				rulesText += "\theight: 45px;\n";
-				rulesText += "\tcursor: pointer;\n";
-				rulesText += "}\n";
+        var rulesText = [
+        "abbr, acronym, span.abbr {",
+        "\tborder-bottom: 1px dashed #444444;",
+        "}",
+
+        "\n.smallText {",
+        "\tfont-size: 85%;",
+        "}",
 
 
-				rulesText += "\n#DC_LoaTS_raidMenuTitleBar {\n";
-				rulesText += "\tbackground: #347D87 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menutitlebarbg.png) 50% 50% repeat-x;\n";
-				//rulesText += "\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
-				rulesText += "\tpadding:  2px 10px;\n";
-				rulesText += "\tborder-top-left-radius: 5px;\n";
-//				rulesText += "\tborder-top-right-radius: 5px;\n";
-				rulesText += "\tborder-right-width: 0px;\n";
-				rulesText += "\twidth: 702px;\n";
-				rulesText += "\theight: 37px;\n";
-				rulesText += "\tcursor: move;\n";
-				rulesText += "\tfont-size: 15pt;\n";
-				rulesText += "\tcolor: #DEECED;\n";
-				rulesText += "\tborder: 3px solid #93CDD0;\n";
-				rulesText += "\tborder-bottom: 1px solid #062834;\n";
-				rulesText += "\tborder-right-width: 0px;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
+        "\na.DC_LoaTS_updateLink {",
+        "\tbackground: #BAE37F url(http://userscripts.org/images/sprite.png?2) right -130px no-repeat;",
+        "\tborder: 1px solid #888; padding: 2px 16px;",
+        "\ttext-decoration: none;",
+        "\tfont-weight: bold;",
+        "\tfont-size: 1.5em;",
+        "\ttext-align: center;",
+        "\tcolor: #004 !important;",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "}",
 
-				rulesText += "\n#DC_LoaTS_raidMenuTitleBarLeft {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTitleBarCenter {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "\tmargin: auto;\n";
-				rulesText += "\twidth: 400px;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTitleBarRight {\n";
-				rulesText += "\tfloat: right;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuBodyWrapper {\n";
-				rulesText += "\tbackground: #0E5969 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menubodywrapperbg.png) 50% 50% repeat;\n";
-				//rulesText += "\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;\n";
-				rulesText += "\tborder: 3px solid #93CDD0;\n";
-				rulesText += "\tborder-top-width: 0px;\n";
-				rulesText += "\tborder-bottom-left-radius: 5px;\n";
-				rulesText += "\tborder-bottom-right-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTabs {\n";
-				rulesText += "\tclear: both;\n";
-				rulesText += "\tborder-bottom: 1px solid #CCC;\n";
-				rulesText += "\theight: 23px;\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTabs li {\n";
-				rulesText += "\tlist-style: none;\n";
-				rulesText += "\tfont-family: Verdana, sans;\n";
-				rulesText += "\tfont-size: 11px;\n";
-				rulesText += "\tline-height: 18px;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "\tmargin-right: 5px;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "\t;\n";
-				rulesText += "\t;\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTabs li a {\n";
-				rulesText += "\tdisplay: block;\n";
-				rulesText += "\theight: 20px;\n";
-				rulesText += "\tpadding: 0px 6px;\n";
-				rulesText += "\twidth: 80px;\n";
-				rulesText += "\tbackground-color: #153041;\n";
-				rulesText += "\tborder: 2px solid #41B0B5;\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tborder-top-left-radius: 5px;\n";
-				rulesText += "\tborder-top-right-radius: 5px;\n";
-				rulesText += "\tfont-size: 115%;\n";
-				rulesText += "\tcolor: #FFFFFF;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidMenuTabs li a.active {\n";
-				rulesText += "\tbackground-color: #57959E;\n";
-				rulesText += "\tborder: 2px solid #F1FFFF;\n";
-				rulesText += "\tcolor: #B7E5EE;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.RaidMenuTab-Header {\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuOptionWrapper {\n";
-				rulesText += "\tborder-bottom: 1px solid #479090;\n";
-				rulesText += "\tmargin-bottom: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuOptionWrapper div{\n";
-				rulesText += "\tpadding: 5px;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuDescription{\n";
-				rulesText += "\tpadding-left: 15px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuPane {\n";
-				//rulesText += "\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;\n";
-				rulesText += "\tbackground: #77C0C0 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menupanebg.png) 50% bottom repeat-x;\n";
-				rulesText += "\tfont-size: 1.2em;\n";
-				rulesText += "\tpadding: 5px 10px;\n";
-				rulesText += "\tmin-height: 200px;\n";
-				rulesText += "\tmax-height: 600px;\n";
-				rulesText += "\toverflow: auto;\n";
-				rulesText += "\tclear: both;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuPane h1{\n";
-				rulesText += "\tborder-bottom: 1px solid #000000;\n";
-				rulesText += "\tmargin-bottom: 15px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_raidMenuPane h2{\n";
-				rulesText += "\tborder-bottom: 1px solid #479090;\n";
-				rulesText += "\tmargin-bottom: 10px;\n";
-				rulesText += "}\n";
-				
-				
-				
-				rulesText += "\n#RaidsMenu-SearchWrapper {\n";
-				rulesText += "\twidth: 50%;\n";
-				rulesText += "\tmargin: auto;\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#RaidsMenu-SearchBox {\n";
-				rulesText += "\twidth: 70%;\n";
-				rulesText += "\tmin-width: 150px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#RaidsMenu-ResultsBox {\n";
-				rulesText += "\tmax-height: 300px;\n";
-				rulesText += "\toverflow: auto;\n";
-				rulesText += "}\n";				
-				
-				rulesText += "\n#FormattingTab-MessageFormatTextArea {\n";
-				rulesText += "\twidth: 100%;\n";
-				rulesText += "\tmin-height: 35px;\n";
-				rulesText += "}\n";				
-				
-				
-				rulesText += "\n.FormattingTab-Button {\n";
-				rulesText += "\tpadding: 3px 15px 4px;\n";
-				rulesText += "}\n";				
-				
-				rulesText += "\n.StylesTab-RaidNamesPicker {\n";
-				rulesText += "\tfloat:left;\n";
-				rulesText += "}\n";				
-				
-				
-				rulesText += "\n#PreferencesMenu-LoadRaidsInBackgroundDelayInputWrapper input {\n";
-				rulesText += "\twidth: 30px;\n";
-				rulesText += "\theight: 10px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "}\n";				
-				
-				
-				rulesText += "\n#DC_LoaTS_notificationBar {\n";
-				rulesText += "\tbackground: #f8dc5a url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/notificationbg.png) 50% 50% repeat-x;\n";
-				//rulesText += "\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;\n";
-				rulesText += "\tpadding: 4px 10px; 0px\n";
-				rulesText += "\twidth: 100%;\n";
-				rulesText += "\tfont-size: 12pt;\n";
-				rulesText += "\tcolor: #915608;\n";
-				rulesText += "\tborder-bottom: 1px solid #fcd113;\n";
-				rulesText += "\tposition: fixed;\n";
-				rulesText += "\ttop: 0px;\n";
-				rulesText += "\tleft: 0px;\n";
-				rulesText += "\tz-index: 99999999;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_notificationBarTitle {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_notificationBarText {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_notificationBarButtons {\n";
-				rulesText += "\tfloat: right;\n";
-				rulesText += "\tpadding-top:1px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_notificationBarButtons a.DC_LoaTS_updateLink {\n";
-				rulesText += "\tfont-size: inherit;\n";
-				rulesText += "\tmargin-right:10px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\na.DC_LoaTS_notificationBarButton {\n";
-				rulesText += "\tbackground-color: #F9B83E;\n";
-				rulesText += "\tborder: 1px solid #915608;";
-				rulesText += "\tpadding: 2px 10px;\n";
-				rulesText += "\tmargin-right: 10px;\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tfont-weight: bold;\n";
-				rulesText += "\ttext-align: center;\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "}\n";
-								
-				rulesText += "\na.DC_LoaTS_notificationBarButton:hover {\n";
-				rulesText += "\tcolor: #915608;\n";
-				rulesText += "\tbackground: #FDE477;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer {\n";
-				rulesText += "\tcolor: #FFFFFF;\n";
-				rulesText += "\tlist-style: none;\n";
-				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\theight: 16px;\n";
-				rulesText += "\tpadding: 2px 5px;\n";
-				rulesText += "\ttext-align:left;\n";
-				rulesText += "}\n";
+        "\na.DC_LoaTS_updateLink:hover {",
+        "\tcolor: #08F !important;",
+        "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;",
+        "}",
 
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li {\n";
-				rulesText += "float:left;";
-				rulesText += "}\n";
-				
 
-				rulesText += "\na.DC_LoaTS_button {\n";
-				rulesText += "\twidth: 16px;\n";
-				rulesText += "\theight: 16px;\n";
-				rulesText += "\tbackground: url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/icons.png);\n";
-				rulesText += "\tbackground-repeat: no-repeat;\n";
-				rulesText += "\tcursor: pointer;\n";
-				rulesText += "\tdisplay: block;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "\ttext-indent: -99999px;\n";
-				rulesText += "}\n";
+        "\nimg.raidIcon {",
+        "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;",
+        "}",
 
-				rulesText += "\na.DC_LoaTS_menuButton {\n";
-				rulesText += "\tbackground-position: -48px -80px;";
-				rulesText += "}\n";
+        "\n.context-menu {",
+        "\tbackground-color: #433F3E;",
+        "\tcolor: #FFFFFF;",
+        "\tmin-width: 180px;",
+        "\tlist-style-type: none;",
+        "\tborder: 1px solid #000;",
+        "}",
 
-				rulesText += "\na.DC_LoaTS_reloadButton {\n";
-				rulesText += "\tbackground-position: -160px -64px;";
-				rulesText += "}\n";
+        "\n.menu-item {",
+        "\tcursor: pointer;",
+        "}",
 
-                rulesText += "\na.DC_LoaTS_toggleGameButton {\n";
-                rulesText += "\tbackground-position: 0 -176px;";
-                rulesText += "}\n";
+        "\n.menu-item a {",
+        "\tdisplay: block;",
+        "\ttext-decoration: none;",
+        "\tpadding: 5px 5px 5px 20px;",
+        "}",
 
-                rulesText += "\na.DC_LoaTS_toggleWorldChatButton {\n";
-                rulesText += "\tbackground-position: -128px -96px;";
-                rulesText += "}\n";
+        "\n.menu-item a:hover {",
+        "\tbackground-color: #710000;",
+        "\tcolor: #FFFFFF;",
+        "}",
 
-				rulesText += "\na.DC_LoaTS_WRButton {\n";
-				rulesText += "\ttext-indent: 0px;\n";
-				rulesText += "\tbackground: none;\n";
-				rulesText += "\twidth: auto;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\na.DC_LoaTS_WRButton:hover {\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tbackground-color: #71A5CE;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li.DC_LoaTS_WRButtonWrapper {\n";
-				rulesText += "\tfloat: right;\n";
-				rulesText += "}\n";
-				
 
-				rulesText += "\n.DC_LoaTS_omnibox {\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\tborder-color: #FFFFFF;\n";
-				rulesText += "\tbackground-color: #71A5CE;\n";
-				rulesText += "\tpadding: 0px 2px !important;\n";
-				rulesText += "}\n";
-								
-				rulesText += "\n.DC_LoaTS_omnibox_focus {\n";
-				rulesText += "\tborder-color: #71A5CE;\n";
-				rulesText += "\tbackground-color: #FFFFFF;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_omniboxWrapper {\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "\tposition: relative;\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.DC_LoaTS_omniboxCommandsWrapper {\n";
-				rulesText += "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;\n";
-				rulesText += "\tlist-style: none;\n";
-				rulesText += "\tz-index: 999;\n";
-				rulesText += "\tposition: absolute;\n";
-				rulesText += "\twidth: 630px;\n";
-				rulesText += "\tpadding: 5px;;\n";
-				rulesText += "\tborder-bottom-left-radius: 5px;\n";
-				rulesText += "\tborder-bottom-right-radius: 5px;\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
+        // -- Raid Menu Styles -- \\
 
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li{\n";
-				rulesText += "\tfloat:none;\n";
-				rulesText += "\tmargin: 0px;\n";
-				rulesText += "\tbackground-color: #051E2A;\n";
-				rulesText += "\tfont-size: 1.3em;\n";
-				rulesText += "\toverflow: hidden;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li a{\n";
-				rulesText += "\tdisplay: block;\n";
-				rulesText += "\tcolor: #EEEEEE;\n";
-				rulesText += "\ttext-decoration: none;\n";
-				rulesText += "\tfloat:left;\n";
-				rulesText += "\t-moz-border-radius: 5px;\n";
-				rulesText += "\t-webkit-border-radius: 5px;\n";
-				rulesText += "\tborder-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li a:hover{\n";
-				rulesText += "\tbackground-color: #57959E;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li:first-child{\n";
-				rulesText += "\tborder-top-left-radius: 5px;\n";
-				rulesText += "\tborder-top-right-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li:last-child{\n";
-				rulesText += "\tborder-bottom-left-radius: 5px;\n";
-				rulesText += "\tborder-bottom-right-radius: 5px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer li li a:first-child, #DC_LoaTS_raidToolbarContainer li li div:first-child{\n";
-				rulesText += "\tpadding-left: 10px !important;\n";
-				rulesText += "}\n";				
-				
-				//--- Onnibox Option Styles ---\\
-				
-				rulesText += "\n.DC_LoaTS_initialtext {\n";
-				rulesText += "\tfloat: left;\n";
-				rulesText += "\tpadding-left: 0px !important;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_omniboxOption {\n";
-				rulesText += "\tpadding: 2px 10px;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_any {\n";
-				rulesText += "\t;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_normal {\n";
-				rulesText += "\tcolor:#48C957;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_normal:hover {\n";
-				rulesText += "\tcolor:#FFFFFF;\n";
-				rulesText += "\tbackground-color:#48C957;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_hard {\n";
-				rulesText += "\tcolor:#E3E72E;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_hard:hover {\n";
-				rulesText += "\tcolor:#FFFFFF;\n";
-				rulesText += "\tbackground-color:#E3E72E;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_legendary {\n";
-				rulesText += "\tcolor:#CB0039;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_legendary:hover {\n";
-				rulesText += "\tcolor:#FFFFFF;\n";
-				rulesText += "\tbackground-color:#CB0039;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare {\n";
-				rulesText += "\tcolor:#B84EFE;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare:hover {\n";
-				rulesText += "\tcolor:#FFFFFF;\n";
-				rulesText += "\tbackground-color:#B84EFE;\n";
-				rulesText += "}\n";
-				
+        "\n#DC_LoaTS_raidMenu {",
+//				"\theight: 60%;",
+        "\twidth: 775px;",
+//				"\tbackground: #062834;",
+//				"\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;",
+        "\tposition: fixed;",
+        "\tleft: 7%;",
+        "\ttop: 20%;",
+        "\tz-index: 99999999;",
+        "\t-webkit-border-radius: 5px;",
+//				"\tborder:  2px solid #93CDD0;",
+        "}",
 
-				rulesText += "\na.raidDiffNormal:hover {\n";
-				rulesText += "\tcolor:#48C957;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\na.raidDiffHard:hover {\n";
-				rulesText += "\tcolor:#828505;\n";
-				rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuClose {",
+        "\tfloat: right;",
+        "\tdisplay: block;",
+        "\twidth: 50px;",
+        "\theight: 45px;",
+        "\tcursor: pointer;",
+        "}",
 
-				rulesText += "\na.raidDiffLegendary:hover {\n";
-				rulesText += "\tcolor:#CB0039;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\na.raidDiffNightmare:hover {\n";
-				rulesText += "\tcolor:#B84EFE;\n";
-				rulesText += "}\n";
-				
-				rulesText += "\n.hidden {\n";
-				rulesText += "\tdisplay: none;\n";
-				rulesText += "}\n";
-				
-				
-				rulesText += "\n.DataDumpTab-Data {\n";
-				rulesText += "\twidth: 100%;\n";
-				rulesText += "\theight: 400px;\n";
-				rulesText += "}\n";
 
-				rulesText += "\n.DC_LoaTS_raidMenuCloseTabA {\n";
-				rulesText += "\tborder-radius: 100px;\n";
-				rulesText += "\twidth: 5px;\n";
-				rulesText += "\theight: 5px;\n";
-				rulesText += "\tcolor: #FFFFFF;\n";
-				rulesText += "\tbackground-color: #CCCCCC;\n";
-				rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuTitleBar {",
+        "\tbackground: #347D87 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menutitlebarbg.png) 50% 50% repeat-x;",
+        //"\tbackground: #347D87 url(http://old.jqueryui.com/themeroller/images/?new=347d87&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;",
+        "\tpadding:  2px 10px;",
+        "\tborder-top-left-radius: 5px;",
+//				"\tborder-top-right-radius: 5px;",
+        "\tborder-right-width: 0px;",
+        "\twidth: 702px;",
+        "\theight: 37px;",
+        "\tcursor: move;",
+        "\tfont-size: 15pt;",
+        "\tcolor: #DEECED;",
+        "\tborder: 3px solid #93CDD0;",
+        "\tborder-bottom: 1px solid #062834;",
+        "\tborder-right-width: 0px;",
+        "\tfloat: left;",
+        "}",
 
-                rulesText += "\n#maingame {\n";
-                rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
-                rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
-                rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
-                rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuTitleBarLeft {",
+        "\tfloat: left;",
+        "}",
 
-                rulesText += "\n#maingame.hideWorldChat {\n";
-                rulesText += "\twidth: 1060px !important;\n";
-                rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuTitleBarCenter {",
+        "\tfloat: left;",
+        "\tmargin: auto;",
+        "\twidth: 400px;",
+        "\ttext-align: center;",
+        "}",
 
-                rulesText += "\n#game {\n";
-                rulesText += "\toverflow: hidden;\n";
-                rulesText += "\t-moz-transition: width .5s ease-out 0s;\n";
-                rulesText += "\t-webkit-transition: width .5s ease-out 0s;\n";
-                rulesText += "\t-o-transition: width .5s ease-out 0s;\n";
-                rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuTitleBarRight {",
+        "\tfloat: right;",
+        "}",
 
-                rulesText += "\n.hideWorldChat #game {\n";
-                rulesText += "\twidth: 759px !important;\n";
-                rulesText += "}\n";
+        "\n#DC_LoaTS_raidMenuBodyWrapper {",
+        "\tbackground: #0E5969 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menubodywrapperbg.png) 50% 50% repeat;",
+        //"\tbackground: #0E5969 url(http://old.jqueryui.com/themeroller/images/?new=0e5969&w=12&h=10&f=png&q=100&fltr[]=over|textures/18_hexagon.png|0|0|20) 50% 50% repeat;",
+        "\tborder: 3px solid #93CDD0;",
+        "\tborder-top-width: 0px;",
+        "\tborder-bottom-left-radius: 5px;",
+        "\tborder-bottom-right-radius: 5px;",
+        "}",
 
-                rulesText += "\n#gameholder {\n";
-                rulesText += "\twidth: auto !important;\n";
-                rulesText += "}\n";
+
+        "\n#DC_LoaTS_raidMenuTabs {",
+        "\tclear: both;",
+        "\tborder-bottom: 1px solid #CCC;",
+        "\theight: 23px;",
+        "}",
+
+        "\n#DC_LoaTS_raidMenuTabs li {",
+        "\tlist-style: none;",
+        "\tfont-family: Verdana, sans;",
+        "\tfont-size: 11px;",
+        "\tline-height: 18px;",
+        "\tfloat: left;",
+        "\tmargin-right: 5px;",
+        "\ttext-align: center;",
+        "}",
+
+        "\n#DC_LoaTS_raidMenuTabs li a {",
+        "\tdisplay: block;",
+        "\theight: 20px;",
+        "\tpadding: 0px 6px;",
+        "\twidth: 80px;",
+        "\tbackground-color: #153041;",
+        "\tborder: 2px solid #41B0B5;",
+        "\ttext-decoration: none;",
+        "\tborder-top-left-radius: 5px;",
+        "\tborder-top-right-radius: 5px;",
+        "\tfont-size: 115%;",
+        "\tcolor: #FFFFFF;",
+        "}",
+
+        "\n#DC_LoaTS_raidMenuTabs li a.active {",
+        "\tbackground-color: #57959E;",
+        "\tborder: 2px solid #F1FFFF;",
+        "\tcolor: #B7E5EE;",
+        "}",
+
+        "\n.RaidMenuTab-Header {",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuOptionWrapper {",
+        "\tborder-bottom: 1px solid #479090;",
+        "\tmargin-bottom: 5px;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuOptionWrapper div{",
+        "\tpadding: 5px;",
+        "\tfloat: left;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuDescription{",
+        "\tpadding-left: 15px;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuPane {",
+        //"\tbackground: #77C0C0 url(http://old.jqueryui.com/themeroller/images/?new=77c0c0&w=1&h=100&f=png&q=100&fltr[]=over|textures/06_inset_hard.png|0|0|50) 50% bottom repeat-x;",
+        "\tbackground: #77C0C0 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/menupanebg.png) 50% bottom repeat-x;",
+        "\tfont-size: 1.2em;",
+        "\tpadding: 5px 10px;",
+        "\tmin-height: 200px;",
+        "\tmax-height: 600px;",
+        "\toverflow: auto;",
+        "\tclear: both;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuPane h1{",
+        "\tborder-bottom: 1px solid #000000;",
+        "\tmargin-bottom: 15px;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuPane h2{",
+        "\tborder-bottom: 1px solid #479090;",
+        "\tmargin-bottom: 10px;",
+        "}",
+
+
+
+        "\n#RaidsMenu-SearchWrapper {",
+        "\twidth: 50%;",
+        "\tmargin: auto;",
+        "\t;",
+        "}",
+
+        "\n#RaidsMenu-SearchBox {",
+        "\twidth: 70%;",
+        "\tmin-width: 150px;",
+        "}",
+
+        "\n#RaidsMenu-ResultsBox {",
+        "\tmax-height: 300px;",
+        "\toverflow: auto;",
+        "}",
+
+        "\n#FormattingTab-MessageFormatTextArea {",
+        "\twidth: 100%;",
+        "\tmin-height: 35px;",
+        "}",
+
+
+        "\n.FormattingTab-Button {",
+        "\tpadding: 3px 15px 4px;",
+        "}",
+
+        "\n.StylesTab-RaidNamesPicker {",
+        "\tfloat:left;",
+        "}",
+
+
+        "\n#PreferencesMenu-LoadRaidsInBackgroundDelayInputWrapper input {",
+        "\twidth: 30px;",
+        "\theight: 10px;",
+        "\tborder-radius: 5px;",
+        "\ttext-align: center;",
+        "}",
+
+
+        "\n#DC_LoaTS_notificationBar {",
+        "\tbackground: #f8dc5a url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/notificationbg.png) 50% 50% repeat-x;",
+        //"\tbackground: #f8dc5a url(http://old.jqueryui.com/themeroller/images/?new=f8dc5a&w=1&h=100&f=png&q=100&fltr[]=over|textures/03_highlight_soft.png|0|0|75) 50% 50% repeat-x;",
+        "\tpadding: 4px 10px; 0px",
+        "\twidth: 100%;",
+        "\tfont-size: 12pt;",
+        "\tcolor: #915608;",
+        "\tborder-bottom: 1px solid #fcd113;",
+        "\tposition: fixed;",
+        "\ttop: 0px;",
+        "\tleft: 0px;",
+        "\tz-index: 99999999;",
+        "}",
+
+        "\n#DC_LoaTS_notificationBarTitle {",
+        "\tfloat: left;",
+        "}",
+
+        "\n#DC_LoaTS_notificationBarText {",
+        "\tfloat: left;",
+        "}",
+
+        "\n#DC_LoaTS_notificationBarButtons {",
+        "\tfloat: right;",
+        "\tpadding-top:1px;",
+        "}",
+
+        "\n#DC_LoaTS_notificationBarButtons a.DC_LoaTS_updateLink {",
+        "\tfont-size: inherit;",
+        "\tmargin-right:10px;",
+        "}",
+
+        "\na.DC_LoaTS_notificationBarButton {",
+        "\tbackground-color: #F9B83E;",
+        "\tborder: 1px solid #915608;",
+        "\tpadding: 2px 10px;",
+        "\tmargin-right: 10px;",
+        "\ttext-decoration: none;",
+        "\tfont-weight: bold;",
+        "\ttext-align: center;",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "}",
+
+        "\na.DC_LoaTS_notificationBarButton:hover {",
+        "\tcolor: #915608;",
+        "\tbackground: #FDE477;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer {",
+        "\tcolor: #FFFFFF;",
+        "\tlist-style: none;",
+        "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "\theight: 16px;",
+        "\tpadding: 2px 5px;",
+        "\ttext-align:left;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li {",
+        "float:left;",
+        "}",
+
+
+        "\na.DC_LoaTS_button {",
+        "\twidth: 16px;",
+        "\theight: 16px;",
+        "\tbackground: url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/icons.png);",
+        "\tbackground-repeat: no-repeat;",
+        "\tcursor: pointer;",
+        "\tdisplay: block;",
+        "\tfloat: left;",
+        "\ttext-indent: -99999px;",
+        "}",
+
+        "\na.DC_LoaTS_menuButton {",
+        "\tbackground-position: -48px -80px;",
+        "}",
+
+        "\na.DC_LoaTS_reloadButton {",
+        "\tbackground-position: -160px -64px;",
+        "}",
+
+        "\na.DC_LoaTS_toggleGameButton {",
+        "\tbackground-position: 0 -176px;",
+        "}",
+
+        "\na.DC_LoaTS_toggleWorldChatButton {",
+        "\tbackground-position: -128px -96px;",
+        "}",
+
+        "\na.DC_LoaTS_WRButton {",
+        "\ttext-indent: 0px;",
+        "\tbackground: none;",
+        "\twidth: auto;",
+        "\tborder-radius: 5px;",
+        "}",
+
+        "\na.DC_LoaTS_WRButton:hover {",
+        "\ttext-decoration: none;",
+        "\tbackground-color: #71A5CE;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li.DC_LoaTS_WRButtonWrapper {",
+        "\tfloat: right;",
+        "}",
+
+
+        "\n.DC_LoaTS_omnibox {",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "\tborder-color: #FFFFFF;",
+        "\tbackground-color: #71A5CE;",
+        "\tpadding: 0px 2px !important;",
+        "}",
+
+        "\n.DC_LoaTS_omnibox_focus {",
+        "\tborder-color: #71A5CE;",
+        "\tbackground-color: #FFFFFF;",
+        "}",
+
+        "\n.DC_LoaTS_omniboxWrapper {",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "\tposition: relative;",
+        "\tfloat: left;",
+        "}",
+
+        "\n.DC_LoaTS_omniboxCommandsWrapper {",
+        "\tbackground: #113552 url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/hexbg.png) 50% 50% repeat;",
+        "\tlist-style: none;",
+        "\tz-index: 999;",
+        "\tposition: absolute;",
+        "\twidth: 630px;",
+        "\tpadding: 5px;;",
+        "\tborder-bottom-left-radius: 5px;",
+        "\tborder-bottom-right-radius: 5px;",
+        "\t;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li{",
+        "\tfloat:none;",
+        "\tmargin: 0px;",
+        "\tbackground-color: #051E2A;",
+        "\tfont-size: 1.3em;",
+        "\toverflow: hidden;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li a{",
+        "\tdisplay: block;",
+        "\tcolor: #EEEEEE;",
+        "\ttext-decoration: none;",
+        "\tfloat:left;",
+        "\t-moz-border-radius: 5px;",
+        "\t-webkit-border-radius: 5px;",
+        "\tborder-radius: 5px;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li a:hover{",
+        "\tbackground-color: #57959E;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li:first-child{",
+        "\tborder-top-left-radius: 5px;",
+        "\tborder-top-right-radius: 5px;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li:last-child{",
+        "\tborder-bottom-left-radius: 5px;",
+        "\tborder-bottom-right-radius: 5px;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer li li a:first-child, #DC_LoaTS_raidToolbarContainer li li div:first-child{",
+        "\tpadding-left: 10px !important;",
+        "}",
+
+        //--- Onnibox Option Styles ---\\
+
+        "\n.DC_LoaTS_initialtext {",
+        "\tfloat: left;",
+        "\tpadding-left: 0px !important;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_omniboxOption {",
+        "\tpadding: 2px 10px;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_any {",
+        "\t;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_normal {",
+        "\tcolor:#48C957;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_normal:hover {",
+        "\tcolor:#FFFFFF;",
+        "\tbackground-color:#48C957;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_hard {",
+        "\tcolor:#E3E72E;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_hard:hover {",
+        "\tcolor:#FFFFFF;",
+        "\tbackground-color:#E3E72E;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_legendary {",
+        "\tcolor:#CB0039;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_legendary:hover {",
+        "\tcolor:#FFFFFF;",
+        "\tbackground-color:#CB0039;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare {",
+        "\tcolor:#B84EFE;",
+        "}",
+
+        "\n#DC_LoaTS_raidToolbarContainer a.DC_LoaTS_nightmare:hover {",
+        "\tcolor:#FFFFFF;",
+        "\tbackground-color:#B84EFE;",
+        "}",
+
+
+        "\na.raidLink {",
+        "\ttextDecoration: none;",
+        "}",
+
+        "\na.raidDiffNormal:hover {",
+        "\tcolor:#48C957;",
+        "}",
+
+        "\na.raidDiffHard:hover {",
+        "\tcolor:#828505;",
+        "}",
+
+        "\na.raidDiffLegendary:hover {",
+        "\tcolor:#CB0039;",
+        "}",
+
+        "\na.raidDiffNightmare:hover {",
+        "\tcolor:#B84EFE;",
+        "}",
+
+        "\n.hidden {",
+        "\tdisplay: none;",
+        "}",
+
+
+        "\n.DataDumpTab-Data {",
+        "\twidth: 100%;",
+        "\theight: 400px;",
+        "}",
+
+        "\n.DC_LoaTS_raidMenuCloseTabA {",
+        "\tborder-radius: 100px;",
+        "\twidth: 5px;",
+        "\theight: 5px;",
+        "\tcolor: #FFFFFF;",
+        "\tbackground-color: #CCCCCC;",
+        "}",
+
+        "\n#maingame {",
+        "\t-moz-transition: width .5s ease-out 0s;",
+        "\t-webkit-transition: width .5s ease-out 0s;",
+        "\t-o-transition: width .5s ease-out 0s;",
+        "}",
+
+        "\n#maingame.hideWorldChat {",
+        "\twidth: 1060px !important;",
+        "}",
+
+        "\n#game {",
+        "\toverflow: hidden;",
+        "\t-moz-transition: width .5s ease-out 0s;",
+        "\t-webkit-transition: width .5s ease-out 0s;",
+        "\t-o-transition: width .5s ease-out 0s;",
+        "}",
+
+        "\n.hideWorldChat #game {",
+        "\twidth: 759px !important;",
+        "}",
+
+        "\n#gameholder {",
+        "\twidth: auto !important;",
+        "}"
+        ];
 
         var head = document.getElementsByTagName('head')[0],
-				    style = document.createElement('style'),
-				    rules = document.createTextNode(rulesText);
-				
-				style.type = 'text/css';
-				
-				if(style.styleSheet)
-				{
-				    style.styleSheet.cssText = rules.nodeValue;
-				}
-				else
-				{
-					style.appendChild(rules);
-				}
-				
-				head.appendChild(style);
-	}
+            style = document.createElement('style'),
+            rules = document.createTextNode(rulesText.join("\n"));
+
+        style.type = 'text/css';
+
+        if(style.styleSheet)
+        {
+            style.styleSheet.cssText = rules.nodeValue;
+        }
+        else
+        {
+            style.appendChild(rules);
+        }
+
+        head.appendChild(style);
+    }
 	
 	function setupGMFunctions()
 	{

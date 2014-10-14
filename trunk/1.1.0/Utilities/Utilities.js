@@ -1,8 +1,74 @@
 		/************************************/
 		/********* Utility Functions ********/
 		/************************************/
-		
-		// Hooks up a listener for a particular event on a specific object
+
+        if (!window.holodeck) {
+            window.holodeck = new Holodeck();
+        }
+
+        /**
+         * Returns the boolean opposite of the result of the given function
+         * @param fn The function to take the opposite of
+         * @param scope {Object?} The scope to call the function with
+         */
+        DC_LoaTS_Helper.not = function(fn, scope) {
+            return function() {
+                return !fn.apply(scope || window, arguments);
+            }
+        };
+
+        /**
+         * Returns a function of all the arguments passed in called in order
+         */
+        DC_LoaTS_Helper.chain = function() {
+            var fns = arguments;
+            return function() {
+                var ret;
+                for (var i = 0; i < fns.length; i++) {
+                    try {
+                        ret = fns[i].apply(this, arguments);
+                    }
+                    catch (e) {
+                        console.error("Utilities.js: Error during function chain", e);
+                    }
+                }
+                return ret;
+            }
+        };
+
+        DC_LoaTS_Helper.getCurrentUsername = function() {
+            return holodeck._active_user._attributes._object.username;
+        };
+
+        DC_LoaTS_Helper.isFriend = function(username) {
+            return holodeck.chatWindow().isFriend(username);
+        };
+
+        DC_LoaTS_Helper.addFriend = function(username) {
+            new Ajax.Request("http://www.kongregate.com/accounts/" + DC_LoaTS_Helper.getCurrentUsername() + "/friends/"+ username + "?friend_from=chat", {
+                method: 'put',
+                onComplete: function(transport)
+                {
+                    DCDebug("Added Friend: " + transport.request.url);
+                    // Update the listing in the top of the chat
+                    holodeck.addFriend(this);
+                }
+            });
+        };
+
+        DC_LoaTS_Helper.removeFriend = function(username) {
+            new Ajax.Request("http://www.kongregate.com/accounts/" + DC_LoaTS_Helper.getCurrentUsername() + "/friends/"+ username + "?friend_from=chat", {
+                method: 'delete',
+                onComplete: function(transport)
+                {
+                    DCDebug("Removed Friend: " + transport.request.url);
+                    // Update the listing in the top of the chat
+                    holodeck.removeFriend(this);
+                }
+            });
+        };
+
+        // Hooks up a listener for a particular event on a specific object
 		// Borrowed from: http://www.quirksmode.org/js/eventSimple.html
 		DC_LoaTS_Helper.registerEventHandler = function(obj,evt,fn)
 		{
@@ -29,6 +95,28 @@
 				obj.detachEvent('on'+evt,fn);
 			}
 		};
+
+        DC_LoaTS_Helper.isLeftClickEvent = function(evt) {
+            // evt.which for IE6,7,8/Opera. evt.button for everyone else
+            return  (evt.button && (evt.button == 0)) || (evt.which && (evt.which == 1));
+        };
+
+        DC_LoaTS_Helper.isRightClickEvent = function(evt) {
+            // evt.which for IE6,7,8/Opera. evt.button for everyone else
+            return (evt.button && (evt.button == 2)) || (evt.which && (evt.which == 3));
+        };
+
+        DC_LoaTS_Helper.getEventTarget = function(evt) {
+            var target = evt.target || evt.srcElement;
+
+            // Safari work around, not that we even support Safari...
+            if (target.nodeType && target.nodeType == 3)
+            {
+                target = target.parentNode;
+            }
+
+            return target;
+        };
 		
 		// Should prevent the event from doing its normal action
 		// like selecting text on click and drag.
@@ -45,6 +133,21 @@
 		    }
 		    return false;
 		};
+
+		// Should prevent the event from propagating to Kongregate code
+		DC_LoaTS_Helper.stopEventPropagation = function(evt)
+		{
+		    if (evt && evt.stopPropagation)
+		    {
+		        evt.stopPropagation();
+		    }
+		    return false;
+		};
+
+        // Borrowed from http://stackoverflow.com/a/384380
+        DC_LoaTS_Helper.isElement = function(o) {
+            return o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string";
+        };
 
 		// Pretty format health / damage numbers
 		DC_LoaTS_Helper.prettyFormatNumber = function(num)
@@ -173,39 +276,41 @@
 						// Iterate over all possible states
 						// This is basically a hack for the fact that the 
 						// STATEs don't have any inherit ordinal values that could be incremented
-						//TODO: Reorganize STATE to have ordinals if this ever happens somewhere else in the code
-						for (var stateKey in RaidManager.STATE)
-						{
-							// Grab the state
-							var state = RaidManager.STATE[stateKey];
-							
-							// Make sure this isn't a function or anything from STATE
-							if (typeof state == "object")
-							{
-								// If this is the first state we've seen
-								if (typeof firstState == "undefined")
-								{
-									// Capture it so we can roll back around past the last state
-									firstState = state;
-								}
-							
-								// If this is the same state as the link is currently in
-								if (RaidManager.STATE.equals(linkState, state))
-								{
-									// Note the current state
-									foundCurrent = true;
-								}
-								// If we found current, this must be the next state
-								else if (foundCurrent)
-								{
-									// Grab this state to save as the new state
-									newLinkState = state;
-									
-									// Don't accidentally find other states
-									break;
-								}
-							}
-						}
+                        //TODO: Reorganize STATE to have ordinals if this ever happens somewhere else in the code
+                        for (var stateKey in RaidManager.STATE)
+                        {
+                            if (RaidManager.STATE.hasOwnProperty(stateKey)) {
+                                // Grab the state
+                                var state = RaidManager.STATE[stateKey];
+
+                                // Make sure this isn't a function or anything from STATE
+                                if (typeof state == "object")
+                                {
+                                    // If this is the first state we've seen
+                                    if (typeof firstState == "undefined")
+                                    {
+                                        // Capture it so we can roll back around past the last state
+                                        firstState = state;
+                                    }
+
+                                    // If this is the same state as the link is currently in
+                                    if (RaidManager.STATE.equals(linkState, state))
+                                    {
+                                        // Note the current state
+                                        foundCurrent = true;
+                                    }
+                                    // If we found current, this must be the next state
+                                    else if (foundCurrent)
+                                    {
+                                        // Grab this state to save as the new state
+                                        newLinkState = state;
+
+                                        // Don't accidentally find other states
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 						
 						// If we did not find a new state to set it to
 						if (typeof newLinkState == "undefined")
@@ -258,40 +363,15 @@
 				// Don't cancel the click
 				return;
 			}
-			
-			// Detect right click
-			var rightclick;
-			if (event.which)
-			{
-				rightclick = (event.which == 3);
-			}
-			else if (event.button)
-			{
-				rightclick = (event.button == 2);
-			}
-			
+
 			// Only care about right clicks
-			if (rightclick)
+			if (DC_LoaTS_Helper.isRightClickEvent(event))
 			{
 				// Get the target element
-				var target;			
-				if (event.target) 
-				{
-					target = event.target;
-				}
-				else if (event.srcElement)
-				{
-					target = event.srcElement;
-				}
-				
-				// Safari work around
-				if (target.nodeType == 3)
-				{
-					target = target.parentNode;
-				}
+				var target = DC_LoaTS_Helper.getEventTarget(event);
 
 				// If there was no target
-				if (typeof target == "undefined")
+				if (typeof target === "undefined")
 				{
 					console.warn("Couldn't locate the target for right-click detection");
 					
@@ -338,14 +418,266 @@
 					console.warn(raidLink);
 				}
 			}
-			
-
 		};
-		
-		// Force the download of some data as a file
+
+        DC_LoaTS_Helper.handleMessageWindowClickHandler = function() {
+            DCDebug("Utilities.js: DC_LoaTS_Helper.handleMessageWindowClickHandler");
+            var lctw = DC_LoaTS_Helper.getPref("LeftClickToWhisper", true);
+            DCDebug("LeftClickToWhisper: ", lctw);
+            if (holodeck._chat_window && holodeck._chat_window._chat_rooms_container_node) {
+                // We should be attaching the left click handler
+                if (lctw) {
+                    // This destroys the existing Kong functionality of left-clicking to load mini-profile
+                    ChatDialogue.MESSAGE_TEMPLATE.template = ChatDialogue.MESSAGE_TEMPLATE.template.replace('username="#{username}"', '_username="#{username}"');
+
+                    // Actually register the click handler onto the node
+                    DC_LoaTS_Helper.registerEventHandler(
+                        holodeck._chat_window._chat_rooms_container_node,
+                        "click",
+                        DC_LoaTS_Helper.messageWindowClick
+                    );
+
+                    // Register the click handler to hide the menu on the body
+                    DC_LoaTS_Helper.registerEventHandler(
+                        document.body,
+                        "click",
+                        DC_LoaTS_Helper.hideContextMenu
+                    );
+                }
+                else {
+                    // This repairs the existing Kong functionality of left-clicking to load mini-profile
+                    ChatDialogue.MESSAGE_TEMPLATE.template = ChatDialogue.MESSAGE_TEMPLATE.template.replace('_username="#{username}"', 'username="#{username}"');
+
+                    // Actually unregister the click handler onto the node
+                    DC_LoaTS_Helper.unregisterEventHandler(
+                        holodeck._chat_window._chat_rooms_container_node,
+                        "click",
+                        DC_LoaTS_Helper.messageWindowClick
+                    );
+
+                    // Unregister the click handler to hide the menu on the body
+                    DC_LoaTS_Helper.unregisterEventHandler(
+                        document.body,
+                        "click",
+                        DC_LoaTS_Helper.hideContextMenu
+                    );
+
+                }
+            }
+            else {
+                DCDebug("Waiting 1 second to try again");
+                setTimeout(DC_LoaTS_Helper.handleMessageWindowClickHandler, 1000);
+            }
+        };
+
+        DC_LoaTS_Helper.handleMessageWindowContextMenuHandler = function() {
+            DCDebug("Utilities.js: DC_LoaTS_Helper.handleMessageWindowContextMenuHandler");
+            var rcm = DC_LoaTS_Helper.getPref("RightClickUserMenu", true);
+            DCDebug("RightClickUserMenu: ", rcm);
+            if (holodeck._chat_window && holodeck._chat_window._chat_rooms_container_node) {
+                // We should be attaching the context menu
+                if (rcm) {
+                    // Actually register the click handler onto the node
+                    DC_LoaTS_Helper.registerEventHandler(
+                        holodeck._chat_window._chat_rooms_container_node,
+                        "contextmenu",
+                        DC_LoaTS_Helper.messageWindowRightClick
+                    );
+                }
+                else {
+                    // Unregister the click handler onto the node
+                    DC_LoaTS_Helper.unregisterEventHandler(
+                        holodeck._chat_window._chat_rooms_container_node,
+                        "contextmenu",
+                        DC_LoaTS_Helper.messageWindowRightClick
+                    );
+                }
+            }
+            else {
+                DCDebug("Waiting 1 second to try again");
+                setTimeout(DC_LoaTS_Helper.handleMessageWindowContextMenuHandler, 1000);
+            }
+        };
+
+        DC_LoaTS_Helper.messageWindowClick = function(event) {
+            var ret,
+                lctw = DC_LoaTS_Helper.getPref("LeftClickToWhisper", true),
+                username;
+
+            if (lctw) {
+                // If we've altered the left click functionality (lctw==true), the username will be in _username
+                if (event.target &&
+                    (username = event.target.getAttribute("_username") || event.target.getAttribute("username"))) {
+
+                    // Is it a left click
+                    if (DC_LoaTS_Helper.isLeftClickEvent(event)) {
+                        // Since we're doing this, don't let any other actions have it
+                        DC_LoaTS_Helper.stopDefaultEventAction(event);
+
+                        DCDebug("Caught left click on name", event, username);
+
+                        // Insert the /w username into the chat area
+                        holodeck.chatWindow().insertPrivateMessagePrefixFor(username);
+                        ret = false;
+                    }
+                }
+            }
+
+            return ret;
+        };
+
+        DC_LoaTS_Helper.messageWindowRightClick = function(event) {
+            var ret,
+                rcm = DC_LoaTS_Helper.getPref("RightClickUserMenu", true),
+                contextMenu,
+                username, coords;
+
+            if (rcm) {
+                // If we've altered the left click functionality (lctw==true), the username will be in _username
+                if (event.target &&
+                    (username = event.target.getAttribute("_username") || event.target.getAttribute("username"))) {
+
+                    // Since we're doing this, don't let any other actions have it
+                    DC_LoaTS_Helper.stopDefaultEventAction(event);
+
+                    DCDebug("Caught right click on name", event, username);
+
+                    // Hide the existing context menu
+                    DC_LoaTS_Helper.hideContextMenu();
+
+                    // Get the absolute coordinates of mouse event
+                    coords = DC_LoaTS_Helper.getMouseEventCoords(event);
+
+                    DCDebug("Utilities.js: Right click event", event);
+
+                    // Create context menu
+                    contextMenu = DC_LoaTS_Helper.createUserContextMenu(username);
+
+                    // Pop-up context menu
+                    DC_LoaTS_Helper.showContextMenu(contextMenu, coords.x, coords.y);
+
+                    ret = false;
+                }
+            }
+
+            return ret;
+        };
+
+        DC_LoaTS_Helper.getMouseEventCoords = function(e) {
+            var posx = 0,
+                posy = 0;
+            e = e || window.event;
+
+            if (e.pageX || e.pageY) 	{
+                posx = e.pageX;
+                posy = e.pageY;
+            }
+            else if (e.clientX || e.clientY) 	{
+                posx = e.clientX + document.body.scrollLeft
+                    + document.documentElement.scrollLeft;
+                posy = e.clientY + document.body.scrollTop
+                    + document.documentElement.scrollTop;
+            }
+
+            return {x: posx, y: posy};
+        };
+
+        DC_LoaTS_Helper.userContextMenuItems = [
+            {
+                text: "{username}'s Kong Profile",
+                title: "Show {username}'s Kongregate mini-profile normally shown on left-clicks",
+                fn: holodeck.chatWindow().showProfile.bind(holodeck.chatWindow())
+            },
+            {
+                text: "Add Friend",
+                title: "Add {username} as your friend",
+                condition: DC_LoaTS_Helper.not(DC_LoaTS_Helper.isFriend),
+                fn: DC_LoaTS_Helper.addFriend
+            },
+            {
+                text: "Unfriend",
+                title: "Remove {username} from your friends list",
+                condition: DC_LoaTS_Helper.isFriend,
+                fn: DC_LoaTS_Helper.removeFriend
+            }
+        ];
+
+        DC_LoaTS_Helper.createUserContextMenu = function (username) {
+            DCDebug("Utilities.js: Creating Context Menu for user " + username);
+            var menu = document.createElement("ul"),
+                itemDef, li, a;
+            menu.id = "DC_LoaTS_contextMenu";
+            menu.className = "context-menu user-context-menu";
+            for (var i = 0; i < DC_LoaTS_Helper.userContextMenuItems.length; i++) {
+                itemDef = DC_LoaTS_Helper.userContextMenuItems[i];
+                a = null;
+
+                DCDebug("Utilities.js: itemDef: ", itemDef);
+
+                if (typeof itemDef.condition === "undefined" ||
+                    (typeof itemDef.condition === "function" && itemDef.condition(username))) {
+                    li = document.createElement("li");
+                    li.className = "menu-item";
+
+
+                    if (itemDef.fn) {
+                        a = document.createElement("a");
+                        a.onclick = DC_LoaTS_Helper.chain(
+                            itemDef.fn.bind(this, username),
+                            function(clickEvent) {
+                                DC_LoaTS_Helper.stopDefaultEventAction(clickEvent);
+                                DC_LoaTS_Helper.stopEventPropagation(clickEvent);
+                                DC_LoaTS_Helper.hideContextMenu(menu);
+                            });
+                        li.appendChild(a);
+                    }
+
+                    if (itemDef.title) {
+                        (a||li).title = itemDef.title.replace("{username}", username);
+                    }
+                    if (itemDef.text) {
+                        (a||li).appendChild(document.createTextNode(itemDef.text.replace("{username}", username)));
+                    }
+
+                    menu.appendChild(li);
+                }
+            }
+
+            DCDebug("Utilities.js: Created Menu", menu);
+
+            return menu;
+        };
+
+        DC_LoaTS_Helper.showContextMenu = function (contextMenu, x, y) {
+            DCDebug("Utilities.js: showContextMenu ", arguments);
+            if (DC_LoaTS_Helper.contextMenu) {
+                DC_LoaTS_Helper.hideContextMenu(DC_LoaTS_Helper.contextMenu);
+            }
+            DC_LoaTS_Helper.contextMenu = contextMenu;
+            contextMenu.style.position = "absolute";
+            contextMenu.style.left = x + "px";
+            contextMenu.style.top = y + "px";
+            contextMenu.style.visible = "visible";
+            contextMenu.style.display = "auto";
+            document.body.appendChild(contextMenu);
+        };
+
+        DC_LoaTS_Helper.hideContextMenu = function(contextMenu) {
+            // If this is a click event or something, it's not an element
+            if (!DC_LoaTS_Helper.isElement(contextMenu)) {
+                contextMenu = null;
+            }
+            contextMenu = contextMenu || DC_LoaTS_Helper.contextMenu || document.getElementById("DC_LoaTS_contextMenu");
+            DCDebug("Hiding Context Menu: ", DC_LoaTS_Helper.isElement(contextMenu), contextMenu, DC_LoaTS_Helper.contextMenu, document.getElementById("DC_LoaTS_contextMenu"));
+            contextMenu && contextMenu.parentNode.removeChild(contextMenu);
+            DC_LoaTS_Helper.contextMenu = null;
+        };
+
+
+        // Force the download of some data as a file
 		// Works nice on some browsers
 		// Title parameter only works in some browsers as well.
-		DC_LoaTS_Helper.forceDownload = function(data, title)
+		DC_LoaTS_Helper.forceDownload = function(data/*, title*/)
 		{
 //			// Awesome style
 //			window.requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
@@ -457,7 +789,7 @@
 		    	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data));
 //			}
 		    return true; 
-		}
+		};
 		
 		// Pastebin API
 		DC_LoaTS_Helper.PastebinAPI = {
@@ -591,9 +923,9 @@
 					{
                         DC_LoaTS_Helper.getGameIframe_old = DC_LoaTS_Helper.getGameIframe;
 
-						// Needed for the creation of GameIframe
+						// Needed for the creation of GameIframe. It's part of the eval process.
 						var urlOptions = '';
-						
+
 						// Parse and return the existing iframe options
 						var optionsVal = eval(match[1]);
 
@@ -639,7 +971,7 @@
 				else if (typeof raidParam === "string")
 				{
 					// Create a raid link from the url
-					var raidLink = new RaidLink(raidParam);
+					raidLink = new RaidLink(raidParam);
 				}
 				
 				// If the link is valid
@@ -655,7 +987,9 @@
 						
 						for (var option in iframe_options)
 						{
-							collapsedOptions += option + "=" + iframe_options[option] + "&";
+                            if (iframe_options.hasOwnProperty(option)) {
+                                collapsedOptions += option + "=" + iframe_options[option] + "&";
+                            }
 						}
 						
 						DC_LoaTS_Helper.ajax({
@@ -710,7 +1044,7 @@
 			DCDebug("Ajax Raid Join: ", raidLink.raidTypeId + " (" + raidLink.id + ")", " Message: ", raidJoinMessage);
 			
 			// Get the current state of the raid form the cache
-			var oldState = RaidManager.fetchState(raidLink)
+			var oldState = RaidManager.fetchState(raidLink);
 			
 			if (responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
@@ -966,7 +1300,7 @@
 					var took = (endTime - startTime)/1000;
 					holodeck.activeDialogue().raidBotMessage("Load ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
 				}
-			}
+			};
 			
 
 			// Kick off the auto loading
@@ -986,7 +1320,7 @@
 			var didReload = false;
 			
 			// Try to reload the game
-			if (typeof activateGame  != "undefined")
+			if (typeof activateGame  !== "undefined")
 			{
 				holodeck.activeDialogue().raidBotMessage("Reloading game, please wait...");
 				activateGame();
@@ -1013,6 +1347,8 @@
 			
 			// Find all the styles matching this filter
 			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
+
+            var i;
 			
 			//console.log("Ignore: ", ignore);
 			if (ignore === true) {
@@ -1030,7 +1366,7 @@
 				else
 				{
 					var found = false;
-					for (var i = 0; i < matchingStyles.length; i++) {
+					for (i = 0; i < matchingStyles.length; i++) {
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							found = true;
 							break;
@@ -1047,7 +1383,7 @@
 				// - If yes, disable it
 				// - If no, do nothing
 				if (typeof matchingStyles !== "undefined") {
-					for (var i = 0; i < matchingStyles.length; i++) {
+					for (i = 0; i < matchingStyles.length; i++) {
 						if (parser.raidFilter.getKey() === matchingStyles[i].raidFilter.getKey()) {
 							matchingStyles.splice(i, 1);
 							break;
@@ -1108,168 +1444,6 @@
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
-			/*
-			// If updating posted links is locked
-			if (DC_LoaTS_Helper.upl.lock) {
-				DCDebug("UPL already locked trying to update: " + (raidLink ? raidLink.id : "ALL"));
-				// No raidLink provided. Load everything
-				if (!raidLink) {
-					DC_LoaTS_Helper.upl.next.refreshAll = true;
-					delete DC_LoaTS_Helper.upl.next.list;
-				}
-				// If we're not loading all
-				else if (!DC_LoaTS_Helper.upl.next.refreshAll) {
-					// Make sure the list is ready
-					if (!DC_LoaTS_Helper.upl.next.list) {
-						DC_LoaTS_Helper.upl.next.list = [];
-					}
-					DC_LoaTS_Helper.upl.next.list.push(raidLink);
-				}
-				
-				// If updating posted links became unlocked
-				if (DC_LoaTS_Helper.upl.lock) {
-					// Lock it
-					DC_LoaTS_Helper.upl.lock = true;
-					DCDebug("UPL became unlocked during update: " + (raidLink ? raidLink.id : "ALL"));
-					DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
-
-					// In theory, we now have the lock and other code can't get in here
-
-					// Copy over the important values
-					DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
-					DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
-					
-					// Clear out the nexts
-					DC_LoaTS_Helper.upl.next.refreshAll = false;
-					delete DC_LoaTS_Helper.upl.next.list;
-
-					DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
-					// Run the private runner. Will do the unlock for us
-					_upl();
-				}
-				// If it's still locked, don't do anything
-			}
-			else {
-				// Lock it
-				DC_LoaTS_Helper.upl.lock = true;
-				DCDebug("UPL already unlocked for: " + (raidLink ? raidLink.id : "ALL"));
-				DCDebug("UPL Locking now for: " + (raidLink ? raidLink.id : "ALL"));
-				
-				// In theory, we now have the lock and other code can't get in here
-
-				// Set the important values
-				DC_LoaTS_Helper.upl.now.refreshAll = !raidLink;
-				DC_LoaTS_Helper.upl.now.list = raidLink ? [raidLink] : undefined;
-
-				DCDebug("Calling UPL for: " + (raidLink ? raidLink.id : "ALL"));
-				// Run the private runner. Will do the unlock for us
-				_upl();
-			}
-			
-			// Private function
-			function _upl() {
-				// At this time, we can assume that the locks prevent this code from every being run
-				// more than once at a time, and that the upl.now variables are set and won't change
-				
-				// Set a timeout to avoid sucking up all the cpu
-				setTimeout(function()
-				{
-					Timer.start("updatePostedLinksTimeout");
-					DCDebug("Running UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
-					try 
-					{
-						// Look up all raid links in chat
-						var elems = $("play").getElementsByClassName("raidMessage");
-						
-						// Retrieve the message format
-						var messageFormat = DC_LoaTS_Helper.getMessageFormat();
-						
-						// Retrieve the link format
-						var linkFormat = DC_LoaTS_Helper.getLinkFormat();
-						
-						// Iterate over all link elements in the chat
-						for (var i = 0; i < elems.length; i++)
-						{
-							// Convert them to RaidLink objects
-							var elem = elems[i];
-							var newRaidLink = new RaidLink(elem.children[0].href);
-							
-							// If we're looking for a specific link, make sure to match it. Otherwise, do them all
-							if (newRaidLink.isValid() && (DC_LoaTS_Helper.upl.now.refreshAll || DC_LoaTS_Helper.listContainsRaid(DC_LoaTS_Helper.upl.now.list, newRaidLink)))
-							{
-								// Restyle the message as appropriate
-								var styles = newRaidLink.getMatchedStyles();
-								
-								// TODO: Eventually figure out how to style whispers without it being a PITA especially raidbot seenraids whispers
-								if ((elem.parentNode.parentNode.parentNode.className || "").indexOf("hisper") < 0) {
-									
-									// Remove existing doomscript styles. We don't want to double them up or anything weird
-									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "").trim();
-
-									// If there are styles, apply them
-									if (styles && styles.className)
-									{
-										// Append to the existing styles
-										elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
-									}
-								}
-								
-								// Remove the old link, and shove in the new, formatted, styled one
-								elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
-								elem.remove();
-							}
-							else if (!newRaidLink.isValid())
-							{
-								console.warn("Element did not produce a valid raid link:");
-								console.warn(elem);
-							}
-							else if (newRaidLink.hash === raidLink.hash || raidLink.id === newRaidLink.id)
-							{
-								DCDebug("Similar links found while updating posted links, but not similar enough?");
-								DCDebug(raidLink);
-								DCDebug(newRaidLink);
-							}
-						}
-					}
-					catch (e)
-					{
-						console.warn(e);
-					}
-					
-					// If there's other stuff to run
-					if (DC_LoaTS_Helper.upl.next.refreshAll || DC_LoaTS_Helper.upl.next.list) {
-						DCDebug("Additional links available. Scheduling UPL again for: ", DC_LoaTS_Helper.upl.next.list, " refreshAll: " + DC_LoaTS_Helper.upl.next.refreshAll);
-						setTimeout(function() {
-							// Copy over the important values
-							DC_LoaTS_Helper.upl.now.refreshAll = DC_LoaTS_Helper.upl.next.refreshAll;
-							DC_LoaTS_Helper.upl.now.list = DC_LoaTS_Helper.upl.next.list;
-							
-							// Clear out the nexts
-							DC_LoaTS_Helper.upl.next.refreshAll = false;
-							delete DC_LoaTS_Helper.upl.next.list;
-	
-							DCDebug("Calling UPL for: ", DC_LoaTS_Helper.upl.now.list, " refreshAll: " + DC_LoaTS_Helper.upl.now.refreshAll);
-							// Run the private runner. Will do the unlock for us
-							_upl();
-						// If we go to run this again, don't run it too soon
-						}, 500);
-					}
-					else {
-						DCDebug("Unlocking UPL");
-						DC_LoaTS_Helper.upl.lock = false;
-					}
-					Timer.stop("updatePostedLinksTimeout");
-				}, 100);
-			}
-			
-			
-			
-			*/
-			
-			
-			
-			
-			
 			if (typeof DC_LoaTS_Helper.updatePostedLinksTimeout !== "undefined")
 			{
 				clearTimeout(DC_LoaTS_Helper.updatePostedLinksTimeout);
@@ -1426,7 +1600,7 @@
 				elem.removeClassName("DC_LoaTS_checkingForUpdate");
 			}
 		    
-			
+			// TODO Migrate to use DC_LoaTS_Helper.ajax?
 			new Ajax.Request(DC_LoaTS_Properties.updateURL,
 				{
 					method: 'get',
@@ -1842,7 +2016,7 @@
 
 		DC_LoaTS_Helper.doWRTimer = function() {
 			var wr = DC_LoaTS_Helper.worldRaidInfo;
-			var timerText = "No current WR or WR is over."
+			var timerText = "No current WR or WR is over.";
 			if (typeof wr === "object" && wr.timerEnds) {
 				var now = new Date();
 				var timerEnds = new Date(wr.timerEnds);
@@ -1872,7 +2046,7 @@
 					wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
 				}
 			}
-		}
+		};
 		
 		DC_LoaTS_Helper.timeDifference = function(current, previous) {
 
@@ -1933,6 +2107,22 @@
 			}).call(new Date())
 		};
 
+        DC_LoaTS_Helper.__debug_generatePostImageBlocks = function() {
+            for (var i in DC_LoaTS_Helper.raids) {
+                if (DC_LoaTS_Helper.raids.hasOwnProperty(i)) {
+                    var a = document.createElement("a"),
+                        img = document.createElement("img");
+                    img.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + i + "_1.jpg";
+                    img.title = i + " - " + DC_LoaTS_Helper.raids[i].shortName;
+                    img.onerror = RaidLink.fixBrokenImage;
+
+                    a.href = "?kv_raid_boss=" + i + "&kv_hash=test&kv_raid_id=123";
+                    a.appendChild(img);
+
+                    document.body.appendChild(a);
+                }
+            }
+        };
 
 		DC_LoaTS_Helper.generateUUID = function()
 		{

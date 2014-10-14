@@ -7,10 +7,10 @@
 				handler: function(deck, raidLink, params, text, context)
 				{
 					// Declare ret object
-					var ret = {sucess: true, statusMessage: "Chat cleared at " + (new Date().toLocaleString())};
+					var ret = {success: true, statusMessage: "Chat cleared at " + (new Date().toLocaleString())};
 						
 					// Load the raid from the link's url
-					holodeck._active_dialogue._message_window_node.childElements().invoke("remove");
+					holodeck.activeDialogue().clear();
 					
 					return ret;
 				},

@@ -291,8 +291,12 @@
 					// Only pass the message along if it wasn't a /w RaidBot and it's not a command and we're not ignoring this message by preference
 					return !raidBotWhisper && chatCommandResult && !ignoredByPreference;
 				}; // End Replacement displayUnsanitizedMessage
-				
-				
+
+                // This is how we're going to manage left clicks on the chat area
+                DC_LoaTS_Helper.handleMessageWindowClickHandler();
+                // This is how we're going to manage right clicks on the chat area
+                DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
+
 				// Make sure the ignore visited thing is working
 				// TODO: If we ever do more of these, make a framework for it, or something
 				DC_LoaTS_Helper.handleIgnoreVisitedRaids();
