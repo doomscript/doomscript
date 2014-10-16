@@ -242,6 +242,28 @@
         "\ttext-align: center;",
         "}",
 
+        "\n#CharacterViewMenu-PlatformSelect {",
+        "\tcursor: pointer;",
+        "\tborder-radius: 4px;",
+        "\tfont-size: 14px;",
+        "\tmargin-bottom: 10px;",
+        "\tpadding: 4px 6px;",
+        "\theight: 30px;",
+        "\twidth: 220px;",
+        "\toutline-offset: -2px;",
+        "\toutline: 5px auto -webkit-focus-ring-color;",
+        "}",
+
+        "\n#CharacterViewMenu-UsernameBox {",
+        "\twidth: 206px;",
+        "\tline-height: 20px;",
+        "\tfont-size: 14px;",
+        "}",
+
+        "\n.CharacterViewMenu-Button {",
+        "\tpadding: 3px 15px 4px;",
+        "}",
+
 
         "\n#DC_LoaTS_notificationBar {",
         "\tbackground: #f8dc5a url(http://subversion.assembla.com/svn/doomscript/trunk/1.1.0/Assets/notificationbg.png) 50% 50% repeat-x;",
@@ -818,7 +840,24 @@ DCDebug = function() {
 // Borrowed from: http://stackoverflow.com/a/2303228
 if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))
 {
+    var ugupCSS = document.createElement('link');
+    ugupCSS.type = "text/css";
+    ugupCSS.href = "https://rawgit.com/doomcat/OpenUgUp/master/js/src/ugup.css";
+    ugupCSS.rel = "stylesheet";
+    (document.head || document.body || document.documentElement).appendChild(ugupCSS);
+
+    var ugupEquips = document.createElement('script');
+    ugupEquips.type = "text/javascript";
+    ugupEquips.src = "https://rawgit.com/doomcat/OpenUgUp/master/js/src/ugup.equipment.js";
+    (document.body || document.head || document.documentElement).appendChild(ugupEquips);
+
+    var ugupScript = document.createElement('script');
+    ugupScript.type = "text/javascript";
+    ugupScript.src = "https://rawgit.com/doomcat/OpenUgUp/master/js/src/ugup.js";
+    (document.body || document.head || document.documentElement).appendChild(ugupScript);
+
 	var script = document.createElement('script');
 	script.appendChild(document.createTextNode('('+ main +')();'));
 	(document.body || document.head || document.documentElement).appendChild(script);
+
 }

@@ -150,6 +150,10 @@
 			activateTab: function(tabClass) {
 				this.activatedTabs[tabClass.tabPosition] = new tabClass(this);
 			},
+
+            setActiveTab: function(tabClass) {
+                this.tabs.setActiveTab(this.activatedTabs[tabClass.tabPosition].tabA);
+            },
 			
 			// Event fired as the menu title has been clicked
 			/*private void*/	
@@ -253,18 +257,15 @@
 			}
 			
 			return raidMenu;
-		}
+		};
 
-
-		
 		// Toggle the visibility of the raid menu
 		/*public static void*/
 		RaidMenu.toggle = function()
 		{
 			// Toggle its visibility
 			RaidMenu.getInstance().toggle();
-		}
-
+		};
 
 		// Show the raid menu
 		/*public static void*/
@@ -272,15 +273,25 @@
 		{
 			// Show it
 			RaidMenu.getInstance().show();
-		}
+		};
 
+        // Hide the raid menu
+        /*public static void*/
+        RaidMenu.hide = function()
+        {
+            // Hide it
+            RaidMenu.getInstance().hide();
+        };
 
-		// Hide the raid menu
-		/*public static void*/
-		RaidMenu.hide = function()
-		{
-			// Hide it
-			RaidMenu.getInstance().hide();
-		}
+        // Show a specific tab
+        /*public static void*/
+        RaidMenu.setActiveTab = function(tabClass)
+        {
+            // Switch to the tab
+            RaidMenu.getInstance().setActiveTab(tabClass);
+
+            // Show the menu itself, if it's hidden
+            RaidMenu.show();
+        };
 
 

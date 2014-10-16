@@ -53,7 +53,7 @@
 						}
 						me.parentMenu.tabs.previous();
 						return false;
-					}
+					};
 					me.tabLi.appendChild(me.tabCloseA);
 				} // End closeable logic
 				

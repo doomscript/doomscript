@@ -37,7 +37,7 @@
         };
 
         DC_LoaTS_Helper.getCurrentUsername = function() {
-            return holodeck._active_user._attributes._object.username;
+            return holodeck.username();
         };
 
         DC_LoaTS_Helper.isFriend = function(username) {
@@ -67,6 +67,48 @@
                 }
             });
         };
+
+        DC_LoaTS_Helper.isMuted = function(username) {
+            return holodeck.chatWindow().isMuted(username);
+        };
+
+        DC_LoaTS_Helper.muteUser = function(username) {
+            new Ajax.Request("http://www.kongregate.com/accounts/" + DC_LoaTS_Helper.getCurrentUsername() + "/muted_users/?username="+ username + "&from_chat=true", {
+                method: 'post',
+                onComplete: function(transport)
+                {
+                    DCDebug("Muted User: " + transport.request.url);
+                    // Update the listing in the top of the chat
+                    holodeck.chatWindow().addMutings([username]);
+                }
+            });
+        };
+
+        DC_LoaTS_Helper.unmuteUser = function(username) {
+            new Ajax.Request("http://www.kongregate.com/accounts/" + DC_LoaTS_Helper.getCurrentUsername() + "/muted_users/"+ username + "?from_chat=true", {
+                method: 'delete',
+                onComplete: function(transport)
+                {
+                    DCDebug("Unmuted User: " + transport.request.url);
+                    // Update the listing in the top of the chat
+                    holodeck.chatWindow().removeMutings([username]);
+                }
+            });
+        };
+
+        DC_LoaTS_Helper.openPrivateProfileMessageWindow = function(username) {
+            username && window.open("http://www.kongregate.com/accounts/" + username + "/private_messages?focus=true", "_blank");
+        };
+
+        DC_LoaTS_Helper.showUgUpProfile = function(username) {
+            DCDebug("Utilities.js: Showing UgUp Profile");
+            if (username) {
+                RaidMenu.setActiveTab(RaidMenu.tabClasses[40]);
+                document.getElementById("CharacterViewMenu-UsernameBox").value = username;
+                document.getElementById("CharacterViewMenu-RunQueryButton").click();
+            }
+        };
+
 
         // Hooks up a listener for a particular event on a specific object
 		// Borrowed from: http://www.quirksmode.org/js/eventSimple.html
@@ -147,6 +189,12 @@
         // Borrowed from http://stackoverflow.com/a/384380
         DC_LoaTS_Helper.isElement = function(o) {
             return o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string";
+        };
+
+        DC_LoaTS_Helper.removeAllChildren = function(parentNode) {
+            while (parentNode.firstChild) {
+                parentNode.removeChild(parentNode.firstChild);
+            }
         };
 
 		// Pretty format health / damage numbers
@@ -589,6 +637,16 @@
                 fn: holodeck.chatWindow().showProfile.bind(holodeck.chatWindow())
             },
             {
+                text: "Show LoTS Profile",
+                title: "Show {username}'s LoTS public profile via UgUp",
+                fn: DC_LoaTS_Helper.showUgUpProfile
+            },
+            {
+                text: "Send Profile Message",
+                title: "Send {username} a Kongregate profile private message",
+                fn: DC_LoaTS_Helper.openPrivateProfileMessageWindow
+            },
+            {
                 text: "Add Friend",
                 title: "Add {username} as your friend",
                 condition: DC_LoaTS_Helper.not(DC_LoaTS_Helper.isFriend),
@@ -599,6 +657,18 @@
                 title: "Remove {username} from your friends list",
                 condition: DC_LoaTS_Helper.isFriend,
                 fn: DC_LoaTS_Helper.removeFriend
+            },
+            {
+                text: "Mute",
+                title: "Mute {username} to hide their messages in chat",
+                condition: DC_LoaTS_Helper.not(DC_LoaTS_Helper.isMuted),
+                fn: DC_LoaTS_Helper.muteUser
+            },
+            {
+                text: "Unmute",
+                title: "Unmute {username} to show their messages in chat",
+                condition: DC_LoaTS_Helper.isMuted,
+                fn: DC_LoaTS_Helper.unmuteUser
             }
         ];
 
@@ -1898,8 +1968,20 @@
 			});
 
 		};
-		
-		DC_LoaTS_Helper.getCommandLink = function(commandText, displayText)
+
+        DC_LoaTS_Helper.getUGUPConnector = function(apiKey, platform) {
+            return UGUP && new UGUP.Suns({
+                apiKey: apiKey,
+                platform: platform,
+                customAjaxBridge: function(params) {
+                    params.onload = params.callback;
+                    DC_LoaTS_Helper.ajax(params);
+                },
+                urlRoot: "http://getkonge.org/games/lots/ugup/proxytest.php/"
+            });
+        };
+
+        DC_LoaTS_Helper.getCommandLink = function(commandText, displayText)
 		{
 			if (typeof displayText == "undefined"){displayText = commandText};
 			return "<a href=\"#\" class=\"chatCommandLink\" onclick=\"holodeck.processChatCommand('" + commandText + "'); return false;\">" + displayText + "</a>";
