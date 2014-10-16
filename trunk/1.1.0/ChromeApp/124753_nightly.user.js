@@ -2138,8 +2138,6 @@ function main()
 		/********** RaidLink Class **********/
 		/************************************/
 
-        console.info("Declaring RaidLink");
-
 		// Represents and parses actual raid link
 		// Constructor is either
 		// new RaidLink(str)
@@ -2834,8 +2832,6 @@ function main()
 				this.src="";
 			}
 		};
-
-        console.info("Declared RaidLink");
 		/************************************/
 		/**** RaidLinkstateParser Class *****/
 		/************************************/
@@ -3954,6 +3950,10 @@ function main()
 			activateTab: function(tabClass) {
 				this.activatedTabs[tabClass.tabPosition] = new tabClass(this);
 			},
+
+            setActiveTab: function(tabClass) {
+                this.tabs.setActiveTab(this.activatedTabs[tabClass.tabPosition].tabA);
+            },
 			
 			// Event fired as the menu title has been clicked
 			/*private void*/	
@@ -4057,18 +4057,15 @@ function main()
 			}
 			
 			return raidMenu;
-		}
+		};
 
-
-		
 		// Toggle the visibility of the raid menu
 		/*public static void*/
 		RaidMenu.toggle = function()
 		{
 			// Toggle its visibility
 			RaidMenu.getInstance().toggle();
-		}
-
+		};
 
 		// Show the raid menu
 		/*public static void*/
@@ -4076,16 +4073,26 @@ function main()
 		{
 			// Show it
 			RaidMenu.getInstance().show();
-		}
+		};
 
+        // Hide the raid menu
+        /*public static void*/
+        RaidMenu.hide = function()
+        {
+            // Hide it
+            RaidMenu.getInstance().hide();
+        };
 
-		// Hide the raid menu
-		/*public static void*/
-		RaidMenu.hide = function()
-		{
-			// Hide it
-			RaidMenu.getInstance().hide();
-		}
+        // Show a specific tab
+        /*public static void*/
+        RaidMenu.setActiveTab = function(tabClass)
+        {
+            // Switch to the tab
+            RaidMenu.getInstance().setActiveTab(tabClass);
+
+            // Show the menu itself, if it's hidden
+            RaidMenu.show();
+        };
 
 
 		/************************************/
@@ -4143,7 +4150,7 @@ function main()
 						}
 						me.parentMenu.tabs.previous();
 						return false;
-					}
+					};
 					me.tabLi.appendChild(me.tabCloseA);
 				} // End closeable logic
 				
@@ -4526,7 +4533,7 @@ function main()
 			}
 			
 			return el;
-		}
+		};
 		
 												 
 		/************************************/
@@ -5393,6 +5400,99 @@ function main()
 			"cconoly": /(?:http:\/\/)?(?:www\.)?cconoly\.com\/lots\/raidlinks\.php/i
 		};
 		
+        /************************************/
+        /*********** Styles Tab *************/
+        /************************************/
+
+		RaidMenuTab.create(
+			{
+				tabName: "Profile View",
+				tabHeader: "UGUP Character Profile Viewer",
+				tabPosition: 40,
+
+				initPane: function()
+				{
+                    var wrapper = document.createElement("div");
+
+                    var entryArea = document.createElement("div");
+                    entryArea.id = "CharacterViewMenu-EntryArea";
+
+                    var usernameLabel = document.createElement("label");
+                    usernameLabel.id = "CharacterViewMenu-UsernameLabel";
+                    usernameLabel.appendChild(document.createTextNode("Username: "));
+                    usernameLabel.title = "This is the name of the user on their platform, not their in game character name";
+
+                    var usernameBox = document.createElement("input");
+                    usernameBox.type = "text";
+                    usernameBox.id = "CharacterViewMenu-UsernameBox";
+
+                    usernameLabel.appendChild(usernameBox);
+                    entryArea.appendChild(usernameLabel);
+
+                    var platformPicker = document.createElement("select");
+                    platformPicker.id = "CharacterViewMenu-PlatformSelect";
+
+                    var opt;
+                    for (var platform in UGUP.PLATFORM) {
+                        if (UGUP.PLATFORM.hasOwnProperty(platform) && typeof UGUP.PLATFORM[platform] !== "function") {
+                            opt = document.createElement("option");
+                            opt.value = platform;
+                            opt.appendChild(document.createTextNode(UGUP.PLATFORM[platform].name));
+                            opt.platform = UGUP.PLATFORM[platform];
+                            platformPicker.appendChild(opt);
+                        }
+                    }
+
+                    platformPicker.value = "KONG";
+
+                    entryArea.appendChild(platformPicker);
+
+                    var connector = DC_LoaTS_Helper.getUGUPConnector(null, UGUP.PLATFORM.KONG);
+                    var renderArea = document.createElement("div");
+                    renderArea.id = "CharacterViewMenu-RenderArea";
+
+                    var runQueryButton = document.createElement("button");
+                    runQueryButton.appendChild(document.createTextNode("Lookup User Profile"));
+                    runQueryButton.id = "CharacterViewMenu-RunQueryButton";
+                    runQueryButton.className = "CharacterViewMenu-Button";
+                    runQueryButton.onclick = function() {
+                        console.log("Running User Profile Lookup", this, arguments);
+                        var platformOpt = platformPicker.selectedOptions[0],
+                            username = usernameBox.value.trim();
+
+                        DC_LoaTS_Helper.removeAllChildren(renderArea);
+                        var loadingImg = document.createElement("img");
+                        loadingImg.id = "CharacterViewMenu-RenderLoadingImg";
+                        loadingImg.src = "http://i.imgur.com/NyArTaF.gif";
+                        renderArea.appendChild(loadingImg);
+
+                        connector.cfg.platform = platformOpt.platform;
+                        console.log("About to fetch profile by username", connector);
+
+                        connector.fetchUserProfileByUsername(username, function(response, model) {
+                            console.log("Fetched Profile: ", response, model);
+                            model._modelType.render(model, connector, function(el){
+                                console.log("Rendered Profile", el);
+                                DC_LoaTS_Helper.removeAllChildren(renderArea);
+                                renderArea.appendChild(el);
+                            });
+                        });
+                    };
+                    entryArea.appendChild(runQueryButton);
+                    wrapper.appendChild(entryArea);
+
+                    var facebookLookupLink = document.createElement("a");
+                    facebookLookupLink.href = "http://findmyfacebookid.com/";
+                    facebookLookupLink.target = "_blank";
+                    facebookLookupLink.appendChild(document.createTextNode("Lookup a Facebook Username (id) from Profile Url"));
+                    wrapper.appendChild(facebookLookupLink);
+
+                    wrapper.appendChild(renderArea);
+
+                    this.pane.appendChild(wrapper);
+                }
+		});
+
 		/************************************/
 		/********** Formatting Tab **********/
 		/************************************/
@@ -5816,44 +5916,14 @@ function main()
 //		RaidMenuTab.create(
 //			{
 //				tabName: "Styles",
-//				tabHeader: "Raid Styles (Under construction)",
+//				tabHeader: "Raid Styles",
 //				tabPosition: 20,
 //				optionIndex: 0,
-//				
+//
 //				initPane: function()
 //				{
-//					this.optionRowTemplate = document.createElement("div");
-//					this.optionRowTemplate.className = "StylesTab-OptionRow clearfix";
-//					
-//					var raidNamesPicker = document.createElement("div");
-//					raidNamesPicker.className = "StylesTab-RaidNamesPicker";
-//					this.optionRowTemplate.appendChild(raidNamesPicker);
-//					
-//					var selectedRaidsInput = document.createElement("input");
-//					raidNamesPicker.appendChild(selectedRaidsInput);
-//					
-//					var selectedRaidsOptionHolder = document.createElement("div");
-//					raidNamesPicker.appendChild(selectedRaidsOptionHolder);
-//					
-//					for (var raidId in DC_LoaTS_Helper.raids)
-//					{
-//						var raid = DC_LoaTS_Helper.raids[raidId];
-//						var label = document.createElement("label");
-//						label["for"] = "StyleTab-RaidOption-" + raid.shortestName + "-" + this.optionIndex++;
-//						label.appendChild(document.createTextNode(raid.colloqName));
-//						
-//						var checkbox = document.createElement("input");
-//						checkbox.type = "checkbox";
-//						checkbox.id = label["for"];
-//						label.appendChild(checkbox);
-//						
-//						selectedRaidsOptionHolder.appendChild(label);
-//						selectedRaidsOptionHolder.appendChild(document.createElement("br"));
-//					}
-//					
-//					this.pane.appendChild(this.optionRowTemplate);
+//
 //				}
-//				
 //		});
 
 		/************************************/
@@ -7530,7 +7600,7 @@ RaidCommand
 					// Declare ret object
 					var ret = {};
 					
-					console.log(parser);
+					DCDebug("raidstyle.command.js: parser: ", parser);
 					
 					if (typeof parser.raidFilter === "undefined" || parser.raidFilter.isEmpty())
 					{
@@ -8611,7 +8681,7 @@ DC_LoaTS_Helper.raids =
         };
 
         DC_LoaTS_Helper.getCurrentUsername = function() {
-            return holodeck._active_user._attributes._object.username;
+            return holodeck.username();
         };
 
         DC_LoaTS_Helper.isFriend = function(username) {
@@ -8641,6 +8711,48 @@ DC_LoaTS_Helper.raids =
                 }
             });
         };
+
+        DC_LoaTS_Helper.isMuted = function(username) {
+            return holodeck.chatWindow().isMuted(username);
+        };
+
+        DC_LoaTS_Helper.muteUser = function(username) {
+            new Ajax.Request("http://www.kongregate.com/accounts/" + DC_LoaTS_Helper.getCurrentUsername() + "/muted_users/?username="+ username + "&from_chat=true", {
+                method: 'post',
+                onComplete: function(transport)
+                {
+                    DCDebug("Muted User: " + transport.request.url);
+                    // Update the listing in the top of the chat
+                    holodeck.chatWindow().addMutings([username]);
+                }
+            });
+        };
+
+        DC_LoaTS_Helper.unmuteUser = function(username) {
+            new Ajax.Request("http://www.kongregate.com/accounts/" + DC_LoaTS_Helper.getCurrentUsername() + "/muted_users/"+ username + "?from_chat=true", {
+                method: 'delete',
+                onComplete: function(transport)
+                {
+                    DCDebug("Unmuted User: " + transport.request.url);
+                    // Update the listing in the top of the chat
+                    holodeck.chatWindow().removeMutings([username]);
+                }
+            });
+        };
+
+        DC_LoaTS_Helper.openPrivateProfileMessageWindow = function(username) {
+            username && window.open("http://www.kongregate.com/accounts/" + username + "/private_messages?focus=true", "_blank");
+        };
+
+        DC_LoaTS_Helper.showUgUpProfile = function(username) {
+            DCDebug("Utilities.js: Showing UgUp Profile");
+            if (username) {
+                RaidMenu.setActiveTab(RaidMenu.tabClasses[40]);
+                document.getElementById("CharacterViewMenu-UsernameBox").value = username;
+                document.getElementById("CharacterViewMenu-RunQueryButton").click();
+            }
+        };
+
 
         // Hooks up a listener for a particular event on a specific object
 		// Borrowed from: http://www.quirksmode.org/js/eventSimple.html
@@ -8721,6 +8833,12 @@ DC_LoaTS_Helper.raids =
         // Borrowed from http://stackoverflow.com/a/384380
         DC_LoaTS_Helper.isElement = function(o) {
             return o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string";
+        };
+
+        DC_LoaTS_Helper.removeAllChildren = function(parentNode) {
+            while (parentNode.firstChild) {
+                parentNode.removeChild(parentNode.firstChild);
+            }
         };
 
 		// Pretty format health / damage numbers
@@ -9163,6 +9281,16 @@ DC_LoaTS_Helper.raids =
                 fn: holodeck.chatWindow().showProfile.bind(holodeck.chatWindow())
             },
             {
+                text: "Show LoTS Profile",
+                title: "Show {username}'s LoTS public profile via UgUp",
+                fn: DC_LoaTS_Helper.showUgUpProfile
+            },
+            {
+                text: "Send Profile Message",
+                title: "Send {username} a Kongregate profile private message",
+                fn: DC_LoaTS_Helper.openPrivateProfileMessageWindow
+            },
+            {
                 text: "Add Friend",
                 title: "Add {username} as your friend",
                 condition: DC_LoaTS_Helper.not(DC_LoaTS_Helper.isFriend),
@@ -9173,6 +9301,18 @@ DC_LoaTS_Helper.raids =
                 title: "Remove {username} from your friends list",
                 condition: DC_LoaTS_Helper.isFriend,
                 fn: DC_LoaTS_Helper.removeFriend
+            },
+            {
+                text: "Mute",
+                title: "Mute {username} to hide their messages in chat",
+                condition: DC_LoaTS_Helper.not(DC_LoaTS_Helper.isMuted),
+                fn: DC_LoaTS_Helper.muteUser
+            },
+            {
+                text: "Unmute",
+                title: "Unmute {username} to show their messages in chat",
+                condition: DC_LoaTS_Helper.isMuted,
+                fn: DC_LoaTS_Helper.unmuteUser
             }
         ];
 
@@ -10472,8 +10612,20 @@ DC_LoaTS_Helper.raids =
 			});
 
 		};
-		
-		DC_LoaTS_Helper.getCommandLink = function(commandText, displayText)
+
+        DC_LoaTS_Helper.getUGUPConnector = function(apiKey, platform) {
+            return UGUP && new UGUP.Suns({
+                apiKey: apiKey,
+                platform: platform,
+                customAjaxBridge: function(params) {
+                    params.onload = params.callback;
+                    DC_LoaTS_Helper.ajax(params);
+                },
+                urlRoot: "http://getkonge.org/games/lots/ugup/proxytest.php/"
+            });
+        };
+
+        DC_LoaTS_Helper.getCommandLink = function(commandText, displayText)
 		{
 			if (typeof displayText == "undefined"){displayText = commandText};
 			return "<a href=\"#\" class=\"chatCommandLink\" onclick=\"holodeck.processChatCommand('" + commandText + "'); return false;\">" + displayText + "</a>";
@@ -11008,6 +11160,28 @@ DC_LoaTS_Helper.raids =
         "\theight: 10px;",
         "\tborder-radius: 5px;",
         "\ttext-align: center;",
+        "}",
+
+        "\n#CharacterViewMenu-PlatformSelect {",
+        "\tcursor: pointer;",
+        "\tborder-radius: 4px;",
+        "\tfont-size: 14px;",
+        "\tmargin-bottom: 10px;",
+        "\tpadding: 4px 6px;",
+        "\theight: 30px;",
+        "\twidth: 220px;",
+        "\toutline-offset: -2px;",
+        "\toutline: 5px auto -webkit-focus-ring-color;",
+        "}",
+
+        "\n#CharacterViewMenu-UsernameBox {",
+        "\twidth: 206px;",
+        "\tline-height: 20px;",
+        "\tfont-size: 14px;",
+        "}",
+
+        "\n.CharacterViewMenu-Button {",
+        "\tpadding: 3px 15px 4px;",
         "}",
 
 
@@ -11586,7 +11760,24 @@ DCDebug = function() {
 // Borrowed from: http://stackoverflow.com/a/2303228
 if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns.*/i.test(window.location.href))
 {
+    var ugupCSS = document.createElement('link');
+    ugupCSS.type = "text/css";
+    ugupCSS.href = "https://rawgit.com/doomcat/OpenUgUp/master/js/src/ugup.css";
+    ugupCSS.rel = "stylesheet";
+    (document.head || document.body || document.documentElement).appendChild(ugupCSS);
+
+    var ugupEquips = document.createElement('script');
+    ugupEquips.type = "text/javascript";
+    ugupEquips.src = "https://rawgit.com/doomcat/OpenUgUp/master/js/src/ugup.equipment.js";
+    (document.body || document.head || document.documentElement).appendChild(ugupEquips);
+
+    var ugupScript = document.createElement('script');
+    ugupScript.type = "text/javascript";
+    ugupScript.src = "https://rawgit.com/doomcat/OpenUgUp/master/js/src/ugup.js";
+    (document.body || document.head || document.documentElement).appendChild(ugupScript);
+
 	var script = document.createElement('script');
 	script.appendChild(document.createTextNode('('+ main +')();'));
 	(document.body || document.head || document.documentElement).appendChild(script);
+
 }

@@ -2,8 +2,6 @@
 		/********** RaidLink Class **********/
 		/************************************/
 
-        console.info("Declaring RaidLink");
-
 		// Represents and parses actual raid link
 		// Constructor is either
 		// new RaidLink(str)
@@ -698,5 +696,3 @@
 				this.src="";
 			}
 		};
-
-        console.info("Declared RaidLink");

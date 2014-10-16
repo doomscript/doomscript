@@ -9,7 +9,7 @@
 					// Declare ret object
 					var ret = {};
 					
-					console.log(parser);
+					DCDebug("raidstyle.command.js: parser: ", parser);
 					
 					if (typeof parser.raidFilter === "undefined" || parser.raidFilter.isEmpty())
 					{
