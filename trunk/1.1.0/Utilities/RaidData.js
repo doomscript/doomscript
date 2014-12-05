@@ -100,6 +100,7 @@ DC_LoaTS_Helper.raids =
     void_master:        new RaidType("void_master",        "ZA3", "Void Master", "V. Master", "V. Master",            30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
     giant_kwelshax:     new RaidType("giant_kwelshax",     "ZA4", "Giant Kwelshax", "Kwelshax", "Kwel",               30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
     flying_saucer_mothership:new RaidType("flying_saucer_mothership","C1-3", "Flying Saucer Mothership", "Mothership", "Mothership", 48, 75, "S", [12500000000,18750000000,25000000000,37500000000], /*FS calculated normally*/null, 500000000),
+    sapphire:           new RaidType("sapphire",           "Z22", "Sapphire", "Sapphire", "Sapphire",                 80,  75, "S", [13333333333,20000000000,26666666667,40000000000]),
 
     // Epic+ Raids
     centurian_sentinel: new RaidType("centurian_sentinel",  "Z5", "Centurian Sentinel", "CC Sentinel", "Sentinel",   168, 275, "S", [340000000,510000000,680000000,1020000000], null, [7418182,7418182,7418182,7418182]),
@@ -117,18 +118,21 @@ DC_LoaTS_Helper.raids =
     the_saboteur:       new RaidType("the_saboteur",       "ZA3", "The Saboteur", "Saboteur", "Saboteur",             30, 500, "S", 5000000000),
     the_tyraness:       new RaidType("the_tyraness",       "ZA4", "The Tyraness", "Tyraness", "Tyraness",             30, 500, "S", 5000000000),
     hwang:              new RaidType("hwang",             "C1-4", "Hwang", "Hwang", "Hwang",                          64, 100, "S", [16666666667,25000000000,33333333333,50000000000], /*FS calculated normally*/null, 500000000),
+    multheru:           new RaidType("multheru",           "Z22", "Multheru", "Multheru", "Multheru",                 80, 100, "s", [17666666667,26500000000,35333333333,53000000000]),
 
     // Colossal+ Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    168, 550, "S",  [767250000, 1150875000, 1534500000, 2301750000], null, [12555000,12555000,12555000,12555000]),
-    pinatas_revenge1:	new RaidType("pinatas_revenge1",    "S",  "Pinata's Revenge", "Pinata II", "Pinata",         128, 500, "S",  [50000000000, 87500000000, 110000000000, 205000000000], null, 1000000000),
+    pinatas_revenge1:	new RaidType("pinatas_revenge1",     "S",  "Pinata's Revenge", "Pinata II", "Pinata",         128, 500, "S",  [50000000000, 87500000000, 110000000000, 205000000000], null, 1000000000),
 
     // Titanic Raids
-    king_krandar1:	    new RaidType("king_krandar1",       "E",  "King Krandar", "Krandar", "Krandar",    		      44, 500, "E",  [250000000000, 250000000000, 250000000000, 250000000000], null, 1000000000),
+    king_krandar1:	    new RaidType("king_krandar1",        "E",  "King Krandar", "Krandar", "Krandar",    		      44, 500, "E",  [250000000000, 250000000000, 250000000000, 250000000000], null, 1000000000),
     sinaroms_death_flora:new RaidType("sinaroms_death_flora","C1-5","Sinarom's Death Flora","Death Flora II","D.F. II",72,250, "S",  [ 41666666667,  62500000000,  83333333333, 125000000000], /*FS calculated normally*/null, 500000000),
+    professor_bonderbrand:new RaidType("professor_bonderbrand","Z22","Professor Bonderbrand","Bonderbrand","Prof Bond",80,250, "S",  [ 41666666667,  62500000000,  83333333333, 125000000000]),
 
     // Galactic Raids
-    sultan_shrakzan1:	new RaidType("sultan_shrakzan1",    "S",  "Sultan Shrakzan", "Shrakzan", "Shrakzan",    	  44, 500, "S",  [300000000000, 300000000000, 300000000000, 300000000000], null, 1000000000),
+    sultan_shrakzan1:	new RaidType("sultan_shrakzan1",     "S",  "Sultan Shrakzan", "Shrakzan", "Shrakzan",    	  44, 500, "S",  [300000000000, 300000000000, 300000000000, 300000000000], null, 1000000000),
     tourniquet_seven_five:new RaidType("tourniquet_seven_five","C1-6", "Tourniquet 7.5", "Tourniquet 7.5", "T7.5",    80, 500, "S",  [ 83333333333, 125000000000, 166666666667, 250000000000], /*FS calculated normally*/null, 500000000),
+    noir3:              new RaidType("noir3",              "Z22", "Noir (III)", "Noir (III)", "Noir3",                80, 500, "S",  [ 83333333333, 125000000000, 166666666667, 250000000000]),
 
     // Aliance Raids
     // Small Raids
