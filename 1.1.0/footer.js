@@ -652,8 +652,30 @@
 			{
 				console.warn("Unexpected exception during raidBotMessage", ex);
 			}
-		}
-	}
+		};
+
+        function hookInputDialogue() {
+            if (holodeck && holodeck.activeDialogue()) {
+                // Hook the handler
+                DC_LoaTS_Helper.registerEventHandler(holodeck.activeDialogue()._input_node, "keyup", function(e) {
+                    e = e || window.event;
+                    // TODO: Eventually, maybe handle up and down arrow for recent messages
+                    if (e.keyCode === 38) {
+//                        console.log("Pressed up");
+                    }
+                    if (e.keyCode === 40) {
+//                        console.log("Pressed down");
+                    }
+                });
+            }
+            else {
+                // Not ready, wait an try later
+                setTimeout(hookInputDialogue, 1000);
+            }
+        }
+
+        hookInputDialogue();
+    }
 	
 	// Gotta jumpstart this bucket of giggles	
     function bootstrap_DC_LoaTS_Helper(loadSubFrames)
@@ -709,8 +731,8 @@
 			window._dc_loats_helper = new DC_LoaTS_Helper();
 			
 			// Update raid data
-			DC_LoaTS_Helper.updateRaidData();			
-    	}
+			DC_LoaTS_Helper.updateRaidData();
+        }
     	
     	// Everything is done
         console.info("DC LoaTS Link Helper started!");
