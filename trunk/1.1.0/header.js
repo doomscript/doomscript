@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.34
+// @version        1.1.35
 // @date           27.08.2014
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getValue
@@ -396,6 +396,15 @@ Added /ad alias to /linktools post
 Added Left Click to Whisper preference and functionality
 Added Right Click on Username menu
 
+2015.01.20 - 1.1.35
+Added 29 new raids (ops, zone 22, anniversary), and some updated OS values
+Added new {progress} filter to /lrm
+Included /lrm in the code directly (rather than external inclusion)
+Added url linkification
+Updated filtering for noirs: noir i finds Noir only, noir ii finds Noir (II) only, noir iii finds Noir (III) only
+kv_raid_boss is now part of the searchable raid text
+Added new /news command
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -407,7 +416,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.34",
+    	version: "1.1.35",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -423,9 +432,10 @@ function main()
         lotsCDNUrl: "http://5thplanetlots.insnw.net/lots_live/",
 
         // Other URLS
-    	RaidToolsURL: "http://userscripts.org/132671",
-    	QuickFriendURL: "http://userscripts.org/125666",
-    	PlayNowFixURL: "http://userscripts.org/142619",
+    	RaidToolsURL: "http://userscripts.org:8080/132671",
+    	QuickFriendURL: "http://userscripts.org:8080/125666",
+    	PlayNowFixURL: "http://userscripts.org:8080/142619",
+        FleetCodesURL: "https://sites.google.com/site/lotsfleetcodes",
     	farmSpreadsheetURL: "https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4",
     	
     	// Do not check code in with this set to true. 

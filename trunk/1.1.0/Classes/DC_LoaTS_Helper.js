@@ -68,18 +68,24 @@
 					if (user.toLowerCase() != "raidbot")
 					{
 						// Just in case we need it
-						var originalMsg = msg;
+						var originalMsg = msg,
+                            match;
 						
 						// Try to create a RaidLink from this message
 						var raidLink = new RaidLink(msg);
 						
 						// Alliance Invite Link
 						var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)?kv_fbuid=kong_([^<"']+)/i;
-						
-						var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance?</a>";
-						
-						
-						// Make sure we haven't already put a raid link in here and the link we found was valid
+						var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance? (Opens in this window)</a>";
+
+                        // Regular external links, borrowed from: http://stackoverflow.com/a/8943487/1449525
+//                        var urlPattern = /((?!=)\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+                        // Regular external links, borrowed from: http://jmrware.com/articles/2010/linkifyurl/linkify.html
+                        var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
+                        var urlFormat = "<a href='{0}' target='_blank'>{0}</a>";
+
+
+                        // Make sure we haven't already put a raid link in here and the link we found was valid
 						if (msg.indexOf("<span class=\"raidMessage\"") == -1 && raidLink.isValid())
 						{
 							// Retrieve the message format
@@ -91,7 +97,7 @@
 							// Mark the link visited if the current user posted
 							if (user == holodeck._active_user._attributes._object.username)
 							{
-								// Store this link as visted
+								// Store this link as visited
 								RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 							}
 							else
@@ -157,11 +163,19 @@
 								console.warn($A(arguments));
 							}
 						}
-						else if (allianceInvitePattern.test(msg)) {
-							var match = allianceInvitePattern.exec(msg);
-							
+						else if (match = allianceInvitePattern.exec(msg)) {
 							msg = msg.replace(/<a(?:(?!<a class="reply_link).)*<\/a>/i, allianceInviteFormat.format(match[0], match[1]));
 						}
+						else {
+                            // Only even check this if it's not another kind of message type
+                            if (DC_LoaTS_Helper.getPref("LinkifyUrls", true)) {
+                                msg = msg.replace(urlPattern, function(url) {
+                                    // Last minute check to make sure the regex didn't flub it
+                                    // If the url contains any weird characters, ", ', <, or >, just bail
+                                    return /["'><]/g.test(url) ? url : urlFormat.format(url);
+                                });
+                            }
+                        }
 					}
 					
 					// Make sure to run the normal version of this function because
@@ -196,6 +210,8 @@
 				holodeck.DC_LoaTS_processChatCommand = holodeck.processChatCommand;
 				holodeck.processChatCommand = function(str)
 				{
+                    DC_LoaTS_Helper.recentlySent.unshift(str);
+
 					// Assume it's not /w RaidBot
 					var raidBotWhisper = false;
 					
@@ -227,7 +243,7 @@
 							str = command;
 						}
 						
-						// This supressed the command going to chat, even on failure
+						// This suppressed the command going to chat, even on failure
 						// and even if a real command is not found by that name
 						raidBotWhisper = true;
 					}
@@ -520,7 +536,8 @@
 			
 			return false;
 	    };
-	    
+
+	DC_LoaTS_Helper.recentlySent = [];
 	DC_LoaTS_Helper.chatCommands = {};
 	DC_LoaTS_Helper.raidStyles = {};
 

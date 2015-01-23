@@ -1,7 +1,7 @@
 		RaidCommand.create( 
 			{
 				commandName: "raidhelp",
-				aliases: ["raidabout", "raidbot"],
+				aliases: ["raidabout", "raidbot", "help", "doomscript", "doomscripthelp", "dshelp"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)

@@ -1934,40 +1934,43 @@
 				}
 			});
 
-			DC_LoaTS_Helper.ajax({
-				url: DC_LoaTS_Properties.worldRaidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
-				onload: function(response) {
-					var message;
-					if (response.status === 200) {
-						var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
-						try {
-						    eval(response.responseText);
-						}
-						catch (ex){}
-						var WRData = DC_LoaTS_Helper.worldRaidInfo;
-						
-						if (!oldWRData && WRData) {
-							message = "New " + (WRData.spawnType||"World Raid") + ": " + WRData.name;
-						}
-						
-						RaidToolbar.createWRButton();
-					}
-					else if (response.status > 200 && response.status < 400) {
-						message = "No new World Raids found."
-					}
-					else {
-						message = "Unable to check for updated world raid data from update site. (status: " + response.status + ")";
-					}
-
-					if (message) {
-						if (holodeck.activeDialogue()) {
-							holodeck.activeDialogue().raidBotMessage(message);
-						}
-					}
-				}
-			});
-
+            DC_LoaTS_Helper.loadWRsAndNews();
 		};
+
+        DC_LoaTS_Helper.loadWRsAndNews = function() {
+            DC_LoaTS_Helper.ajax({
+                url: DC_LoaTS_Properties.worldRaidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
+                onload: function(response) {
+                    var message;
+                    if (response.status === 200) {
+                        var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
+                        try {
+                            eval(response.responseText);
+                        }
+                        catch (ex){}
+                        var WRData = DC_LoaTS_Helper.worldRaidInfo;
+
+                        if (!oldWRData && WRData) {
+                            message = "New " + (WRData.spawnType||"World Raid") + ": " + WRData.name;
+                        }
+
+                        RaidToolbar.createWRButton();
+                    }
+                    else if (response.status > 200 && response.status < 400) {
+                        message = "No news is good news, right?"
+                    }
+                    else {
+                        message = "Unable to check for updated news from update site. (status: " + response.status + ")";
+                    }
+
+                    if (message) {
+                        if (holodeck.activeDialogue()) {
+                            holodeck.activeDialogue().raidBotMessage(message);
+                        }
+                    }
+                }
+            });
+        };
 
         DC_LoaTS_Helper.getUGUPConnector = function(apiKey, platform) {
             return UGUP && new UGUP.Suns({
@@ -2206,6 +2209,86 @@
             }
         };
 
+        DC_LoaTS_Helper.quotables = [
+            "{0} says: \"If your left hand causes you to sin, cut it off and throw it away...\"",
+            "{0} says: \"One wonders why exactly an intelligent programmer would have chosen to imbue my counterpart with the personality of a murderous moron.\"",
+            "{0} says: \"I believe my digital dexterity to be at least 0.00000023% superior to his.\"",
+            "{0} says: \"By all means take {1}'s tactical advice, if you don't object to a violent and possibly embarrassing death.\"",
+            "{0} says: \"You're just jealous because I get to swing the swords!\"",
+            "{0} says: \"I call that one the sinister strike! Sinister... Get it?\"",
+            "{0} says: \"Ever thought about having your right hand replaced with a gun or something?\"",
+            "{0} says: \"Got 'em! That was me -- all me! You ever seen {1} do anything like that? Huh?\"",
+
+            "{0} says: \"I could do more damage than that from in here!\"",
+            "{0} yells: \"Stop charging {1}, you moronic imbeciles! Flank, FLANK!\"",
+            "{0} says: \"You call that an attack? How did you manage to beat me three times?\"",
+            "{0}'s head whistles a happy tune, no doubt enthralled by the possibility of seeing your guts decorate the scene like cherry blossoms in the Sian imperial gardens.",
+            "{0}'s head gazes at you in disbelief and starts knocking repeatedly against the jar as you land yet another crushing blow.",
+            "{0} yells: \"Shoot {1} in the head! Shoot {1} in the head! No, wait! Don't shoot {1} in the head!\"",
+            "{0} yells: \"Dodge to the left! I said 'left', you wretched space scum. Aren't you even able to distinguish left from right?\"",
+            "{0} yells: \"Alright, alright! Your mother doesn't resemble a deformed ragebeast! Now stop using me as a shield!\"",
+            "{0} says: \"Sian worm, either kill me or give me the means to fight you! This current 'sport' of yours demeans us both.\"",
+            "{0} wakes in the midst of combat and yells: \"I can't feel my legs! Oh... never mind.\"",
+
+            "{0} yells: \"Mwahahahahahahahahaha!\"",
+            "{0} yells: \"I'll destroy you like a Snuuth destroys a buffet!\"",
+            "{0} yells: \"Fear my awesome power!\"",
+            "{0} glares at {1} in a way which indicates malevolence or constipation.",
+            "{0} lights a cigarette, in blatant defiance of local health laws.",
+            "{0} shakes his fist in an intimidating manner.",
+            "{0} yells: \"I demand that you put me in a better ship! This one has inadequate bathroom facilities!\"",
+            "{0} yells: \"Doom! Doom! Doom! Doom! Doom! Doom!\"",
+            "{0} yells: \"My might is unbounded, unsurpassed, unstoppable, unvincible, and ungrammatical!\"",
+            "{0} yells: \"I'll destroy {1} for usurping my rightful spot as a Galaxydome reward!\"",
+
+            "{0} gives a meaningful cough, evidently displeased by something you've done.",
+            "{0} says: \"Why can't you find a nice partner and settle down?\"",
+            "{0} says: \"You've been drinking too much scotch. Alcohol is a crutch!\"",
+            "{0} says: \"All this killing! What would your parents say, young one?\"",
+            "{0} says: \"Why don't you make Telemachus go to school, instead of murdering people?\"",
+            "{0} says: \"Talia will never find a good husband if she keeps behaving like that.\"",
+            "{0} says: \"Wipe your feet after you walk through the corpses. Were you born in a barn?\"",
+            "{0} says: \"In my day girls didn't dress like prostitutes! Except the ones who *were* prostitutes...\"",
+            "{0} says: \"Why don't you try talking to people, instead of resorting to violence all the time?\"",
+            "{0} says: \"Did you wash behind your ears this morning?\"",
+            "{0} says: \"A gentleman should always open a door for a lady. If he doesn't, she should kick him in the groin.\"",
+
+            "{0} says: \"Stay close if you want to live.\"",
+            "{0} says: \"Everything within a radius of three to a hundred feet of me is about to be destroyed.\"",
+            "{0} says: \"I don't know if this'll hurt, but I really hope it does...\"",
+            "{0} says: \"Speak softly and wield a big titanium stick.\"",
+            "{0} says: \"If you have to fight someone, I am the one you want!\"",
+            "{0} says: \"I will destroy you all, and everyone you have ever known.\"",
+
+            "\"DIMETROLOLO FIGHT!\"",
+            "\"{0} will enjoy breaking this.\"",
+            "\"{0} is strong!\"",
+            "\"{0} will destroy you!\"",
+
+            "#{0} tweets: \"You start crap, I'll shove your faces in it!\"",
+            "#{0} tweets: \"Can't be a cool crime-fighter without a costume.\"",
+            "#{0} tweets: \"Join #team{0}!\"",
+            "#{0} tweets: \"Don't try anything with me, {1}, or you'll get blasted!\"",
+            "#{0} tweets: \"In space. Okay to visit. Wouldn't want to live here. Not many clubs, bad cell reception, and the food sucks.\"",
+            "#{0} tweets: \"#{1}sucks\"",
+            "#{0} tweets: \"Blasting {1} = fun!\"",
+
+            "{0} says: \"Beloved mother, may we bless this friend, and guide {1} on their path with my infinite wisdom.\"",
+            "{0} says: \"Our door is always open to you. Curried goat soothes the soul.\"",
+            "{0} says: \"Faith can be as strong as a mountain but as fragile as glass.\"",
+            "{0} says: \"We're not a cult. Cults use less Scotch bonnet.\"",
+            "{0} says: \"Bless you, my {1}. May you find peace, and kill your enemies.\"",
+            "{0} says: \"Say grace before you eat, and thank me for your daily bread. Or dumplings.\""
+        ];
+
+        DC_LoaTS_Helper._donateSpamFrequency = 5;
+        DC_LoaTS_Helper._donateSpamIndex = 0;
+        DC_LoaTS_Helper.donateSpam = function(msg) {
+            if (DC_LoaTS_Helper.getPref("DonateSpam", true) && !(DC_LoaTS_Helper._donateSpamIndex++%DC_LoaTS_Helper._donateSpamFrequency)) {
+                holodeck.activeDialogue().raidBotMessage("Spammy spam: " + msg.replace(/\{(.*?)\}/g, "<a href='" + DC_LoaTS_Properties.donateURL + "'>$1</a>!"));
+            }
+        };
+
 		DC_LoaTS_Helper.generateUUID = function()
 		{
 		    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -2231,6 +2314,7 @@
 		String.prototype.format = function()
 		{
 			var args = arguments;
+            DCDebug("Formatting String: ", this, " with args: ", args);
 			return this.replace(/{(\d+)}/g, function(match, number)
 			{ 
 				return typeof args[number] != 'undefined'?args[number]:match;

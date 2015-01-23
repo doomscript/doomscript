@@ -17,7 +17,8 @@
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
 				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
 				leftClickToWhisperKey: "LeftClickToWhisper",
-				rightClickUserMenu: "RightClickUserMenu",
+				rightClickUserMenuKey: "RightClickUserMenu",
+                linkifyUrlsKey: "LinkifyUrls",
 
 				initPane: function()
 				{
@@ -156,13 +157,13 @@
                     var rightClickUserMenuOption = me.createSimpleOptionHTML(
                         "PreferencesMenu-RightClickUserMenu",
                         "boolean",
-                        DC_LoaTS_Helper.getPref(me.rightClickUserMenu, true),
+                        DC_LoaTS_Helper.getPref(me.rightClickUserMenuKey, true),
                         "Right click a user's name to show an action menu",
                         "Contains options to show their profile, friend them, and eventually more",
                         {
                             onclick: function()
                             {
-                                DC_LoaTS_Helper.setPref(me.rightClickUserMenu, this.checked);
+                                DC_LoaTS_Helper.setPref(me.rightClickUserMenuKey, this.checked);
 
                                 // Attach or detach the handlers
                                 DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
@@ -170,6 +171,21 @@
                         }
                     );
                     wrapper.appendChild(rightClickUserMenuOption.wrapper);
+
+                    var linkifyUrlsOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-LinkifyUrls",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.linkifyUrlsKey, true),
+                        "Make URLs posted to chat clickable",
+                        "When someone posts a URL, automatically make it a link that will open in a new tab",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.linkifyUrlsKey, this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(linkifyUrlsOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}

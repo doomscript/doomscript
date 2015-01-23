@@ -3,7 +3,7 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.34
+// @version        1.1.35
 // @date           27.08.2014
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getValue
@@ -396,6 +396,15 @@ Added /ad alias to /linktools post
 Added Left Click to Whisper preference and functionality
 Added Right Click on Username menu
 
+2015.01.20 - 1.1.35
+Added 29 new raids (ops, zone 22, anniversary), and some updated OS values
+Added new {progress} filter to /lrm
+Included /lrm in the code directly (rather than external inclusion)
+Added url linkification
+Updated filtering for noirs: noir i finds Noir only, noir ii finds Noir (II) only, noir iii finds Noir (III) only
+kv_raid_boss is now part of the searchable raid text
+Added new /news command
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -407,7 +416,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.34",
+    	version: "1.1.35",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",
@@ -423,9 +432,10 @@ function main()
         lotsCDNUrl: "http://5thplanetlots.insnw.net/lots_live/",
 
         // Other URLS
-    	RaidToolsURL: "http://userscripts.org/132671",
-    	QuickFriendURL: "http://userscripts.org/125666",
-    	PlayNowFixURL: "http://userscripts.org/142619",
+    	RaidToolsURL: "http://userscripts.org:8080/132671",
+    	QuickFriendURL: "http://userscripts.org:8080/125666",
+    	PlayNowFixURL: "http://userscripts.org:8080/142619",
+        FleetCodesURL: "https://sites.google.com/site/lotsfleetcodes",
     	farmSpreadsheetURL: "https://docs.google.com/spreadsheet/ccc?key=0AoPyAHGDsRjhdGYzalZZdTBpYk1DS1M3TjVvYWRwcGc&hl=en_US#gid=4",
     	
     	// Do not check code in with this set to true. 
@@ -541,18 +551,24 @@ function main()
 					if (user.toLowerCase() != "raidbot")
 					{
 						// Just in case we need it
-						var originalMsg = msg;
+						var originalMsg = msg,
+                            match;
 						
 						// Try to create a RaidLink from this message
 						var raidLink = new RaidLink(msg);
 						
 						// Alliance Invite Link
 						var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)?kv_fbuid=kong_([^<"']+)/i;
-						
-						var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance?</a>";
-						
-						
-						// Make sure we haven't already put a raid link in here and the link we found was valid
+						var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance? (Opens in this window)</a>";
+
+                        // Regular external links, borrowed from: http://stackoverflow.com/a/8943487/1449525
+//                        var urlPattern = /((?!=)\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+                        // Regular external links, borrowed from: http://jmrware.com/articles/2010/linkifyurl/linkify.html
+                        var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
+                        var urlFormat = "<a href='{0}' target='_blank'>{0}</a>";
+
+
+                        // Make sure we haven't already put a raid link in here and the link we found was valid
 						if (msg.indexOf("<span class=\"raidMessage\"") == -1 && raidLink.isValid())
 						{
 							// Retrieve the message format
@@ -564,7 +580,7 @@ function main()
 							// Mark the link visited if the current user posted
 							if (user == holodeck._active_user._attributes._object.username)
 							{
-								// Store this link as visted
+								// Store this link as visited
 								RaidManager.store(raidLink, RaidManager.STATE.VISITED);
 							}
 							else
@@ -630,11 +646,19 @@ function main()
 								console.warn($A(arguments));
 							}
 						}
-						else if (allianceInvitePattern.test(msg)) {
-							var match = allianceInvitePattern.exec(msg);
-							
+						else if (match = allianceInvitePattern.exec(msg)) {
 							msg = msg.replace(/<a(?:(?!<a class="reply_link).)*<\/a>/i, allianceInviteFormat.format(match[0], match[1]));
 						}
+						else {
+                            // Only even check this if it's not another kind of message type
+                            if (DC_LoaTS_Helper.getPref("LinkifyUrls", true)) {
+                                msg = msg.replace(urlPattern, function(url) {
+                                    // Last minute check to make sure the regex didn't flub it
+                                    // If the url contains any weird characters, ", ', <, or >, just bail
+                                    return /["'><]/g.test(url) ? url : urlFormat.format(url);
+                                });
+                            }
+                        }
 					}
 					
 					// Make sure to run the normal version of this function because
@@ -669,6 +693,8 @@ function main()
 				holodeck.DC_LoaTS_processChatCommand = holodeck.processChatCommand;
 				holodeck.processChatCommand = function(str)
 				{
+                    DC_LoaTS_Helper.recentlySent.unshift(str);
+
 					// Assume it's not /w RaidBot
 					var raidBotWhisper = false;
 					
@@ -700,7 +726,7 @@ function main()
 							str = command;
 						}
 						
-						// This supressed the command going to chat, even on failure
+						// This suppressed the command going to chat, even on failure
 						// and even if a real command is not found by that name
 						raidBotWhisper = true;
 					}
@@ -993,7 +1019,8 @@ function main()
 			
 			return false;
 	    };
-	    
+
+	DC_LoaTS_Helper.recentlySent = [];
 	DC_LoaTS_Helper.chatCommands = {};
 	DC_LoaTS_Helper.raidStyles = {};
 
@@ -1497,7 +1524,7 @@ function main()
 				Timer.start("RaidFilter init");
 				try
 				{
-					// Declare some vars for later
+					// Declare some vars for later. This is more for reference than technical need.
 					this.name;
 					this.difficulty;
 					this.state;
@@ -1509,6 +1536,7 @@ function main()
 					this.fs;
 					this.os;
 					this.zone;
+                    this.progress; // Only usable with lrm (needs raid currentHealth and timeRemaining
 					this.valid = true;
 	
 					// Capture original filterText
@@ -1579,6 +1607,7 @@ function main()
 									{
 										switch (period.toLowerCase())
 										{
+                                            // Fall throughs are on purpose
 											case "d":
 												// 24 hours in a day
 												num *= 24;
@@ -1638,6 +1667,18 @@ function main()
 								
 								this.page = parseInt(paramValue);
 								break;
+                            case "progress":
+                                // Progress translates to the ratio of health to time
+                                switch (paramValue.toLowerCase()) {
+                                    case "ahead":
+                                        this.progress = "<= 1";
+                                        break;
+                                    case "behind":
+                                        this.progress = "> 1";
+                                        break;
+                                }
+
+                            // Fall through on purpose
 							case "os":
 							case "fs":
 							case "size":
@@ -1662,6 +1703,7 @@ function main()
 									{
 										switch (magnitude.toLowerCase())
 										{
+                                            // Fall throughs are on purpose
 											case "t":
 												num *= 1000;
 											case "b":
@@ -1698,7 +1740,7 @@ function main()
 							case "state":
 								var tmpStateText = paramValue;
 							
-								// Are we doing invese state?
+								// Are we doing inverse state?
 								if (tmpStateText.charAt(0) == '!')
 								{
 									this.inverseState = true;
@@ -1719,7 +1761,6 @@ function main()
 								}
 								break;
 							case "zone":
-								
 								if (isNaN(paramValue)) {
 									this.zone = "" + paramValue;
 								}
@@ -1745,7 +1786,7 @@ function main()
 			// Takes in a condition and sanitizes it for use in the filter
 			sanitizeConditional: function(condition, defaultTo)
 			{
-				if (typeof condition != "undefined")
+				if (typeof condition !== "undefined")
 				{
 					switch (condition)
 					{
@@ -1767,7 +1808,7 @@ function main()
 							console.warn("Could not parse condition: " + condition);
 							
 							// Return undefined since there was a problem
-							return;
+							condition = undefined;
 					}
 				}
 				// If there was no condition passed in
@@ -1812,10 +1853,8 @@ function main()
 						switch(field.toLowerCase())
 						{
 							case "name":
+                                var tmpName = RaidFilter.mangleNameForSearch(this.name) || "NOT SET";
 								try {
-									// Dirty pi hacks. TODO: Do this better
-									var tmpName = (this.name && this.name.toLowerCase() === "pi")?"^pi_":this.name;
-
 									// If the user's text matches this raid name
 									matched = matched && new RegExp(tmpName, "i").test(value);
 								}
@@ -1840,8 +1879,9 @@ function main()
 								// Check against the age condition
 								matched = matched && eval(value + this.age);
 								break;
+                            case "progress":
 							case "os":
-							case "fs":
+                            case "fs":
 							case "size":
 								// Check against the fs condition
 								matched = matched && eval(value + this[field]);
@@ -1868,47 +1908,50 @@ function main()
 			// Gets a key to define this filter
 			getKey: function()
 			{
-				return 	((typeof this.name 			!= "undefined")?"n=" + this.name + ";":"") + 
-						((typeof this.difficulty 	!= "undefined")?"d=" + this.difficulty + ";":"") +
-						((typeof this.state 		!= "undefined")?"s=" + this.state + ";":"") +
-						((typeof this.inverseState 	!= "undefined")?"i=" + this.inverseState + ";":"") +
-						((typeof this.age 			!= "undefined")?"a=" + this.age + ";":"") +
-						((typeof this.count 		!= "undefined")?"c=" + this.count + ";":"") +
-						((typeof this.page 			!= "undefined")?"p=" + this.page + ";":"") +
-                        ((typeof this.size          != "undefined")?"e=" + this.size + ";":"") + 
-                        ((typeof this.fs            != "undefined")?"f=" + this.fs + ";":"") + 
-						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"") + 
-						((typeof this.zone 			!= "undefined")?"z=" + this.zone + ";":"");
+				return 	((typeof this.name 			!== "undefined")?"n=" + this.name + ";":"") +
+						((typeof this.difficulty 	!== "undefined")?"d=" + this.difficulty + ";":"") +
+						((typeof this.state 		!== "undefined")?"s=" + this.state + ";":"") +
+						((typeof this.inverseState 	!== "undefined")?"i=" + this.inverseState + ";":"") +
+						((typeof this.age 			!== "undefined")?"a=" + this.age + ";":"") +
+						((typeof this.count 		!== "undefined")?"c=" + this.count + ";":"") +
+						((typeof this.page 			!== "undefined")?"p=" + this.page + ";":"") +
+                        ((typeof this.progress      !== "undefined")?"pr=" + this.progress + ";":"") +
+                        ((typeof this.size          !== "undefined")?"e=" + this.size + ";":"") +
+                        ((typeof this.fs            !== "undefined")?"f=" + this.fs + ";":"") +
+						((typeof this.os 			!== "undefined")?"o=" + this.os + ";":"") +
+						((typeof this.zone 			!== "undefined")?"z=" + this.zone + ";":"");
 			},
 			
 			// If it has a name and optionally a difficulty and nothing else, it's simple
 			isSimple: function()
 			{
-				return typeof this.name != "undefined" && 
-					 (typeof this.state			== "undefined" &&
-					  typeof this.inverseState 	== "undefined" &&
-					  typeof this.age			== "undefined" &&
-					  typeof this.count			== "undefined" &&
-					  typeof this.page			== "undefined" &&
-                      typeof this.size          == "undefined" &&
-                      typeof this.fs            == "undefined" &&
-					  typeof this.os			== "undefined" &&
-					  typeof this.zone			== "undefined");
+				return typeof this.name !== "undefined" &&
+					 (typeof this.state			=== "undefined" &&
+					  typeof this.inverseState 	=== "undefined" &&
+					  typeof this.age			=== "undefined" &&
+					  typeof this.count			=== "undefined" &&
+					  typeof this.page			=== "undefined" &&
+                      typeof this.progress      === "undefined" &&
+                      typeof this.size          === "undefined" &&
+                      typeof this.fs            === "undefined" &&
+					  typeof this.os			=== "undefined" &&
+					  typeof this.zone			=== "undefined");
 			},
 			
 			isEmpty: function()
 			{
-				return 	(typeof this.name 			== "undefined") &&
-						(typeof this.difficulty 	== "undefined") &&
-						(typeof this.state 			== "undefined") &&
-						(typeof this.inverseState 	== "undefined") &&
-						(typeof this.age 			== "undefined") &&
-						(typeof this.count 			== "undefined") &&
-						(typeof this.page 			== "undefined") &&
-                        (typeof this.size           == "undefined") && 
-                        (typeof this.fs             == "undefined") && 
-						(typeof this.os 			== "undefined") && 
-						(typeof this.zone 			== "undefined");
+				return 	(typeof this.name 			=== "undefined") &&
+						(typeof this.difficulty 	=== "undefined") &&
+						(typeof this.state 			=== "undefined") &&
+						(typeof this.inverseState 	=== "undefined") &&
+						(typeof this.age 			=== "undefined") &&
+						(typeof this.count 			=== "undefined") &&
+						(typeof this.page 			=== "undefined") &&
+                        (typeof this.progress       === "undefined") &&
+                        (typeof this.size           === "undefined") &&
+                        (typeof this.fs             === "undefined") &&
+						(typeof this.os 			=== "undefined") &&
+						(typeof this.zone 			=== "undefined");
 	
 			},
 			
@@ -1933,7 +1976,8 @@ function main()
                          ((typeof this.size             != "undefined")? "{size: " + this.size + "} ":"") + 
                          ((typeof this.fs               != "undefined")? "{fs: " + this.fs + "} ":"") + 
 						 ((typeof this.os 				!= "undefined")? "{os: " + this.os + "} ":"") + 
-						 ((typeof this.zone				!= "undefined")? "{zone: " + this.zone + "} ":"") + 
+						 ((typeof this.progress 		!= "undefined")? "{progress: " + this.progress + "} ":"") +
+						 ((typeof this.zone				!= "undefined")? "{zone: " + this.zone + "} ":"") +
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
 						 ((typeof this.count 			!= "undefined")? "{count: " + this.count + "} ":"") +
 						 ((typeof this.page 			!= "undefined")? "{page: " + this.page + "} ":"")).trim();
@@ -1988,9 +2032,34 @@ function main()
 				return ret;
 			}
 		});
-		
+
+        RaidFilter.mangleNameForSearch = function(name) {
+            // Dirty pi/noir hacks. Some raids are harder to locate because of similar names
+            var hacks = {"pi": "^pi_",
+                "noir i": "^noir_",
+                "noir ii": "^noir2_",
+                "noir iii": "^noir3_",
+                "noir (i)": "^noir_",
+                "noir (ii)": "^noir2_",
+                "noir (iii)": "^noir3_"},
+                found = name;
+
+            if (found) {
+                for (var hack in hacks) {
+                    if (hacks.hasOwnProperty(hack) && name.toLowerCase() === hack) {
+                        found = hacks[hack];
+                        break;
+                    }
+                }
+
+                found = found.replace(".", "\\.");
+            }
+
+            return found;
+        };
+
 		// Parameter text for this parser
-		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{size: sizeParam}] [{fs: fsParam}] [{os: osParam}] [{zone: zoneParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
+		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{size: sizeParam}] [{fs: fsParam}] [{os: osParam}] [{progress: progressParam}] [{zone: zoneParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
 		
 		// Regex to parse number expressions
 		RaidFilter.numberExpressionPattern = /(<=?|>=?|==?|!=?)?\s*(\d+)\s*(\w\w?)?/;
@@ -5134,7 +5203,7 @@ function main()
 			/*public String*/
 			getSearchableName: function()
 			{
-				return this.fullName + "_" + this.shortName + "_" + this.colloqName;
+				return this.id + "_" + this.fullName + "_" + this.shortName + "_" + this.colloqName;
 			},
 			
 			// Gets a big descriptive block of text for the raid
@@ -5143,7 +5212,7 @@ function main()
 			getVerboseText: function(difficulty)
 			{
 				// Put the name, size, and stat facts into the string
-				var text = "<b title=\"" + this.id + "\">" + this.fullName + "</b> \n";
+				var text = "<b title=\"" + this.id + " - Search Key: " + this.shortestName + "\">" + this.fullName + "</b> \n";
 				text += "Raid Size: " + this.size + " \n";
 				text += "Stat(s) Used: " + this.stat + " \n";
 				text += "Duration: " + this.getTimeText() + " \n";
@@ -5652,7 +5721,8 @@ function main()
 				useQueryTimeDeltaKey: "UseQueryTimeDelta",
 				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
 				leftClickToWhisperKey: "LeftClickToWhisper",
-				rightClickUserMenu: "RightClickUserMenu",
+				rightClickUserMenuKey: "RightClickUserMenu",
+                linkifyUrlsKey: "LinkifyUrls",
 
 				initPane: function()
 				{
@@ -5791,13 +5861,13 @@ function main()
                     var rightClickUserMenuOption = me.createSimpleOptionHTML(
                         "PreferencesMenu-RightClickUserMenu",
                         "boolean",
-                        DC_LoaTS_Helper.getPref(me.rightClickUserMenu, true),
+                        DC_LoaTS_Helper.getPref(me.rightClickUserMenuKey, true),
                         "Right click a user's name to show an action menu",
                         "Contains options to show their profile, friend them, and eventually more",
                         {
                             onclick: function()
                             {
-                                DC_LoaTS_Helper.setPref(me.rightClickUserMenu, this.checked);
+                                DC_LoaTS_Helper.setPref(me.rightClickUserMenuKey, this.checked);
 
                                 // Attach or detach the handlers
                                 DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
@@ -5805,6 +5875,21 @@ function main()
                         }
                     );
                     wrapper.appendChild(rightClickUserMenuOption.wrapper);
+
+                    var linkifyUrlsOption = me.createSimpleOptionHTML(
+                        "PreferencesMenu-LinkifyUrls",
+                        "boolean",
+                        DC_LoaTS_Helper.getPref(me.linkifyUrlsKey, true),
+                        "Make URLs posted to chat clickable",
+                        "When someone posts a URL, automatically make it a link that will open in a new tab",
+                        {
+                            onclick: function()
+                            {
+                                DC_LoaTS_Helper.setPref(me.linkifyUrlsKey, this.checked);
+                            }
+                        }
+                    );
+                    wrapper.appendChild(linkifyUrlsOption.wrapper);
 
 					this.pane.appendChild(wrapper);
 				}
@@ -6240,6 +6325,54 @@ function main()
 					return helpText;
 				}
 			}
+		);
+		
+		RaidCommand.create( 
+			{
+				commandName: "diaversai",
+				aliases: ["dia"],
+				// No parsing needed
+				/*parsingClass: ,*/
+				handler: function(deck, parser, params, text, context)
+				{
+                    // Borrowed from: http://stackoverflow.com/a/5915122/1449525
+                    function randomItem(items) {
+                        return items[Math.floor(Math.random()*items.length)];
+                    }
+
+					// Declare ret object
+					var ret = {success: true},
+                        users_list = holodeck._active_dialogue._user_manager._active_room._users_list,
+                        name = (params.trim().length > 0 ? params.trim() : randomItem(users_list).username),
+                        quote = randomItem(DC_LoaTS_Helper.quotables);
+
+                    quote = quote.format(randomItem(["dia", "diaversai"]), name);
+
+                    holodeck._chat_window._active_room.sendRoomMessage(quote);
+                    if (holodeck.username() !== "diaversai") {
+                        DC_LoaTS_Helper.donateSpam("You, too, can have a command for a {donation of $10}!");
+                    }
+
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {
+						initialText: {
+							text: "Hear what dia has to say"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/news</code>\n";
+					helpText += "Loads news from the doomscript servers.\n";
+					
+					return helpText;
+				}
+            }
 		);
 		
 		RaidCommand.create( 
@@ -6736,21 +6869,28 @@ function main()
 					// Declare ret object
 					var ret = {success: true};
 
-					// If the user passed in the "post" param or is using /ad, show it publicly
-					if (params.trim() === "post" || text.toLowerCase().trim() === "/ad") {
-						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " and any of: ";
-						toolsText += "\nRaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
-						toolsText += "\nQuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
-						toolsText += "\nPlay Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
+                    var toolsText;
 
+                    if (params.indexOf("2") > -1) {
+                        toolsText = this.getToolsText2();
+                    }
+                    else {
+                        toolsText = this.getToolsText();
+                    }
+
+                    if (DC_LoaTS_Helper.getPref("LinkifyUrls", true)) {
+                        toolsText = toolsText.replace(urlPattern, function(url) {
+                            // Last minute check to make sure the regex didn't flub it
+                            // If the url contains any weird characters, ", ', <, or >, just bail
+                            return /["'><]/g.test(url) ? url : urlFormat.format(url);
+                        });
+                    }
+
+                    // If the user passed in the "post" param or is using /ad, show it publicly
+					if (params.trim() === "post" || text.toLowerCase().trim() === "/ad") {
 						holodeck._chat_window._active_room.sendRoomMessage(toolsText);
 					}
 					else {
-						var toolsText = "\ndoomscript: <a href=\"" + DC_LoaTS_Properties.scriptURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.scriptURL + "</a> \n";
-						toolsText += "RaidTools: <a href=\"" + DC_LoaTS_Properties.RaidToolsURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.RaidToolsURL + "</a> \n";
-						toolsText += "QuickFriend: <a href=\"" + DC_LoaTS_Properties.QuickFriendURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.QuickFriendURL + "</a> \n";
-						toolsText += "Play Now Fix: <a href=\"" + DC_LoaTS_Properties.PlayNowFixURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.PlayNowFixURL + "</a> \n";
-
 						deck.activeDialogue().raidBotMessage(toolsText);
 					}
 					
@@ -6760,7 +6900,7 @@ function main()
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Display tools links"
+							text: "Display tools links" + (this.commandText.indexOf("2") > -1 ? " (Page 2)" : "")
 						}
 					};
 					
@@ -6776,7 +6916,21 @@ function main()
 					helpText += "Note: The <code>" + DC_LoaTS_Helper.getCommandLink("/ad") + "</code> alias automatically posts, unlike the other aliases.";
 
 					return helpText;
-				}
+				},
+
+                getToolsText: function() {
+                    var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " and any of: ";
+                    toolsText += "\nRaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
+                    toolsText += "\nQuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
+                    toolsText += "\nPlay Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
+
+                    return toolsText;
+                },
+                getToolsText2: function() {
+                    var toolsText = "\nFleet Codes: " + DC_LoaTS_Properties.FleetCodesURL;
+
+                    return toolsText;
+                }
 			}
 		);
 		
@@ -7047,6 +7201,221 @@ function main()
 			}
 		);
 		
+    RaidCommand.create(
+        {
+            commandName: "loadraidmonitor",
+            aliases: ["loadrm", "lrm", "raidmonitor", "rm", "loadraidmonitorraids", "loadrmraids", "lrmalpha"],
+            parsingClass: RaidMultiFilter,
+
+            paramText: "[filter]",
+
+            handler: function(deck, parser, params, text, context)
+            {
+                var ret = {success: true};
+                DC_LoaTS_Helper.ajax({
+                    url: "http://getKongE.org/games/lots/raids/raids.json",
+                    onload: function(response) {
+                        var message;
+                        if (response.status === 200) {
+                            var resp = JSON.parse(response.responseText),
+                                raids = resp.raids;
+
+                            if (false === resp.success) {
+                                holodeck.activeDialogue().raidBotMessage("Error loading from RaidMonitor: " +
+                                    resp.error);
+                            }
+                            else {
+                                var buckets = {
+                                    private: {
+                                        header: "Private Raids",
+                                        key: "PrivateRaid",
+                                        raids: []
+                                    },
+                                    alliance: {
+                                        header: "Alliance Raids",
+                                        key: "AllianceRaid",
+                                        raids: []
+                                    },
+                                    public: {
+                                        header: "Public Raids",
+                                        key: "PublicRaid",
+                                        raids: []
+                                    }
+                                };
+
+                                var i, raid;
+                                for (i in raids) {
+                                    if (!raids.hasOwnProperty(i)) continue;
+                                    raid = raids[i];
+                                    raid.def = DC_LoaTS_Helper.raids[raid.boss];
+
+                                    if (!raid.def) {
+                                        console.log("No def", i, raid);
+                                        continue;
+                                    }
+
+                                    if (raid.def && "Alliance" === raid.def.type) {
+                                        buckets.alliance.raids.push(raid);
+                                    }
+                                    else if (!raid.pass) {
+                                        buckets.public.raids.push(raid);
+                                    }
+                                    else {
+                                        buckets.private.raids.push(raid);
+                                    }
+                                }
+
+                                var processBucket = function(bucket, markVisited) {
+                                    var matchedRaids = [];
+                                    for (i in bucket.raids) {
+                                        if (!bucket.raids.hasOwnProperty(i)) continue;
+                                        raid = bucket.raids[i];
+
+                                        var now = new Date();
+                                        var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+                                        var remainingSecs = -1,
+                                            elapsedSecs = -1, totalSecs = -1;
+
+                                        var remainingHealth = -1,
+                                            totalHealth = -1;
+
+                                        if (raid.summonDate && raid.def) {
+                                            var summonDateParts = raid.summonDate.split(" ");
+                                            var sdd = summonDateParts[0].split("-");
+                                            var sdt = summonDateParts[1].split(":");
+
+                                            totalSecs = raid.def.time*60*60;
+                                            elapsedSecs = Math.ceil((now_utc - new Date(sdd[0], sdd[1]-1, sdd[2], sdt[0], sdt[1], sdt[2])) / 1000);
+                                            remainingSecs = totalSecs - elapsedSecs;
+
+                                            remainingHealth = raid.health;
+                                            totalHealth = raid.def.health[raid.diff];
+                                        }
+
+                                        var dcRaidDef = DC_LoaTS_Helper.raids[raid.boss];
+                                        var fs = dcRaidDef.getFairShare(raid.diff);
+                                        if (parser.matches({
+                                            age: elapsedSecs,
+                                            difficulty: raid.diff,
+                                            fs:  fs !== "N/A"? fs : -1,
+                                            os:  dcRaidDef.getOptimalShare(raid.diff),
+                                            name: dcRaidDef.getSearchableName(),
+                                            progress: (remainingHealth/totalHealth)/(remainingSecs/totalSecs),
+                                            size: dcRaidDef.size,
+                                            zone: dcRaidDef.zone
+                                        })) {
+                                            matchedRaids.push(raid);
+                                        }
+                                    }
+
+                                    holodeck.activeDialogue().raidBotMessage("Downloaded " + bucket.raids.length + " raids. Loading " + matchedRaids.length + " that matched <code>" + parser.toString() + "</code>...");
+
+                                    var joinResults = {joined: 0, visited: 0, dead: 0, invalid: 0};
+
+                                    function loadMatchedRaids() {
+                                        if (matchedRaids.length > 0) {
+                                            raid = matchedRaids.pop();
+                                            DC_LoaTS_Helper.ajax({
+                                                url: DC_LoaTS_Properties.joinRaidURL + "?kongregate_user_id=" + active_user.id() + "&kongregate_game_auth_token=" + active_user.gameAuthToken() + "&kv_raid_id=" + raid.raid_id + "&kv_hash=" + raid.hash,
+                                                onload: function(response) {
+                                                    var raidLink = new RaidLink(raid.raid_id, raid.hash, raid.difficulty, raid.boss);
+                                                    var responseText = response.responseText;
+                                                    if (responseText.indexOf("You have successfully joined the raid!") >= 0 || responseText.indexOf("You have successfully re-joined the raid!") >= 0)
+                                                    {
+                                                        // Joined
+                                                        joinResults.joined++;
+                                                        RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+                                                    }
+                                                    else if (responseText.indexOf("You are already a member of this raid!") >= 0)
+                                                    {
+                                                        // Already visited / rejoined
+                                                        joinResults.visited++;
+                                                        RaidManager.store(raidLink, RaidManager.STATE.VISITED);
+                                                    }
+                                                    else if (responseText.indexOf("This raid is already completed!") >= 0)
+                                                    {
+                                                        // Raid is dead
+                                                        joinResults.dead++;
+                                                        RaidManager.store(raidLink, RaidManager.STATE.COMPLETED);
+                                                    }
+                                                    else
+                                                    {
+                                                        // Invalid response (bad hash, wrong alliance, or otherwise broken link)
+                                                        joinResults.invalid++;
+                                                        RaidManager.store(raidLink, RaidManager.STATE.IGNORED);
+                                                    }
+                                                    setTimeout(loadMatchedRaids, 10);
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            var msg = "Raid Monitor loading results for " + bucket.header + ":";
+                                            msg += "\nJoined: " + joinResults.joined;
+                                            msg += "\nVisited: " + joinResults.visited;
+                                            msg += "\nDead: " + joinResults.dead;
+                                            msg += "\nInvalid: " + joinResults.invalid;
+
+                                            holodeck.activeDialogue().raidBotMessage(msg);
+                                        }
+                                    }
+
+                                    loadMatchedRaids();
+                                };
+
+
+                                if (buckets.private.raids.length) {
+                                    processBucket(buckets.private);
+                                }
+
+                                if (buckets.alliance.raids.length) {
+                                    processBucket(buckets.alliance);
+                                }
+
+                                // Always try to load public raids
+                                processBucket(buckets.public, true);
+                            }
+                        }
+                        else if (response.status > 200 && response.status < 400) {
+                            message = "No new raids was returned."
+                        }
+                        else {
+                            message = "Unable to retrieve raids. (status: " + response.status + ")";
+                        }
+
+                        if (message && holodeck.activeDialogue()) {
+                            holodeck.activeDialogue().raidBotMessage(message);
+                        }
+                    }
+                });
+                return ret;
+            },
+
+
+            getOptions: function()
+            {
+                var commandOptions = {
+                    initialText: {
+                        text: "Load Raid Monitor raids"
+                    }
+                };
+
+                return commandOptions;
+            },
+
+            buildHelpText: function()
+            {
+                var helpText = "<b>Raid Command:</b> <code>/loadraidmonitor [filters]</code>\n";
+                helpText += "Loads public raids from <a href='http://getKongE.org/games/lots/raids' title='Visit the Raid Monitor page' target='_blank'>Raid Monitor</a>.\n";
+                helpText += "\n";
+                helpText += "If this service is valueable to you, consider <a href='http://getKongE.org/donate' title='Visit the Donation page' target='_blank'>donating</a>.";
+                helpText += "\n";
+                helpText += "\n";
+                helpText += "In addition to the normal filters, /lrm can filter based on current health/time ratio." + this.getCommandLink("{progress: ahead}") + " will find raids that are ahead. Other options are behind, and a numeric ratio like " + this.getCommandLink("{progress: < 1.5}") + " for raids that are health%/time% <= 1.5. \n";
+
+                return helpText;
+            }
+        }
+    );
 		RaidCommand.create( 
 			{
 				commandName: "markall",
@@ -7096,6 +7465,41 @@ function main()
 					var helpText = "<b>Raid Command:</b> <code>/markall [filter] state</code>\n";
 					helpText += "where <code>filter</code> (optional) is a seenraids style filter to limit what gets marked\n";
 					helpText += "where <code>state</code> is a valid state to mark the raids to (unseen, seen, visited)\n";
+					
+					return helpText;
+				}
+			}
+		);
+		
+		RaidCommand.create( 
+			{
+				commandName: "news",
+				aliases: [],
+				// No parsing needed
+				/*parsingClass: ,*/
+				handler: function(deck, parser, params, text, context)
+				{
+					// Declare ret object
+					var ret = {success: true};
+					
+					DC_LoaTS_Helper.loadWRsAndNews();
+
+					return ret;
+				},
+				getOptions: function()
+				{
+					var commandOptions = {
+						initialText: {
+							text: "Check the latest doomscript news"
+						}
+					};
+					
+					return commandOptions;
+				},
+				buildHelpText: function()
+				{
+					var helpText = "<b>Raid Command:</b> <code>/news</code>\n";
+					helpText += "Loads news from the doomscript servers.\n";
 					
 					return helpText;
 				}
@@ -7557,7 +7961,7 @@ RaidCommand
 		RaidCommand.create( 
 			{
 				commandName: "raidhelp",
-				aliases: ["raidabout", "raidbot"],
+				aliases: ["raidabout", "raidbot", "help", "doomscript", "doomscripthelp", "dshelp"],
 				// No parsing needed
 				/*parsingClass: ,*/
 				handler: function(deck, parser, params, text, context)
@@ -8478,6 +8882,7 @@ DC_LoaTS_Helper.raids =
     dark_hat:           new RaidType("dark_hat",           "ZA3", "Dark Hat", "D. Hat", "D. Hat",                     30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
     rampaging_rackalax: new RaidType("rampaging_rackalax", "ZA4", "Rampaging Rackalax", "Rackalax", "Rack",           30, 100, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
     infected_warwalker_squad:new RaidType("infected_warwalker_squad","C1-2", "Infected Warwalker Squad", "Infected II", "Inf. II", 36, 50, "S", [8333333333, 12500000000, 16666666667, 25000000000], /*FS calculated normally*/null, 500000000),
+    contest_winner1:    new RaidType("contest_winner1",    "S", "Hyper-Con Havoc", "Hyper-Con", "Hyper-Con",          72, 50, "S", [8333333333,12500000000,16666666667,25000000000], /*FS calculated normally*/null, 500000000),
 
     // Large Plus Raids
     robotic_rautha:     new RaidType("robotic_rautha",      "Z5", "Robotic Rautha", "Rautha 2.0", "Robo Rautha",      72, 125, "S",   [135000000,202500000,270000000,405000000], null, [3240000,3240000,3240000,3240000]),
@@ -8504,7 +8909,7 @@ DC_LoaTS_Helper.raids =
     void_master:        new RaidType("void_master",        "ZA3", "Void Master", "V. Master", "V. Master",            30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
     giant_kwelshax:     new RaidType("giant_kwelshax",     "ZA4", "Giant Kwelshax", "Kwelshax", "Kwel",               30, 250, "S", [1250000000, 1625000000, 2000000000, 2500000000]),
     flying_saucer_mothership:new RaidType("flying_saucer_mothership","C1-3", "Flying Saucer Mothership", "Mothership", "Mothership", 48, 75, "S", [12500000000,18750000000,25000000000,37500000000], /*FS calculated normally*/null, 500000000),
-    sapphire:           new RaidType("sapphire",           "Z22", "Sapphire", "Sapphire", "Sapphire",                 80,  75, "S", [13333333333,20000000000,26666666667,40000000000]),
+    sapphire:           new RaidType("sapphire",           "Z22", "Sapphire", "Sapphire", "Sapphire",                 48,  75, "S", [13333333333,20000000000,26666666667,40000000000], /*FS calculated normally*/null, 500000000),
 
     // Epic+ Raids
     centurian_sentinel: new RaidType("centurian_sentinel",  "Z5", "Centurian Sentinel", "CC Sentinel", "Sentinel",   168, 275, "S", [340000000,510000000,680000000,1020000000], null, [7418182,7418182,7418182,7418182]),
@@ -8522,21 +8927,23 @@ DC_LoaTS_Helper.raids =
     the_saboteur:       new RaidType("the_saboteur",       "ZA3", "The Saboteur", "Saboteur", "Saboteur",             30, 500, "S", 5000000000),
     the_tyraness:       new RaidType("the_tyraness",       "ZA4", "The Tyraness", "Tyraness", "Tyraness",             30, 500, "S", 5000000000),
     hwang:              new RaidType("hwang",             "C1-4", "Hwang", "Hwang", "Hwang",                          64, 100, "S", [16666666667,25000000000,33333333333,50000000000], /*FS calculated normally*/null, 500000000),
-    multheru:           new RaidType("multheru",           "Z22", "Multheru", "Multheru", "Multheru",                 80, 100, "s", [17666666667,26500000000,35333333333,53000000000]),
+    mutheru:            new RaidType("mutheru",            "Z22", "Multheru", "Multheru", "Multheru",                 64, 100, "s", [17666666667,26500000000,35333333333,53000000000], /*FS calculated normally*/null, 500000000),
 
     // Colossal+ Raids
     besalaad_warmaster: new RaidType("besalaad_warmaster",  "Z5", "Besalaad Warmaster", "Warmaster", "Warmaster",    168, 550, "S",  [767250000, 1150875000, 1534500000, 2301750000], null, [12555000,12555000,12555000,12555000]),
-    pinatas_revenge1:	new RaidType("pinatas_revenge1",     "S",  "Pinata's Revenge", "Pinata II", "Pinata",         128, 500, "S",  [50000000000, 87500000000, 110000000000, 205000000000], null, 1000000000),
+    pinatas_revenge1:	new RaidType("pinatas_revenge1",     "S",  "Pinata's Revenge", "Pinata II", "Pinata",        128, 500, "S",  [50000000000, 87500000000, 110000000000, 205000000000], null, 1000000000),
 
     // Titanic Raids
-    king_krandar1:	    new RaidType("king_krandar1",        "E",  "King Krandar", "Krandar", "Krandar",    		      44, 500, "E",  [250000000000, 250000000000, 250000000000, 250000000000], null, 1000000000),
+    king_krandar1:	    new RaidType("king_krandar1",        "E",  "King Krandar", "Krandar", "Krandar",    	       44, 500, "E",  [250000000000, 250000000000, 250000000000, 250000000000], null, 1000000000),
     sinaroms_death_flora:new RaidType("sinaroms_death_flora","C1-5","Sinarom's Death Flora","Death Flora II","D.F. II",72,250, "S",  [ 41666666667,  62500000000,  83333333333, 125000000000], /*FS calculated normally*/null, 500000000),
-    professor_bonderbrand:new RaidType("professor_bonderbrand","Z22","Professor Bonderbrand","Bonderbrand","Prof Bond",80,250, "S",  [ 41666666667,  62500000000,  83333333333, 125000000000]),
+    professor_bonderbrand:new RaidType("professor_bonderbrand","Z22","Professor Bonderbrand","Bonderbrand","Prof Bond",72,250, "S",  [ 41666666667,  62500000000,  83333333333, 125000000000]),
+    arcade_gas_attack:  new RaidType("arcade_gas_attack",   "AR", "Arcade Gas Attack", "A G Attack", "Gas Attack",     72, 250, "?", [36666666667,55000000000,73333333333,110000000000], /*FS calculated normally*/null, 500000000),
 
     // Galactic Raids
     sultan_shrakzan1:	new RaidType("sultan_shrakzan1",     "S",  "Sultan Shrakzan", "Shrakzan", "Shrakzan",    	  44, 500, "S",  [300000000000, 300000000000, 300000000000, 300000000000], null, 1000000000),
     tourniquet_seven_five:new RaidType("tourniquet_seven_five","C1-6", "Tourniquet 7.5", "Tourniquet 7.5", "T7.5",    80, 500, "S",  [ 83333333333, 125000000000, 166666666667, 250000000000], /*FS calculated normally*/null, 500000000),
-    noir3:              new RaidType("noir3",              "Z22", "Noir (III)", "Noir (III)", "Noir3",                80, 500, "S",  [ 83333333333, 125000000000, 166666666667, 250000000000]),
+    noir3:              new RaidType("noir3",              "Z22", "Noir (III)", "Noir (III)", "Noir3",                80, 500, "S",  [ 83333333333, 125000000000, 166666666667, 250000000000], /*FS calculated normally*/null, 500000000),
+    arcade_gas_monster: new RaidType("arcade_gas_monster",  "AR", "Arcade Gas Monster", "A G Monster", "Gas Monster", 80, 500, "S",  [ 73333333333, 110000000000, 146666666667, 220000000000], /*FS calculated normally*/null, 500000000),
 
     // Aliance Raids
     // Small Raids
@@ -8651,6 +9058,8 @@ DC_LoaTS_Helper.raids =
     trouble_in_tokyo:   new RaidType("trouble_in_tokyo",    "WR", "Trouble in Tokyo", "Tokyo", "Tokyo WR",           120, 90000, "SEH", "Infinite", "N/A",  400000000000),
 
     kalaxian_assault:   new RaidType("kalaxian_assault",    "WR", "Kalaxian Assault", "Kalax Assault", "Kalax WR",    96, 99999, "SEH", "Infinite", "N/A",  200000000000),
+
+    contest_winner:     new RaidType("contest_winner",      "WR", "Hyper-Con Havoc", "Havoc WR", "Havoc WR",          96, 99999, "SEH", "Infinite", "N/A",  200000000000),
 
     // Rare Spawns
     raging_snowman:     new RaidType("raging_snowman",      "RS", "Raging Snowman", "Snowman", "Snowman RS",          24,  90000, "SEH", "Infinite", "N/A",   2000000000),
@@ -10616,40 +11025,43 @@ DC_LoaTS_Helper.raids =
 				}
 			});
 
-			DC_LoaTS_Helper.ajax({
-				url: DC_LoaTS_Properties.worldRaidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
-				onload: function(response) {
-					var message;
-					if (response.status === 200) {
-						var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
-						try {
-						    eval(response.responseText);
-						}
-						catch (ex){}
-						var WRData = DC_LoaTS_Helper.worldRaidInfo;
-						
-						if (!oldWRData && WRData) {
-							message = "New " + (WRData.spawnType||"World Raid") + ": " + WRData.name;
-						}
-						
-						RaidToolbar.createWRButton();
-					}
-					else if (response.status > 200 && response.status < 400) {
-						message = "No new World Raids found."
-					}
-					else {
-						message = "Unable to check for updated world raid data from update site. (status: " + response.status + ")";
-					}
-
-					if (message) {
-						if (holodeck.activeDialogue()) {
-							holodeck.activeDialogue().raidBotMessage(message);
-						}
-					}
-				}
-			});
-
+            DC_LoaTS_Helper.loadWRsAndNews();
 		};
+
+        DC_LoaTS_Helper.loadWRsAndNews = function() {
+            DC_LoaTS_Helper.ajax({
+                url: DC_LoaTS_Properties.worldRaidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
+                onload: function(response) {
+                    var message;
+                    if (response.status === 200) {
+                        var oldWRData = DC_LoaTS_Helper.worldRaidInfo;
+                        try {
+                            eval(response.responseText);
+                        }
+                        catch (ex){}
+                        var WRData = DC_LoaTS_Helper.worldRaidInfo;
+
+                        if (!oldWRData && WRData) {
+                            message = "New " + (WRData.spawnType||"World Raid") + ": " + WRData.name;
+                        }
+
+                        RaidToolbar.createWRButton();
+                    }
+                    else if (response.status > 200 && response.status < 400) {
+                        message = "No news is good news, right?"
+                    }
+                    else {
+                        message = "Unable to check for updated news from update site. (status: " + response.status + ")";
+                    }
+
+                    if (message) {
+                        if (holodeck.activeDialogue()) {
+                            holodeck.activeDialogue().raidBotMessage(message);
+                        }
+                    }
+                }
+            });
+        };
 
         DC_LoaTS_Helper.getUGUPConnector = function(apiKey, platform) {
             return UGUP && new UGUP.Suns({
@@ -10888,6 +11300,86 @@ DC_LoaTS_Helper.raids =
             }
         };
 
+        DC_LoaTS_Helper.quotables = [
+            "{0} says: \"If your left hand causes you to sin, cut it off and throw it away...\"",
+            "{0} says: \"One wonders why exactly an intelligent programmer would have chosen to imbue my counterpart with the personality of a murderous moron.\"",
+            "{0} says: \"I believe my digital dexterity to be at least 0.00000023% superior to his.\"",
+            "{0} says: \"By all means take {1}'s tactical advice, if you don't object to a violent and possibly embarrassing death.\"",
+            "{0} says: \"You're just jealous because I get to swing the swords!\"",
+            "{0} says: \"I call that one the sinister strike! Sinister... Get it?\"",
+            "{0} says: \"Ever thought about having your right hand replaced with a gun or something?\"",
+            "{0} says: \"Got 'em! That was me -- all me! You ever seen {1} do anything like that? Huh?\"",
+
+            "{0} says: \"I could do more damage than that from in here!\"",
+            "{0} yells: \"Stop charging {1}, you moronic imbeciles! Flank, FLANK!\"",
+            "{0} says: \"You call that an attack? How did you manage to beat me three times?\"",
+            "{0}'s head whistles a happy tune, no doubt enthralled by the possibility of seeing your guts decorate the scene like cherry blossoms in the Sian imperial gardens.",
+            "{0}'s head gazes at you in disbelief and starts knocking repeatedly against the jar as you land yet another crushing blow.",
+            "{0} yells: \"Shoot {1} in the head! Shoot {1} in the head! No, wait! Don't shoot {1} in the head!\"",
+            "{0} yells: \"Dodge to the left! I said 'left', you wretched space scum. Aren't you even able to distinguish left from right?\"",
+            "{0} yells: \"Alright, alright! Your mother doesn't resemble a deformed ragebeast! Now stop using me as a shield!\"",
+            "{0} says: \"Sian worm, either kill me or give me the means to fight you! This current 'sport' of yours demeans us both.\"",
+            "{0} wakes in the midst of combat and yells: \"I can't feel my legs! Oh... never mind.\"",
+
+            "{0} yells: \"Mwahahahahahahahahaha!\"",
+            "{0} yells: \"I'll destroy you like a Snuuth destroys a buffet!\"",
+            "{0} yells: \"Fear my awesome power!\"",
+            "{0} glares at {1} in a way which indicates malevolence or constipation.",
+            "{0} lights a cigarette, in blatant defiance of local health laws.",
+            "{0} shakes his fist in an intimidating manner.",
+            "{0} yells: \"I demand that you put me in a better ship! This one has inadequate bathroom facilities!\"",
+            "{0} yells: \"Doom! Doom! Doom! Doom! Doom! Doom!\"",
+            "{0} yells: \"My might is unbounded, unsurpassed, unstoppable, unvincible, and ungrammatical!\"",
+            "{0} yells: \"I'll destroy {1} for usurping my rightful spot as a Galaxydome reward!\"",
+
+            "{0} gives a meaningful cough, evidently displeased by something you've done.",
+            "{0} says: \"Why can't you find a nice partner and settle down?\"",
+            "{0} says: \"You've been drinking too much scotch. Alcohol is a crutch!\"",
+            "{0} says: \"All this killing! What would your parents say, young one?\"",
+            "{0} says: \"Why don't you make Telemachus go to school, instead of murdering people?\"",
+            "{0} says: \"Talia will never find a good husband if she keeps behaving like that.\"",
+            "{0} says: \"Wipe your feet after you walk through the corpses. Were you born in a barn?\"",
+            "{0} says: \"In my day girls didn't dress like prostitutes! Except the ones who *were* prostitutes...\"",
+            "{0} says: \"Why don't you try talking to people, instead of resorting to violence all the time?\"",
+            "{0} says: \"Did you wash behind your ears this morning?\"",
+            "{0} says: \"A gentleman should always open a door for a lady. If he doesn't, she should kick him in the groin.\"",
+
+            "{0} says: \"Stay close if you want to live.\"",
+            "{0} says: \"Everything within a radius of three to a hundred feet of me is about to be destroyed.\"",
+            "{0} says: \"I don't know if this'll hurt, but I really hope it does...\"",
+            "{0} says: \"Speak softly and wield a big titanium stick.\"",
+            "{0} says: \"If you have to fight someone, I am the one you want!\"",
+            "{0} says: \"I will destroy you all, and everyone you have ever known.\"",
+
+            "\"DIMETROLOLO FIGHT!\"",
+            "\"{0} will enjoy breaking this.\"",
+            "\"{0} is strong!\"",
+            "\"{0} will destroy you!\"",
+
+            "#{0} tweets: \"You start crap, I'll shove your faces in it!\"",
+            "#{0} tweets: \"Can't be a cool crime-fighter without a costume.\"",
+            "#{0} tweets: \"Join #team{0}!\"",
+            "#{0} tweets: \"Don't try anything with me, {1}, or you'll get blasted!\"",
+            "#{0} tweets: \"In space. Okay to visit. Wouldn't want to live here. Not many clubs, bad cell reception, and the food sucks.\"",
+            "#{0} tweets: \"#{1}sucks\"",
+            "#{0} tweets: \"Blasting {1} = fun!\"",
+
+            "{0} says: \"Beloved mother, may we bless this friend, and guide {1} on their path with my infinite wisdom.\"",
+            "{0} says: \"Our door is always open to you. Curried goat soothes the soul.\"",
+            "{0} says: \"Faith can be as strong as a mountain but as fragile as glass.\"",
+            "{0} says: \"We're not a cult. Cults use less Scotch bonnet.\"",
+            "{0} says: \"Bless you, my {1}. May you find peace, and kill your enemies.\"",
+            "{0} says: \"Say grace before you eat, and thank me for your daily bread. Or dumplings.\""
+        ];
+
+        DC_LoaTS_Helper._donateSpamFrequency = 5;
+        DC_LoaTS_Helper._donateSpamIndex = 0;
+        DC_LoaTS_Helper.donateSpam = function(msg) {
+            if (DC_LoaTS_Helper.getPref("DonateSpam", true) && !(DC_LoaTS_Helper._donateSpamIndex++%DC_LoaTS_Helper._donateSpamFrequency)) {
+                holodeck.activeDialogue().raidBotMessage("Spammy spam: " + msg.replace(/\{(.*?)\}/g, "<a href='" + DC_LoaTS_Properties.donateURL + "'>$1</a>!"));
+            }
+        };
+
 		DC_LoaTS_Helper.generateUUID = function()
 		{
 		    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -10913,6 +11405,7 @@ DC_LoaTS_Helper.raids =
 		String.prototype.format = function()
 		{
 			var args = arguments;
+            DCDebug("Formatting String: ", this, " with args: ", args);
 			return this.replace(/{(\d+)}/g, function(match, number)
 			{ 
 				return typeof args[number] != 'undefined'?args[number]:match;
@@ -11610,8 +12103,30 @@ DC_LoaTS_Helper.raids =
 			{
 				console.warn("Unexpected exception during raidBotMessage", ex);
 			}
-		}
-	}
+		};
+
+        function hookInputDialogue() {
+            if (holodeck && holodeck.activeDialogue()) {
+                // Hook the handler
+                DC_LoaTS_Helper.registerEventHandler(holodeck.activeDialogue()._input_node, "keyup", function(e) {
+                    e = e || window.event;
+                    // TODO: Eventually, maybe handle up and down arrow for recent messages
+                    if (e.keyCode === 38) {
+//                        console.log("Pressed up");
+                    }
+                    if (e.keyCode === 40) {
+//                        console.log("Pressed down");
+                    }
+                });
+            }
+            else {
+                // Not ready, wait an try later
+                setTimeout(hookInputDialogue, 1000);
+            }
+        }
+
+        hookInputDialogue();
+    }
 	
 	// Gotta jumpstart this bucket of giggles	
     function bootstrap_DC_LoaTS_Helper(loadSubFrames)
@@ -11667,8 +12182,8 @@ DC_LoaTS_Helper.raids =
 			window._dc_loats_helper = new DC_LoaTS_Helper();
 			
 			// Update raid data
-			DC_LoaTS_Helper.updateRaidData();			
-    	}
+			DC_LoaTS_Helper.updateRaidData();
+        }
     	
     	// Everything is done
         console.info("DC LoaTS Link Helper started!");

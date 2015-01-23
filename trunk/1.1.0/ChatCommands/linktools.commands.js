@@ -9,21 +9,28 @@
 					// Declare ret object
 					var ret = {success: true};
 
-					// If the user passed in the "post" param or is using /ad, show it publicly
-					if (params.trim() === "post" || text.toLowerCase().trim() === "/ad") {
-						var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " and any of: ";
-						toolsText += "\nRaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
-						toolsText += "\nQuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
-						toolsText += "\nPlay Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
+                    var toolsText;
 
+                    if (params.indexOf("2") > -1) {
+                        toolsText = this.getToolsText2();
+                    }
+                    else {
+                        toolsText = this.getToolsText();
+                    }
+
+                    if (DC_LoaTS_Helper.getPref("LinkifyUrls", true)) {
+                        toolsText = toolsText.replace(urlPattern, function(url) {
+                            // Last minute check to make sure the regex didn't flub it
+                            // If the url contains any weird characters, ", ', <, or >, just bail
+                            return /["'><]/g.test(url) ? url : urlFormat.format(url);
+                        });
+                    }
+
+                    // If the user passed in the "post" param or is using /ad, show it publicly
+					if (params.trim() === "post" || text.toLowerCase().trim() === "/ad") {
 						holodeck._chat_window._active_room.sendRoomMessage(toolsText);
 					}
 					else {
-						var toolsText = "\ndoomscript: <a href=\"" + DC_LoaTS_Properties.scriptURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.scriptURL + "</a> \n";
-						toolsText += "RaidTools: <a href=\"" + DC_LoaTS_Properties.RaidToolsURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.RaidToolsURL + "</a> \n";
-						toolsText += "QuickFriend: <a href=\"" + DC_LoaTS_Properties.QuickFriendURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.QuickFriendURL + "</a> \n";
-						toolsText += "Play Now Fix: <a href=\"" + DC_LoaTS_Properties.PlayNowFixURL + "\" target=\"_blank\">" + DC_LoaTS_Properties.PlayNowFixURL + "</a> \n";
-
 						deck.activeDialogue().raidBotMessage(toolsText);
 					}
 					
@@ -33,7 +40,7 @@
 				{
 					var commandOptions = {					
 						initialText: {
-							text: "Display tools links"
+							text: "Display tools links" + (this.commandText.indexOf("2") > -1 ? " (Page 2)" : "")
 						}
 					};
 					
@@ -49,7 +56,21 @@
 					helpText += "Note: The <code>" + DC_LoaTS_Helper.getCommandLink("/ad") + "</code> alias automatically posts, unlike the other aliases.";
 
 					return helpText;
-				}
+				},
+
+                getToolsText: function() {
+                    var toolsText = "\nGet doomscript: " + DC_LoaTS_Properties.scriptURL + " and any of: ";
+                    toolsText += "\nRaidTools: " + DC_LoaTS_Properties.RaidToolsURL + " ";
+                    toolsText += "\nQuickFriend: " + DC_LoaTS_Properties.QuickFriendURL + " ";
+                    toolsText += "\nPlay Now Fix: " + DC_LoaTS_Properties.PlayNowFixURL;
+
+                    return toolsText;
+                },
+                getToolsText2: function() {
+                    var toolsText = "\nFleet Codes: " + DC_LoaTS_Properties.FleetCodesURL;
+
+                    return toolsText;
+                }
 			}
 		);
 		

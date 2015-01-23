@@ -157,7 +157,7 @@
 			/*public String*/
 			getSearchableName: function()
 			{
-				return this.fullName + "_" + this.shortName + "_" + this.colloqName;
+				return this.id + "_" + this.fullName + "_" + this.shortName + "_" + this.colloqName;
 			},
 			
 			// Gets a big descriptive block of text for the raid
@@ -166,7 +166,7 @@
 			getVerboseText: function(difficulty)
 			{
 				// Put the name, size, and stat facts into the string
-				var text = "<b title=\"" + this.id + "\">" + this.fullName + "</b> \n";
+				var text = "<b title=\"" + this.id + " - Search Key: " + this.shortestName + "\">" + this.fullName + "</b> \n";
 				text += "Raid Size: " + this.size + " \n";
 				text += "Stat(s) Used: " + this.stat + " \n";
 				text += "Duration: " + this.getTimeText() + " \n";

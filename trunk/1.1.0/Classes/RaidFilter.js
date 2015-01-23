@@ -11,7 +11,7 @@
 				Timer.start("RaidFilter init");
 				try
 				{
-					// Declare some vars for later
+					// Declare some vars for later. This is more for reference than technical need.
 					this.name;
 					this.difficulty;
 					this.state;
@@ -23,6 +23,7 @@
 					this.fs;
 					this.os;
 					this.zone;
+                    this.progress; // Only usable with lrm (needs raid currentHealth and timeRemaining
 					this.valid = true;
 	
 					// Capture original filterText
@@ -93,6 +94,7 @@
 									{
 										switch (period.toLowerCase())
 										{
+                                            // Fall throughs are on purpose
 											case "d":
 												// 24 hours in a day
 												num *= 24;
@@ -152,6 +154,18 @@
 								
 								this.page = parseInt(paramValue);
 								break;
+                            case "progress":
+                                // Progress translates to the ratio of health to time
+                                switch (paramValue.toLowerCase()) {
+                                    case "ahead":
+                                        this.progress = "<= 1";
+                                        break;
+                                    case "behind":
+                                        this.progress = "> 1";
+                                        break;
+                                }
+
+                            // Fall through on purpose
 							case "os":
 							case "fs":
 							case "size":
@@ -176,6 +190,7 @@
 									{
 										switch (magnitude.toLowerCase())
 										{
+                                            // Fall throughs are on purpose
 											case "t":
 												num *= 1000;
 											case "b":
@@ -212,7 +227,7 @@
 							case "state":
 								var tmpStateText = paramValue;
 							
-								// Are we doing invese state?
+								// Are we doing inverse state?
 								if (tmpStateText.charAt(0) == '!')
 								{
 									this.inverseState = true;
@@ -233,7 +248,6 @@
 								}
 								break;
 							case "zone":
-								
 								if (isNaN(paramValue)) {
 									this.zone = "" + paramValue;
 								}
@@ -259,7 +273,7 @@
 			// Takes in a condition and sanitizes it for use in the filter
 			sanitizeConditional: function(condition, defaultTo)
 			{
-				if (typeof condition != "undefined")
+				if (typeof condition !== "undefined")
 				{
 					switch (condition)
 					{
@@ -281,7 +295,7 @@
 							console.warn("Could not parse condition: " + condition);
 							
 							// Return undefined since there was a problem
-							return;
+							condition = undefined;
 					}
 				}
 				// If there was no condition passed in
@@ -326,10 +340,8 @@
 						switch(field.toLowerCase())
 						{
 							case "name":
+                                var tmpName = RaidFilter.mangleNameForSearch(this.name) || "NOT SET";
 								try {
-									// Dirty pi hacks. TODO: Do this better
-									var tmpName = (this.name && this.name.toLowerCase() === "pi")?"^pi_":this.name;
-
 									// If the user's text matches this raid name
 									matched = matched && new RegExp(tmpName, "i").test(value);
 								}
@@ -354,8 +366,9 @@
 								// Check against the age condition
 								matched = matched && eval(value + this.age);
 								break;
+                            case "progress":
 							case "os":
-							case "fs":
+                            case "fs":
 							case "size":
 								// Check against the fs condition
 								matched = matched && eval(value + this[field]);
@@ -382,47 +395,50 @@
 			// Gets a key to define this filter
 			getKey: function()
 			{
-				return 	((typeof this.name 			!= "undefined")?"n=" + this.name + ";":"") + 
-						((typeof this.difficulty 	!= "undefined")?"d=" + this.difficulty + ";":"") +
-						((typeof this.state 		!= "undefined")?"s=" + this.state + ";":"") +
-						((typeof this.inverseState 	!= "undefined")?"i=" + this.inverseState + ";":"") +
-						((typeof this.age 			!= "undefined")?"a=" + this.age + ";":"") +
-						((typeof this.count 		!= "undefined")?"c=" + this.count + ";":"") +
-						((typeof this.page 			!= "undefined")?"p=" + this.page + ";":"") +
-                        ((typeof this.size          != "undefined")?"e=" + this.size + ";":"") + 
-                        ((typeof this.fs            != "undefined")?"f=" + this.fs + ";":"") + 
-						((typeof this.os 			!= "undefined")?"o=" + this.os + ";":"") + 
-						((typeof this.zone 			!= "undefined")?"z=" + this.zone + ";":"");
+				return 	((typeof this.name 			!== "undefined")?"n=" + this.name + ";":"") +
+						((typeof this.difficulty 	!== "undefined")?"d=" + this.difficulty + ";":"") +
+						((typeof this.state 		!== "undefined")?"s=" + this.state + ";":"") +
+						((typeof this.inverseState 	!== "undefined")?"i=" + this.inverseState + ";":"") +
+						((typeof this.age 			!== "undefined")?"a=" + this.age + ";":"") +
+						((typeof this.count 		!== "undefined")?"c=" + this.count + ";":"") +
+						((typeof this.page 			!== "undefined")?"p=" + this.page + ";":"") +
+                        ((typeof this.progress      !== "undefined")?"pr=" + this.progress + ";":"") +
+                        ((typeof this.size          !== "undefined")?"e=" + this.size + ";":"") +
+                        ((typeof this.fs            !== "undefined")?"f=" + this.fs + ";":"") +
+						((typeof this.os 			!== "undefined")?"o=" + this.os + ";":"") +
+						((typeof this.zone 			!== "undefined")?"z=" + this.zone + ";":"");
 			},
 			
 			// If it has a name and optionally a difficulty and nothing else, it's simple
 			isSimple: function()
 			{
-				return typeof this.name != "undefined" && 
-					 (typeof this.state			== "undefined" &&
-					  typeof this.inverseState 	== "undefined" &&
-					  typeof this.age			== "undefined" &&
-					  typeof this.count			== "undefined" &&
-					  typeof this.page			== "undefined" &&
-                      typeof this.size          == "undefined" &&
-                      typeof this.fs            == "undefined" &&
-					  typeof this.os			== "undefined" &&
-					  typeof this.zone			== "undefined");
+				return typeof this.name !== "undefined" &&
+					 (typeof this.state			=== "undefined" &&
+					  typeof this.inverseState 	=== "undefined" &&
+					  typeof this.age			=== "undefined" &&
+					  typeof this.count			=== "undefined" &&
+					  typeof this.page			=== "undefined" &&
+                      typeof this.progress      === "undefined" &&
+                      typeof this.size          === "undefined" &&
+                      typeof this.fs            === "undefined" &&
+					  typeof this.os			=== "undefined" &&
+					  typeof this.zone			=== "undefined");
 			},
 			
 			isEmpty: function()
 			{
-				return 	(typeof this.name 			== "undefined") &&
-						(typeof this.difficulty 	== "undefined") &&
-						(typeof this.state 			== "undefined") &&
-						(typeof this.inverseState 	== "undefined") &&
-						(typeof this.age 			== "undefined") &&
-						(typeof this.count 			== "undefined") &&
-						(typeof this.page 			== "undefined") &&
-                        (typeof this.size           == "undefined") && 
-                        (typeof this.fs             == "undefined") && 
-						(typeof this.os 			== "undefined") && 
-						(typeof this.zone 			== "undefined");
+				return 	(typeof this.name 			=== "undefined") &&
+						(typeof this.difficulty 	=== "undefined") &&
+						(typeof this.state 			=== "undefined") &&
+						(typeof this.inverseState 	=== "undefined") &&
+						(typeof this.age 			=== "undefined") &&
+						(typeof this.count 			=== "undefined") &&
+						(typeof this.page 			=== "undefined") &&
+                        (typeof this.progress       === "undefined") &&
+                        (typeof this.size           === "undefined") &&
+                        (typeof this.fs             === "undefined") &&
+						(typeof this.os 			=== "undefined") &&
+						(typeof this.zone 			=== "undefined");
 	
 			},
 			
@@ -447,7 +463,8 @@
                          ((typeof this.size             != "undefined")? "{size: " + this.size + "} ":"") + 
                          ((typeof this.fs               != "undefined")? "{fs: " + this.fs + "} ":"") + 
 						 ((typeof this.os 				!= "undefined")? "{os: " + this.os + "} ":"") + 
-						 ((typeof this.zone				!= "undefined")? "{zone: " + this.zone + "} ":"") + 
+						 ((typeof this.progress 		!= "undefined")? "{progress: " + this.progress + "} ":"") +
+						 ((typeof this.zone				!= "undefined")? "{zone: " + this.zone + "} ":"") +
 						 ((typeof this.age 				!= "undefined")? "{age: " + this.age + "ms} ":"") +
 						 ((typeof this.count 			!= "undefined")? "{count: " + this.count + "} ":"") +
 						 ((typeof this.page 			!= "undefined")? "{page: " + this.page + "} ":"")).trim();
@@ -502,9 +519,34 @@
 				return ret;
 			}
 		});
-		
+
+        RaidFilter.mangleNameForSearch = function(name) {
+            // Dirty pi/noir hacks. Some raids are harder to locate because of similar names
+            var hacks = {"pi": "^pi_",
+                "noir i": "^noir_",
+                "noir ii": "^noir2_",
+                "noir iii": "^noir3_",
+                "noir (i)": "^noir_",
+                "noir (ii)": "^noir2_",
+                "noir (iii)": "^noir3_"},
+                found = name;
+
+            if (found) {
+                for (var hack in hacks) {
+                    if (hacks.hasOwnProperty(hack) && name.toLowerCase() === hack) {
+                        found = hacks[hack];
+                        break;
+                    }
+                }
+
+                found = found.replace(".", "\\.");
+            }
+
+            return found;
+        };
+
 		// Parameter text for this parser
-		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{size: sizeParam}] [{fs: fsParam}] [{os: osParam}] [{zone: zoneParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
+		RaidFilter.paramText = "[raidName] [raidDifficulty] [{state: stateParam}] [{size: sizeParam}] [{fs: fsParam}] [{os: osParam}] [{progress: progressParam}] [{zone: zoneParam}] [{age: ageParam}] [{count: countParam} [{page: pageParam}]]";
 		
 		// Regex to parse number expressions
 		RaidFilter.numberExpressionPattern = /(<=?|>=?|==?|!=?)?\s*(\d+)\s*(\w\w?)?/;
