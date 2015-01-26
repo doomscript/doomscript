@@ -158,10 +158,10 @@
                                 // Progress translates to the ratio of health to time
                                 switch (paramValue.toLowerCase()) {
                                     case "ahead":
-                                        this.progress = "<= 1";
+                                        paramValue = this.progress = "<= 1";
                                         break;
                                     case "behind":
-                                        this.progress = "> 1";
+                                        paramValue = this.progress = "> 1";
                                         break;
                                 }
 

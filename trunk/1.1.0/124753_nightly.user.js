@@ -1671,10 +1671,10 @@ function main()
                                 // Progress translates to the ratio of health to time
                                 switch (paramValue.toLowerCase()) {
                                     case "ahead":
-                                        this.progress = "<= 1";
+                                        paramValue = this.progress = "<= 1";
                                         break;
                                     case "behind":
-                                        this.progress = "> 1";
+                                        paramValue = this.progress = "> 1";
                                         break;
                                 }
 
@@ -6367,8 +6367,8 @@ function main()
 				},
 				buildHelpText: function()
 				{
-					var helpText = "<b>Raid Command:</b> <code>/news</code>\n";
-					helpText += "Loads news from the doomscript servers.\n";
+					var helpText = "<b>Raid Command:</b> <code>/diaversai</code>\n";
+					helpText += "Hear what <a href='http://www.kongregate.com/accounts/diaversai'>dia</a> has to say.\n";
 					
 					return helpText;
 				}
