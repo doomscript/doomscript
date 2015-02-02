@@ -812,7 +812,7 @@ function gmCallBack(UUID, funcName, response)
 
                 var cloned = {callbackName: funcName, responseObj: {}};
                 for (var p in detail.responseObj) {
-                    if (detail.responseObj.hasOwnProperty(p)) {
+                    if (Object.prototype.hasOwnProperty.call(detail.responseObj, p)) {
                         DCDebug("GM XHR: Cloning property ", p, " which is a ", typeof detail.responseObj[p]);
                         cloned.responseObj[p] = detail.responseObj[p];
                     }
