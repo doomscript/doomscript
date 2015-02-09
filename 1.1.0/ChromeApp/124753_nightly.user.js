@@ -2859,7 +2859,15 @@ function main()
                         break;
                     case "sultan_shrakzan1":
                         // This one even has a weird location for its small image
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/king_krandar_small.jpg";
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/sultan_shrakzan_small.jpg";
+                        break;
+                    case "contest_winner1":
+                        // This one even has a weird location for its small image
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/contest_winner_small.jpg";
+                        break;
+                    case "thyestean_banquet1":
+                        // This one even has a weird location for its small image
+                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/thyestean_banquet_small.jpg";
                         break;
                     // These are ones that we've not found alternate images for except for the raid list image
                     case "purple_lion":
