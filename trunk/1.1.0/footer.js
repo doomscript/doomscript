@@ -654,6 +654,7 @@
 			}
 		};
 
+        // The idea to this feature would be that we could show the user previous things they typed by pressing up or down.
         function hookInputDialogue() {
             if (holodeck && holodeck.activeDialogue()) {
                 // Hook the handler
@@ -812,6 +813,7 @@ function gmCallBack(UUID, funcName, response)
 
                 var cloned = {callbackName: funcName, responseObj: {}};
                 for (var p in detail.responseObj) {
+                    // Awkward call to hasOwnProperty because of weird GreaseMonkey behavior in Firefox.
                     if (Object.prototype.hasOwnProperty.call(detail.responseObj, p)) {
                         DCDebug("GM XHR: Cloning property ", p, " which is a ", typeof detail.responseObj[p]);
                         cloned.responseObj[p] = detail.responseObj[p];
