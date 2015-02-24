@@ -6484,6 +6484,43 @@ function main()
 			}
 		);
 		
+
+RaidCommand.create(
+    {
+        commandName: "exportusers",
+        aliases: ["eu"],
+        doNotEnumerateInHelp: true,
+
+        handler: function(deck, parser, params, text, context)
+        {
+            // Declare ret object
+            var ret = {success: true, message: "Exported Users"};
+
+            var playerData = "Date: " + new Date() + "\n" +
+                "User,Level,Admin,Developer,K+\n";
+
+            for (var i = 0; i < active_room._users_list.length; i++) {
+                var ufr = active_room._users_list[i];
+                playerData += [ufr.username, ufr._level, ufr._admin, ufr._developer, ufr._premium].join(",") + "\n";
+            }
+
+            RaidMenuTab.createDataDumpTab(playerData, "KChat Users");
+
+            return ret;
+        },
+
+        getOptions: function()
+        {
+            return {};
+        },
+
+        buildHelpText: function()
+        {
+            return "";
+        }
+    }
+);
+		
 		RaidCommand.create( 
 			{
 				commandName: "farmvalue",
@@ -11408,6 +11445,10 @@ DC_LoaTS_Helper.raids =
 				console.log.apply(console, arguments);
 			}
 		};
+
+        window.DCI = {
+            e: function() {
+        }};
 		
 		// Borrowed from: http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format/4673436#4673436
 		String.prototype.format = function()
@@ -12113,6 +12154,7 @@ DC_LoaTS_Helper.raids =
 			}
 		};
 
+        // The idea to this feature would be that we could show the user previous things they typed by pressing up or down.
         function hookInputDialogue() {
             if (holodeck && holodeck.activeDialogue()) {
                 // Hook the handler
@@ -12271,6 +12313,7 @@ function gmCallBack(UUID, funcName, response)
 
                 var cloned = {callbackName: funcName, responseObj: {}};
                 for (var p in detail.responseObj) {
+                    // Awkward call to hasOwnProperty because of weird GreaseMonkey behavior in Firefox.
                     if (Object.prototype.hasOwnProperty.call(detail.responseObj, p)) {
                         DCDebug("GM XHR: Cloning property ", p, " which is a ", typeof detail.responseObj[p]);
                         cloned.responseObj[p] = detail.responseObj[p];
