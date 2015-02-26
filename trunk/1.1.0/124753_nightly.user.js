@@ -396,11 +396,12 @@ Added /ad alias to /linktools post
 Added Left Click to Whisper preference and functionality
 Added Right Click on Username menu
 
-2015.01.20 - 1.1.35
-Added 29 new raids (ops, zone 22, anniversary), and some updated OS values
-Added new {progress} filter to /lrm
+2015.02.26 - 1.1.35
+Added 31 new raids (ops, zone 22, anniversary), and some updated OS values
+Added new {progress} filter to /lrm -- This still seems a bit buggy
 Included /lrm in the code directly (rather than external inclusion)
 Added url linkification
+Added #wiki linkification
 Updated filtering for noirs: noir i finds Noir only, noir ii finds Noir (II) only, noir iii finds Noir (III) only
 kv_raid_boss is now part of the searchable raid text
 Added new /news command
@@ -564,8 +565,12 @@ function main()
                         // Regular external links, borrowed from: http://stackoverflow.com/a/8943487/1449525
 //                        var urlPattern = /((?!=)\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
                         // Regular external links, borrowed from: http://jmrware.com/articles/2010/linkifyurl/linkify.html
-                        var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
+                        //var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
+                        var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
                         var urlFormat = "<a href='{0}' target='_blank'>{0}</a>";
+
+                        // Wiki link generation
+                        var hashWikiPattern = /#wiki (?:(?!(?:ht|f)tp|<|:\/\/).)*/img;
 
 
                         // Make sure we haven't already put a raid link in here and the link we found was valid
@@ -656,6 +661,11 @@ function main()
                                     // Last minute check to make sure the regex didn't flub it
                                     // If the url contains any weird characters, ", ', <, or >, just bail
                                     return /["'><]/g.test(url) ? url : urlFormat.format(url);
+                                });
+
+                                // Replace #wiki links
+                                msg = msg.replace(hashWikiPattern, function(hashWikiText) {
+                                    return DC_LoaTS_Helper.getCommandLink("/" + hashWikiText.substr(1), hashWikiText);
                                 });
                             }
                         }
@@ -5888,7 +5898,7 @@ function main()
                         "PreferencesMenu-LinkifyUrls",
                         "boolean",
                         DC_LoaTS_Helper.getPref(me.linkifyUrlsKey, true),
-                        "Make URLs posted to chat clickable",
+                        "Make URLs and #wiki's posted to chat be clickable links",
                         "When someone posts a URL, automatically make it a link that will open in a new tab",
                         {
                             onclick: function()
@@ -8880,6 +8890,7 @@ DC_LoaTS_Helper.raids =
     pi:                 new RaidType("pi",                 "ZA2", "Pi", "Pi", "Pi",                                   72,  10, "S",  [24000000, 31200000, 38400000, 48000000]),
     master_hao:         new RaidType("master_hao",         "Z19", "Master Hao", "Hao", "Hao",                         36,  10, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
     trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               3,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000],/*FS calculated normally*/null,[1000000000, 1000000000, 1000000000, 1000000000]),
+    robot_uprising1:    new RaidType("robot_uprising1",     "F2", "Robot Uprising", "Robot Uprising", "Uprising",     72,  25, "S",[ 900000000, 3600000000, 4500000000, 5400000000],/*FS calculated normally*/null,[500000000, 500000000, 500000000, 500000000]),
 
     // Small+ Raids
     purple_lion:        new RaidType("purple_lion",         "Z5", "Purple Lion", "Lion", "Lion",                      72,  20, "S",   [15500000,23250000,31000000,46500000], null, [2325000,2325000,2325000,2325000]),
@@ -9044,6 +9055,9 @@ DC_LoaTS_Helper.raids =
     quiskan_psi_hound:  new RaidType("quiskan_psi_hound",   "A7","Quiskan Psi-Hound","Psi-Hound","Hound",            168,  100, "H", [1000000000, 1500000000, 2500000000, 10000000000]),
     ms_myriad_and_steelstike: new RaidType("ms_myriad_and_steelstike","A10","Ms. Myriad and Steelstrike","M & S","M & S",168,100,"H",[1500000000, 2000000000, 3000000000, 12500000000]),
     kulnarxex_tank_1:   new RaidType("kulnarxex_tank_1",  "A2-4", "Kulnar-Xex Tank", "K-X Tank", "KX Tank",           72,  100, "H", 2500000000, null, 50000000),
+
+    // Colossal Raids
+    training_sim1: new RaidType("training_sim1","AX", "Live Fire Training Sim #102", "Training Sim #102", "Sim #102", 72,  100, "H", [35000000000,70000000000,87500000000,105000000000]),
 
     // Titanic Raids
     thyestean_banquet1: new RaidType("thyestean_banquet1","AX", "Thyestean Banquet", "Banquet", "Banquet",            72,  100, "H", 50000000000),

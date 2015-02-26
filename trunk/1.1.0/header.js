@@ -396,11 +396,12 @@ Added /ad alias to /linktools post
 Added Left Click to Whisper preference and functionality
 Added Right Click on Username menu
 
-2015.01.20 - 1.1.35
-Added 29 new raids (ops, zone 22, anniversary), and some updated OS values
-Added new {progress} filter to /lrm
+2015.02.26 - 1.1.35
+Added 31 new raids (ops, zone 22, anniversary), and some updated OS values
+Added new {progress} filter to /lrm -- This still seems a bit buggy
 Included /lrm in the code directly (rather than external inclusion)
 Added url linkification
+Added #wiki linkification
 Updated filtering for noirs: noir i finds Noir only, noir ii finds Noir (II) only, noir iii finds Noir (III) only
 kv_raid_boss is now part of the searchable raid text
 Added new /news command

@@ -27,6 +27,7 @@ DC_LoaTS_Helper.raids =
     pi:                 new RaidType("pi",                 "ZA2", "Pi", "Pi", "Pi",                                   72,  10, "S",  [24000000, 31200000, 38400000, 48000000]),
     master_hao:         new RaidType("master_hao",         "Z19", "Master Hao", "Hao", "Hao",                         36,  10, "S",[1000000000, 1300000000, 1600000000, 2000000000]),
     trulcharn:          new RaidType("trulcharn",           "F1", "Trulcharn", "Trulcharn", "Trulcharn",               3,  10, "S",[10100000000, 10100000000, 10100000000, 10100000000],/*FS calculated normally*/null,[1000000000, 1000000000, 1000000000, 1000000000]),
+    robot_uprising1:    new RaidType("robot_uprising1",     "F2", "Robot Uprising", "Robot Uprising", "Uprising",     72,  25, "S",[ 900000000, 3600000000, 4500000000, 5400000000],/*FS calculated normally*/null,[500000000, 500000000, 500000000, 500000000]),
 
     // Small+ Raids
     purple_lion:        new RaidType("purple_lion",         "Z5", "Purple Lion", "Lion", "Lion",                      72,  20, "S",   [15500000,23250000,31000000,46500000], null, [2325000,2325000,2325000,2325000]),
@@ -191,6 +192,9 @@ DC_LoaTS_Helper.raids =
     quiskan_psi_hound:  new RaidType("quiskan_psi_hound",   "A7","Quiskan Psi-Hound","Psi-Hound","Hound",            168,  100, "H", [1000000000, 1500000000, 2500000000, 10000000000]),
     ms_myriad_and_steelstike: new RaidType("ms_myriad_and_steelstike","A10","Ms. Myriad and Steelstrike","M & S","M & S",168,100,"H",[1500000000, 2000000000, 3000000000, 12500000000]),
     kulnarxex_tank_1:   new RaidType("kulnarxex_tank_1",  "A2-4", "Kulnar-Xex Tank", "K-X Tank", "KX Tank",           72,  100, "H", 2500000000, null, 50000000),
+
+    // Colossal Raids
+    training_sim1: new RaidType("training_sim1","AX", "Live Fire Training Sim #102", "Training Sim #102", "Sim #102", 72,  100, "H", [35000000000,70000000000,87500000000,105000000000]),
 
     // Titanic Raids
     thyestean_banquet1: new RaidType("thyestean_banquet1","AX", "Thyestean Banquet", "Banquet", "Banquet",            72,  100, "H", 50000000000),
