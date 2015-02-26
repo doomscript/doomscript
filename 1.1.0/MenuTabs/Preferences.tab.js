@@ -176,7 +176,7 @@
                         "PreferencesMenu-LinkifyUrls",
                         "boolean",
                         DC_LoaTS_Helper.getPref(me.linkifyUrlsKey, true),
-                        "Make URLs posted to chat clickable",
+                        "Make URLs and #wiki's posted to chat be clickable links",
                         "When someone posts a URL, automatically make it a link that will open in a new tab",
                         {
                             onclick: function()
