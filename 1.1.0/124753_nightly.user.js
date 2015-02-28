@@ -397,6 +397,7 @@ Added Left Click to Whisper preference and functionality
 Added Right Click on Username menu
 
 2015.02.26 - 1.1.35
+Major Firefox/Greasemonkey fix [greenkabbage]
 Added 31 new raids (ops, zone 22, anniversary), and some updated OS values
 Added new {progress} filter to /lrm -- This still seems a bit buggy
 Included /lrm in the code directly (rather than external inclusion)
