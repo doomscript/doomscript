@@ -521,14 +521,19 @@
 		});
 
         RaidFilter.mangleNameForSearch = function(name) {
-            // Dirty pi/noir hacks. Some raids are harder to locate because of similar names
-            var hacks = {"pi": "^pi_",
-                "noir i": "^noir_",
-                "noir ii": "^noir2_",
-                "noir iii": "^noir3_",
-                "noir (i)": "^noir_",
-                "noir (ii)": "^noir2_",
-                "noir (iii)": "^noir3_"},
+            // Dirty pi/noir/sub hacks. Some raids are harder to locate because of similar names
+            var hacks = {
+                "pi": "^pi_", // Pi
+                "noir i": "^noir_", // Noir
+                "noir ii": "^noir2_", // Noir (2)
+                "noir iii": "^noir3_", // Noir (3)
+                "noir (i)": "^noir_", // Noir
+                "noir (ii)": "^noir2_", // Noir (2)
+                "noir (iii)": "^noir3_", // Noir (3)
+                "xsub": "x sub", // Kulnar-Xex Subjugator
+                "nsub": "x sub", // Kulnar-Xex Subjugator
+                "esub": "e sub" // Kulnar-Xex Elite Subjugator
+                },
                 found = name;
 
             if (found) {

@@ -3,8 +3,8 @@
 // @namespace      tag://kongregate
 // @description    Improves the text of raid links and stuff
 // @author         doomcat
-// @version        1.1.35
-// @date           27.08.2014
+// @version        1.1.36
+// @date           06.03.2015
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getValue
 // @grant          GM_setValue
@@ -407,6 +407,10 @@ Updated filtering for noirs: noir i finds Noir only, noir ii finds Noir (II) onl
 kv_raid_boss is now part of the searchable raid text
 Added new /news command
 
+2015.??.?? - 1.1.36
+Fixed UgUp profile issue for users who've opted out
+Updated filtering for subjugators: sub finds both, nsub finds regular subs, esub finds elites
+
 [TODO] Post new Opera instructions
 [TODO] Fix missing images on menu
 */
@@ -418,7 +422,7 @@ function main()
 	window.DC_LoaTS_Properties = {
 		// Script info
 		
-    	version: "1.1.35",
+    	version: "1.1.36",
     	
     	authorURL: "http://www.kongregate.com/accounts/doomcat",
     	updateURL: "http://www.kongregate.com/accounts/doomcat.chat",

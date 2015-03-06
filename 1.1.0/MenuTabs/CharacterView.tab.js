@@ -68,12 +68,28 @@
                         console.log("About to fetch profile by username", connector);
 
                         connector.fetchUserProfileByUsername(username, function(response, model) {
-                            console.log("Fetched Profile: ", response, model);
-                            model._modelType.render(model, connector, function(el){
-                                console.log("Rendered Profile", el);
+                            if (model.id) {
+                                console.log("Fetched Profile: ", response, model);
+                                model._modelType.render(model, connector, function(el){
+                                    console.log("Rendered Profile", el);
+                                    DC_LoaTS_Helper.removeAllChildren(renderArea);
+                                    renderArea.appendChild(el);
+                                });
+                            }
+                            else {
+                                console.log("Error Fetching Profile: ", response, model);
+                                var el = document.createElement("div");
+                                var errMsg = "";
+                                if (model.code == 402) {
+                                    errMsg = "User " + username + " has opted out of UgUp.";
+                                }
+                                else {
+                                    errMsg = "Failed to load profile for " + username + ": " + model.reason + " (Code: " + model.code + ")";
+                                }
+                                el.appendChild(document.createTextNode(errMsg));
                                 DC_LoaTS_Helper.removeAllChildren(renderArea);
                                 renderArea.appendChild(el);
-                            });
+                            }
                         });
                     };
                     entryArea.appendChild(runQueryButton);
