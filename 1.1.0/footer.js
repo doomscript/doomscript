@@ -34,7 +34,7 @@
 
 
         "\nimg.raidIcon {",
-        "\tbackground: url(http://userscripts.org/images/sprite.png?2) right 0px no-repeat;",
+        "\twidth: 40px !important;",
         "}",
 
         "\n.context-menu {",
