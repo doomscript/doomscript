@@ -608,63 +608,96 @@
 			// First time failed, check for alternate fail names
 			if (this.src === DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/" + raidLink.raidTypeId + "_1.jpg" && this.src !== RaidLink.defaultImageSRC)
 			{
+				this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/";
 				switch(raidLink.raidTypeId)
 				{
+					// baseURL + "post/" + raidLink.raidTypeId + ".jpg";
+					case "celebration_enhancer_1":
+					case "weiqi_game_1":
+					case "kulnarxex_scout_ships_1":
+					case "cow_abduction_1":
+					case "mutated_spacepox_1":
+                        this.src += "post/" + raidLink.raidTypeId + ".jpg";
+                        break;
+					// Raids with diviating image paths 
 					case "wr_space_pox":
-						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/space_pox_1.jpg";
+						this.src += "post/space_pox_1.jpg";
 						break;
                     case "dule_warmaster_1":
                     case "dule_warmaster":
-						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/dule_1.jpg";
+						this.src += "post/dule_1.jpg";
 						break;
 					case "hultex_quibberath":
-						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/hultex_1.jpg";
+						this.src += "post/hultex_1.jpg";
 						break;
 					case "warden_ramiro":
-						this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/ramiro_1.jpg";
+						this.src += "post/ramiro_1.jpg";
 						break;
-                    case "celebration_enhancer_1":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/celebration_enhancer_1.jpg";
-                        break;
-                    case "weiqi_game_1":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/weiqi_game_1.jpg";
-                        break;
                     case "crimzo_the_killer_clown":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/crimzo_1.jpg";
+                        this.src += "post/crimzo_1.jpg";
                         break;
-                    case "kulnarxex_subjugator_1":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator_1.jpg";
-                        break;
+                    case "kulnarxex_subjugator_1":                       
                     case "kulnarxex_elite_subjugator_1":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_subjugator_1.jpg";
+					case "elite_kulnarxex_elite_subjugator":
+                        this.src += "post/kulnarxex_subjugator_1.jpg";
                         break;
-                    case "kulnarxex_scout_ships_1":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/kulnarxex_scout_ships_1.jpg";
-                        break;
-                    case "cow_abduction_1":
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/post/cow_abduction_1.jpg";
-                        break;
-                    case "pinatas_revenge1":
-                        // This one even has a weird location for its small image
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/pinatas_revenge_small.jpg";
-                        break;
-                    case "king_krandar1":
-                        // This one even has a weird location for its small image
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/king_krandar_small.jpg";
-                        break;
-                    case "sultan_shrakzan1":
-                        // This one even has a weird location for its small image
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/sultan_shrakzan_small.jpg";
-                        break;
-                    case "contest_winner1":
-                        // This one even has a weird location for its small image
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/contest_winner_small.jpg";
-                        break;
-                    case "thyestean_banquet1":
-                        // This one even has a weird location for its small image
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/thyestean_banquet_small.jpg";
-                        break;
+					case "elite_birthday_cake_of_doom":
+						this.src += "post/birthday_cake_of_doom_1.jpg";
+						break;
+					case "elite_centurian_commander":
+						this.src += "post/commander_1.jpg";
+						break;
+					case "elite_master_hao":
+						this.src += "post/master_hao_1.jpg";
+						break;
+					case "elite_bashan":
+						this.src += "post/bashan_1.jpg";
+						break;
                     // These are ones that we've not found alternate images for except for the raid list image
+                    case "pinatas_revenge1":
+                    case "king_krandar1":
+                    case "sultan_shrakzan1":
+                    case "contest_winner1":
+                    case "thyestean_banquet1":
+					case "rogue_terraformer1":
+					case "ruins_of_the_forgotten1":
+					case "rak_thun_eviscipod1":
+					case "contest_winner1":
+					case "temynx_parasite1":
+					case "robot_uprising1":
+					case "besalaad_exhibit_rampage1":
+						this.src += raidLink.raidTypeId + ".$$repl$$";
+						this.src = this.src.replace("1.$$repl$$", "_small.jpg");
+						break;
+					// Raids with image paths that don't fit known patterns
+					case "invaders_from_dimension_b":
+						this.src += "Invaders_from_Dimension_B1_small.png";
+						break;
+					case "training_sim1":
+						this.src += "training_sim_small2.jpg";
+						break;
+					case "predatory_constellation":
+						this.src += "predatory_constellation_small.png"; //PNG!
+						break;
+					case "attack_of_the_gourds":
+						this.src += "Attack_of_the_Gourds_small.jpg";
+						break;
+					case "sun_egg":
+						this.src += "the_sun_egg_small.jpg";
+						break;
+					case "hate":
+						this.src += "the_hate_walker_small.jpg";
+						break;
+					case "hukkral_war_crawler":
+						this.src += "huk-kral_war_crawler_small.jpg";
+						break;
+					case "elite_titanomachy":
+						this.src += "z27_boss_small.jpg"; //omg what 5pg?
+						break;
+					case "giant_kwelshax":
+					case "elite_giant_kwelshax":
+						this.src += "giant_kwelshax_small.jpg";
+						break;
                     case "purple_lion":
 					case "kang":
 					case "tourniquet":
@@ -675,7 +708,6 @@
                     case "sian_dragonfly_1":
                     case "lady_victoria_ashdown_1":
                     case "rampaging_rackalax_1":
-                    case "giant_kwelshax":
                     case "the_tyraness":
                     case "the_mega_mimes":
                     case "the_neon_knights":
@@ -690,7 +722,7 @@
                     case "ship_pinata":
                     case "dimetrodon_riot":
 					default:
-                        this.src = DC_LoaTS_Properties.lotsCDNUrl + "images/bosses/" + raidLink.raidTypeId + "_small.jpg";
+                        this.src += raidLink.raidTypeId + "_small.jpg";
 				}
 			}
 			// Second time failed, switch to default
