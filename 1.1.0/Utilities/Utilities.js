@@ -159,7 +159,7 @@
 
             return target;
         };
-		
+
 		// Should prevent the event from doing its normal action
 		// like selecting text on click and drag.
 		// Borrowed from http://stackoverflow.com/a/891616
@@ -231,11 +231,11 @@
 			}
 			else if (typeof num === "string")
 			{
-				text = num;				
+				text = num;
 			}
 			return text;
 		};
-		
+
 		// Responds to a click on a raid link
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		DC_LoaTS_Helper.raidLinkClick = function(eventParam)
@@ -245,19 +245,19 @@
 			{
 				// Just in case
 				var event = eventParam || window.event;
-				
+
 				// Couldn't locate event
 				if (typeof event == "undefined")
 				{
 					console.warn("Couldn't locate the event for right-click detection");
-					
+
 					// Don't cancel the click
 					return;
 				}
-				
+
 				// Get the target element
-				var target;			
-				if (event.target) 
+				var target;
+				if (event.target)
 				{
 					target = event.target;
 				}
@@ -265,25 +265,25 @@
 				{
 					target = event.srcElement;
 				}
-				
+
 				// Safari work around
 				if (target.nodeType == 3)
 				{
 					target = target.parentNode;
 				}
 
-				
+
 				if (typeof target == "undefined")
 				{
 					console.warn("Couldn't locate the target for right-click detection");
-					
+
 					// Don't cancel the click
 					return;
 				}
-				
+
 				// Grab the url from the link
 				var url = target.href;
-							
+
 				// Still failed
 				if (typeof url == "undefined" || url.length == 0)
 				{
@@ -297,32 +297,32 @@
 						console.warn("Trouble determining url from link. Could not apply click.");
 						console.warn(event);
 						console.warn(target);
-						
+
 						// Let the click go through and reload the whole browser. Better than nothing.
 						return true;
 					}
 				}
-				
+
 				// If the user is holding shift, cycle through the states
 				if (event.shiftKey)
 				{
 					// Generate an actual raid link object
 					var raidLink = new RaidLink(url);
-					
+
 					// If the link is valid
 					if (raidLink.isValid())
 					{
 						// Get the STATE of the link
 						var linkState = RaidManager.fetchState(raidLink);
-						
+
 						// Place holder for our new state
 						var newLinkState;
-						
+
 						var foundCurrent = false;
 						var firstState;
-						
+
 						// Iterate over all possible states
-						// This is basically a hack for the fact that the 
+						// This is basically a hack for the fact that the
 						// STATEs don't have any inherit ordinal values that could be incremented
                         //TODO: Reorganize STATE to have ordinals if this ever happens somewhere else in the code
                         for (var stateKey in RaidManager.STATE)
@@ -359,23 +359,23 @@
                                 }
                             }
                         }
-						
+
 						// If we did not find a new state to set it to
 						if (typeof newLinkState == "undefined")
 						{
 							// Cycle back around to the first state
 							newLinkState = firstState;
 						}
-						
+
 						// Store the link with its new state
-						RaidManager.store(raidLink, newLinkState);					
+						RaidManager.store(raidLink, newLinkState);
 					}
 					// Log invalid raid links
 					else
 					{
 						console.warn("Clicked invalid link to " + url);
 					}
-					
+
 					// Always suppress reload on shift-clicks
 					return false;
 				}
@@ -389,25 +389,25 @@
 			{
 				// Notify the user of the issue
 				console.warn("An error occurred while trying to handle your click!");
-				
+
 				console.warn(ex);
-				
+
 				// Let the click go through. Annoying, but still can load raid
 				return true;
 			}
 		};
-		
+
 		// Intended solely to capture right clicks for the purpose of marking them visited
 		DC_LoaTS_Helper.raidLinkMouseDown = function(eventParam)
 		{
 			// Just in case
 			var event = eventParam || window.event;
-			
+
 			// Couldn't locate event
 			if (typeof event == "undefined")
 			{
 				console.warn("Couldn't locate the event for right-click detection");
-				
+
 				// Don't cancel the click
 				return;
 			}
@@ -422,14 +422,14 @@
 				if (typeof target === "undefined")
 				{
 					console.warn("Couldn't locate the target for right-click detection");
-					
+
 					// Don't cancel the click
 					return;
 				}
-				
+
 				// Grab the url from the link
 				var url = target.href;
-							
+
 				// Still failed
 				if (typeof url == "undefined" || url.length == 0)
 				{
@@ -443,7 +443,7 @@
 						console.warn("Trouble determining url from link. Could not apply click.");
 						console.warn(event);
 						console.warn(target);
-						
+
 						// No useful work to complete here
 						return;
 					}
@@ -451,7 +451,7 @@
 				// Successfully got the url
 				// Get the raid link
 				var raidLink = new RaidLink(url);
-				
+
 				// Only care about valid links
 				if (raidLink.isValid())
 				{
@@ -818,20 +818,20 @@
 //				window.requestFileSystem(window.TEMPORARY, 8*data.length, onInitFs, errorHandler);
 //
 //				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //				 window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
 //				    fs.root.getFile(title + '.txt', {create: true}, function(fileEntry) {
 //				        fileEntry.createWriter(function(fileWriter) {
@@ -858,9 +858,9 @@
 //			{
 		    	window.open('data:text/csv;charset=utf8,' + encodeURIComponent(data));
 //			}
-		    return true; 
+		    return true;
 		};
-		
+
 		// Pastebin API
 		DC_LoaTS_Helper.PastebinAPI = {
 				privacy: {
@@ -876,14 +876,14 @@
 					MONTH: "1M",
 					NEVER: "N"
 				},
-				
+
 				options: {
 					PASTE: "paste",
 					LIST: "list",
 					TRENDS: "trends",
 					DELETE: "delete",
 					USER_DETAILS: "userdetails"
-					
+
 				},
 
 				pasteData: function(data, title, note) {
@@ -892,7 +892,7 @@
 							api_option: this.options.PASTE,
 							api_dev_key_enc: ":117ce9e35bfgec11f1336f96916c4d1",
 							api_paste_code: data,
-							api_paste_private: this.privacy.UNLISTED, 
+							api_paste_private: this.privacy.UNLISTED,
 							api_paste_name: title,
 							api_paste_expire_date: this.duration.MONTH
 					};
@@ -917,7 +917,7 @@
 					});
 				}
 		};
-		
+
 		// Serialize a JS object for form submission
 		DC_LoaTS_Helper.uriSerialize = function(obj) {
 			var ret = [];
@@ -931,30 +931,30 @@
 					ret.push(encodeURIComponent(field) + "=" + encodeURIComponent(value));
 				}
 			}
-			
+
 			return ret.join("&");
 		};
-		
-		
+
+
         // Obtains the iframe_options from the game page
         DC_LoaTS_Helper.getIFrameOptions = function() {
             try
             {
                 // Regex to locate the iframe properties as defined by Kong
                 var reg = new RegExp(/var iframe_options = ([^\x3B]+)/g);
-                
-                // If Kong has defined the properties we need to scrape from            
+
+                // If Kong has defined the properties we need to scrape from
                 if (typeof activateGame !== "undefined")
                 {
                     // Attempt to find the properties we need
-                    var match = reg.exec(activateGame); 
-                    
+                    var match = reg.exec(activateGame);
+
                     // If we have the iframe options
                     if (match != null)
-                    {                           
+                    {
                         // Parse and return the existing iframe options
                         return eval('('+match[1]+')');
-                        
+
                     }
                 }
             }
@@ -963,22 +963,22 @@
                 return {};
             }
         };
-        
-        
+
+
         // Obtains the GameIframe from the game page
         DC_LoaTS_Helper.getGameIframe = function() {
             try
             {
                 // Regex to locate the iframe properties as defined by Kong
                 var reg = new RegExp(/(new GameIframe\(.*?\)).createGameIframeElement\(\);/g);
-                
-                // If Kong has defined the properties we need to scrape from            
+
+                // If Kong has defined the properties we need to scrape from
                 var children = document.getElementById("game");
                 if (typeof children !== "undefined")
                 {
 					//find the <script> tag in the collection that has the gameiframe info
 					var scriptNodes = children.getElementsByTagName("script");
-				
+
 					var match = null;
 					for (var i = 0; i < scriptNodes.length; i++)
 					{
@@ -987,7 +987,7 @@
 						if (match != null)
 							break;
 					}
-				
+
 					// If we have the iframe options
 					if (match != null)
 					{
@@ -1003,7 +1003,7 @@
 
                         return optionsVal;
 					}
-					console.warn("Could not locate the gameIframe options.");					
+					console.warn("Could not locate the gameIframe options.");
                 }
 				else
 				{
@@ -1016,20 +1016,20 @@
                 return {};
             }
         };
-        
-        
-		
+
+
+
 		// Load raid without refreshing page
 		// Returns true if the browser should load the raid itself, false if we loaded without refresh
 		// callback should be a function that takes two parameters, oldState and newState
 		DC_LoaTS_Helper.loadRaid = function(raidParam, gameIframe, loadRaidsInBackground, callback)
 		{
 			var start = new Date()/1;
-			
+
 			// Gather the info we need to load a raid, either from params or utility methods
 			gameIframe = gameIframe || DC_LoaTS_Helper.getGameIframe();
 			loadRaidsInBackground = typeof loadRaidsInBackground !== "undefined"? loadRaidsInBackground : DC_LoaTS_Helper.getPref("LoadRaidsInBackground", true);
-			
+
 			try
 			{
 				var raidLink;
@@ -1043,35 +1043,35 @@
 					// Create a raid link from the url
 					raidLink = new RaidLink(raidParam);
 				}
-				
+
 				// If the link is valid
 				if (typeof raidLink !== "undefined" && raidLink.isValid())
 				{
 					// Set necessary gameIframe options
 				    gameIframe.urlOptions = raidLink;
 				    var iframe_options = gameIframe.iframeOptions();
-					
+
 					if (loadRaidsInBackground)
 					{
 						var collapsedOptions = "";
-						
+
 						for (var option in iframe_options)
 						{
                             if (iframe_options.hasOwnProperty(option)) {
                                 collapsedOptions += option + "=" + iframe_options[option] + "&";
                             }
 						}
-						
+
 						DC_LoaTS_Helper.ajax({
 											  url: DC_LoaTS_Properties.joinRaidURL + "?" + collapsedOptions,
 											  method: "GET",
 											  onload: DC_LoaTS_Helper.handleAjaxRaidReturn.bind(this, raidLink, callback, start)
 						});
 					}
-					else	
+					else
 					{
 					    $("gameiframe").contentWindow.location.replace(gameIframe.getGameIframeUrl());
-					    
+
 						// Mark link as visited
 						var currentState = RaidManager.fetchState(raidLink);
 						var newState = currentState;
@@ -1102,20 +1102,20 @@
 				// Don't really care
 				console.error("FAILED TO PROCESS LOADRAID", arguments, ex);
 			}
-						
+
 			// Follow the HTML link because we failed here
 			return true;
 		};
-		
+
 		DC_LoaTS_Helper.handleAjaxRaidReturn = function(raidLink, callback, start, response)
 		{
 			var responseText = response.responseText;
 			var raidJoinMessage = /<div style="position:absolute;left:375px;top:318px;width:180px;color:#FFFFFF;text-align:center;">\s*(.*?)\s*<\/div>/.exec(responseText)[1].trim();
 			DCDebug("Ajax Raid Join: ", raidLink.raidTypeId + " (" + raidLink.id + ")", " Message: ", raidJoinMessage);
-			
+
 			// Get the current state of the raid form the cache
 			var oldState = RaidManager.fetchState(raidLink);
-			
+
 			if (responseText.indexOf("You have successfully joined the raid!") >= 0)
 			{
 				// Joined
@@ -1154,13 +1154,13 @@
 			var time = new Date()/1 - start;
 			Timer.addRun("Load Raid - Background", time);
 		};
-		
+
 		DC_LoaTS_Helper.fetchAndLoadRaids = function(urlParsingFilter) {
-			
+
 			if (typeof urlParsingFilter === "string") {
 				urlParsingFilter = new UrlParsingFilter(urlParsingFilter);
 			}
-						
+
 			// Cancel the previous timer, if there is one
 			if (typeof DC_LoaTS_Helper.autoLoader !== "undefined" || urlParsingFilter.cancel)
 			{
@@ -1171,31 +1171,31 @@
 					DC_LoaTS_Helper.autoLoader.raidLinks.length = 0;
 				}
 			}
-			
+
 			if (urlParsingFilter.cancel) {
 				return;
 			}
-			
+
 			// Ignore the tiny amount of time it takes to check for cancellation/ending
 			var commandStartTime = new Date()/1;
-			
+
 			if (holodeck.activeDialogue())
 			{
 				holodeck.activeDialogue().raidBotMessage("Fetching raids from " + urlParsingFilter.getUrlLink() + ". Please wait...");
 			}
-			
+
 			// Update the last query time
 			if (urlParsingFilter.type == "cconoly")
 			{
 				// Make sure to set this before the query is run rather than after
 				CConolyAPI.setLastQueryTime(commandStartTime);
 			}
-			
+
 			// Run the download
 			DC_LoaTS_Helper.ajax({
 				url: urlParsingFilter.getWorkingUrl(),
 				onload: function(response) {
-					
+
 					//DCDebug("Got back external raid data", response);
 					if (response.status === 200) // Must be OK because even other 200 codes won't have our data
 					{
@@ -1207,11 +1207,11 @@
 						    regex = new RegExp(RaidLink.linkPattern.source, "gi"), // Prevent weird JS regex caching/lastIndex issues
 						    hasRaidFilter = typeof urlParsingFilter.raidFilter !== "undefined",
 						    raidFilter = urlParsingFilter.raidFilter;
-						
+
 						// Safety catchall to prevent infinite matching
 						// This also means the maximum number of raids that can be loaded like this is 10,000 which seems reasonable
 						var xx = 10000;
-						
+
 						Timer.start("Parsing External Raids");
 						while ((match = regex.exec(text)) && xx--)
 						{
@@ -1234,13 +1234,13 @@
 								fetchedRaids.push(raidLink);
 							}
 						} // End while(regex)
-						
+
 						DCDebug("Bin Data from '" + urlParsingFilter.getWorkingUrl() + "': ", binData);
-						
+
 						// Store all the raids we grabbed
 						RaidManager.storeBulk(fetchedRaids);
 						Timer.stop("Parsing External Raids");
-						
+
 						// Report the fetched raids
 						str = "Fetched " + fetchedRaids.length + " raids from " + urlParsingFilter.getUrlLink() + " in " + (new Date()/1 - commandStartTime) + "ms.";
 						if (fetchedRaids.length > 0)
@@ -1264,10 +1264,10 @@
 						{
 							holodeck.activeDialogue().raidBotMessage(str);
 						}
-						
+
 						// Load all known raids that match the given filter
 						holodeck.processChatCommand("/loadall" + (hasRaidFilter ? " " + raidFilter.toString() : ""));
-						
+
 					}
 					else if (response.status === 404)
 					{
@@ -1275,12 +1275,12 @@
 					}
 					else if (response.status >= 500 && response.status < 600)
 					{
-						holodeck.activeDialogue().raidBotMessage("Trouble trying to load " + urlParsingFilter.getUrlLink() 
+						holodeck.activeDialogue().raidBotMessage("Trouble trying to load " + urlParsingFilter.getUrlLink()
 						+ ".\n" + "Server gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
-					else 
+					else
 					{
-						holodeck.activeDialogue().raidBotMessage("Trouble loading " + urlParsingFilter.getUrlLink() 
+						holodeck.activeDialogue().raidBotMessage("Trouble loading " + urlParsingFilter.getUrlLink()
 						+ ".\n" + "Server gave status of <code>" + response.statusText +"(" + response.status + ")</code>.");
 					}
 				} // End onload function
@@ -1293,11 +1293,11 @@
 		DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			// Private variable to be closed over in the autoLoader
 			var autoLoadCounter = {
-					attempted: 0, 
+					attempted: 0,
 					invalid: 0,
-					loaded: 0, 
-					visited: 0, 
-					completed: 0, 
+					loaded: 0,
+					visited: 0,
+					completed: 0,
 					reported: false,
 					isValid: function() {return this.loaded + this.visited + this.completed + this.invalid == this.attempted;},
 					getReport: function() {this.reported = true; return this._generateReportText()},
@@ -1317,9 +1317,9 @@
 				{
 					// Keep track of how many we've tried to load
 					autoLoadCounter.attempted++;
-					
+
 					// Load the next raid, capture the visitation marking
-					DC_LoaTS_Helper.loadRaid(raidLinks.pop(), gameIframe, lrib, 
+					DC_LoaTS_Helper.loadRaid(raidLinks.pop(), gameIframe, lrib,
 						function(oldState, newState){
 							if (RaidManager.STATE.equals(newState, RaidManager.STATE.IGNORED)) {
 								autoLoadCounter.invalid++;
@@ -1333,22 +1333,22 @@
 							else {
 								autoLoadCounter.loaded++;
 							}
-							
+
 							if (raidLinks.length === 0 && autoLoadCounter.isValid() && !autoLoadCounter.reported) {
 								// Calculate how long it took to load them all
 								var endTime = new Date()/1;
 								var took = (endTime - startTime)/1000;
 								holodeck.activeDialogue().raidBotMessage("Loading Complete! " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
-								
+
 								// Update all the links, in case any were missed while loading
 								DC_LoaTS_Helper.updatePostedLinks();
-								
+
 								// Clean up
 								delete DC_LoaTS_Helper.autoLoader;
 							}
 						}
 					);
-					
+
 					// If there are any links left, we'll need to continue loading them
 					if (raidLinks.length > 0)
 					{
@@ -1371,24 +1371,24 @@
 					holodeck.activeDialogue().raidBotMessage("Load ended abruptly. " + autoLoadCounter.attempted + " raids loaded in " + took + "s.\n" + autoLoadCounter.getReport());
 				}
 			};
-			
+
 
 			// Kick off the auto loading
 			DC_LoaTS_Helper.autoLoader = {
-				timeout: setTimeout(autoLoader, 500), 
-				raidLinks: raidLinks, 
+				timeout: setTimeout(autoLoader, 500),
+				raidLinks: raidLinks,
 				counter: autoLoadCounter,
 				startingLinkCount: raidLinks.length,
 				startTime: (new Date()/1) + 500
 			};
-			
+
 		};
-		
+
 		DC_LoaTS_Helper.reload = function()
 		{
 			// Whether or not we managed to reload
 			var didReload = false;
-			
+
 			// Try to reload the game
 			if (typeof activateGame  !== "undefined")
 			{
@@ -1401,31 +1401,31 @@
 			{
 				holodeck.activeDialogue().raidBotMessage("Unable to reload game");
 			}
-			
+
 			// Return whether or not we were successful
 			return didReload;
 		};
-		
+
 		DC_LoaTS_Helper.handleIgnoreVisitedRaids = function(ignore) {
-			
+
 			if (typeof ignore === "undefined") {
 				ignore = DC_LoaTS_Helper.getPref("HideVisitedRaids", false);
 			}
-			
+
 			// Parser style for the hiding of these raids
 			var parser = new RaidFilterStyleParser("{state: visited}||{state: completed}||{state: ignored} ++none");
-			
+
 			// Find all the styles matching this filter
 			var matchingStyles = DC_LoaTS_Helper.raidStyles[parser.raidFilter.toString()];
 
             var i;
-			
+
 			//console.log("Ignore: ", ignore);
 			if (ignore === true) {
 				// Does the hide visited style already exist?
 				// - If yes, make sure it's enabled
 				// - If no, create it and make sure it's enabled
-				
+
 				if (typeof matchingStyles === "undefined")
 				{
 					matchingStyles = [];
@@ -1461,13 +1461,25 @@
 					}
 				}
 			}
-			
+
 			DC_LoaTS_Helper.updatePostedLinks();
 		};
 
-        DC_LoaTS_Helper.handleHideWorldChat = function(hide) {
-            var el = document.getElementById("maingame"),
-                hidden = el.className.indexOf("hideWorldChat") > -1;
+DC_LoaTS_Helper.handleMoveChatTimestamps = function(move) {
+  var el = document.getElementById("kong_game_ui"),
+    moved = el.className.indexOf("chat-timestamp-right") > -1;
+
+  if (move && !moved) {
+    el.className += " chat-timestamp-right";
+  }
+  else if (!move && moved) {
+    el.className = el.className.replace("chat-timestamp-right", "");
+  }
+};
+
+DC_LoaTS_Helper.handleHideWorldChat = function(hide) {
+  var el = document.getElementById("maingame"),
+    hidden = el.className.indexOf("hideWorldChat") > -1;
 
             if (hide && !hidden) {
                 el.className += " hideWorldChat";
@@ -1504,13 +1516,13 @@
 			else {
 				DCDebug("No comparison to be done", list, raidLink);
 			}
-			
+
 			return false;
 		};
-		
+
 		// Make sure the upl namespace exists
 		DC_LoaTS_Helper.upl = {now: {}, next: {}};
-		
+
 		// Update links that are already in chat
 		DC_LoaTS_Helper.updatePostedLinks = function(raidLink)
 		{
@@ -1518,38 +1530,38 @@
 			{
 				clearTimeout(DC_LoaTS_Helper.updatePostedLinksTimeout);
 			}
-			
+
 			// Set a timeout to go and update the links in chat
 			DC_LoaTS_Helper.updatePostedLinksTimeout = setTimeout( function(raidLink)
 			{
 				Timer.start("updatePostedLinksTimeout");
-				try 
+				try
 				{
 					// Look up all raid links in chat
 					var elems = $("play").getElementsByClassName("raidMessage");
-					
+
 					// Retrieve the message format
 					var messageFormat = DC_LoaTS_Helper.getMessageFormat();
-					
+
 					// Retrieve the link format
 					var linkFormat = DC_LoaTS_Helper.getLinkFormat();
-					
+
 					// Iterate over all link elements in the chat
 					for (var i = 0; i < elems.length; i++)
 					{
 						// Convert them to RaidLink objects
 						var elem = elems[i];
 						var newRaidLink = new RaidLink(elem.children[0].href);
-						
+
 						// If we're looking for a specific link, make sure to match it. Otherwise, do them all
 						if (newRaidLink.isValid() &&  (typeof raidLink === "undefined" || raidLink.getUniqueKey() === newRaidLink.getUniqueKey()))
 						{
 							// Restyle the message as appropriate
 							var styles = newRaidLink.getMatchedStyles();
-							
+
 							// TODO: Eventually figure out how to style whispers without it being a PITA especially raidbot seenraids whispers
 							if ((elem.parentNode.parentNode.parentNode.className || "").indexOf("hisper") < 0) {
-								
+
 								// Remove existing doomscript styles. We don't want to double them up or anything weird
 								elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").replace(/DCLH-RFSP-\d+/gi, "").trim();
 
@@ -1560,7 +1572,7 @@
 									elem.parentNode.parentNode.className = (elem.parentNode.parentNode.className || "").trim() + " " + styles.className.trim();
 								}
 							}
-							
+
 							// Remove the old link, and shove in the new, formatted, styled one
 							elem.insert({after: newRaidLink.getFormattedRaidLink(messageFormat, linkFormat)});
 							elem.remove();
@@ -1577,7 +1589,7 @@
 							DCDebug(newRaidLink);
 						}
 					}
-					
+
 					delete DC_LoaTS_Helper.updatePostedLinksTimeout;
 				}
 				catch (e)
@@ -1586,9 +1598,9 @@
 				}
 				Timer.stop("updatePostedLinksTimeout");
 			}.bind(window, raidLink), 100);
-			
+
 		};
-		
+
 		DC_LoaTS_Helper.ajax = function(params){
             DCDebug("DC_LoaTS_Helper.ajax: ", params);
             if (!params.method)
@@ -1627,7 +1639,7 @@
                 else {
                     DCDebug("XHR Response in ReadyState ", event.detail.responseObj.readyState);
                 }
-                
+
                 if (typeof params[event.detail.callbackName] === "function")
                 {
                     DCDebug("Callback function exists. calbackName: ", event.detail.callbackName, "func: ", params[event.detail.callbackName], " Invoking...");
@@ -1655,13 +1667,13 @@
             DCDebug("Publishing Ajax event", evt);
             document.dispatchEvent(evt);
         };
-		
-		
+
+
 		// Check for updates
 		DC_LoaTS_Helper.checkForUpdates = function()
-		{		    
+		{
 			var elems = $("chat_window").getElementsByClassName("DC_LoaTS_updateNotRun");
-			
+
 			for (var i = 0; i < elems.length; i++)
 			{
 				var elem = elems[i];
@@ -1669,27 +1681,27 @@
 				elem.removeClassName("DC_LoaTS_updateNotRun");
 				elem.removeClassName("DC_LoaTS_checkingForUpdate");
 			}
-		    
+
 			// TODO Migrate to use DC_LoaTS_Helper.ajax?
 			new Ajax.Request(DC_LoaTS_Properties.updateURL,
 				{
 					method: 'get',
 					onSuccess: function(transport)
 					{
-						// How to find the version number of the script 
+						// How to find the version number of the script
 						var versionPattern = /Current LoaTS Helper Version: ([\d\.]+)/i;
-						
+
 						var match = versionPattern.exec(transport.responseText);
-						
+
 						var resultText = DC_LoaTS_Properties.version + ". This is the latest version.";
 						var resultState = "current";
-						
+
 						if (match != null)
 						{
 							var currentVersion = match[1].trim();
 							var currentVersionPieces = currentVersion.split("\.");
 							var thisVersionPieces = DC_LoaTS_Properties.version.split("\.");
-							
+
 							if (currentVersion != DC_LoaTS_Properties.version)
 							{
 								var i = 0;
@@ -1742,10 +1754,10 @@
 							resultText = "Unable to locate current version number.";
 							resultState = "fail";
 						}
-						
+
 						DC_LoaTS_Helper.notifyUpdate(resultState, resultText);
 					},
-					
+
 					onFailure: function(transport)
 					{
 						DC_LoaTS_Helper.notifyUpdate("fail", "Unable to contact update site.");
@@ -1753,16 +1765,16 @@
 				}
 			);
 		};
-		
+
 		// Notify the user if there's an update
 		DC_LoaTS_Helper.notifyUpdate = function(state, text)
 		{
 			DC_LoaTS_Helper.needUpdateState = state;
 			DC_LoaTS_Helper.needUpdateText = text;
-			
-			
+
+
 			var newHTML = "";
-			
+
 			// If it's time to update
 			if (DC_LoaTS_Helper.needUpdateState == "old")
 			{
@@ -1791,10 +1803,10 @@
 				newHTML += "<span style='float:right;'><a class='DC_LoaTS_updateLink DC_LoaTS_updateNotRun' onclick='DC_LoaTS_Helper.checkForUpdates(); return false;' href='#' target='_blank'>Check now</a></span>";
 				newHTML += "<br><br>\n";
 			}
-			
-			
+
+
 			var elems = $("chat_window").getElementsByClassName("DC_LoaTS_versionWrapper");
-			
+
 			for (var i = 0; i < elems.length; i++)
 			{
 				var elem = elems[i];
@@ -1804,27 +1816,27 @@
 			if (state == "old")
 			{
 				var updateNotificationDiv = document.getElementById("DC_LoaTS_notifitcationBar");
-				
+
 				if (!updateNotificationDiv)
 				{
 					updateNotificationDiv = document.createElement("div");
 					updateNotificationDiv.id = "DC_LoaTS_notifitcationBar";
 					updateNotificationDiv.className = "clearfix";
 					$(updateNotificationDiv).hide();
-					
+
 					var updateTitle = document.createElement("div");
 					updateTitle.appendChild(document.createTextNode("LoaTS Helper - "));
 					updateTitle.id = "DC_LoaTS_notifitcationBarTitle";
 					updateNotificationDiv.appendChild(updateTitle);
-					
+
 					var updateTextDiv = document.createElement("div");
 					updateTextDiv.id = "DC_LoaTS_notifitcationBarText";
 					updateNotificationDiv.appendChild(updateTextDiv);
-					
+
 					var updateButtonsDiv = document.createElement("div");
 					updateButtonsDiv.id = "DC_LoaTS_notifitcationBarButtons";
 					updateNotificationDiv.appendChild(updateButtonsDiv);
-					
+
 					var updateButton = document.createElement("a");
 					updateButton.className = "DC_LoaTS_updateLink";
 					updateButton.href = DC_LoaTS_Properties.scriptDownloadURL;
@@ -1835,11 +1847,11 @@
 						{
 							$("DC_LoaTS_notifitcationBar").hide();
 						}
-						
+
 						return true;
 					};
 					updateButtonsDiv.appendChild(updateButton);
-					
+
 					var remindButton = document.createElement("a");
 					remindButton.className = "DC_LoaTS_notifitcationBarButton";
 					remindButton.href = "#";
@@ -1849,7 +1861,7 @@
 						{
 							$("DC_LoaTS_notifitcationBar").hide();
 						}
-						
+
 						return false;
 					};
 					updateButtonsDiv.appendChild(remindButton);
@@ -1865,22 +1877,22 @@
 							if ($("DC_LoaTS_notifitcationBar")) {
 								$("DC_LoaTS_notifitcationBar").hide();
 							}
-							
+
 							GM_setValue(DC_LoaTS_Properties.storage.autoUpdate, false);
-							
+
 							return false;
 						};
 						updateButtonsDiv.appendChild(ignoreButton);
 					}
-					
-					
+
+
 					document.body.appendChild(updateNotificationDiv);
 				}
 				$(updateNotificationDiv).down("#DC_LoaTS_notifitcationBarText").update(text);
 				$(updateNotificationDiv).show();
 			}
 		};
-		
+
 		DC_LoaTS_Helper.updateRaidData = function() {
 			DC_LoaTS_Helper.ajax({
 				url: DC_LoaTS_Properties.raidDataURL + "?_dc=" + DC_LoaTS_Helper.generateUUID(),
@@ -1918,13 +1930,13 @@
 							holodeck.activeDialogue().raidBotMessage(message);
 						}
 					}
-					
+
 					if (window.raidTools && window.raidTools.spammer && window.raidTools.spammer.raids) {
 						var raidsObj = window.raidTools.spammer.raids;
 						if (!raidsObj.lots) {
 							raidsObj.lots = {};
 						}
-						
+
 						for (var raidId in DC_LoaTS_Helper.raids) {
 							if (!raidsObj.lots[raidId]){
 								raidsObj.lots[raidId] = DC_LoaTS_Helper.raids[raidId].shortName;
@@ -1989,8 +2001,8 @@
 			if (typeof displayText == "undefined"){displayText = commandText};
 			return "<a href=\"#\" class=\"chatCommandLink\" onclick=\"holodeck.processChatCommand('" + commandText + "'); return false;\">" + displayText + "</a>";
 		};
-		
-		
+
+
 		// Calculate shortest names
 		DC_LoaTS_Helper.calculateShortestRaidNames = function()
 		{
@@ -2020,7 +2032,7 @@
 			                    break;
 			                }
 			            }
-			
+
 			            if (!foundMatch)
 			            {
 			                // This substr works!
@@ -2032,13 +2044,13 @@
 			}
 			Timer.stop("calculateShortestRaidNames calc");
 		};
-		
+
 		DC_LoaTS_Helper.showWRInfo = function() {
 			if (typeof DC_LoaTS_Helper.worldRaidInfo === "object") {
-				
+
 				var wr = DC_LoaTS_Helper.worldRaidInfo;
 				wr.spawnType = wr.spawnType || "World Raid";
-				
+
 				RaidMenu.show();
 
 				var wrtab = document.getElementById("DC_LoaTS_raidMenu" + wr.spawnType.trim().replace(" ", "_") + "PaneTab");
@@ -2049,7 +2061,7 @@
 						tabHeader: wr.name + " " + wr.spawnType + ". " + wr.startDate,
 						tabPosition: 150,
 						closeable: true,
-						
+
 						initPane: function()
 						{
 							var timerDiv = document.createElement("div");
@@ -2058,16 +2070,16 @@
 							timerDiv.appendChild(document.createTextNode("Please Wait, Starting Timer..."));
 							this.pane.appendChild(timerDiv);
 							this.pane.appendChild(document.createElement("br"));
-							
+
 							if (wr.raidUrl) {
 								var wrlink = new RaidLink(wr.raidUrl);
 								var wrlinkDiv = document.createElement("div");
 								wrlinkDiv.innerHTML = wrlink.getFormattedRaidLink();
 								this.pane.appendChild(wrlinkDiv);
 							}
-							
+
 							var infoDiv = document.createElement("div");
-							
+
 							if (wr.infoUrl) {
 								var infoLink = document.createElement("a");
 								infoLink.href = wr.infoUrl;
@@ -2075,7 +2087,7 @@
 								infoLink.appendChild(document.createTextNode(wr.infoUrlTitle||wr.infoUrl));
 								infoDiv.appendChild(infoLink);
 							}
-							
+
 							if (wr.lootTableImageUrl) {
 								infoDiv.appendChild(document.createElement("br"));
 								var lootTable = document.createElement("img");
@@ -2084,17 +2096,17 @@
 								lootTable.style.borderRadius = "5px";
 								infoDiv.appendChild(lootTable);
 							}
-							
+
 							this.pane.appendChild(infoDiv);
-							
+
 							wrtab = this.tabA;
-							
+
 							DC_LoaTS_Helper.doWRTimer();
 						}
 					});
 					RaidMenu.getInstance().activateTab(tabClass);
 				}
-	
+
 				RaidMenu.getInstance().tabs.setActiveTab(wrtab);
 			}
 		};
@@ -2105,34 +2117,34 @@
 			if (typeof wr === "object" && wr.timerEnds) {
 				var now = new Date();
 				var timerEnds = new Date(wr.timerEnds);
-				
+
 				if (timerEnds > now) {
 					// WR is on
 					var diff = Math.floor((timerEnds.getTime() - now.getTime()) / 1000);
 					var hours = Math.floor(diff/3600);
 					var minutes = Math.floor((diff%3600)/60);
 					var seconds = Math.floor((diff%60));
-					timerText = "Estimated Time Remaining: " + 
-								(hours<10?"0"+hours:hours) + ":" + 
-								(minutes<10?"0"+minutes:minutes) + ":" + 
+					timerText = "Estimated Time Remaining: " +
+								(hours<10?"0"+hours:hours) + ":" +
+								(minutes<10?"0"+minutes:minutes) + ":" +
 								(seconds<10?"0"+seconds:seconds);
 				}
 				else {
 					// WR is over
 					timerText = wr.name + " is over.";
 				}
-				
+
 				var elems = document.getElementsByClassName("DC_LoaTS_WR_Timer");
-				if (elems && elems.length > 0) { 
+				if (elems && elems.length > 0) {
 					for (var i = 0; i < elems.length; i++) {
 						elems[i].innerHTML = timerText;
 					}
-					
+
 					wr.timerEndsTimeout = setTimeout("DC_LoaTS_Helper.doWRTimer();", 1000);
 				}
 			}
 		};
-		
+
 		DC_LoaTS_Helper.timeDifference = function(current, previous) {
 
 		    var msPerImmediate = 10 * 1000,
@@ -2172,18 +2184,18 @@
 		    	val = Math.round(elapsed/msPerYear);
 		        unit = "year";
 		    }
-		    
+
 		    return text || val + " " + unit + (val !== 1 ? 's':'') + " ago"
 		};
-		
+
 		DC_LoaTS_Helper.getCurrentPrettyDate = function() {
 			// Via: https://gist.github.com/akb/1187817
 			return (function () {
-			    return ['Jan.', 'Feb.', 'Mar.', 
+			    return ['Jan.', 'Feb.', 'Mar.',
 			            'Apr.', 'May', 'Jun.',
-			            'Jul.', 'Aug.', 'Sep.', 
+			            'Jul.', 'Aug.', 'Sep.',
 			            'Oct.', 'Nov.', 'Dec.'][this.getMonth()] + " " +
-			            (function (d) { 
+			            (function (d) {
 			                var s = d.toString(), l = s[s.length-1];
 			                return s+(['st','nd','rd'][l-1] || 'th');
 			            })(this.getDate()) + ", " +
@@ -2296,7 +2308,7 @@
 		        return v.toString(16);
 		    });
 		};
-		
+
 		// Go ahead and execute this, too
 		DC_LoaTS_Helper.calculateShortestRaidNames();
 
@@ -2313,14 +2325,14 @@
         window.DCI = {
             e: function() {
         }};
-		
+
 		// Borrowed from: http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format/4673436#4673436
 		String.prototype.format = function()
 		{
 			var args = arguments;
             DCDebug("Formatting String: ", this, " with args: ", args);
 			return this.replace(/{(\d+)}/g, function(match, number)
-			{ 
+			{
 				return typeof args[number] != 'undefined'?args[number]:match;
 			});
 		};

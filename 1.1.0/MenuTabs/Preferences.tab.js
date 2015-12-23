@@ -1,193 +1,210 @@
-		/************************************/
-		/********* Preferences Tab **********/
-		/************************************/
-		
-		// Class to manage a tab in the raid tab in the popup menu
-		RaidMenuTab.create(
-			{
-				tabName: "Preferences",
-				tabPosition: 100,
-				
-				rightClickVisitedKey: "RightClickVisited",
-				ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
-				hideVisitedRaidsKey: "HideVisitedRaids",
-				hideWorldChatKey: "HideWorldChat",
-				loadRaidsInBackgroundKey: "LoadRaidsInBackground",
-				reportDeadRaidsKey: "ReportDeadRaids",
-				useQueryTimeDeltaKey: "UseQueryTimeDelta",
-				loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
-				leftClickToWhisperKey: "LeftClickToWhisper",
-				rightClickUserMenuKey: "RightClickUserMenu",
-                linkifyUrlsKey: "LinkifyUrls",
+  /************************************/
+  /********* Preferences Tab **********/
+  /************************************/
 
-				initPane: function()
-				{
-					var wrapper = document.createElement("div");
-					var me = this;
+  // Class to manage a tab in the raid tab in the popup menu
+  RaidMenuTab.create(
+    {
+      tabName: "Preferences",
+      tabPosition: 100,
 
-                    var rightClickOption = me.createSimpleOptionHTML(
-                        "PreferencesMenu-RightClickVisitedInput",
-                        "boolean",
-                        DC_LoaTS_Helper.getPref(me.rightClickVisitedKey, true),
-                        "Right-click should mark raids visited.",
-                        "If checked, right clicking a link will mark it visited",
-                        {
-                            onclick: function()
-                            {
-                                DC_LoaTS_Helper.setPref(me.rightClickVisitedKey, this.checked);
-                            }
-                        }
-                    );
-					wrapper.appendChild(rightClickOption.wrapper);
+      rightClickVisitedKey: "RightClickVisited",
+      ignoreInvalidCommandsKey: "IgnoreInvalidCommands",
+      hideVisitedRaidsKey: "HideVisitedRaids",
+      hideWorldChatKey: "HideWorldChat",
+      loadRaidsInBackgroundKey: "LoadRaidsInBackground",
+      reportDeadRaidsKey: "ReportDeadRaids",
+      useQueryTimeDeltaKey: "UseQueryTimeDelta",
+      loadRaidsInBackgroundDelayKey: "LoadRaidsInBackgroundDelay",
+      leftClickToWhisperKey: "LeftClickToWhisper",
+      rightClickUserMenuKey: "RightClickUserMenu",
+      linkifyUrlsKey: "LinkifyUrls",
+      chatTimestampRight: "ChatTimestampRight",
 
-                    var ignoreInvalidOption = me.createSimpleOptionHTML(
-                        "PreferencesMenu-IgnoreInvalidCommandsInput",
-                        "boolean",
-                        DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey, true),
-                        "Ignore invalid commands.",
-                        "If checked, any command that is not a valid command will be ignored",
-                        {
-                            onclick: function()
-                            {
-                                DC_LoaTS_Helper.setPref(me.ignoreInvalidCommandsKey, this.checked);
-                            }
-                        }
-                    );
-                    wrapper.appendChild(ignoreInvalidOption.wrapper);
+      initPane: function()
+      {
+        var wrapper = document.createElement("div");
+        var me = this;
+
+        var rightClickOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-RightClickVisitedInput",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.rightClickVisitedKey, true),
+          "Right-click should mark raids visited.",
+          "If checked, right clicking a link will mark it visited",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.rightClickVisitedKey, this.checked);
+            }
+          }
+        );
+        wrapper.appendChild(rightClickOption.wrapper);
+
+        var ignoreInvalidOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-IgnoreInvalidCommandsInput",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.ignoreInvalidCommandsKey, true),
+          "Ignore invalid commands.",
+          "If checked, any command that is not a valid command will be ignored",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.ignoreInvalidCommandsKey, this.checked);
+            }
+          }
+        );
+        wrapper.appendChild(ignoreInvalidOption.wrapper);
 
 
-                    var hideVisitedOption = me.createSimpleOptionHTML(
-                        "PreferencesMenu-HideVisitedRaidsInput",
-                        "boolean",
-                        DC_LoaTS_Helper.getPref(me.hideVisitedRaidsKey, false),
-                        "Hide Visited and Completed Raids.",
-                        "If checked, Visited and Completed Raids posted into chat will be hidden",
-                        {
-                            onclick: function()
-                            {
-                                DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
+        var hideVisitedOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-HideVisitedRaidsInput",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.hideVisitedRaidsKey, false),
+          "Hide Visited and Completed Raids.",
+          "If checked, Visited and Completed Raids posted into chat will be hidden",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.hideVisitedRaidsKey, this.checked);
 
-                                DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
-                            }
-                        }
-                    );
-                    wrapper.appendChild(hideVisitedOption.wrapper);
+              DC_LoaTS_Helper.handleIgnoreVisitedRaids(this.checked);
+            }
+          }
+        );
+        wrapper.appendChild(hideVisitedOption.wrapper);
 
-                    var hideWorldChat = me.createSimpleOptionHTML(
-                        "PreferencesMenu-HideWorldChatInput",
-                        "boolean",
-                        DC_LoaTS_Helper.getPref(me.hideWorldChatKey, false),
-                        "Hide World Chat",
-                        "If checked, World Chat will not be visible",
-                        {
-                            onclick: function()
-                            {
-                                DC_LoaTS_Helper.setPref(me.hideWorldChatKey, this.checked);
+        var hideWorldChat = me.createSimpleOptionHTML(
+          "PreferencesMenu-HideWorldChatInput",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.hideWorldChatKey, false),
+          "Hide World Chat",
+          "If checked, World Chat will not be visible",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.hideWorldChatKey, this.checked);
 
-                                DC_LoaTS_Helper.handleHideWorldChat(this.checked);
-                            }
-                        }
-                    );
-                    wrapper.appendChild(hideWorldChat.wrapper);
+              DC_LoaTS_Helper.handleHideWorldChat(this.checked);
+            }
+          }
+        );
+        wrapper.appendChild(hideWorldChat.wrapper);
 
-                    var loadBackgroundOption = me.createSimpleOptionHTML(
-                        "PreferencesMenu-LoadRaidsInBackgroundInput",
-                        "boolean",
-                        DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey, true),
-                        "Load Raids in Background (Skips the Play Now screen when loading raids)",
-                        "If checked, raids won't load in the game area.",
-                        {
-                            onclick: function()
-                            {
-                                DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundKey, this.checked);
-                            }
-                        }
-                    );
-                    wrapper.appendChild(loadBackgroundOption.wrapper);
+        var loadBackgroundOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-LoadRaidsInBackgroundInput",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundKey, true),
+          "Load Raids in Background (Skips the Play Now screen when loading raids)",
+          "If checked, raids won't load in the game area.",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundKey, this.checked);
+            }
+          }
+        );
+        wrapper.appendChild(loadBackgroundOption.wrapper);
 
-                    var loadRaidsInBackgroundDelayOption = me.createSimpleOptionHTML(
-                        "PreferencesMenu-LoadRaidsInBackgroundDelayInput",
-                        "text",
-                        DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 50),
-                        "ms. Time Between Loading Raids (Only applicable if Load Raids in Background is enabled)",
-                        "Default = 50; No delay = 0; Half a second = 500.",
-                        {
-                            size: 4,
-                            maxlength: 4,
-                            onchange: function()
-                            {
-                                var v = this.value;
+        var loadRaidsInBackgroundDelayOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-LoadRaidsInBackgroundDelayInput",
+          "text",
+          DC_LoaTS_Helper.getPref(me.loadRaidsInBackgroundDelayKey, 50),
+          "ms. Time Between Loading Raids (Only applicable if Load Raids in Background is enabled)",
+          "Default = 50; No delay = 0; Half a second = 500.",
+          {
+            size: 4,
+            maxlength: 4,
+            onchange: function()
+            {
+              var v = this.value;
 
-                                if (/^\d+$/.test(v))
-                                {
-                                    DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundDelayKey, v);
-                                }
-                                else
-                                {
-                                    holodeck.activeDialogue().raidBotMessage("Load Raids In Background Delay: Please enter only numbers.");
-                                }
-                            }
-                        }
-                    );
-                    wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
+              if (/^\d+$/.test(v))
+              {
+                DC_LoaTS_Helper.setPref(me.loadRaidsInBackgroundDelayKey, v);
+              }
+              else
+              {
+                holodeck.activeDialogue().raidBotMessage("Load Raids In Background Delay: Please enter only numbers.");
+              }
+            }
+          }
+        );
+        wrapper.appendChild(loadRaidsInBackgroundDelayOption.wrapper);
 
-                    var leftClickToWhisperOption = me.createSimpleOptionHTML(
-                        "PreferencesMenu-LeftClickToWhisper",
-                        "boolean",
-                        DC_LoaTS_Helper.getPref(me.leftClickToWhisperKey, true),
-                        "Left click a user's name in chat to whisper them (Requires refresh after change)",
-                        "Overrides default functionality of showing mini-profile",
-                        {
-                            onclick: function()
-                            {
-                                DC_LoaTS_Helper.setPref(me.leftClickToWhisperKey, this.checked);
+        var leftClickToWhisperOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-LeftClickToWhisper",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.leftClickToWhisperKey, true),
+          "Left click a user's name in chat to whisper them (Requires refresh after change)",
+          "Overrides default functionality of showing mini-profile",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.leftClickToWhisperKey, this.checked);
 
-                                // Attach or detach the handlers
-                                DC_LoaTS_Helper.handleMessageWindowClickHandler();
+              // Attach or detach the handlers
+              DC_LoaTS_Helper.handleMessageWindowClickHandler();
 
-                                // Ask the user if they want to refresh now
-                                if (window.confirm && window.confirm("The page needs to be refreshed in order for your preference change to take effect. Confirm to refresh now; Cancel to refresh later.")) {
-                                    document.location.reload();
-                                }
-                            }
-                        }
-                    );
-                    wrapper.appendChild(leftClickToWhisperOption.wrapper);
+              // Ask the user if they want to refresh now
+              if (window.confirm && window.confirm("The page needs to be refreshed in order for your preference change to take effect. Confirm to refresh now; Cancel to refresh later.")) {
+                document.location.reload();
+              }
+            }
+          }
+        );
+        wrapper.appendChild(leftClickToWhisperOption.wrapper);
 
-                    var rightClickUserMenuOption = me.createSimpleOptionHTML(
-                        "PreferencesMenu-RightClickUserMenu",
-                        "boolean",
-                        DC_LoaTS_Helper.getPref(me.rightClickUserMenuKey, true),
-                        "Right click a user's name to show an action menu",
-                        "Contains options to show their profile, friend them, and eventually more",
-                        {
-                            onclick: function()
-                            {
-                                DC_LoaTS_Helper.setPref(me.rightClickUserMenuKey, this.checked);
+        var rightClickUserMenuOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-RightClickUserMenu",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.rightClickUserMenuKey, true),
+          "Right click a user's name to show an action menu",
+          "Contains options to show their profile, friend them, and eventually more",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.rightClickUserMenuKey, this.checked);
 
-                                // Attach or detach the handlers
-                                DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
-                            }
-                        }
-                    );
-                    wrapper.appendChild(rightClickUserMenuOption.wrapper);
+              // Attach or detach the handlers
+              DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
+            }
+          }
+        );
+        wrapper.appendChild(rightClickUserMenuOption.wrapper);
 
-                    var linkifyUrlsOption = me.createSimpleOptionHTML(
-                        "PreferencesMenu-LinkifyUrls",
-                        "boolean",
-                        DC_LoaTS_Helper.getPref(me.linkifyUrlsKey, true),
-                        "Make URLs and #wiki's posted to chat be clickable links",
-                        "When someone posts a URL, automatically make it a link that will open in a new tab",
-                        {
-                            onclick: function()
-                            {
-                                DC_LoaTS_Helper.setPref(me.linkifyUrlsKey, this.checked);
-                            }
-                        }
-                    );
-                    wrapper.appendChild(linkifyUrlsOption.wrapper);
+        var linkifyUrlsOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-LinkifyUrls",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.linkifyUrlsKey, true),
+          "Make URLs and #wiki's posted to chat be clickable links",
+          "When someone posts a URL, automatically make it a link that will open in a new tab",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.linkifyUrlsKey, this.checked);
+            }
+          }
+        );
+        wrapper.appendChild(linkifyUrlsOption.wrapper);
 
-					this.pane.appendChild(wrapper);
-				}
-		});
+        var chatTimestampRightOption = me.createSimpleOptionHTML(
+          "PreferencesMenu-ChatTimestampRight",
+          "boolean",
+          DC_LoaTS_Helper.getPref(me.chatTimestampRight, true),
+          "Chat timestamps on the right",
+          "Moves the chat timestamps down and to the right",
+          {
+            onclick: function()
+            {
+              DC_LoaTS_Helper.setPref(me.chatTimestampRight, this.checked);
+              DC_LoaTS_Helper.handleMoveChatTimestamps(this.checked);
+            }
+          }
+        );
+        wrapper.appendChild(chatTimestampRightOption.wrapper);
+
+        this.pane.appendChild(wrapper);
+      }
+    });
 

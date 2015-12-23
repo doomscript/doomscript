@@ -104,7 +104,12 @@
 					var p = document.createElement("p");
 					p.className = "even";
 					this.messageFormatExampleLinkContainer.appendChild(p);
-					
+
+					var timestamp = document.createElement("p");
+					timestamp.className = "timestamp";
+					timestamp.appendChild(document.createTextNode(new Date().format("mmm d - h:MMTT")));
+					p.appendChild(timestamp);
+
 					var username = holodeck._active_user._attributes._object.username;
 					var usernameSpan = document.createElement("span");
 					usernameSpan.setAttribute("username", username);

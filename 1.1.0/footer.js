@@ -1,5 +1,5 @@
 	}// End declareClasses function
-	
+
 	// Define some CSS Styles
 	function defineStyles()
 	{
@@ -557,10 +557,17 @@
         "\twidth: 759px !important;",
         "}",
 
-        "\n#gameholder {",
-        "\twidth: auto !important;",
-        "}"
-        ];
+    "\n#gameholder {",
+    "\twidth: auto !important;",
+    "}",
+
+    "\n#kong_game_ui.chat-timestamp-right .chat_message_window p .timestamp {",
+    "\tfloat: right",
+    "}",
+    "\n#kong_game_ui.chat-timestamp-right .chat_message_window p .message {",
+    "\tclear: both",
+    "}"
+  ];
 
         var head = document.getElementsByTagName('head')[0],
             style = document.createElement('style'),
@@ -579,7 +586,7 @@
 
         head.appendChild(style);
     }
-	
+
 	function setupGMFunctions()
 	{
 		if (typeof GM_setValue === 'undefined')
@@ -603,7 +610,7 @@
 					{
 						localStorage.removeItem(k);
 					}
-				} 
+				}
 				else
 				{
 					window.GM_setValue = function(){console.warn("Local Storage not accessible.");};
@@ -629,26 +636,26 @@
 				}
 			}
 		}
-		
+
 		if (typeof GM_xmlhttpRequest !== "function") {
 		    console.warn("doomscript will not run properly (or maybe even at all) in your browser without Greasemonkey Emulation: http://userscripts-mirror.org/scripts/show/105153");
 		}
 	}
-	
+
 	function doCriticalHooks()
 	{
 		// Have the raid bot post a message to the user
 		ChatDialogue.prototype.raidBotMessage = function(message)
 		{
-			try 
+			try
 			{
 				holodeck.activeDialogue().displayUnsanitizedMessage("RaidBot",
 														 	message.replace(/\n/g, "<br />\n"),
 														 	{"class": "whisper received_whisper"},
-															{non_user: true} 
+															{non_user: true}
 														   );
 			}
-			catch (ex) 
+			catch (ex)
 			{
 				console.warn("Unexpected exception during raidBotMessage", ex);
 			}
@@ -677,8 +684,8 @@
 
         hookInputDialogue();
     }
-	
-	// Gotta jumpstart this bucket of giggles	
+
+	// Gotta jumpstart this bucket of giggles
     function bootstrap_DC_LoaTS_Helper(loadSubFrames)
     {
     	// Only run if the script is running in the top frame
@@ -686,12 +693,12 @@
     	{
     		return;
     	}
-    	
+
 		if (typeof window._dc_loats_helper_fails == "undefined")
         {
         	window._dc_loats_helper_fails = 0;
         }
-        
+
         if (window._dc_loats_helper_fails >= 10)
         {
             console.warn("DC LoaTS Link Helper could not load.");
@@ -701,44 +708,44 @@
     	// Don't want to run the script twice
     	if (!window._dc_loats_helper)
     	{
-	        
+
 	        // Do we actually have everything we need to start?
 	        if (typeof holodeck === "undefined" || typeof ChatDialogue === "undefined" || typeof Class === "undefined" || !$("chat_window"))
 	        {
 	        	// Something is not loaded yet. Bail on this and try again later
 //	            console.log("DC LoaTS Link Helper not ready. Fail " + window._dc_loats_helper_fails + "/10");
-	            
+
 	            window._dc_loats_helper_fails++;
 	            setTimeout(bootstrap_DC_LoaTS_Helper, 1000); // 1000ms = 1 second
 	            return;
 	        }
-	        
+
 	        // Print that we're about to start
     		console.info("DC LoaTS Link Helper v" + DC_LoaTS_Properties.version + " trying to start...");
-	        
+
 	        // Setup GreaseMonkey functions
 	        setupGMFunctions();
-	        
+
 	        // Do critical hooks
 	        doCriticalHooks();
-	        
+
 	        // Declare classes
 	        declareClasses();
-	        
+
 	        // Define styles
 	        defineStyles();
-	        
+
     		// Throw a reference to this onto the window I guess in case anyone else wants to use it?
 			window._dc_loats_helper = new DC_LoaTS_Helper();
-			
+
 			// Update raid data
 			DC_LoaTS_Helper.updateRaidData();
         }
-    	
+
     	// Everything is done
         console.info("DC LoaTS Link Helper started!");
     }
-    
+
     // Hit the go button and activate the main script.
     bootstrap_DC_LoaTS_Helper(false);
 }
