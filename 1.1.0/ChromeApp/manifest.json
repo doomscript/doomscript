@@ -1,16 +1,25 @@
+
 {
-    "content_scripts": [ {
-        "exclude_globs": ["*kongregate.com/games/*/legacy-of-a-thousand-suns/tags*" ],
-        "exclude_matches": [  ],
-        "include_globs": [ "*kongregate.com/games/*/legacy-of-a-thousand-suns*", "*50.18.1*.*/kong/*" ],
-        "js": [ "124753_nightly.user.js" ],
-        "matches": [ "http://*/*", "https://*/*" ],
-        "run_at": "document_idle",
-        "all_frames": true
-    } ],
-    "manifest_version": 2,
-    "converted_from_user_script": true,
-    "description": "Kongregate Legacy of a Thousand Suns Raid Link Helper",
-    "name": "doomscript",
-    "version": "1.1.36"
+  "name": "doomscript",
+  "version": "1.1.36",
+  "manifest_version": 2,
+  "description": "Kongregate Legacy of a Thousand Suns Raid Link Helper",
+  "homepage_url": "http://github.com/doomscript/doomscript",
+  "permissions": [
+    "https://*/*",
+    "http://*/*",
+    "tabs"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "124753_nightly.user.js"
+      ],
+      "all_frames": true
+    }
+  ]
 }

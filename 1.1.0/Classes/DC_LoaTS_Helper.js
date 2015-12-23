@@ -1,6 +1,6 @@
-		/************************************/
-		/****** DC_LoaTS_Helper Class *******/
-		/************************************/
+/************************************/
+/****** DC_LoaTS_Helper Class *******/
+/************************************/
 
 		// Manager and runner class for this whole thing
 		// This is a PrototypeJS class. Kongregate uses the Prototype libraries, so we don't
@@ -81,15 +81,15 @@
 				var allianceInvitePattern = /(?:https?:\/\/)?(?:www\.)?kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousand-suns\?kv_action_type=guildinvite&(?:amp;)?kv_fbuid=kong_([^<"']+)/i;
 				var allianceInviteFormat = "<a href='{0}'>Join {1}'s alliance? (Opens in this window)</a>";
 
-                        // Regular external links, borrowed from: http://stackoverflow.com/a/8943487/1449525
+				// Regular external links, borrowed from: http://stackoverflow.com/a/8943487/1449525
 //                        var urlPattern = /((?!=)\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-                        // Regular external links, borrowed from: http://jmrware.com/articles/2010/linkifyurl/linkify.html
-                        //var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
-                        var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
-                        var urlFormat = "<a href='{0}' target='_blank'>{0}</a>";
+				// Regular external links, borrowed from: http://jmrware.com/articles/2010/linkifyurl/linkify.html
+				//var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
+				var urlPattern = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
+				var urlFormat = "<a href='{0}' target='_blank'>{0}</a>";
 
-                        // Wiki link generation
-                        var hashWikiPattern = /#wiki (?:(?!(?:ht|f)tp|<|:\/\/).)*/img;
+				// Wiki link generation
+				var hashWikiPattern = /#wiki (?:(?!(?:ht|f)tp|<|:\/\/).)*/img;
 
 
                         // Make sure we haven't already put a raid link in here and the link we found was valid
@@ -320,10 +320,10 @@
 					return !raidBotWhisper && chatCommandResult && !ignoredByPreference;
 				}; // End Replacement displayUnsanitizedMessage
 
-                // This is how we're going to manage left clicks on the chat area
-                DC_LoaTS_Helper.handleMessageWindowClickHandler();
-                // This is how we're going to manage right clicks on the chat area
-                DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
+		// This is how we're going to manage left clicks on the chat area
+		DC_LoaTS_Helper.handleMessageWindowClickHandler();
+		// This is how we're going to manage right clicks on the chat area
+		DC_LoaTS_Helper.handleMessageWindowContextMenuHandler();
 
 				// Make sure the ignore visited thing is working
 				// TODO: If we ever do more of these, make a framework for it, or something
@@ -549,7 +549,6 @@
 			return false;
 	    };
 
-	DC_LoaTS_Helper.recentlySent = [];
-	DC_LoaTS_Helper.chatCommands = {};
-	DC_LoaTS_Helper.raidStyles = {};
-
+DC_LoaTS_Helper.recentlySent = [];
+DC_LoaTS_Helper.chatCommands = {};
+DC_LoaTS_Helper.raidStyles = {};
