@@ -1403,19 +1403,18 @@ DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			}
 		};
 
-		// reload the correct panel based on the button that raised the evt	
-		DC_LoaTS_Helper.reload = function(evt)
+		// reload the correct panel based on the button that raised the evt	or the panel param
+		DC_LoaTS_Helper.reload = function(evt, panel)
 		{
 			// Whether or not we managed to reload
 			var didReload = false;
-			var sPanel = "";
-			if (evt.target.className == "DC_LoaTS_button DC_LoaTS_reloadWCButton")
+			var sPanel = "game";
+			
+			if (panel == "chat" || panel == "wc" || (evt != null && evt.target.className == "DC_LoaTS_button DC_LoaTS_reloadWCButton"))
 				sPanel = "chat";
-			else if (evt.target.className == "DC_LoaTS_button DC_LoaTS_reloadButton")
-				sPanel = "game";			
 
 			// Try to reload the game
-			if (typeof activateGame  !== "undefined" && (sPanel == "chat" || sPanel == "game"))
+			if (typeof activateGame  !== "undefined")
 			{
 				holodeck.activeDialogue().raidBotMessage("Reloading " + sPanel + ", please wait...");
 				//activateGame();

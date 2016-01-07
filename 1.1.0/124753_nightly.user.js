@@ -422,10 +422,12 @@ if (!/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousa
  Added /mutelist command for showing all muted users
  Moved to using external news site
  Migrated to GitHub script hosting
+ Separated Game refresh from World Chat refresh, added World Chat reload button above the chat pane
+ Changed Hide World Chat to unload the chat flash object
+ Fixed missing raid icons for raids added since 1.1.35
  TODO: Move to using external datasource for raids
  TODO: Use PegJS generated raid parsing filter
  TODO: BUG: Links sometime seem to include an extra space at the end
- TODO: Separate Game refresh from World Chat refresh
  TODO: Better /lrm docs
  TODO: Hide previous text from people upon mute
  TODO: /wr command
@@ -8315,9 +8317,14 @@ RaidCommand
 				{
 					// Declare ret object
 					var ret = {};
-
+					params = params.trim().toLowerCase();
+					if (params != "game" && params != "chat" && params != "wc" && params != "")
+					{
+						holodeck.processChatCommand("/reload help");
+                        return {success: true};
+					}
 					// true if we did reload, false otherwise
-					ret.success = DC_LoaTS_Helper.reload();
+					ret.success = DC_LoaTS_Helper.reload(null, params);
 					
 					return ret;
 				},
@@ -8335,6 +8342,7 @@ RaidCommand
 				{
 					var helpText = "<b>Raid Command:</b> <code>/reload</code>\n";
 					helpText += "Attempts to reload just the game and not the window\n";
+					helpText += "To reload the World Chat, use <code>/reload chat</code>\n";
 					
 					return helpText;
 				}
@@ -10792,19 +10800,18 @@ DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			}
 		};
 
-		// reload the correct panel based on the button that raised the evt	
-		DC_LoaTS_Helper.reload = function(evt)
+		// reload the correct panel based on the button that raised the evt	or the panel param
+		DC_LoaTS_Helper.reload = function(evt, panel)
 		{
 			// Whether or not we managed to reload
 			var didReload = false;
-			var sPanel = "";
-			if (evt.target.className == "DC_LoaTS_button DC_LoaTS_reloadWCButton")
+			var sPanel = "game";
+			
+			if (panel == "chat" || panel == "wc" || (evt != null && evt.target.className == "DC_LoaTS_button DC_LoaTS_reloadWCButton"))
 				sPanel = "chat";
-			else if (evt.target.className == "DC_LoaTS_button DC_LoaTS_reloadButton")
-				sPanel = "game";			
 
 			// Try to reload the game
-			if (typeof activateGame  !== "undefined" && (sPanel == "chat" || sPanel == "game"))
+			if (typeof activateGame  !== "undefined")
 			{
 				holodeck.activeDialogue().raidBotMessage("Reloading " + sPanel + ", please wait...");
 				//activateGame();
@@ -10896,7 +10903,7 @@ DC_LoaTS_Helper.handleHideWorldChat = function(hide) {
   var el   = document.getElementById("maingame"),
     button = document.getElementById("DC_LoaTS_raidToolbarContainer").getElementsByClassName("DC_LoaTS_reloadWCButton").item(0),	
     hidden = el.className.indexOf("hideWorldChat") > -1;
-	
+
   if (hide && !hidden) {
     el.className += " hideWorldChat";
 	if (button) 
