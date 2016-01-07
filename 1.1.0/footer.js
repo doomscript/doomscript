@@ -350,6 +350,14 @@ function defineStyles()
     "\na.DC_LoaTS_reloadButton {",
     "\tbackground-position: -160px -64px;",
     "}",
+	
+	"\na.DC_LoaTS_reloadWCButton {",
+    "\tbackground-position: -160px -64px;",
+    "}",
+
+	"\nli.DC_LoaTS_reloadWCButtonWrapper {",
+    "\tfloat: right !important;",
+    "}",
 
     "\na.DC_LoaTS_toggleGameButton {",
     "\tbackground-position: 0 -176px;",
@@ -904,16 +912,95 @@ if (/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousan
   (document.body || document.head || document.documentElement).appendChild(script);
 }
 else if (/50\.18\.1[89]\d\.\d{2,3}/i.test(window.location.host)) {
-  console.log("doomscript loaded in iFrame");
-  function iframeFn() {
-    var flashObjs = document.getElementsByTagName("object");
-    window.onmessage = function(e){console.log("iFrame received message", e);};
-    console.log("Objects: ", flashObjs);
-  }
+	console.log("doomscript loaded in iFrame");
+	function iframeFn() 
+	{
+		if (typeof GM_setValue === 'undefined') 
+		{
+			window.GM_setValue = function(k, v) 
+			{ 
+				localStorage.setItem(k, (typeof v)[0] + v); 
+			};
+		}
+		if (typeof GM_getValue === 'undefined') 
+		{
+			window.GM_getValue = function(k, def) 
+			{
+				var ret = localStorage.getItem(k);
+				if (!ret)
+					return def;
+				var type = ret[0];
+				var value = ret.substring(1);
+				switch (type) {
+					case 'b':
+						return value == 'true';
+					case 'n':
+						return Number(value);
+					case 's':
+						return value;
+					default:
+						return def;
+				}		  
+			};
+		}
+		if (typeof GM_deleteValue === 'undefined') 
+		{			
+			window.GM_deleteValue = function(k)
+			{
+			  localStorage.removeItem(k);
+			}
+		}
+	  
+		window.onmessage = function(e)
+		{
+			if (e.origin != "http://www.kongregate.com" && e.origin != "http://www.armorgames.com")
+				return;
+			
+			console.log("iFrame received message: ", e.data);
+			var data = JSON.parse(e.data); 
+			if (!data || data.namespace != "DC_LoaTS_Helper")
+				return;			
+			
+			if (data.param == "game")
+				var swf = document.getElementById("swfdiv");
+			else if (data.param == "chat")
+				var swf = document.getElementById("chatdiv");
+			else
+				return;
 
-  var iframeScript = document.createElement('script');
-  iframeScript.appendChild(document.createTextNode('('+ iframeFn +')();'));
-  (document.body || document.head || document.documentElement).appendChild(iframeScript);
+			if (swf !== null)
+			{
+				var url = swf.getAttribute("data");					
+				if(data.command == "reload")
+				{			
+					swf.style.visibility = null;
+					swf.setAttribute("data", url);
+					swf.style.visibility = "visible";
+				}
+				else if(data.command == "hide")
+				{
+					GM_setValue("DC_LoaTS_"+data.param+"URL", url);
+					swf.style.visibility = null;
+					swf.setAttribute("data", "");
+				}
+				else if(data.command == "show")
+				{
+					var url = GM_getValue("DC_LoaTS_chatURL", "https://5thplanetlots.insnw.net/dotd_live/chat/812/chatclient.swf");
+					if (data.param == "game")
+						url = GM_getValue("DC_LoaTS_gameURL", "https://5thplanetlots.insnw.net/lots_live/swf/8107/lots.swf");
+					swf.style.visibility = null;
+					swf.setAttribute("data", url);
+					swf.style.visibility = "visible";
+				}
+				data.retCode = true;
+			}
+			e.source.postMessage(JSON.stringify(data), e.origin); //post back message (command, param, retCode) to caller
+		};
+	}
+
+	var iframeScript = document.createElement('script');
+	iframeScript.appendChild(document.createTextNode('('+ iframeFn +')();'));
+	(document.body || document.head || document.documentElement).appendChild(iframeScript);
 }
 else {
   console.log("doomscript not launched on ", window.location);

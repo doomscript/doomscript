@@ -1383,17 +1383,43 @@ DC_LoaTS_Helper.loadAll = function(raidLinks) {
 			};
 
 		};
+		
+		// Dispatch a message to the gameiframe hosted on 50.18.191.15/kong
+		DC_LoaTS_Helper.dispatchMsg = function(command, param)
+		{
+			var gameiframe = document.getElementById('gameiframe');
+			if(typeof gameiframe === 'object' && typeof gameiframe.contentWindow === 'object')
+				window.setTimeout(function(){gameiframe = document.getElementById('gameiframe');}, 1000); //retry one time after 1000 ms
+			
+			if(typeof gameiframe === 'object' && typeof gameiframe.contentWindow === 'object')
+			{			
+				//console.log("DC_LoaTS_Helper.dispatchMsg: Posting message");
+				var jsonmsg = JSON.stringify( { "namespace": "DC_LoaTS_Helper", "command" : command, "param" : param } );
+				gameiframe.contentWindow.postMessage(jsonmsg, '*'); 
+			}
+			else
+			{
+				console.log("DC_LoaTS_Helper.dispatchMsg: gameiframe not accessible");
+			}
+		};
 
-		DC_LoaTS_Helper.reload = function()
+		// reload the correct panel based on the button that raised the evt	
+		DC_LoaTS_Helper.reload = function(evt)
 		{
 			// Whether or not we managed to reload
 			var didReload = false;
+			var sPanel = "";
+			if (evt.target.className == "DC_LoaTS_button DC_LoaTS_reloadWCButton")
+				sPanel = "chat";
+			else if (evt.target.className == "DC_LoaTS_button DC_LoaTS_reloadButton")
+				sPanel = "game";			
 
 			// Try to reload the game
-			if (typeof activateGame  !== "undefined")
+			if (typeof activateGame  !== "undefined" && (sPanel == "chat" || sPanel == "game"))
 			{
-				holodeck.activeDialogue().raidBotMessage("Reloading game, please wait...");
-				activateGame();
+				holodeck.activeDialogue().raidBotMessage("Reloading " + sPanel + ", please wait...");
+				//activateGame();
+				DC_LoaTS_Helper.dispatchMsg("reload", sPanel);
 				didReload = true;
 			}
 			// Could not find necessary info to reload game
@@ -1478,14 +1504,21 @@ DC_LoaTS_Helper.handleMoveChatTimestamps = function(move) {
 };
 
 DC_LoaTS_Helper.handleHideWorldChat = function(hide) {
-  var el = document.getElementById("maingame"),
+  var el   = document.getElementById("maingame"),
+    button = document.getElementById("DC_LoaTS_raidToolbarContainer").getElementsByClassName("DC_LoaTS_reloadWCButton").item(0),	
     hidden = el.className.indexOf("hideWorldChat") > -1;
 
   if (hide && !hidden) {
     el.className += " hideWorldChat";
+	if (button) 
+		button.style.display = "none";
+	DC_LoaTS_Helper.dispatchMsg("hide", "chat");
   }
   else if (!hide && hidden) {
-    el.className = el.className.replace("hideWorldChat", "");
+    el.className = el.className.replace(" hideWorldChat", "");
+	if (button) 
+		button.style.display = "";
+	DC_LoaTS_Helper.dispatchMsg("show", "chat");
   }
 };
 

@@ -44,8 +44,8 @@
 				// Show the raid toolbar
 				RaidToolbar.show();
 
-		// Hide the game (or not)
-		DC_LoaTS_Helper.handleHideWorldChat(DC_LoaTS_Helper.getPref("HideWorldChat", false));
+		// Hide the game (or not) -- but delay execution until gameiframe exists ~5 seconds
+		window.setTimeout(function(){DC_LoaTS_Helper.handleHideWorldChat(DC_LoaTS_Helper.getPref("HideWorldChat", false));}, 5000);
 
 		// Move the chat timestamps (or not)
 		DC_LoaTS_Helper.handleMoveChatTimestamps(DC_LoaTS_Helper.getPref("ChatTimestampRight", false));

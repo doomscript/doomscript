@@ -422,10 +422,12 @@ if (!/https?:\/\/www\.kongregate\.com\/games\/5thPlanetGames\/legacy-of-a-thousa
  Added /mutelist command for showing all muted users
  Moved to using external news site
  Migrated to GitHub script hosting
+ Separated Game refresh from World Chat refresh, added World Chat reload button above the chat pane
+ Changed Hide World Chat to unload the chat flash object
+ Fixed missing raid icons for raids added since 1.1.35
  TODO: Move to using external datasource for raids
  TODO: Use PegJS generated raid parsing filter
  TODO: BUG: Links sometime seem to include an extra space at the end
- TODO: Separate Game refresh from World Chat refresh
  TODO: Better /lrm docs
  TODO: Hide previous text from people upon mute
  TODO: /wr command
