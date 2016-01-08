@@ -970,27 +970,31 @@ else if (/50\.18\.1[89]\d\.\d{2,3}/i.test(window.location.host)) {
 
 			if (swf !== null)
 			{
-				var url = swf.getAttribute("data");					
-				if(data.command == "reload")
-				{			
-					swf.style.visibility = null;
-					swf.setAttribute("data", url);
-					swf.style.visibility = "visible";
+				var url = swf.getAttribute("data");
+				if(data.command == "reload" || data.command == "show")
+				{
+					if (data.command == "show") 
+					{
+						url = GM_getValue("DC_LoaTS_chatURL", "https://5thplanetlots.insnw.net/dotd_live/chat/812/chatclient.swf");
+						if (data.param == "game")
+							url = GM_getValue("DC_LoaTS_gameURL", "https://5thplanetlots.insnw.net/lots_live/swf/8107/lots.swf");
+					}
+					swf.style.display = "none";
+					window.setTimeout(function()
+					{
+						swf.setAttribute("data", url);
+						swf.style.display = "";
+					}, 500);
 				}
 				else if(data.command == "hide")
 				{
 					GM_setValue("DC_LoaTS_"+data.param+"URL", url);
-					swf.style.visibility = null;
-					swf.setAttribute("data", "");
-				}
-				else if(data.command == "show")
-				{
-					var url = GM_getValue("DC_LoaTS_chatURL", "https://5thplanetlots.insnw.net/dotd_live/chat/812/chatclient.swf");
-					if (data.param == "game")
-						url = GM_getValue("DC_LoaTS_gameURL", "https://5thplanetlots.insnw.net/lots_live/swf/8107/lots.swf");
-					swf.style.visibility = null;
-					swf.setAttribute("data", url);
-					swf.style.visibility = "visible";
+					swf.style.display = "none";
+					window.setTimeout(function()
+					{
+						swf.setAttribute("data", "");
+						swf.style.display = "";
+					}, 500);
 				}
 				data.retCode = true;
 			}
