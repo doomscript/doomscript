@@ -350,6 +350,18 @@ function defineStyles()
     "\na.DC_LoaTS_reloadButton {",
     "\tbackground-position: -160px -64px;",
     "}",
+
+    "\na.DC_LoaTS_toggleGameButton {",
+    "\tbackground-position: 0 -176px;",
+    "}",
+
+	"\nli.DC_LoaTS_toggleWorldChatButtonWrapper {",
+    "\tfloat: right !important;",
+    "}",
+	
+    "\na.DC_LoaTS_toggleWorldChatButton {",
+    "\tbackground-position: -128px -96px;",
+    "}",
 	
 	"\na.DC_LoaTS_reloadWCButton {",
     "\tbackground-position: -160px -64px;",
@@ -357,14 +369,6 @@ function defineStyles()
 
 	"\nli.DC_LoaTS_reloadWCButtonWrapper {",
     "\tfloat: right !important;",
-    "}",
-
-    "\na.DC_LoaTS_toggleGameButton {",
-    "\tbackground-position: 0 -176px;",
-    "}",
-
-    "\na.DC_LoaTS_toggleWorldChatButton {",
-    "\tbackground-position: -128px -96px;",
     "}",
 
     "\na.DC_LoaTS_WRButton {",

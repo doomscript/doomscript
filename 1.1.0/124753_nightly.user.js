@@ -4732,6 +4732,7 @@ RaidCommand.create = function(classObject)
 					
 					//TODO: Should break these out like the commands?
 					this.buttons = {
+						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload),
 						toggleMenu: new RaidButton("toggleMenu", "DC_LoaTS_menuButton", 
 							function(event)
 							{
@@ -4748,13 +4749,11 @@ RaidCommand.create = function(classObject)
 									window.raidMenu.container.style.left = Event.pointerX(event) - scrollOffsets.left + "px";
 									window.raidMenu.container.style.top = Event.pointerY(event) - scrollOffsets.top + 20 + "px";
 								}
-
 							}
 						),
-						reload: new RaidButton("reload", "DC_LoaTS_reloadButton", DC_LoaTS_Helper.reload),
-                        toggleGame: new RaidButton("toggleGame", "DC_LoaTS_toggleGameButton", DC_LoaTS_Helper.toggleGame, "Show / Hide the game"),
-                        toggleWorldChat: new RaidButton("toggleWorldChat", "DC_LoaTS_toggleWorldChatButton", DC_LoaTS_Helper.toggleWorldChat, "Show / Hide World Chat"),
-						reloadWorldChat: new RaidButton("reloadWC", "DC_LoaTS_reloadWCButton", DC_LoaTS_Helper.reload)
+						toggleGame: new RaidButton("toggleGame", "DC_LoaTS_toggleGameButton", DC_LoaTS_Helper.toggleGame, "Show / Hide the game"),
+						reloadWorldChat: new RaidButton("reloadWC", "DC_LoaTS_reloadWCButton", DC_LoaTS_Helper.reload),
+						toggleWorldChat: new RaidButton("toggleWorldChat", "DC_LoaTS_toggleWorldChatButton", DC_LoaTS_Helper.toggleWorldChat, "Show / Hide World Chat")
 					};
 					for (var buttonName in this.buttons)
 					{
@@ -12188,6 +12187,18 @@ function defineStyles()
     "\na.DC_LoaTS_reloadButton {",
     "\tbackground-position: -160px -64px;",
     "}",
+
+    "\na.DC_LoaTS_toggleGameButton {",
+    "\tbackground-position: 0 -176px;",
+    "}",
+
+	"\nli.DC_LoaTS_toggleWorldChatButtonWrapper {",
+    "\tfloat: right !important;",
+    "}",
+	
+    "\na.DC_LoaTS_toggleWorldChatButton {",
+    "\tbackground-position: -128px -96px;",
+    "}",
 	
 	"\na.DC_LoaTS_reloadWCButton {",
     "\tbackground-position: -160px -64px;",
@@ -12195,14 +12206,6 @@ function defineStyles()
 
 	"\nli.DC_LoaTS_reloadWCButtonWrapper {",
     "\tfloat: right !important;",
-    "}",
-
-    "\na.DC_LoaTS_toggleGameButton {",
-    "\tbackground-position: 0 -176px;",
-    "}",
-
-    "\na.DC_LoaTS_toggleWorldChatButton {",
-    "\tbackground-position: -128px -96px;",
     "}",
 
     "\na.DC_LoaTS_WRButton {",
